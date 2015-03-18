@@ -29,7 +29,7 @@ public interface ServiceConfig extends Config {
     @Key("services.topics.register")
     String topicsRegister();
     
-    @DefaultValue("http://localhost:3030/ds/upload")
+    @DefaultValue("http://localhost:3030/ds/data")
     @Key("services.devicedirectory.store.url")
     String storeUrl();
     
