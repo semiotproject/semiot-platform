@@ -22,9 +22,6 @@ WORKDIR $FUSEKI_HOME
 RUN wget http://apache-mirror.rbc.ru/pub/apache/jena/binaries/apache-jena-fuseki-2.0.0.zip
 RUN unzip $FUSEKI_ARCHIVE_NAME.zip && rm $FUSEKI_ARCHIVE_NAME.zip
 RUN mv $FUSEKI_ARCHIVE_NAME/* . && rm -rf $FUSEKI_ARCHIVE_NAME
-RUN cp fuseki /etc/init.d/fuseki
-RUN chkconfig --add fuseki
-RUN chkconfig --level 2345 fuseki on
 
 WORKDIR /
 
@@ -37,4 +34,6 @@ RUN mvn clean install -DskipTests=true
 #Clean maven cache
 RUN rm -rf /root/.m2/repository
 
-CMD /etc/init.d/fuseki start && java -jar target/$SERVICE_JAR_NAME.jar
+ADD run.sh .
+
+CMD run.sh
