@@ -1,0 +1,18 @@
+deviceproxyservice:
+  image: semiot/device-proxy-service
+  links:
+    - wamprouter
+  ports:
+    - "3131:3131"
+
+devicedirectoryservice:
+  image: semiot/device-directory-service
+  links:
+    - wamprouter
+  ports:
+    - "3030:3030"
+
+wamprouter:
+  image: semiot/wamp-router
+  ports:
+    - "80:80"
