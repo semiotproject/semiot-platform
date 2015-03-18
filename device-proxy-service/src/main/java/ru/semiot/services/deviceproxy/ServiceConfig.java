@@ -2,6 +2,9 @@ package ru.semiot.services.deviceproxy;
 
 import org.aeonbits.owner.Config;
 
+@Config.Sources({
+    "file:/semiot-platform/device-proxy-service/config.properties"
+})
 public interface ServiceConfig extends Config {
 
     @DefaultValue("3131")

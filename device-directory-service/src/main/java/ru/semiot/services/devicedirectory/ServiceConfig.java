@@ -3,7 +3,11 @@ package ru.semiot.services.devicedirectory;
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.DefaultValue;
 import org.aeonbits.owner.Config.Key;
+import org.aeonbits.owner.Config.Sources;
 
+@Sources({
+    "file:/semiot-platform/device-directory-service/config.properties"
+})
 public interface ServiceConfig extends Config {
 
     @DefaultValue("ws://localhost/ws")
