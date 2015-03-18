@@ -30,6 +30,7 @@ RUN mvn clean install -DskipTests=true
 #Clean maven cache
 RUN rm -rf /root/.m2/repository
 
-ADD run.sh .
+ADD run.sh ./
+RUN chmod 777 run.sh
 
-CMD run.sh
+CMD ./run.sh
