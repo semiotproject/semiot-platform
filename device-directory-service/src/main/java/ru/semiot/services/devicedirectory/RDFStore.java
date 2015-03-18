@@ -10,12 +10,12 @@ import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 
 public class RDFStore {
 
-    private static final RDFStore INSTANCE = new RDFStore();
     private static final String PREFIXES = ""
                 + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
                 + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
     private static final ServiceConfig config = ConfigFactory.create(
             ServiceConfig.class);
+    private static final RDFStore INSTANCE = new RDFStore();
     private final HttpAuthenticator httpAuthenticator;
 
     private RDFStore() {

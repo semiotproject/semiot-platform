@@ -7,7 +7,7 @@ import org.aeonbits.owner.Config.LoadPolicy;
 import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
 
-@LoadPolicy(LoadType.MERGE)
+@LoadPolicy(LoadType.FIRST)
 @Sources({
     "file:/semiot-platform/device-directory-service/config.properties"
 })

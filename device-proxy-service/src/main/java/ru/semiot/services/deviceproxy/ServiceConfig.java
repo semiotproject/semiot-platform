@@ -2,7 +2,7 @@ package ru.semiot.services.deviceproxy;
 
 import org.aeonbits.owner.Config;
 
-@Config.LoadPolicy(Config.LoadType.MERGE)
+@Config.LoadPolicy(Config.LoadType.FIRST)
 @Config.Sources({
     "file:/semiot-platform/device-proxy-service/config.properties"
 })
@@ -13,15 +13,15 @@ public interface ServiceConfig extends Config {
     int port();
 
     @DefaultValue("ws://localhost/ws")
-    @Key("services.deviceproxy.wamp.uri")
+    @Key("services.wamp.uri")
     String wampUri();
     
     @DefaultValue("realm1")
-    @Key("services.deviceproxy.wamp.realm")
+    @Key("services.wamp.realm")
     String wampRealm();
     
     @DefaultValue("15") //seconds
-    @Key("services.deviceproxy.wamp.reconnect")
+    @Key("services.wamp.reconnect")
     int wampReconnectInterval();
     
     @DefaultValue("ru.semiot.devices.register")
