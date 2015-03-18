@@ -3,8 +3,11 @@ package ru.semiot.services.devicedirectory;
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.DefaultValue;
 import org.aeonbits.owner.Config.Key;
+import org.aeonbits.owner.Config.LoadPolicy;
+import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
 
+@LoadPolicy(LoadType.MERGE)
 @Sources({
     "file:/semiot-platform/device-directory-service/config.properties"
 })

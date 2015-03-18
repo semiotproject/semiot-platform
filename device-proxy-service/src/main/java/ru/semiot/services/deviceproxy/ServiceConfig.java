@@ -2,6 +2,7 @@ package ru.semiot.services.deviceproxy;
 
 import org.aeonbits.owner.Config;
 
+@Config.LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
     "file:/semiot-platform/device-proxy-service/config.properties"
 })
