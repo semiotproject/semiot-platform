@@ -1,5 +1,6 @@
 package ru.semiot.services.deviceproxy;
 
+import java.io.IOException;
 import org.aeonbits.owner.ConfigFactory;
 import org.msgpack.core.example.MessagePackExample;
 import org.slf4j.Logger;
@@ -9,8 +10,8 @@ public class Launcher {
 
     private static final Logger logger
             = LoggerFactory.getLogger(Launcher.class);
-    private static final ServiceConfig config = 
-            ConfigFactory.create(ServiceConfig.class);
+    private static final ServiceConfig config
+            = ConfigFactory.create(ServiceConfig.class);
 
     public static final void main(String[] args) {
         Launcher launcher = new Launcher();
@@ -20,9 +21,9 @@ public class Launcher {
     private void run() {
         try (CoAPInterface coap = new CoAPInterface()) {
             coap.start();
-            
+
             WAMPClient.getInstance().init();
-            
+
             synchronized (this) {
                 while (!Thread.interrupted()) {
                     logger.info("Press Ctrl+C to stop");
@@ -32,7 +33,11 @@ public class Launcher {
         } catch (Exception ex) {
             logger.info(ex.getMessage(), ex);
         } finally {
-            
+            try {
+                WAMPClient.getInstance().close();
+            } catch (IOException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
     }
 

@@ -21,6 +21,6 @@ public interface ServiceConfig extends Config {
     int wampReconnectInterval();
     
     @DefaultValue("ru.semiot.devices.register")
-    @Key("services.deviceproxy.topics.register")
+    @Key("services.topics.register")
     String topicsRegister();
 }

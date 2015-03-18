@@ -24,14 +24,8 @@ public class RegisterResource extends CoapResource {
     @Override
     public void handlePOST(CoapExchange exchange) {
         final String description = exchange.getRequestText();
-        wampClient.publish(config.topicsRegister(), description).subscribe(
-                id -> {
-                    exchange.respond(CoAP.ResponseCode.CREATED);
-                }, (Throwable error) -> {
-                    logger.warn(error.getMessage(), error);
-                    exchange.respond(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
-                }
-        );
+        wampClient.publish(config.topicsRegister(), description);
+        exchange.respond(CoAP.ResponseCode.CREATED);
     }
 
     @Override
