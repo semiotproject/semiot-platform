@@ -9,8 +9,8 @@ RUN yum upgrade -y && yum clean all
 RUN yum install -y java-1.8.0-openjdk-devel maven git && yum clean all
 
 #Remove Java 7 which is a dependency for maven package
-RUN rpm -e --nodeps java-1.7.0-openjdk
-RUN rpm -e --nodeps java-1.7.0-openjdk-headless
+#RUN rpm -e --nodeps java-1.7.0-openjdk
+#RUN rpm -e --nodeps java-1.7.0-openjdk-headless
 
 RUN git clone https://github.com/semiotproject/semiot-platform.git
 
