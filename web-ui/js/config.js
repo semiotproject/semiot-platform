@@ -12,7 +12,7 @@ var CONFIG = (function() {
 		SPARQL: {
 			types: {
 				heat: "http://purl.org/NET/ssnext/heatmeters#HeatMeter",
-				electric: "<http://purl.org/NET/ssnext/electricmeters#ElectricMeter>"
+				electric: "http://purl.org/NET/ssnext/electricmeters#ElectricMeter"
 			}
 		}
 	};

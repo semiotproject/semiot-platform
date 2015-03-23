@@ -6,7 +6,7 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 		return [
 			"SELECT ?meter",
 			"WHERE {",
-			"	?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> " + type,
+			"	?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + type + "> .",
 			"}"
 		].join('\n');
 	};
@@ -64,14 +64,29 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 
 	// SPARQL Endpoint support
 	instance.getHeatMeters = function() {
-		return $http.post(CONFIG.URLS.tripleStore, constructSelectQuery(CONFIG.SPARQL.types.heat)).success(function(data) {
-			instance.meters.heat = data;
+		debugger;
+		var config = {
+			params: {
+				query: constructSelectQuery(CONFIG.SPARQL.types.heat)
+			},
+			headers: { Accept: "application/sparql-results+json" }
+		};
+		return $http.get(CONFIG.URLS.tripleStore, config).success(function(data) {
+			instance.meters.heat = data.results.bindings.map(function(binding) {
+				return {
+					uri: binding.meter.value
+				};
+			});
 			instance.trigger("heatMetersUpdate", instance.meters.heat);	
         });
 	};
 	instance.getElectricMeters = function() {
 		return $http.post(CONFIG.URLS.tripleStore, constructSelectQuery(CONFIG.SPARQL.types.electric)).success(function(data) {
-			instance.meters.electric = data;
+			instance.meters.electric = data.results.bindings.map(function(binding) {
+				return {
+					uri: binding.meter.value
+				};
+			});
 			instance.trigger("electricMetersUpdate", instance.meters.electric);	
         });
 	};
