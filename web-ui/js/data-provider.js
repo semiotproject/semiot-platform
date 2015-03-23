@@ -2,21 +2,18 @@ var myModule = angular.module('dataProvider', ['utils']);
 myModule.factory('dataProvider', function($q, $http, utils) {		
 
 	// helpers
-	var constructSelectQuery = function(type) {
+	var constructSelectQuery = function(types) {
+		var _types = types.map(function(type) {
+			return "{ ?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + type + "> }";
+		}).join(" UNION ");
+
 		return [
-			"SELECT ?meter",
+			"SELECT ?meter ?type",
 			"WHERE {",
-			"	?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + type + "> .",
+				_types,
+				"?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type",
 			"}"
 		].join('\n');
-	};
-	var sparqlToHumanType = function(type) {
-		for (var key in CONFIG.SPARQL.types) {
-			if (CONFIG.SPARQL.types[key] === type) {
-				return key;
-			}
-		}
-		return null;
 	};
 
 	// Event Emitter Pattern support
@@ -57,12 +54,10 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 	};
 
 	// data storage
-	instance.meters = {
-		heat: [],
-		electric: []
-	};
+	instance.meters = [];
 
 	// SPARQL Endpoint support
+	/*
 	instance.getHeatMeters = function() {
 		var config = {
 			params: {
@@ -95,18 +90,39 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 			instance.trigger("electricMetersUpdate", instance.meters.electric);	
         });
 	};
+	*/
+	instance.getMeters = function() {
+		var config = {
+			params: {
+				query: constructSelectQuery([
+					CONFIG.SPARQL.types.heat,
+					CONFIG.SPARQL.types.electric
+				])
+			},
+			headers: { Accept: "application/sparql-results+json" }
+		};
+		return $http.get(CONFIG.URLS.tripleStore, config).success(function(data) {
+			instance.meters = data.results.bindings.map(function(binding) {
+				return {
+					uri: binding.meter.value,
+					type: utils.sparqlToHumanType(binding.type.value)
+				};
+			});
+			instance.trigger("metersUpdate", instance.meters);	
+        });
+	};
 
 	// WAMP support
 	instance.onMessage = function(args) {
 		utils.parse(args[0]).then(function(result) {
 			var type = sparqlToHumanType(result.object);
 			if (type) {
-				instance.meters[type].push({
+				instance.meters.push({
 					uri: result.subject
 				});	
-				instance.trigger(type + "MetersUpdate", instance.meters[type]);			
+				instance.trigger("metersUpdate", instance.meters);			
 			} else {
-				console.warn("Unknown sensor type: ", type);
+				console.warn("Unknown sensor type: ", result.object);
 			}
 		});
     };

@@ -13,6 +13,14 @@ myModule.factory('utils', function($q) {
 			});	
 
 			return deferred.promise;
+		},
+	    sparqlToHumanType: function(type) {
+			for (var key in CONFIG.SPARQL.types) {
+				if (CONFIG.SPARQL.types[key] === type) {
+					return key;
+				}
+			}
+			return null;
 		}
 	};
 

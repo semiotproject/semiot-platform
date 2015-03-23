@@ -1,7 +1,7 @@
 (function() {
 	'use strict';
 
-	var app = angular.module('semiotApp', ['utils', 'dataProvider']);
+	var app = angular.module('semiotApp', ['utils', 'dataProvider', 'utils']);
 
 	app.controller('AppCtrl', function($scope) {
 		$scope.tabs = [
@@ -21,17 +21,28 @@
 		};
 	});
 
-	app.controller('HeatCtrl', function($scope, dataProvider) {
-		$scope.title = "Heat Meters";
+	app.controller('MeterCtrl', function($scope, dataProvider, utils) {
 		$scope.meters = [];
+		$scope.search = {			
+			types: CONFIG.SPARQL.types,
+			type: "",
+			uri: ""
+		};
 
-		dataProvider.on('heatMetersUpdate', function(data) {
+		$scope.filterFunction = function(element) {
+			return (!$scope.search.type || element.type == $scope.search.type) &&
+					(!$scope.search.uri || element.uri.indexOf($scope.search.uri) > -1);
+		};
+
+		dataProvider.on('metersUpdate', function(data) {
 			$scope.meters = data;
-		});
+		});	
         
-         dataProvider.getHeatMeters();
-	});
+        dataProvider.getMeters();
 
+        $scope.convertType = utils.sparqlToHumanType;
+	});
+/*
 	app.controller('ElectricCtrl', function($scope, dataProvider) {
 		$scope.title = "Electric Meters";
 		$scope.meters = [];
@@ -42,5 +53,5 @@
         
                dataProvider.getElectricMeters();
 	});
-
+*/
 }()); 

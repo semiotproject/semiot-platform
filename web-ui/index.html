@@ -10,6 +10,7 @@
 </head>
 <body>
 	<div class="container" ng-controller="AppCtrl">
+		<!--
 		<nav class="navbar navbar-default">
 			<div class="container-fluid">
 				<div class="navbar-header">
@@ -19,53 +20,45 @@
 							<a href="#">{{ tab.title }}</a>
 						</li>
 					</ul>
-				</div><!--/.nav-collapse -->
-			</div><!--/.container-fluid -->
-		</nav>		
-		<section ng-controller="HeatCtrl" data-section="heat-section" ng-show="activeTab === 'Heat'">
-			<h4>{{ title }}</h4>
+				</div>
+			</div>/.container-fluid 
+		</nav>		-->
+		<h2>SemIoT Platform</h2>
+		<section ng-controller="MeterCtrl">
+			<h4>Registered meters ({{ meters.length }})</h4>
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th>id</th>
-							<th>URI</th>
+							<th>
+								<label>№</label>
+							</th>
+							<th>
+								<select class="form-control" ng-model="search.type">
+									<option value="">Type</option>
+									<option ng-repeat="type in search.types" value="{{ convertType(type) }}">{{ convertType(type) }}</option>
+								</select>
+							</th>							
+							<th>
+								<input type=text ng-model="search.uri" class="form-control" placeholder="URI"/>
+							</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr ng-show="meters.length === 0">
 							<td>No meters registered</td>
+							<td></td>
+							<td></td>
 						</tr>
-						<tr ng-repeat="meter in meters">
+						<tr ng-repeat="meter in meters | filter: filterFunction | orderBy: 'uri'">
 							<td>{{ $index + 1 }}</td>
+							<td>{{ meter.type }}</td>
 							<td><a href="{{ meter.uri }}">{{ meter.uri }}</a></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
-		</section>
-		<section ng-controller="ElectricCtrl" data-section="electric-section"  ng-show="activeTab === 'Electric'">
-			<h4>{{ title }}</h4>
-			<div class="table-responsive">
-				<table class="table table-striped">
-					<thead>
-						<tr>
-							<th>id</th>
-							<th>URI</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-show="meters.length === 0">
-							<td>No meters registered</td>
-						</tr>
-						<tr ng-repeat="meter in meters">
-							<td>{{ $index + 1 }}</td>
-							<td><a href="{{ meter.uri }}">{{ meter.uri }}</a></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</section>
+		</section>		
 	</div>
 </body>
 <script src="js/lib/autobahn.min.jgz"></script>
