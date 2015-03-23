@@ -115,7 +115,7 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 	// WAMP support
 	instance.onMessage = function(args) {
 		utils.parse(args[0]).then(function(result) {
-			var type = sparqlToHumanType(result.object);
+			var type = utils.sparqlToHumanType(result.object);
 			if (type) {
 				instance.meters.push({
 					uri: result.subject
