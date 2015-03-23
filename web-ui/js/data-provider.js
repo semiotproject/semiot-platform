@@ -64,7 +64,6 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 
 	// SPARQL Endpoint support
 	instance.getHeatMeters = function() {
-		debugger;
 		var config = {
 			params: {
 				query: constructSelectQuery(CONFIG.SPARQL.types.heat)
@@ -81,7 +80,13 @@ myModule.factory('dataProvider', function($q, $http, utils) {
         });
 	};
 	instance.getElectricMeters = function() {
-		return $http.post(CONFIG.URLS.tripleStore, constructSelectQuery(CONFIG.SPARQL.types.electric)).success(function(data) {
+		var config = {
+			params: {
+				query: constructSelectQuery(CONFIG.SPARQL.types.electric)
+			},
+			headers: { Accept: "application/sparql-results+json" }
+		};
+		return $http.get(CONFIG.URLS.tripleStore, config).success(function(data) {
 			instance.meters.electric = data.results.bindings.map(function(binding) {
 				return {
 					uri: binding.meter.value
