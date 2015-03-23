@@ -29,7 +29,11 @@ public interface ServiceConfig extends Config {
     @Key("services.topics.register")
     String topicsRegister();
     
-    @DefaultValue("http://localhost:3030/ds/data")
+    @DefaultValue("ru.semiot.devices.new")
+    @Key("services.topics.newdevice")
+    String topicsNewDevice();
+    
+    @DefaultValue("http://machine3-ailab.tk:3030/ds/data")
     @Key("services.devicedirectory.store.url")
     String storeUrl();
     
