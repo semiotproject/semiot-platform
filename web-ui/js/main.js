@@ -29,7 +29,7 @@
 			$scope.meters = data;
 		});
         
-        // dataProvider.getHeatMeters();
+                dataProvider.getHeatMeters();
 	});
 
 	app.controller('ElectricCtrl', function($scope, dataProvider) {
