@@ -40,7 +40,7 @@
 			$scope.meters = data;
 		});
         
-        // dataProvider.getElectricMeters();
+               dataProvider.getElectricMeters();
 	});
 
 }()); 
