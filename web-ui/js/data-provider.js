@@ -118,7 +118,8 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 			var type = utils.sparqlToHumanType(result.object);
 			if (type) {
 				instance.meters.push({
-					uri: result.subject
+					uri: result.subject,
+					type: type
 				});	
 				instance.trigger("metersUpdate", instance.meters);			
 			} else {
