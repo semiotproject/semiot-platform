@@ -2,9 +2,9 @@ package ru.semiot.services.deviceproxy;
 
 import java.io.IOException;
 import org.aeonbits.owner.ConfigFactory;
-import org.msgpack.core.example.MessagePackExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ws.wamp.jawampa.WampClient;
 
 public class Launcher {
 
@@ -22,8 +22,17 @@ public class Launcher {
         try (CoAPInterface coap = new CoAPInterface()) {
             coap.start();
 
-            WAMPClient.getInstance().init();
-
+            WAMPClient.getInstance().init().subscribe(
+                    (WampClient.Status newStatus) -> {
+                        if (newStatus == WampClient.Status.Connected) {
+                            logger.info("Connected to {}", config.wampUri());
+                        } else if (newStatus == WampClient.Status.Disconnected) {
+                            logger.info("Disconnected from {}", config.wampUri());
+                        } else if (newStatus == WampClient.Status.Connecting) {
+                            logger.debug("Connecting to {}", config.wampUri());
+                        }
+                    });
+            
             synchronized (this) {
                 while (!Thread.interrupted()) {
                     logger.info("Press Ctrl+C to stop");

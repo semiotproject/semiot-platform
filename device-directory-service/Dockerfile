@@ -19,6 +19,7 @@ RUN wget http://apache-mirror.rbc.ru/pub/apache/jena/binaries/apache-jena-fuseki
 RUN unzip $FUSEKI_ARCHIVE_NAME.zip && rm $FUSEKI_ARCHIVE_NAME.zip
 RUN mv $FUSEKI_ARCHIVE_NAME/* . && rm -rf $FUSEKI_ARCHIVE_NAME
 ADD shiro.ini $FUSEKI_BASE/
+ADD config.ttl $FUSEKI_BASE/
 
 WORKDIR /
 

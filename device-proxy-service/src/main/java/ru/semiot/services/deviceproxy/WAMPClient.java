@@ -27,7 +27,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
         return INSTANCE;
     }
 
-    public void init() throws ApplicationError {
+    public Observable<WampClient.Status> init() throws ApplicationError {
         WampClientBuilder builder = new WampClientBuilder();
         builder.withUri(config.wampUri())
                 .withRealm(config.wampRealm())
@@ -35,20 +35,16 @@ public class WAMPClient implements Closeable, AutoCloseable {
                 .withReconnectInterval(
                         config.wampReconnectInterval(), TimeUnit.SECONDS);
         client = builder.build();
-        client.statusChanged().subscribe((WampClient.Status newStatus) -> {
-            if (newStatus == WampClient.Status.Connected) {
-                logger.info("Connected to {}", config.wampUri());
-            } else if (newStatus == WampClient.Status.Disconnected) {
-                logger.info("Disconnected from {}", config.wampUri());
-            } else if (newStatus == WampClient.Status.Connecting) {
-                logger.debug("Connecting to {}", config.wampUri());
-            }
-        });
         client.open();
+        return client.statusChanged();
     }
 
     public Observable<Long> publish(String topic, String message) {
         return client.publish(topic, message);
+    }
+    
+    public Observable<String> subscribe(String topic) {
+        return client.makeSubscription(topic, String.class);
     }
 
     @Override

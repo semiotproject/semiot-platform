@@ -27,4 +27,8 @@ public interface ServiceConfig extends Config {
     @DefaultValue("ru.semiot.devices.register")
     @Key("services.topics.register")
     String topicsRegister();
+    
+    @DefaultValue("ru.semiot.devices.new")
+    @Key("services.topics.newdevice")
+    String topicsNewDevice();
 }

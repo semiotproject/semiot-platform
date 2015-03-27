@@ -1,0 +1,40 @@
+# Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+@prefix :        <#> .
+@prefix fuseki:  <http://jena.apache.org/fuseki#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ja:      <http://jena.hpl.hp.com/2005/11/Assembler#> .
+
+[] a fuseki:Server ;
+    fuseki:services ( <#service1> ) ;
+    .
+
+<#service1> a fuseki:Service ;
+    fuseki:name                         "ds" ;
+    fuseki:serviceQuery                 "sparql" ;
+    fuseki:serviceQuery                 "query" ;
+    fuseki:serviceUpdate                "update" ;
+    fuseki:serviceUpload                "upload" ;
+    fuseki:serviceReadWriteGraphStore   "data" ;
+    fuseki:serviceReadGraphStore        "get" ;
+    fuseki:dataset                      <#dataset> ;
+    .
+
+<#dataset> a ja:RDFDataset ;
+    ja:defaultGraph <#model_inf> ;
+    .
+
+<#model_inf> a ja:InfModel ;
+    ja:baseModel [
+        a ja:MemoryModel ;
+        ja:content [
+            ja:externalContent <http://purl.oclc.org/NET/ssnx/ssn#> ;
+            ja:externalContent <http://purl.org/NET/ssnext/electricmeters#> ;
+            ja:externalContent <http://purl.org/NET/ssnext/heatmeters#> ;
+        ];
+    ];
+    ja:reasoner [
+        ja:reasonerURL <http://jena.hpl.hp.com/2003/RDFSExptRuleReasoner> ;
+    ];
+    .
