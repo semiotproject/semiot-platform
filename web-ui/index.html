@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html ng-app="semiotApp">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SemIoT</title>
+	<link rel="stylesheet" href="">
+	<link rel="stylesheet" type="text/css" href="css/lib/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+	<div class="container" ng-controller="AppCtrl">
+		<!--
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="http://semiot.ru">SemIoT</a>
+					<ul class="nav navbar-nav">
+						<li ng-repeat="tab in tabs" ng-class="tab.title == activeTab ? 'active' : ''" ng-click="toggleTabs(tab.title)">
+							<a href="#">{{ tab.title }}</a>
+						</li>
+					</ul>
+				</div>
+			</div>/.container-fluid 
+		</nav>		-->
+		<h2>SemIoT Platform</h2>
+		<section ng-controller="MeterCtrl">
+			<h4>Registered meters ({{ meters.length }})</h4>
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>
+								<label>№</label>
+							</th>
+							<th>
+								<select class="form-control" ng-model="search.type">
+									<option value="">Type</option>
+									<option ng-repeat="type in search.types" value="{{ convertType(type) }}">{{ convertType(type) }}</option>
+								</select>
+							</th>							
+							<th>
+								<input type=text ng-model="search.uri" class="form-control" placeholder="URI"/>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-show="meters.length === 0">
+							<td>No meters registered</td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr ng-repeat="meter in meters | filter: filterFunction | orderBy: 'uri'">
+							<td>{{ $index + 1 }}</td>
+							<td>{{ meter.type }}</td>
+							<td><a href="{{ meter.uri }}">{{ meter.uri }}</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>		
+	</div>
+</body>
+<script src="js/lib/autobahn.min.jgz"></script>
+<script src="js/lib/n3-browser.min.js"></script>
+<script src="js/lib/angular.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data-provider.js"></script>
+<script src="js/main.js"></script>
+</html>

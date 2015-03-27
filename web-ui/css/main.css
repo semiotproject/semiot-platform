@@ -1,0 +1,31 @@
+.container {
+	margin-top: 40px;
+}
+
+.table thead>tr>th {
+	  padding: 5px 5px 5px 0;
+}
+
+.table thead>tr>th:first-child {
+	  padding: 8px;
+}
+
+.table thead>tr>th input {
+	  padding: 0 10px;
+}
+.table thead>tr>th select {
+	  padding: 0 2px;
+}
+
+.table-responsive {
+	border: 1px solid rgba(181, 181, 181, 0.44);
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.table {
+	margin-bottom: 0;
+}
+
+thead {
+	background-color: rgba(231, 231, 231, 0.45);
+}
