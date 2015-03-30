@@ -39,4 +39,8 @@ public interface ServiceConfig extends Config {
     @DefaultValue("ru.semiot.devices.newAndObserving")
     @Key("services.topics.newAndObserving")
     String topicsNewAndObserving();
+    
+    @DefaultValue("${services.wamp.uri}?topic=%s")
+    @Key("services.mappingToWAMP")
+    String mappingToWAMP(final String topic);
 }

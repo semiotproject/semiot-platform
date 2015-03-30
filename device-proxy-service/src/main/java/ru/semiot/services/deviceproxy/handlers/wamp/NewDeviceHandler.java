@@ -1,20 +1,29 @@
 package ru.semiot.services.deviceproxy.handlers.wamp;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.InfModel;
 import ru.semiot.services.deviceproxy.handlers.coap.NewObservationHandler;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.util.FileManager;
+import java.io.IOException;
 import java.io.StringReader;
-import java.util.Set;
 import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.riot.RiotException;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapObserveRelation;
-import org.eclipse.californium.core.WebLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.semiot.commons.namespaces.RDF;
+import ru.semiot.semiot.commons.namespaces.EMTR;
+import ru.semiot.semiot.commons.namespaces.HMTR;
+import ru.semiot.semiot.commons.namespaces.SSN;
 import ru.semiot.services.deviceproxy.ServiceConfig;
 import ru.semiot.services.deviceproxy.WAMPClient;
 import rx.Observer;
@@ -24,12 +33,27 @@ public class NewDeviceHandler implements Observer<String> {
     private static final Logger logger = LoggerFactory.getLogger(NewDeviceHandler.class);
     private static final ServiceConfig config = ConfigFactory.create(
             ServiceConfig.class);
+    private static final String queryFile = 
+            "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
+    private static final String VAR_COAP = "coap";
+    private static final String VAR_WAMP = "wamp";
     private final WAMPClient wampClient = WAMPClient.getInstance();
-    /**
-     * Query finds a path with attributes <code>if=sensor</code> and
-     * <code>obs</code>.
-     */
-    private static final String QUERY = "if=sensor&obs";
+    private final Model schema;
+    private final Query query;
+
+    public NewDeviceHandler() {
+        this.schema = FileManager.get().loadModel(SSN.URI);
+        this.schema.add(FileManager.get().loadModel(HMTR.URI));
+        this.schema.add(FileManager.get().loadModel(EMTR.URI));
+
+        try {
+            this.query = QueryFactory.create(IOUtils.toString(
+                    this.getClass().getResourceAsStream(queryFile)));
+        } catch (IOException ex) {
+            logger.debug(ex.getMessage(), ex);
+            throw new IllegalArgumentException(ex);
+        }
+    }
 
     @Override
     public void onCompleted() {
@@ -42,34 +66,37 @@ public class NewDeviceHandler implements Observer<String> {
     }
 
     @Override
-    public void onNext(String message) {
+    public void onNext(final String message) {
         try {
             Model description = ModelFactory.createDefaultModel()
-                    .read(new StringReader(message), null,
+                    .read(IOUtils.toInputStream(message), null,
                             config.wampMessageFormat());
             if (!description.isEmpty()) {
-                //TODO: Filter by a class name, e.g. ssn:Sensor.
-                ResIterator iter = description.listResourcesWithProperty(RDF.type);
-                if (iter.hasNext()) {
-                    Resource resource = iter.nextResource();
+                InfModel infModel = ModelFactory.createRDFSModel(
+                        schema, description);
 
-                    CoapClient coapClient = new CoapClient(resource.getURI());
-                    Set<WebLink> links = coapClient.discover(QUERY);
+                try (QueryExecution qexec = QueryExecutionFactory.create(
+                        query, infModel)) {
+                    final ResultSet results = qexec.execSelect();
+                    while (results.hasNext()) {
+                        final QuerySolution soln = results.next();
+                        
+                        final Resource coap = soln.getResource(VAR_COAP);
+                        final Resource wamp = soln.getResource(VAR_WAMP);
 
-                    for (WebLink link : links) {
-                        final String uri = resource.getURI() + link.getURI();
-                        logger.debug("Subscribing to {}", uri);
+                        logger.debug("Mapping {} to {}", coap.getURI(), wamp.getURI());
+                        
+                        final NewObservationHandler handler = 
+                                new NewObservationHandler(getWampTopic(wamp.getURI()));
 
-                        final NewObservationHandler handler
-                                = new NewObservationHandler(uri);
-
-                        coapClient.setURI(uri);
-                        CoapObserveRelation rel = coapClient.observe(handler);
+                        final CoapClient coapClient = new CoapClient(coap.getURI());
+                        final CoapObserveRelation rel = coapClient.observe(handler);
+                        
                         //So the handler could cancel the subscription.
                         handler.setRelation(rel);
                     }
-                } else {
-                    logger.warn("Can't find a resource in\n{}", message);
+                    
+                    wampClient.publish(config.topicsNewAndObserving(), message);
                 }
             } else {
                 logger.warn("Received an empty message or in a wrong format!");
@@ -79,6 +106,10 @@ public class NewDeviceHandler implements Observer<String> {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
+    }
+    
+    private String getWampTopic(final String wampUri) {
+        return wampUri.split("\\?topic=")[1];
     }
 
 }
