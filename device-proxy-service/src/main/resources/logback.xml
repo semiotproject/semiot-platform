@@ -8,6 +8,7 @@
     
     <logger name="io.netty" level="INFO"/>
     <logger name="ws.wamp.jawampa" level="INFO"/>
+    <logger name="org.apache.jena" level="INFO"/>
 
     <root level="debug">
         <appender-ref ref="STDOUT" />

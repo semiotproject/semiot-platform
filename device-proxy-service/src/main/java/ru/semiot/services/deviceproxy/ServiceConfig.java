@@ -24,6 +24,10 @@ public interface ServiceConfig extends Config {
     @Key("services.wamp.reconnect")
     int wampReconnectInterval();
     
+    @DefaultValue("TURTLE")
+    @Key("services.wamp.message.format")
+    String wampMessageFormat();
+    
     @DefaultValue("ru.semiot.devices.register")
     @Key("services.topics.register")
     String topicsRegister();
@@ -31,4 +35,8 @@ public interface ServiceConfig extends Config {
     @DefaultValue("ru.semiot.devices.new")
     @Key("services.topics.newdevice")
     String topicsNewDevice();
+    
+    @DefaultValue("ru.semiot.devices.newAndObserving")
+    @Key("services.topics.newAndObserving")
+    String topicsNewAndObserving();
 }

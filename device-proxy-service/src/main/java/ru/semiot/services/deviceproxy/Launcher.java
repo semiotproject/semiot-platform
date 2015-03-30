@@ -1,5 +1,6 @@
 package ru.semiot.services.deviceproxy;
 
+import ru.semiot.services.deviceproxy.handlers.wamp.NewDeviceHandler;
 import java.io.IOException;
 import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
@@ -22,10 +23,13 @@ public class Launcher {
         try (CoAPInterface coap = new CoAPInterface()) {
             coap.start();
 
-            WAMPClient.getInstance().init().subscribe(
-                    (WampClient.Status newStatus) -> {
+            WAMPClient.getInstance().init().subscribe((WampClient.Status newStatus) -> {
                         if (newStatus == WampClient.Status.Connected) {
                             logger.info("Connected to {}", config.wampUri());
+                            
+                            WAMPClient.getInstance()
+                                    .subscribe(config.topicsNewDevice())
+                                    .subscribe(new NewDeviceHandler());
                         } else if (newStatus == WampClient.Status.Disconnected) {
                             logger.info("Disconnected from {}", config.wampUri());
                         } else if (newStatus == WampClient.Status.Connecting) {
