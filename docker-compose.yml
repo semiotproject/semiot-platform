@@ -19,3 +19,9 @@ wamprouter:
   ports:
     - "80:80"
   restart: always
+
+wamprouter:
+  image: semiot/web-ui
+  ports:
+    - "8080:80"
+  restart: always
