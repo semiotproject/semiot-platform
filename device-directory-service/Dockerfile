@@ -31,8 +31,8 @@ WORKDIR /semiot-platform/semiot-commons
 RUN mvn clean install -DskipTests=true
 
 
-WORKDIR /semiot-platform/$SERVICE_NAME && rm -rf /root/.m2/repository
-RUN mvn clean install -DskipTests=true
+WORKDIR /semiot-platform/$SERVICE_NAME
+RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
 
 ADD run.sh ./
 RUN chmod 777 run.sh
