@@ -3,6 +3,7 @@ FROM fedora
 ENV FUSEKI_ARCHIVE_NAME apache-jena-fuseki-2.0.0
 ENV FUSEKI_HOME /fuseki
 ENV FUSEKI_BASE /fuseki/base
+ENV SERVICE_NAME device-directory-service
 ENV SERVICE_JAR_NAME device-directory-service-1.0-SNAPSHOT-jar-with-dependencies
 
 WORKDIR /
@@ -26,11 +27,12 @@ WORKDIR /
 #Install Device Directory Service
 RUN git clone https://github.com/semiotproject/semiot-platform.git
 
-WORKDIR /semiot-platform/device-directory-service
-
+WORKDIR /semiot-platform/semiot-commons && RUN rm -rf /root/.m2/repository
 RUN mvn clean install -DskipTests=true
-#Clean maven cache
-RUN rm -rf /root/.m2/repository
+
+
+WORKDIR /semiot-platform/$SERVICE_NAME && RUN rm -rf /root/.m2/repository
+RUN mvn clean install -DskipTests=true
 
 ADD run.sh ./
 RUN chmod 777 run.sh
