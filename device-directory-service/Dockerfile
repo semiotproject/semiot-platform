@@ -27,11 +27,11 @@ WORKDIR /
 #Install Device Directory Service
 RUN git clone https://github.com/semiotproject/semiot-platform.git
 
-WORKDIR /semiot-platform/semiot-commons && RUN rm -rf /root/.m2/repository
+WORKDIR /semiot-platform/semiot-commons && rm -rf /root/.m2/repository
 RUN mvn clean install -DskipTests=true
 
 
-WORKDIR /semiot-platform/$SERVICE_NAME && RUN rm -rf /root/.m2/repository
+WORKDIR /semiot-platform/$SERVICE_NAME && rm -rf /root/.m2/repository
 RUN mvn clean install -DskipTests=true
 
 ADD run.sh ./

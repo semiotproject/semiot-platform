@@ -12,10 +12,10 @@ RUN git clone https://github.com/semiotproject/semiot-platform.git
 
 WORKDIR /semiot-platform/semiot-commons
 
-RUN mvn clean install -DskipTests=true && RUN rm -rf /root/.m2/repository
+RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
 
 WORKDIR /semiot-platform/$SERVICE_NAME
 
-RUN mvn clean install -DskipTests=true && RUN rm -rf /root/.m2/repository
+RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
 
 CMD java -jar target/$SERVICE_JAR_NAME.jar
