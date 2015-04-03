@@ -2,16 +2,24 @@ var myModule = angular.module('dataProvider', ['utils']);
 myModule.factory('dataProvider', function($q, $http, utils) {		
 
 	// helpers
-	var constructSelectQuery = function(types) {
-		var _types = types.map(function(type) {
-			return "{ ?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + type + "> }";
-		}).join(" UNION ");
+	var getPrefixes = function() {
+		var str = [];
+		for (var key in CONFIG.SPARQL.prefixes) {
+			str.push("PREFIX " + key + ": " + CONFIG.SPARQL.prefixes[key]);
+		}
+		return str.join('\n') + '\n';
+	};
 
-		return [
+	var constructSelectQuery = function(types) {
+		return getPrefixes() + [
 			"SELECT ?meter ?type",
 			"WHERE {",
-				_types,
-				"?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type",
+				"?meter a ssn:System ;",
+					"a ?type .",
+				"FILTER NOT EXISTS {",
+					"?subClass rdfs:subClassOf ?type .",
+					"FILTER (?subClass != ?type)",
+				"}",
 			"}"
 		].join('\n');
 	};
@@ -94,10 +102,7 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 	instance.getMeters = function() {
 		var config = {
 			params: {
-				query: constructSelectQuery([
-					CONFIG.SPARQL.types.heat,
-					CONFIG.SPARQL.types.electric
-				])
+				query: constructSelectQuery()
 			},
 			headers: { Accept: "application/sparql-results+json" }
 		};
