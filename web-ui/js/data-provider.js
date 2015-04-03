@@ -12,10 +12,11 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 
 	var constructSelectQuery = function(types) {
 		return getPrefixes() + [
-			"SELECT ?meter ?type",
+			"SELECT ?label ?type",
 			"WHERE {",
 				"?meter a ssn:System ;",
 					"a ?type .",
+					"?meter rdfs:label ?label .",
 				"FILTER NOT EXISTS {",
 					"?subClass rdfs:subClassOf ?type .",
 					"FILTER (?subClass != ?type)",
@@ -109,7 +110,7 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 		return $http.get(CONFIG.URLS.tripleStore, config).success(function(data) {
 			instance.meters = data.results.bindings.map(function(binding) {
 				return {
-					uri: binding.meter.value,
+					name: binding.label.value,
 					type: utils.sparqlToHumanType(binding.type.value)
 				};
 			});
