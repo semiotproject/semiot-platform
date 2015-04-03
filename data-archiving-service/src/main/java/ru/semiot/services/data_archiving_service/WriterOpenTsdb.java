@@ -25,6 +25,7 @@ public class WriterOpenTsdb {
 		return INSTANCE;
 	}
 
+	// TODO добавить множественную загрузку
 	public void send(String nameMetric, Object value, Long timestamp,
 			HashMap<String, String> tags) {
 		open.send(OpenTsdbMetric.named(nameMetric).withValue(value)

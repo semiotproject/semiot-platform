@@ -24,6 +24,7 @@ public class WriterMetricsListener implements Observer<String> {
 	private static final Logger logger = LoggerFactory
 			.getLogger(WriterMetricsListener.class);
 
+	// TODO изменить имена
 	private static final String TIMESTAMP = "t";
 	private static final String NAME_METRIC = "ob";
 	private static final String VALUE = "v";

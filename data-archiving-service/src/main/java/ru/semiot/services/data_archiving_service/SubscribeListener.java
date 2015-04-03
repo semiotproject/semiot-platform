@@ -27,6 +27,8 @@ public class SubscribeListener implements Observer<String> {
 
 	private final WAMPClient wampClient = WAMPClient.getInstance();
 	private static final String PREFIX_TOPIC = "topic=";
+
+	// TODO поправить имена
 	private static final Query TOPICS_QUERY = QueryFactory
 			.create("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> prefix ssncom: <http://purl.org/NET/ssnext/communication#> SELECT ?q where{ ?x a ssn:Sensor; ssncom:hasCommunicationEndpoint ?q. ?q ssncom:protocol \"WAMP\"}");
 
@@ -68,7 +70,7 @@ public class SubscribeListener implements Observer<String> {
 
 	private String parseTopicName(String uri) {
 		int index = uri.indexOf(PREFIX_TOPIC);
-		return index == -1 || index + PREFIX_TOPIC.length() + 2 > uri.length() ? null
-				: uri.substring(index + PREFIX_TOPIC.length());
+		return index == -1 || index + PREFIX_TOPIC.length() + 3 > uri.length() ? null
+				: uri.substring(index + PREFIX_TOPIC.length(), uri.length() - 1);
 	}
 }
