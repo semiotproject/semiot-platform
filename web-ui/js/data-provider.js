@@ -2,16 +2,25 @@ var myModule = angular.module('dataProvider', ['utils']);
 myModule.factory('dataProvider', function($q, $http, utils) {		
 
 	// helpers
-	var constructSelectQuery = function(types) {
-		var _types = types.map(function(type) {
-			return "{ ?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <" + type + "> }";
-		}).join(" UNION ");
+	var getPrefixes = function() {
+		var str = [];
+		for (var key in CONFIG.SPARQL.prefixes) {
+			str.push("PREFIX " + key + ": " + CONFIG.SPARQL.prefixes[key]);
+		}
+		return str.join('\n') + '\n';
+	};
 
-		return [
-			"SELECT ?meter ?type",
+	var constructSelectQuery = function(types) {
+		return getPrefixes() + [
+			"SELECT ?label ?type",
 			"WHERE {",
-				_types,
-				"?meter <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type",
+				"?meter a ssn:System ;",
+					"a ?type .",
+					"?meter rdfs:label ?label .",
+				"FILTER NOT EXISTS {",
+					"?subClass rdfs:subClassOf ?type .",
+					"FILTER (?subClass != ?type)",
+				"}",
 			"}"
 		].join('\n');
 	};
@@ -94,17 +103,14 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 	instance.getMeters = function() {
 		var config = {
 			params: {
-				query: constructSelectQuery([
-					CONFIG.SPARQL.types.heat,
-					CONFIG.SPARQL.types.electric
-				])
+				query: constructSelectQuery()
 			},
 			headers: { Accept: "application/sparql-results+json" }
 		};
 		return $http.get(CONFIG.URLS.tripleStore, config).success(function(data) {
 			instance.meters = data.results.bindings.map(function(binding) {
 				return {
-					uri: binding.meter.value,
+					name: binding.label.value,
 					type: utils.sparqlToHumanType(binding.type.value)
 				};
 			});
