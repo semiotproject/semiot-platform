@@ -10,21 +10,6 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 		return str.join('\n') + '\n';
 	};
 
-	var constructSelectQuery = function(types) {
-		return getPrefixes() + [
-			"SELECT ?label ?type",
-			"WHERE {",
-				"?meter a ssn:System ;",
-					"a ?type .",
-					"?meter rdfs:label ?label .",
-				"FILTER NOT EXISTS {",
-					"?subClass rdfs:subClassOf ?type .",
-					"FILTER (?subClass != ?type)",
-				"}",
-			"}"
-		].join('\n');
-	};
-
 	// Event Emitter Pattern support
 	var events = [];
 	var instance = {
@@ -37,7 +22,6 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 				events[e].push(handler);
 			});
 		},
-
 		off: function(event, handler) {
 			var that = this;
 			if(events[event]) {
@@ -51,7 +35,6 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 				}
 			} 
 		},
-
 		trigger: function(event, data) {
 			var that = this;
 			if(events[event]) {
@@ -63,84 +46,89 @@ myModule.factory('dataProvider', function($q, $http, utils) {
 	};
 
 	// data storage
-	instance.meters = [];
+	instance.systems = [];
 
 	// SPARQL Endpoint support
-	/*
-	instance.getHeatMeters = function() {
+	instance.executeQuery = function(query, callback) {
 		var config = {
 			params: {
-				query: constructSelectQuery(CONFIG.SPARQL.types.heat)
+				query: getPrefixes() + query
 			},
 			headers: { Accept: "application/sparql-results+json" }
 		};
-		return $http.get(CONFIG.URLS.tripleStore, config).success(function(data) {
-			instance.meters.heat = data.results.bindings.map(function(binding) {
-				return {
-					uri: binding.meter.value
-				};
-			});
-			instance.trigger("heatMetersUpdate", instance.meters.heat);	
-        });
+		return $http.get(CONFIG.URLS.tripleStore, config).success(callback);
 	};
-	instance.getElectricMeters = function() {
-		var config = {
-			params: {
-				query: constructSelectQuery(CONFIG.SPARQL.types.electric)
-			},
-			headers: { Accept: "application/sparql-results+json" }
-		};
-		return $http.get(CONFIG.URLS.tripleStore, config).success(function(data) {
-			instance.meters.electric = data.results.bindings.map(function(binding) {
-				return {
-					uri: binding.meter.value
-				};
-			});
-			instance.trigger("electricMetersUpdate", instance.meters.electric);	
-        });
+	instance.fetchSystemEndpoint = function(uri, callback) {
+		return this.executeQuery(CONFIG.SPARQL.queries.getSystemEndpoint.format(uri), callback);
 	};
-	*/
-	instance.getMeters = function() {
-		var config = {
-			params: {
-				query: constructSelectQuery()
-			},
-			headers: { Accept: "application/sparql-results+json" }
-		};
-		return $http.get(CONFIG.URLS.tripleStore, config).success(function(data) {
-			instance.meters = data.results.bindings.map(function(binding) {
+	instance.fetchSystems = function() {
+		return this.executeQuery(CONFIG.SPARQL.queries.getAllSystems, function(data) {
+			instance.systems = data.results.bindings.map(function(binding) {
 				return {
 					name: binding.label.value,
-					type: utils.sparqlToHumanType(binding.type.value)
+					type: utils.sparqlToHumanType(binding.type.value),
+					uri: binding.uri.value
 				};
 			});
-			instance.trigger("metersUpdate", instance.meters);	
+			instance.trigger("systemsUpdate", instance.systems);	
         });
 	};
+	instance.getSystems = function() {
+		return this.systems;
+	}
 
 	// WAMP support
 	instance.onMessage = function(args) {
 		utils.parse(args[0]).then(function(result) {
+			console.log(arguments);
 			var type = utils.sparqlToHumanType(result.object);
 			if (type) {
-				instance.meters.push({
+				instance.systems.push({
 					uri: result.subject,
 					type: type
 				});	
-				instance.trigger("metersUpdate", instance.meters);			
+				instance.trigger("systemsUpdate", instance.systems);			
 			} else {
 				console.warn("Unknown sensor type: ", result.object);
 			}
 		});
     };
-    var connection = new autobahn.Connection({
-		url: CONFIG.URLS.messageBus,
-		realm: 'realm1'
-	});
-	connection.onopen = function (session) {
-		session.subscribe(CONFIG.TOPICS.device_registered, instance.onMessage);
-	};
-	connection.open();	
+
+	utils.subscribe(
+		CONFIG.URLS.messageBus,
+		CONFIG.TOPICS.device_registered,
+		instance.onMessage
+	);
+
+	var str = [
+		"@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .", 
+		"@prefix hmtr: <http://purl.org/NET/ssnext/heatsystems#> .", 
+		"@prefix ssncom: <http://purl.org/NET/ssnext/communication#> .", 
+
+		"<coap://localhost:3131> a hmtr:HeatMeter ;", 
+		"    ssn:hasSubsystem <coap://localhost:3131/temperature> ;", 
+		"    ssn:hasSubsystem <coap://localhost:3131/heat> .", 
+
+		"<coap://localhost:3131/temperature> a ssn:Sensor ;", 
+		"   ssn:observes hmtr:Temperature ;", 
+		"   ssncom:hasCommunicationEndpoint <coap://localhost:3131/temperature/obs> ;", 
+		"    ssncom:hasCommunicationEndpoint <ws://localhost/ws?topic=coap://localhost:3131/temperature/obs> .", 
+
+		"<coap://localhost:3131/heat> a ssn:Sensor ;", 
+		"    ssn:observes hmtr:Heat ;", 
+		"    ssncom:hasCommunicationEndpoint <coap://localhost:3131/heat/obs> ;", 
+		"    ssncom:hasCommunicationEndpoint <ws://localhost/ws?topic=coap://localhost:3131/heat/obs>.", 
+
+		"<coap://localhost:3131/temperature/obs> a ssncom:CommunicationEndpoint ;", 
+		"    ssncom:protocol 'COAP' .", 
+		"<coap://localhost:3131/heat/obs> a ssncom:CommunicationEndpoint ;", 
+		"    ssncom:protocol 'COAP' .", 
+		"<ws://localhost/ws?topic=coap://localhost:3131/temperature/obs> a ssncom:CommunicationEndpoint ;", 
+		"    ssncom:protocol 'WAMP' .", 
+		"<ws://localhost/ws?topic=coap://localhost:3131/heat/obs> a ssncom:CommunicationEndpoint ;", 
+		"    ssncom:protocol 'WAMP' ." 
+	].join('\n');
+	//instance.onMessage([str]);
 
 	return instance;
 

@@ -11,8 +11,8 @@
 <body>
 	<div class="container" ng-controller="AppCtrl">
 		<h2>SemIoT Platform</h2>
-		<section ng-controller="MeterListCtrl" ng-show="mode === 'List'">
-			<h4>Registered meters ({{ meters.length }})</h4>
+		<section ng-controller="MeterListCtrl" ng-show="currentView === 'List'">
+			<h4>Registered systems ({{ systems.length }})</h4>
 			<div class="table-responsive">
 				<table class="table table-striped" id="systems-list">
 					<thead>
@@ -32,12 +32,12 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-show="meters.length === 0">
-							<td>No meters registered</td>
+						<tr ng-show="systems.length === 0">
+							<td>No systems registered</td>
 							<td></td>
 							<td></td>
 						</tr>
-						<tr ng-repeat="meter in meters | filter: filterFunction | orderBy: 'name'" ng-click="showSingle($index)">
+						<tr ng-repeat="meter in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle($index)">
 							<td>{{ $index + 1 }}</td>
 							<td>{{ meter.type }}</td>
 							<td>{{ meter.name }}</td>
@@ -46,15 +46,23 @@
 				</table>
 			</div>
 		</section>
-		<section ng-controller="MeterSingleCtrl" ng-show="mode === 'Single'">
-			<h4>Single Controller</h4>
+		<section ng-controller="MeterSingleCtrl" ng-show="currentView === 'Single'">
+			<h4>{{ title }}</h4>
 			<a href="#" ng-click="showList()">back</a>
+			<div id="single-system-wrapper">
+				<div ng-repeat="sensor in sensors">
+					<highchart config="sensor.chartConfig"></highchart>
+				</div>
+			</div>
 		</section>			
 	</div>
 </body>
 <script src="js/lib/autobahn.min.jgz"></script>
 <script src="js/lib/n3-browser.min.js"></script>
 <script src="js/lib/angular.js"></script>
+<script src="http://code.highcharts.com/adapters/standalone-framework.js"></script>
+<script src="js/lib/highcharts.js"></script>
+<script src="js/lib/highcharts-ng.js"></script>
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/data-provider.js"></script>
