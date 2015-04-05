@@ -4,7 +4,8 @@ var CONFIG = (function() {
 	return {
 		URLS: {
 			messageBus: "ws://machine3-ailab.tk/ws",
-			tripleStore: "http://machine3-ailab.tk:3030/ds/query"
+			tripleStore: "http://machine3-ailab.tk:3030/ds/query",
+			tsdb: "http://machine3-ailab.tk:3030"
 		},
 		TOPICS: {
 			"device_registered": 'ru.semiot.devices.register'
@@ -20,7 +21,8 @@ var CONFIG = (function() {
 				heatSystem: "http://purl.org/NET/ssnext/heatmeters#HeatMeter",
 				electricSystem: "http://purl.org/NET/ssnext/electricmeters#ElectricMeter",
 				temperature: "http://purl.org/NET/ssnext/heatmeters#Temperature",
-				heat: "http://purl.org/NET/ssnext/heatmeters#Heat"
+				heat: "http://purl.org/NET/ssnext/heatmeters#Heat",
+				observationResult: "http://purl.org/NET/ssnext/meters/core#hasQuantityValue"
 			},
 			queries: {
 				getAllSystems: [
