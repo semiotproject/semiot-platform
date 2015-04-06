@@ -23,8 +23,8 @@ public interface ServiceConfig extends Config {
 	int wampReconnectInterval();
 
 	@DefaultValue("ru.semiot.devices.newandobserving")
-	@Key("services.topics.register")
-	String topicsRegister();
+	@Key("services.topics.subscriber")
+	String topicsSubscriber();
 
 	@DefaultValue("localhost:4242")
 	@Key("services.tsdb.url")

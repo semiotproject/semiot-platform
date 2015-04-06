@@ -1,6 +1,6 @@
 package ru.semiot.services.data_archiving_service;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
@@ -19,7 +19,9 @@ public class WriterOpenTsdb {
 	private final OpenTsdb open;
 
 	private WriterOpenTsdb() {
+		logger.info("Connecting to {}", config.tsdbUrl());
 		open = OpenTsdb.forService(config.tsdbUrl()).create();
+		logger.info("Connected to {}", config.tsdbUrl());
 	}
 
 	public static WriterOpenTsdb getInstance() {
@@ -28,11 +30,12 @@ public class WriterOpenTsdb {
 
 	// TODO добавить множественную загрузку
 	public void send(String nameMetric, Object value, Long timestamp,
-			HashMap<String, String> tags) {
-		open.send(OpenTsdbMetric.named(nameMetric).withValue(value)
-				.withTimestamp(timestamp).withTags(tags).build());
+			Map<String, String> tags) {
 		logger.info("Send metric=" + nameMetric + ", value=" + value
 				+ ", timestamp=" + String.valueOf(timestamp));
+		open.send(OpenTsdbMetric.named(nameMetric).withValue(value)
+				.withTimestamp(timestamp).withTags(tags).build());
+		logger.info("Successfully");
 	}
 
 }

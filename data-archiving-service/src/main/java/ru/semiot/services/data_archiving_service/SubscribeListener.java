@@ -73,8 +73,14 @@ public class SubscribeListener implements Observer<String> {
 
 	private String parseTopicName(String uri) {
 		int index = uri.indexOf(PREFIX_TOPIC);
-		return index == -1 || index + PREFIX_TOPIC.length() + 3 > uri.length() ? null
-				: uri.substring(index + PREFIX_TOPIC.length());
+		if (index != -1) {
+			int lastIndex = uri.lastIndexOf(">", index);
+			return index + PREFIX_TOPIC.length() + 2 > uri.length() ? null
+					: uri.substring(index + PREFIX_TOPIC.length(),
+							lastIndex == -1 ? uri.length() : lastIndex);
+		} else {
+			return null;
+		}
 	}
 
 	private void subscribeTopics(Model description) {
