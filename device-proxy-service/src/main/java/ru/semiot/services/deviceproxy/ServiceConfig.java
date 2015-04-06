@@ -36,8 +36,8 @@ public interface ServiceConfig extends Config {
     @Key("services.topics.newdevice")
     String topicsNewDevice();
 
-    @DefaultValue("ru.semiot.devices.newAndObserving")
-    @Key("services.topics.newAndObserving")
+    @DefaultValue("ru.semiot.devices.newandobserving")
+    @Key("services.topics.newandobserving")
     String topicsNewAndObserving();
 
     @DefaultValue("${services.wamp.uri}?topic=%s")
