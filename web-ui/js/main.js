@@ -55,8 +55,9 @@
 				$scope.connectionPull = [];
 			}			
 			$scope.connectionPull.forEach(function(connection) {				
-				// here will be something like connection.close();
-				$interval.cancel(connection);
+				// here will be something like 
+				connection.close();
+				// $interval.cancel(connection);
 			});
 		};
 		$scope.init = function(uri) {
@@ -77,18 +78,18 @@
 						// and add it to sensor.chartConfig.series[0].data
 						sensor.chartConfig.series[0].data.push(10, 4, 12, 44, 43, 40, 20);						
 
-						// here we will subscribe on each sensor< for example: 				
-						// commonUtils.subscribe(
-						// 	CONFIG.URLS.messageBus,
-						// 	commonUtils.parseTopicFromEndpoint(sensor.endpoint),
-						// 	function(args) {
-						// 		$scope.onUpdated(sensor, args[0]);
-						// 	}
-						// );	
-						var connection = $interval(function() {
+						// here we will subscribe on each sensor, for example: 				
+						var connection = commonUtils.subscribe(
+							CONFIG.URLS.messageBus,
+							commonUtils.parseTopicFromEndpoint(sensor.endpoint),
+							function(args) {
+								$scope.onUpdated(sensor, args[0]);
+							}
+						);	
+						/*var connection = $interval(function() {
 							var str = commonUtils.getMockHeatObservation();
 							$scope.onUpdated(sensor, str);
-						}, 2000);	
+						}, 2000);*/	
 						$scope.connectionPull.push(connection);
 						
 					});
