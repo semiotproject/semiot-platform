@@ -22,9 +22,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class WriterMetricsListener implements Observer<String> {
+
 	private static final Logger logger = LoggerFactory
 			.getLogger(WriterMetricsListener.class);
-
 	private static final String TIMESTAMP = "timestamp";
 	private static final String NAME_METRIC = "mname";
 	private static final String VALUE = "mvalue";
@@ -47,6 +47,11 @@ public class WriterMetricsListener implements Observer<String> {
 					.append("?result ssn:hasValue ?value. ")
 					.append("?value meter:hasQuantityValue ?").append(VALUE)
 					.append(". ?x a ?").append(TYPE).append(".}").toString());
+	private final String nameMetric; // временное решение
+
+	public WriterMetricsListener(String nameMetric) {
+		this.nameMetric = nameMetric;
+	}
 
 	@Override
 	public void onCompleted() {
@@ -70,7 +75,7 @@ public class WriterMetricsListener implements Observer<String> {
 
 				while (metrics.hasNext()) {
 					QuerySolution qs = metrics.next();
-					String nameMetric = qs.getResource(NAME_METRIC).getURI();
+					// String nameMetric = qs.getResource(NAME_METRIC).getURI();
 					String timestamp = qs.getLiteral(TIMESTAMP).getString();
 					String value = qs.getLiteral(VALUE).getString();
 					String type = qs.getResource(TYPE).getURI();
@@ -82,7 +87,7 @@ public class WriterMetricsListener implements Observer<String> {
 						try {
 							Calendar calendar = DatatypeConverter
 									.parseDateTime(timestamp);
-							tags.put(TYPE, type);
+							tags.put(TYPE, type.replaceAll(":", "_"));
 							WriterOpenTsdb.getInstance().send(nameMetric,
 									value, calendar.getTimeInMillis(), tags);
 						} catch (IllegalArgumentException e) {

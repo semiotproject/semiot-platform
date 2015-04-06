@@ -1,9 +1,12 @@
 package ru.semiot.services.data_archiving_service;
 
 import java.io.StringReader;
+import java.util.LinkedList;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.atlas.web.auth.HttpAuthenticator;
+import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +27,10 @@ public class SubscribeListener implements Observer<String> {
 	public static final String LANG = "TURTLE";
 	private static final ServiceConfig config = ConfigFactory
 			.create(ServiceConfig.class);
-
+	private final HttpAuthenticator httpAuthenticator;
 	private final WAMPClient wampClient = WAMPClient.getInstance();
 	private static final String PREFIX_TOPIC = "topic=";
+	private LinkedList<String> listTopics = new LinkedList<String>();
 
 	private static final Query TOPICS_QUERY = QueryFactory
 			.create(new StringBuilder()
@@ -35,6 +39,12 @@ public class SubscribeListener implements Observer<String> {
 					.append("prefix ssncom: <http://purl.org/NET/ssnext/communication#> ")
 					.append("SELECT ?q where{ ?x a ssn:Sensor; ssncom:hasCommunicationEndpoint ?q. ")
 					.append("?q ssncom:protocol \"WAMP\"}").toString());
+
+	public SubscribeListener() {
+		httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
+				config.storePassword().toCharArray());
+		subscribeTopics(null);
+	}
 
 	@Override
 	public void onCompleted() {
@@ -51,21 +61,8 @@ public class SubscribeListener implements Observer<String> {
 		try {
 			Model description = ModelFactory.createDefaultModel().read(
 					new StringReader(message), null, LANG);
-			if (!description.isEmpty()) {
-				QueryExecution qe = QueryExecutionFactory.create(TOPICS_QUERY,
-						description);
-				ResultSet topics = qe.execSelect();
-
-				while (topics.hasNext()) {
-					String topicName = parseTopicName(topics.next().toString());
-					if (StringUtils.isNotBlank(topicName)) {
-						wampClient.subscribe(topicName).subscribe(
-								new WriterMetricsListener());
-					} else {
-						logger.warn("Name topic is blank");
-					}
-				}
-
+			if (description != null && !description.isEmpty()) {
+				subscribeTopics(description);
 			} else {
 				logger.warn("Received an empty message or in a wrong format!");
 			}
@@ -78,5 +75,35 @@ public class SubscribeListener implements Observer<String> {
 		int index = uri.indexOf(PREFIX_TOPIC);
 		return index == -1 || index + PREFIX_TOPIC.length() + 3 > uri.length() ? null
 				: uri.substring(index + PREFIX_TOPIC.length(), uri.length() - 1);
+	}
+
+	private void subscribeTopics(Model description) {
+		QueryExecution qe;
+		if (description == null) {
+			qe = getQEFromStoredTopics();
+		} else {
+			qe = getQEFromModelTopics(description);
+		}
+		ResultSet topics = qe.execSelect();
+		while (topics.hasNext()) {
+			String topicName = parseTopicName(topics.next().toString());
+			if (StringUtils.isNotBlank(topicName)
+					&& !listTopics.contains(topicName)) {
+				listTopics.add(topicName);
+				wampClient.subscribe(topicName).subscribe(
+						new WriterMetricsListener(topicName));
+			} else {
+				logger.warn("Name topic is blank");
+			}
+		}
+	}
+
+	private QueryExecution getQEFromStoredTopics() {
+		return QueryExecutionFactory.sparqlService(config.storeUrl(),
+				TOPICS_QUERY, httpAuthenticator);
+	}
+
+	private QueryExecution getQEFromModelTopics(Model description) {
+		return QueryExecutionFactory.create(TOPICS_QUERY, description);
 	}
 }
