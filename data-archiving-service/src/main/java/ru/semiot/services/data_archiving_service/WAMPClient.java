@@ -8,7 +8,6 @@ import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import rx.Observable;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
@@ -16,42 +15,44 @@ import ws.wamp.jawampa.WampClientBuilder;
 
 public class WAMPClient implements Closeable, AutoCloseable {
 
-    private static final Logger logger
-            = LoggerFactory.getLogger(WAMPClient.class);
-    private static final ServiceConfig config = ConfigFactory.create(ServiceConfig.class);
-    private static final WAMPClient INSTANCE = new WAMPClient();
-    private WampClient client;
-    
-    private WAMPClient() {
-    }
+	private static final Logger logger = LoggerFactory
+			.getLogger(WAMPClient.class);
+	private static final ServiceConfig config = ConfigFactory
+			.create(ServiceConfig.class);
+	private static final WAMPClient INSTANCE = new WAMPClient();
+	private WampClient client;
 
-    public static WAMPClient getInstance() {
-        return INSTANCE;
-    }
+	private WAMPClient() {
+	}
 
-    public Observable<WampClient.Status> init() throws ApplicationError {
-        WampClientBuilder builder = new WampClientBuilder();
-        builder.withUri(config.wampUri())
-                .withRealm(config.wampRealm())
-                .withInfiniteReconnects()
-                .withReconnectInterval(
-                        config.wampReconnectInterval(), TimeUnit.SECONDS);
-        client = builder.build();
-        client.open();
-        return client.statusChanged();
-    }
+	public static WAMPClient getInstance() {
+		return INSTANCE;
+	}
 
-    public Observable<Long> publish(String topic, String message) {
-        return client.publish(topic, message);
-    }
-    
-    public Observable<String> subscribe(String topic) {
-        return client.makeSubscription(topic, String.class);
-    }
+	public Observable<WampClient.Status> init() throws ApplicationError {
+		WampClientBuilder builder = new WampClientBuilder();
+		builder.withUri(config.wampUri())
+				.withRealm(config.wampRealm())
+				.withInfiniteReconnects()
+				.withReconnectInterval(config.wampReconnectInterval(),
+						TimeUnit.SECONDS);
+		client = builder.build();
+		client.open();
+		return client.statusChanged();
+	}
 
-    @Override
-    public void close() throws IOException {
-        client.close();
-    }
+	public Observable<Long> publish(String topic, String message) {
+		return client.publish(topic, message);
+	}
+
+	public Observable<String> subscribe(String topic) {
+		logger.info("Made subscription to " + topic);
+		return client.makeSubscription(topic, String.class);
+	}
+
+	@Override
+	public void close() throws IOException {
+		client.close();
+	}
 
 }

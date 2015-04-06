@@ -28,9 +28,13 @@ public class SubscribeListener implements Observer<String> {
 	private final WAMPClient wampClient = WAMPClient.getInstance();
 	private static final String PREFIX_TOPIC = "topic=";
 
-	// TODO поправить имена
 	private static final Query TOPICS_QUERY = QueryFactory
-			.create("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> prefix ssncom: <http://purl.org/NET/ssnext/communication#> SELECT ?q where{ ?x a ssn:Sensor; ssncom:hasCommunicationEndpoint ?q. ?q ssncom:protocol \"WAMP\"}");
+			.create(new StringBuilder()
+					.append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
+					.append("prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> ")
+					.append("prefix ssncom: <http://purl.org/NET/ssnext/communication#> ")
+					.append("SELECT ?q where{ ?x a ssn:Sensor; ssncom:hasCommunicationEndpoint ?q. ")
+					.append("?q ssncom:protocol \"WAMP\"}").toString());
 
 	@Override
 	public void onCompleted() {
@@ -57,6 +61,8 @@ public class SubscribeListener implements Observer<String> {
 					if (StringUtils.isNotBlank(topicName)) {
 						wampClient.subscribe(topicName).subscribe(
 								new WriterMetricsListener());
+					} else {
+						logger.warn("Name topic is blank");
 					}
 				}
 
