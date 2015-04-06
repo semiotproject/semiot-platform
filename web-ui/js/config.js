@@ -8,7 +8,7 @@ var CONFIG = (function() {
 			tsdb: "http://machine3-ailab.tk:3030"
 		},
 		TOPICS: {
-			"device_registered": 'ru.semiot.devices.register'
+			"device_registered": 'ru.semiot.devices.newandobserving'
 		},
 		SPARQL: {
 			prefixes: {
