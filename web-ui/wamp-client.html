@@ -9,6 +9,9 @@
 			width: 70%;
 			margin: 20px auto;
 		}
+		#wamp-send-topic {
+			margin-bottom: 10px;
+		}
 		.form-group label {
 			width: 100px;
 		}
@@ -44,6 +47,13 @@
 				<tr>
 					<td>Topic</td>
 					<td class="topic"></td>
+				</tr>
+				<tr>
+					<td><button id="wamp-send" class="btn btn-primary">Send</button></td>
+					<td>
+						<input id="wamp-send-topic" class="form-control" placeholder="Topic">
+						<textarea id="wamp-send-text" class="form-control">Message</textarea>
+					</td>
 				</tr>
 			</table>		
 			<div id="message-log">

@@ -32,8 +32,15 @@
 				$("#summary .url").text(url);
 				$("#summary .topic").text(topic);
 				connection.onopen = function (session) {
+					logger.append("connection established");	
 					session.subscribe(topic, function(args) {
 						logger.append("message received: " + args[0]);
+					});					
+					$("#wamp-send").on('click', function() {
+						var topic = $("#wamp-send-topic").val();
+						var text = $("#wamp-send-text").val();
+						session.publish(topic, [text]);
+						logger.append("publishing message " + text + " on topic " + topic);
 					});
 				};
 				connection.onclose = function (reason, details) {
