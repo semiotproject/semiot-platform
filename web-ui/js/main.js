@@ -12,15 +12,13 @@
 
 	app.controller('AppCtrl', function($scope, dataProvider) {
 		$scope.currentView = "List";
-		$scope.showSingle = function(index) {
-			dataProvider.trigger("currentSystemChanged", dataProvider.getSystems()[index]);
-			$scope.currentView = "Single"
-			console.log('showing single, index = ', index);
+		$scope.showSingle = function(system) {
+			dataProvider.trigger("currentSystemChanged", system);
+			$scope.currentView = "Single";
 		};
 		$scope.showList = function() {
 			dataProvider.trigger("currentSystemChanged", null);
-			$scope.currentView = "List"
-			console.log('showing list');
+			$scope.currentView = "List";
 		};
 	});
 
@@ -51,14 +49,12 @@
 		$scope.setDefault = function() {
 			$scope.title = "";
 			$scope.sensors = [];
-			if (!$scope.connectionPull) {
-				$scope.connectionPull = [];
-			}			
-			$scope.connectionPull.forEach(function(connection) {				
-				// here will be something like 
-				connection.close();
-				// $interval.cancel(connection);
-			});
+			if ($scope.connectionPull && $scope.connectionPull.length > 0) {		
+				$scope.connectionPull.forEach(function(connection) {
+					connection.close();
+				});
+			}	
+			$scope.connectionPull = [];
 		};
 		$scope.init = function(uri) {
 			// get extended info

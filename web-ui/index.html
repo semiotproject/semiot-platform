@@ -37,10 +37,10 @@
 							<td></td>
 							<td></td>
 						</tr>
-						<tr ng-repeat="meter in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle($index)">
+						<tr ng-repeat="system in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle(system)">
 							<td>{{ $index + 1 }}</td>
-							<td>{{ meter.type }}</td>
-							<td>{{ meter.name }}</td>
+							<td>{{ system.type }}</td>
+							<td>{{ system.name }}</td>
 						</tr>
 					</tbody>
 				</table>
