@@ -101,12 +101,12 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 		CONFIG.TOPICS.device_registered,
 		instance.onMessage
 	);
- 
+ /*
  	$interval(function() {
 		var str = commonUtils.getMockNewSystem();		
 		instance.onMessage([str]);
 	}, 4000);
-
+*/
 	return instance;
 
 });
