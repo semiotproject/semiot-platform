@@ -25,7 +25,7 @@
 	app.controller('MeterListCtrl', function($scope, dataProvider, commonUtils) {
 		$scope.systems = [];
 		$scope.search = {			
-			types: CONFIG.SPARQL.types,
+			types: [],
 			type: "",
 			name: ""
 		};
@@ -37,6 +37,11 @@
 
 		dataProvider.on('systemsUpdate', function(data) {
 			$scope.systems = data;
+			$scope.systems.forEach(function(system) {
+				if ($scope.search.types.indexOf(system.type) === -1) {
+					$scope.search.types.push(system.type);	
+				}
+			});
 		});	
         
         dataProvider.fetchSystems();
