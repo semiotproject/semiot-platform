@@ -13,7 +13,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.FileManager;
 import java.io.IOException;
-import java.io.StringReader;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.riot.RiotException;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import ru.semiot.semiot.commons.namespaces.EMTR;
 import ru.semiot.semiot.commons.namespaces.HMTR;
 import ru.semiot.semiot.commons.namespaces.SSN;
+import ru.semiot.services.deviceproxy.CoAPInterface;
 import ru.semiot.services.deviceproxy.ServiceConfig;
 import ru.semiot.services.deviceproxy.WAMPClient;
 import rx.Observer;
@@ -33,8 +33,8 @@ public class NewDeviceHandler implements Observer<String> {
     private static final Logger logger = LoggerFactory.getLogger(NewDeviceHandler.class);
     private static final ServiceConfig config = ConfigFactory.create(
             ServiceConfig.class);
-    private static final String queryFile = 
-            "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
+    private static final String queryFile
+            = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
     private static final String VAR_COAP = "coap";
     private static final String VAR_WAMP = "wamp";
     private final WAMPClient wampClient = WAMPClient.getInstance();
@@ -80,22 +80,24 @@ public class NewDeviceHandler implements Observer<String> {
                     final ResultSet results = qexec.execSelect();
                     while (results.hasNext()) {
                         final QuerySolution soln = results.next();
-                        
+
                         final Resource coap = soln.getResource(VAR_COAP);
                         final Resource wamp = soln.getResource(VAR_WAMP);
 
                         logger.debug("Mapping {} to {}", coap.getURI(), wamp.getURI());
-                        
+
                         final NewObservationHandler handler = 
                                 new NewObservationHandler(getWampTopic(wamp.getURI()));
 
                         final CoapClient coapClient = new CoapClient(coap.getURI());
+                        coapClient.setEndpoint(CoAPInterface.getEndpoint());
                         final CoapObserveRelation rel = coapClient.observe(handler);
-                        
+
                         //So the handler could cancel the subscription.
                         handler.setRelation(rel);
+                        coapClient.shutdown();
                     }
-                    
+
                     wampClient.publish(config.topicsNewAndObserving(), message);
                 }
             } else {
@@ -107,7 +109,7 @@ public class NewDeviceHandler implements Observer<String> {
             logger.error(ex.getMessage(), ex);
         }
     }
-    
+
     private String getWampTopic(final String wampUri) {
         return wampUri.split("\\?topic=")[1];
     }

@@ -15,31 +15,31 @@ public interface ServiceConfig extends Config {
     @DefaultValue("ws://localhost/ws")
     @Key("services.wamp.uri")
     String wampUri();
-    
+
     @DefaultValue("realm1")
     @Key("services.wamp.realm")
     String wampRealm();
-    
+
     @DefaultValue("15") //seconds
     @Key("services.wamp.reconnect")
     int wampReconnectInterval();
-    
+
     @DefaultValue("TURTLE")
     @Key("services.wamp.message.format")
     String wampMessageFormat();
-    
+
     @DefaultValue("ru.semiot.devices.register")
     @Key("services.topics.register")
     String topicsRegister();
-    
+
     @DefaultValue("ru.semiot.devices.new")
     @Key("services.topics.newdevice")
     String topicsNewDevice();
-    
+
     @DefaultValue("ru.semiot.devices.newAndObserving")
     @Key("services.topics.newAndObserving")
     String topicsNewAndObserving();
-    
+
     @DefaultValue("${services.wamp.uri}?topic=%s")
     @Key("services.mappingToWAMP")
     String mappingToWAMP(final String topic);

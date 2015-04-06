@@ -75,7 +75,7 @@ public class RegisterResource extends CoapResource {
             stmts.forEachRemaining((Statement stmt) -> {
                 final String uri = stmt.getObject().asResource().getURI();
                 final Resource wampEndpoint = ResourceFactory.createResource(
-                        config.mappingToWAMP(uri));
+                        config.mappingToWAMP(coapUriToWAMPUri(uri)));
 
                 //Declare a new CommunicationEndpoint (WAMP)
                 tmp.add(sensor, SSNCOM.hasCommunicationEndpoint, wampEndpoint)
@@ -85,6 +85,10 @@ public class RegisterResource extends CoapResource {
         });
 
         source.add(tmp);
+    }
+    
+    private String coapUriToWAMPUri(final String coapUri) {
+        return coapUri.replaceAll("coap://", "").replaceAll(":|/", ".");
     }
 
     private String toString(final Model model) {

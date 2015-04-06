@@ -43,7 +43,8 @@ public class NewObservationHandler implements CoapHandler {
 
     @Override
     public void onError() {
-        logger.warn("Something went wrong!");
+        logger.warn("Something went wrong! Stop proxying to {} topic", topic);
+        relation.reactiveCancel();
     }
 
 }
