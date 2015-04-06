@@ -8,4 +8,6 @@ dataarchivingservice:
     image: semiot/data-archiving-service
     links:
         - opentsdb
+    volumes:
+        - /semiot-platform/data-archiving-service:/semiot-platform/data-archiving-service
     restart: always

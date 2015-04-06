@@ -74,7 +74,7 @@ public class SubscribeListener implements Observer<String> {
 	private String parseTopicName(String uri) {
 		int index = uri.indexOf(PREFIX_TOPIC);
 		return index == -1 || index + PREFIX_TOPIC.length() + 3 > uri.length() ? null
-				: uri.substring(index + PREFIX_TOPIC.length(), uri.length() - 1);
+				: uri.substring(index + PREFIX_TOPIC.length());
 	}
 
 	private void subscribeTopics(Model description) {
@@ -86,7 +86,8 @@ public class SubscribeListener implements Observer<String> {
 		}
 		ResultSet topics = qe.execSelect();
 		while (topics.hasNext()) {
-			String topicName = parseTopicName(topics.next().toString());
+			String topicName = parseTopicName(topics.next().get("q")
+					.asResource().getURI());
 			if (StringUtils.isNotBlank(topicName)
 					&& !listTopics.contains(topicName)) {
 				listTopics.add(topicName);

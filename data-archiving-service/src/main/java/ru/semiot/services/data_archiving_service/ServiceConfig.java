@@ -6,7 +6,7 @@ import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
 
 @LoadPolicy(LoadType.FIRST)
-@Sources({ "file:/semiot-platform/data-archiving-service/config.properties" })
+@Sources({ "file:~/semiot-platform/data-archiving-service/config.properties" })
 public interface ServiceConfig extends Config {
 
 	@DefaultValue("ws://localhost/ws")
