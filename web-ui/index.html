@@ -19,12 +19,6 @@
 						<tr>
 							<th>
 								<label>№</label>
-							</th>
-							<th>
-								<select class="form-control" ng-model="search.type">
-									<option value="">Type</option>
-									<option ng-repeat="type in search.types" value="{{ type }}">{{ type }}</option>
-								</select>
 							</th>							
 							<th>
 								<input type=text ng-model="search.name" class="form-control" placeholder="Name"/>
@@ -35,11 +29,9 @@
 						<tr ng-show="systems.length === 0">
 							<td>No systems registered</td>
 							<td></td>
-							<td></td>
 						</tr>
 						<tr ng-repeat="system in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle(system)">
 							<td>{{ $index + 1 }}</td>
-							<td>{{ system.type }}</td>
 							<td>{{ system.name }}</td>
 						</tr>
 					</tbody>

@@ -19,8 +19,7 @@ myModule.factory('commonUtils', function($q) {
 				},
 				series: [
 					{						
-						pointInterval: 2 * 1000,
-						pointStart: Date.UTC(2006, 0, 1),
+						pointStart: (new Date()).getTime(),
 						name: type,
 						data: data
 					}
@@ -30,12 +29,23 @@ myModule.factory('commonUtils', function($q) {
 				},
 				xAxis: {
 					type: 'datetime',
+					dateTimeLabelFormats: { // don't display the dummy year
+						month: '%e. %b',
+						year: '%b'
+					},
 				},
 				yAxis: {
 					title: {
 						text: type
 					}
-				}
+				},
+		        tooltip: {
+                    formatter: function() {
+	                    return  '<b>' + this.series.name +'</b><br/>' +
+	                        Highcharts.dateFormat('%e - %b - %Y',
+	                                              new Date(this.x));
+	                }
+                }
 			}
 		},
 		parseTopicFromEndpoint: function(endpoint) {

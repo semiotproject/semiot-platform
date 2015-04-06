@@ -26,7 +26,7 @@ var CONFIG = (function() {
 			},
 			queries: {
 				getAllSystems: [
-					"SELECT ?label ?type ?uri",
+					"SELECT ?label ?uri",
 					"WHERE {",
 					"	?uri a ssn:System ;",
 					"		a ?type .",
