@@ -26,9 +26,9 @@ public class WriterMetricsListener implements Observer<String> {
 	private static final Logger logger = LoggerFactory
 			.getLogger(WriterMetricsListener.class);
 	private static final String TIMESTAMP = "timestamp";
-	private static final String NAME_METRIC = "mname";
-	private static final String VALUE = "mvalue";
-	private static final String TYPE = "mtype";
+	private static final String NAME_METRIC = "name";
+	private static final String VALUE = "val";
+	private static final String TYPE = "type";
 	private static final Query METRICS_QUERY = QueryFactory
 			.create(new StringBuilder()
 					.append("prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> ")
@@ -78,7 +78,7 @@ public class WriterMetricsListener implements Observer<String> {
 					// String nameMetric = qs.getResource(NAME_METRIC).getURI();
 					String timestamp = qs.getLiteral(TIMESTAMP).getString();
 					String value = qs.getLiteral(VALUE).getString();
-					String type = qs.getResource(TYPE).getURI();
+					String type = qs.getResource(TYPE).getLocalName();
 					if (StringUtils.isNotBlank(nameMetric)
 							&& StringUtils.isNotBlank(value)
 							&& StringUtils.isNotBlank(type)

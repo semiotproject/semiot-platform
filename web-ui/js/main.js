@@ -8,6 +8,29 @@
 		return this.replace(pattern, function(capture){ return args[capture.match(/\d+/)]; });
 	};
 
+	if (!Array.prototype.find) {
+		Array.prototype.find = function(predicate) {
+			if (this == null) {
+				throw new TypeError('Array.prototype.find called on null or undefined');
+			}
+			if (typeof predicate !== 'function') {
+				throw new TypeError('predicate must be a function');
+			}
+			var list = Object(this);
+			var length = list.length >>> 0;
+			var thisArg = arguments[1];
+			var value;
+
+			for (var i = 0; i < length; i++) {
+				value = list[i];
+				if (predicate.call(thisArg, value, i, list)) {
+					return value;
+				}
+			}
+			return undefined;
+		};
+	}
+
 	var app = angular.module('semiotApp', ['commonUtils', 'rdfUtils', 'dataProvider', "highcharts-ng"]);
 
 	app.controller('AppCtrl', function($scope, dataProvider) {
@@ -24,9 +47,7 @@
 
 	app.controller('MeterListCtrl', function($scope, dataProvider, commonUtils) {
 		$scope.systems = [];
-		$scope.search = {			
-			types: [],
-			type: "",
+		$scope.search = {	
 			name: ""
 		};
 
@@ -37,16 +58,10 @@
 
 		dataProvider.on('systemsUpdate', function(data) {
 			$scope.systems = data;
-			$scope.systems.forEach(function(system) {
-				if ($scope.search.types.indexOf(system.type) === -1) {
-					$scope.search.types.push(system.type);	
-				}
-			});
 		});	
         
         dataProvider.fetchSystems();
 
-        $scope.convertType = commonUtils.sparqlToHumanType;
 	});
 
 	app.controller('MeterSingleCtrl', function($scope, $interval, dataProvider, commonUtils, rdfUtils) {
@@ -75,9 +90,15 @@
 
 					// get TSDB archive testimonial
 					dataProvider.fetchArchiveTestimonials(sensor.endpoint).then(function(result) {
+						if (result.data[0]) {
+							var dps = result.data[0].dps;
+							for (var timestamp in dps) {
+								sensor.chartConfig.series[0].data.push([timestamp * 1000, dps[timestamp]]);
+							}
+
+						}
 						// here we will parse result.data 
-						// and add it to sensor.chartConfig.series[0].data
-						sensor.chartConfig.series[0].data.push(10, 4, 12, 44, 43, 40, 20);						
+						// and add it to sensor.chartConfig.series[0].data											
 
 						// here we will subscribe on each sensor, for example: 				
 						var connection = commonUtils.subscribe(
@@ -103,7 +124,7 @@
 			rdfUtils.parseTTL(data).then(function(triples) {
 				var resource = rdfUtils.parseTriples(triples);
 				var observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
-				sensor.chartConfig.series[0].data.push(observationResult);
+				sensor.chartConfig.series[0].data.push([(new Date()).getTime(), observationResult]);
 			});
 		}
 

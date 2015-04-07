@@ -6,7 +6,7 @@ import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
 
 @LoadPolicy(LoadType.FIRST)
-@Sources({ "file:~/semiot-platform/data-archiving-service/config.properties" })
+@Sources({ "file:/semiot-platform/data-archiving-service/config.properties" })
 public interface ServiceConfig extends Config {
 
 	@DefaultValue("ws://localhost/ws")
@@ -23,8 +23,8 @@ public interface ServiceConfig extends Config {
 	int wampReconnectInterval();
 
 	@DefaultValue("ru.semiot.devices.newandobserving")
-	@Key("services.topics.register")
-	String topicsRegister();
+	@Key("services.topics.subscriber")
+	String topicsSubscriber();
 
 	@DefaultValue("localhost:4242")
 	@Key("services.tsdb.url")

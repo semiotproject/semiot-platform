@@ -66,7 +66,6 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 			instance.systems = data.results.bindings.map(function(binding) {
 				return {
 					name: binding.label.value,
-					type: commonUtils.sparqlToHumanType(binding.type.value),
 					uri: binding.uri.value
 				};
 			});
@@ -75,8 +74,8 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 	};
 
 	// TSDB support
-	instance.fetchArchiveTestimonials = function(uri, from, till) {
-		return $http.get(CONFIG.URLS.tsdb, {});
+	instance.fetchArchiveTestimonials = function(metric, from, till) {
+		return $http.get(CONFIG.URLS.tsdb.format("10h-ago", commonUtils.parseTopicFromEndpoint(metric)), {});
 	}
 
 	instance.getSystems = function() {
@@ -87,12 +86,15 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 	instance.onMessage = function(args) {
 		rdfUtils.parseTTL(args[0]).then(function(triples) {
 			var resource = rdfUtils.parseTriples(triples);
-			instance.systems.push({
-				uri: resource.uri,
-				name: resource.get("http://www.w3.org/2000/01/rdf-schema#label"),
-				type: commonUtils.sparqlToHumanType(resource.get("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
-			});	
-			instance.trigger("systemsUpdate", instance.systems);	
+			if (!instance.systems.find(function(system) { // if system is new
+				return system.uri === resource.uri;
+			})) {
+				instance.systems.push({
+					uri: resource.uri,
+					name: resource.get("http://www.w3.org/2000/01/rdf-schema#label")
+				});	
+				instance.trigger("systemsUpdate", instance.systems);					
+			}
 		});
     };
 
@@ -101,12 +103,7 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 		CONFIG.TOPICS.device_registered,
 		instance.onMessage
 	);
- /*
- 	$interval(function() {
-		var str = commonUtils.getMockNewSystem();		
-		instance.onMessage([str]);
-	}, 4000);
-*/
+	
 	return instance;
 
 });
