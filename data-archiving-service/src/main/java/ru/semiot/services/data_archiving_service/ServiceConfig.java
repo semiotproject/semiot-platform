@@ -30,7 +30,7 @@ public interface ServiceConfig extends Config {
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
-	@DefaultValue("http://localhost:3030/ds/data")
+	@DefaultValue("http://localhost:3030/ds/query")
 	@Key("services.devicedirectory.store.url")
 	String storeUrl();
 
