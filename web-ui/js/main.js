@@ -90,8 +90,15 @@
 
 					// get TSDB archive testimonial
 					dataProvider.fetchArchiveTestimonials(sensor.endpoint).then(function(result) {
+						if (result.data[0]) {
+							var dps = result.data[0].dps;
+							for (var timestamp in dps) {
+								sensor.chartConfig.series[0].data.push([timestamp * 1000, dps[timestamp]]);
+							}
+
+						}
 						// here we will parse result.data 
-						// and add it to sensor.chartConfig.series[0].data					
+						// and add it to sensor.chartConfig.series[0].data											
 
 						// here we will subscribe on each sensor, for example: 				
 						var connection = commonUtils.subscribe(

@@ -5,7 +5,7 @@ var CONFIG = (function() {
 		URLS: {
 			messageBus: "ws://machine3-ailab.tk/ws",
 			tripleStore: "http://machine3-ailab.tk:3030/ds/query",
-			tsdb: "http://machine3-ailab.tk:3030"
+			tsdb: "http://machine2-ailab.tk:4242/api/query?start={0}&m=sum:{1}"
 		},
 		TOPICS: {
 			"device_registered": 'ru.semiot.devices.newandobserving'

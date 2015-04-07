@@ -14,7 +14,8 @@ myModule.factory('commonUtils', function($q) {
 			return {
 				options: {
 					chart: {
-						type: 'spline'
+						type: 'spline',
+						zoomType: 'x'
 					},
 				},
 				series: [
@@ -27,6 +28,9 @@ myModule.factory('commonUtils', function($q) {
 				title: {
 					text: type
 				},
+				scrollbar: {
+					enabled: true
+				},
 				xAxis: {
 					type: 'datetime',
 					dateTimeLabelFormats: { // don't display the dummy year
@@ -34,6 +38,7 @@ myModule.factory('commonUtils', function($q) {
 						year: '%b'
 					},
 				},
+
 				yAxis: {
 					title: {
 						text: type
