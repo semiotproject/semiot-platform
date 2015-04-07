@@ -32,6 +32,7 @@ public class WriterMetricsListener implements Observer<String> {
 	private static final Query METRICS_QUERY = QueryFactory
 			.create(new StringBuilder()
 					.append("prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> ")
+					.append("prefix emtr: <http://purl.org/NET/ssnext/electricmeters#> ")
 					.append("prefix meter: <http://purl.org/NET/ssnext/meters/core#> ")
 					.append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
 					.append("prefix xsd: <http://www.w3.org/2001/XMLSchema#> ")
@@ -40,6 +41,9 @@ public class WriterMetricsListener implements Observer<String> {
 					.append(" ?").append(TYPE)
 					.append(" WHERE { {?x a hmtr:TemperatureObservation} ")
 					.append("UNION{ ?x a hmtr:HeatObservation} ")
+					.append("UNION{ ?x a emtr:AmperageObservation} ")
+					.append("UNION{ ?x a emtr:VoltageObservation} ")
+					.append("UNION{ ?x a emtr:PowerObservation} ")
 					.append("?x ssn:observationResultTime ?").append(TIMESTAMP)
 					.append("; ").append("ssn:observedBy ?")
 					.append(NAME_METRIC).append("; ")
