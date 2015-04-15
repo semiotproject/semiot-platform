@@ -85,15 +85,18 @@
 						testimonials: [],
 						endpoint: binding.endpoint.value,
 						type: binding.type.value,
-						chartConfig: commonUtils.getChartConfig(commonUtils.sparqlToHumanType(binding.type.value), [])
+						chartConfig: commonUtils.getChartConfig(binding.type.value, [])
 					};
 
 					// get TSDB archive testimonial
 					dataProvider.fetchArchiveTestimonials(sensor.endpoint).then(function(result) {
 						if (result.data[0]) {
 							var dps = result.data[0].dps;
+							var localTime = (new Date()).getTime();
 							for (var timestamp in dps) {
-								sensor.chartConfig.series[0].data.push([timestamp * 1000, dps[timestamp]]);
+								if (timestamp * 1000 < localTime) {
+									sensor.chartConfig.series[0].data.push([timestamp * 1000, dps[timestamp]]);
+								}
 							}
 
 						}

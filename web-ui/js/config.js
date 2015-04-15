@@ -33,6 +33,7 @@ var CONFIG = (function() {
 					"		?uri rdfs:label ?label .",
 					"	FILTER NOT EXISTS {",
 					"		?subClass rdfs:subClassOf ?type .",
+					"		?uri a ?subClass .",
 					"		FILTER (?subClass != ?type)",
 					"	}",
 					"}"
