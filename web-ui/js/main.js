@@ -8,6 +8,7 @@
 		return this.replace(pattern, function(capture){ return args[capture.match(/\d+/)]; });
 	};
 
+	// usage: var founded = myArray.find((a) => { return a % 2 === 0; })
 	if (!Array.prototype.find) {
 		Array.prototype.find = function(predicate) {
 			if (this == null) {
@@ -31,7 +32,15 @@
 		};
 	}
 
-	var app = angular.module('semiotApp', ['commonUtils', 'rdfUtils', 'dataProvider', "highcharts-ng"]);
+	var ng_dependencies = [ 
+		"rdfUtils", 
+		"commonUtils",
+		"dataProvider",
+		"highcharts-ng", 
+		"ui.bootstrap.datetimepicker"
+	];
+
+	var app = angular.module('semiotApp', ng_dependencies);
 
 	app.controller('AppCtrl', function($scope, dataProvider) {
 		$scope.currentView = "List";
@@ -75,6 +84,11 @@
 				});
 			}	
 			$scope.connectionPull = [];
+			$scope.default_range = (function() {
+				var end_date = (new Date()).getTime();
+				var start_date = (new Date(end_date - 7 * 24 * 3600 * 1000)).getTime();
+				return [start_date, end_date];
+			})();
 		};
 		$scope.init = function(uri) {
 			// get extended info
@@ -118,6 +132,7 @@
 						$scope.connectionPull.push(connection);
 						
 					});
+					sensor.range = $scope.default_range;
 					sensors.push(sensor);
 				});
 				$scope.sensors = sensors;

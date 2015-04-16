@@ -17,6 +17,9 @@ myModule.factory('commonUtils', function($q) {
             		chart: {
             			type: "spline"
             		},
+					navigator: {
+						enabled: true
+					},
 					rangeSelector: {
 						enabled: false
 					}

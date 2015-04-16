@@ -42,3 +42,8 @@ thead {
 .highcharts-container {
 	margin-bottom: 20px;
 }
+
+/* highcharts */
+.highcharts-button {
+	display: none;
+}

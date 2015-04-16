@@ -6,6 +6,7 @@
 	<title>SemIoT</title>
 	<link rel="stylesheet" href="">
 	<link rel="stylesheet" type="text/css" href="css/lib/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/lib/datetimepicker.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
@@ -43,18 +44,49 @@
 			<a href="#" ng-click="showList()">back</a>
 			<div id="single-system-wrapper">
 				<div ng-repeat="sensor in sensors">
+					<div class="range-control">
+						<label>From</label>
+						<div class="dropdown">
+							<a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="#">
+								<div class="input-group">
+									<input type="text" class="form-control" data-ng-model="sensor.range[0]">
+									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+								</div>
+							</a>
+							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+								<datetimepicker data-ng-model="sensor.range[0]" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }"/>
+							</ul>
+						</div>
+					</div>
+					<div class="range-control">
+						<label>To</label>
+						<div class="dropdown">
+							<a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="#">
+								<div class="input-group">
+									<input type="text" class="form-control" data-ng-model="sensor.range[1]">
+									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+								</div>
+							</a>
+							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+								<datetimepicker data-ng-model="sensor.range[1]" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }"/>
+							</ul>
+						</div>
+					</div>
 					<highchart config="sensor.chartConfig"></highchart>
 				</div>
 			</div>
 		</section>			
 	</div>
 </body>
-<script src="http://code.highcharts.com/adapters/standalone-framework.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="http://code.highcharts.com/stock/highstock.js"></script>
 <script src="js/lib/autobahn.min.jgz"></script>
 <script src="js/lib/n3-browser.min.js"></script>
 <script src="js/lib/angular.js"></script>
 <script src="js/lib/highcharts-ng.js"></script>
+<script src="js/lib/datetimepicker.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script src="js/config.js"></script>
 <script src="js/utils/commonUtils.js"></script>
