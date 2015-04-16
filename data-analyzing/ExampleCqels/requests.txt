@@ -1,0 +1,8 @@
+SELECT ?x ?y ?z WHERE {
+STREAM <?{STREAM_ID}> [NOW] {?x ?y ?z}
+}
+
+SELECT ?x ?y ?z WHERE {
+STREAM ?stream [NOW] {?x ?y ?z}
+<http://example.org/resource/1> <http://example.org/ontology#hasStream> ?stream .
+}
