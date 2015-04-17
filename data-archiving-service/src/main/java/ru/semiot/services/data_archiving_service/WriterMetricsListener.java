@@ -92,8 +92,9 @@ public class WriterMetricsListener implements Observer<String> {
 							Calendar calendar = DatatypeConverter
 									.parseDateTime(timestamp);
 							tags.put(TYPE, type.replaceAll(":", "_"));
-							WriterOpenTsdb.getInstance().send(nameMetric,
-									value, calendar.getTimeInMillis(), tags);
+							WriterOpenTsdb.getInstance().sendMetricToSet(
+									nameMetric, value,
+									calendar.getTimeInMillis(), tags);
 						} catch (IllegalArgumentException e) {
 							logger.warn("Can't convert " + timestamp
 									+ " to calendar (xsd:dateTime)");
