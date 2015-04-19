@@ -14,7 +14,7 @@
 		<h2>SemIoT Platform</h2>
 		<section ng-controller="MeterListCtrl" ng-show="currentView === 'List'">
 			<h4>Registered systems ({{ systems.length }})</h4>
-			<div class="table-responsive">
+			<div class="table-responsive system-list">
 				<table class="table table-striped" id="systems-list">
 					<thead>
 						<tr>
@@ -40,37 +40,45 @@
 			</div>
 		</section>
 		<section ng-controller="MeterSingleCtrl" ng-show="currentView === 'Single'">
-			<h4>{{ title }}</h4>
-			<a href="#" ng-click="showList()">back</a>
+			<ol class="breadcrumb">
+				<li><a href="#" ng-click="showList()">Systems</a></li>
+				<li class="active">{{ title }}</li>
+			</ol>			
 			<div id="single-system-wrapper">
-				<div ng-repeat="sensor in sensors">
+				<div ng-repeat="sensor in sensors" class="sensor-view">
 					<div class="range-control">
 						<label>From</label>
 						<div class="dropdown">
-							<a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="#">
+							<a class="dropdown-toggle" id="dropdown{{ $index }}.0" role="button" data-toggle="dropdown" data-target="#" href="#">
 								<div class="input-group">
 									<input type="text" class="form-control" data-ng-model="sensor.range[0]">
 									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 								</div>
 							</a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-								<datetimepicker data-ng-model="sensor.range[0]" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }"/>
+								<datetimepicker 
+									data-ng-model="sensor.range[0]" 
+									data-on-set-time="onTimeSet(newDate, oldDate)"
+									data-datetimepicker-config="{ dropdownSelector: '#dropdown{{ $index }}.0' }"/>
 							</ul>
 						</div>
 					</div>
 					<div class="range-control">
 						<label>To</label>
 						<div class="dropdown">
-							<a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="#">
+							<a class="dropdown-toggle" id="dropdown{{ $index }}.1" role="button" data-toggle="dropdown" data-target="#" href="#">
 								<div class="input-group">
 									<input type="text" class="form-control" data-ng-model="sensor.range[1]">
 									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 								</div>
 							</a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-								<datetimepicker data-ng-model="sensor.range[1]" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }"/>
+								<datetimepicker data-ng-model="sensor.range[1]" data-datetimepicker-config="{ dropdownSelector: '#dropdown{{ $index }}.1' }"/>
 							</ul>
 						</div>
+					</div>
+					<div class="range-control">
+						<button class="btn btn-primary" ng-click="setRange($index)">View</button>
 					</div>
 					<highchart config="sensor.chartConfig"></highchart>
 				</div>

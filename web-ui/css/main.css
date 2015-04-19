@@ -17,7 +17,7 @@
 	  padding: 0 2px;
 }
 
-.table-responsive {
+.system-list {
 	border: 1px solid rgba(181, 181, 181, 0.44);
     border-radius: 5px;
     margin-bottom: 20px;
@@ -39,11 +39,26 @@ thead {
  	color: white !important;
 }
 
-.highcharts-container {
+.range-control {
+	display: inline-block;
+	width: 325px;
+	margin: 0 20px 10px 0;
+	  vertical-align: bottom;
+}
+
+.sensor-view {
+	padding: 15px;
+	border-radius: 5px;
+	background: #f5f5f5;
 	margin-bottom: 20px;
+	box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+	border: 1px solid rgb(219, 219, 219);
 }
 
 /* highcharts */
 .highcharts-button {
 	display: none;
+}
+.highcharts-container {
+	margin-bottom: 20px;
 }

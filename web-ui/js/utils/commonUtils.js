@@ -13,6 +13,9 @@ myModule.factory('commonUtils', function($q) {
 		getChartConfig: function(type, data) {
 			return {
             	useHighStocks: true,
+            	xAxis: {
+					type: 'datetime'
+				},
             	options: {
             		chart: {
             			type: "spline"
@@ -22,7 +25,8 @@ myModule.factory('commonUtils', function($q) {
 					},
 					rangeSelector: {
 						enabled: false
-					}
+					},
+					useUTC: false
             	},
 				series: [
 					{				
@@ -35,6 +39,19 @@ myModule.factory('commonUtils', function($q) {
 					text: type
 				}
 			}
+		},
+		normalizeTSDBData: function(result) {
+			var data = [];
+			if (result.data[0]) {
+				var dps = result.data[0].dps;
+				var localTime = (new Date()).getTime();
+				for (var timestamp in dps) {
+					if (timestamp * 1000 < localTime) {
+						data.push([timestamp * 1000, dps[timestamp]]);
+					}
+				}
+			}
+			return data;
 		},
 		parseTopicFromEndpoint: function(endpoint) {
 			var prefix = "ws://wamprouter/ws?topic=";

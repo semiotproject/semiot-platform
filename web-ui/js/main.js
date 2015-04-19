@@ -85,8 +85,12 @@
 			}	
 			$scope.connectionPull = [];
 			$scope.default_range = (function() {
-				var end_date = (new Date()).getTime();
-				var start_date = (new Date(end_date - 7 * 24 * 3600 * 1000)).getTime();
+				// time difference between server and client
+				// FIXME
+				var TIME_DIFF = 3 * 3600 * 1000; 
+				var now = (new Date()).getTime() - TIME_DIFF;
+				var end_date = new Date(now);
+				var start_date = (new Date(now - 1 * 3600 * 1000));
 				return [start_date, end_date];
 			})();
 		};
@@ -99,25 +103,15 @@
 						testimonials: [],
 						endpoint: binding.endpoint.value,
 						type: binding.type.value,
-						chartConfig: commonUtils.getChartConfig(binding.type.value, [])
+						chartConfig: commonUtils.getChartConfig(binding.type.value, []),
+						range: $scope.default_range
 					};
 
 					// get TSDB archive testimonial
-					dataProvider.fetchArchiveTestimonials(sensor.endpoint).then(function(result) {
-						if (result.data[0]) {
-							var dps = result.data[0].dps;
-							var localTime = (new Date()).getTime();
-							for (var timestamp in dps) {
-								if (timestamp * 1000 < localTime) {
-									sensor.chartConfig.series[0].data.push([timestamp * 1000, dps[timestamp]]);
-								}
-							}
 
-						}
-						// here we will parse result.data 
-						// and add it to sensor.chartConfig.series[0].data											
+					dataProvider.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
+						sensor.chartConfig.series[0].data = commonUtils.normalizeTSDBData(result);
 
-						// here we will subscribe on each sensor, for example: 				
 						var connection = commonUtils.subscribe(
 							CONFIG.URLS.messageBus,
 							commonUtils.parseTopicFromEndpoint(sensor.endpoint),
@@ -125,14 +119,8 @@
 								$scope.onUpdated(sensor, args[0]);
 							}
 						);	
-						/*var connection = $interval(function() {
-							var str = commonUtils.getMockHeatObservation();
-							$scope.onUpdated(sensor, str);
-						}, 2000);*/	
-						$scope.connectionPull.push(connection);
-						
+						$scope.connectionPull.push(connection);						
 					});
-					sensor.range = $scope.default_range;
 					sensors.push(sensor);
 				});
 				$scope.sensors = sensors;
@@ -143,6 +131,14 @@
 				var resource = rdfUtils.parseTriples(triples);
 				var observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
 				sensor.chartConfig.series[0].data.push([(new Date()).getTime(), observationResult]);
+			});
+		}
+		$scope.setRange = function(index) {
+			var sensor = $scope.sensors[index];
+			dataProvider.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
+				sensor.chartConfig.series[0].data = commonUtils.normalizeTSDBData(result);
+				//sensor.chartConfig.xAxis.currentMin = (sensor.range[0]).getTime();
+				//sensor.chartConfig.xAxis.currentMax = (sensor.range[1]).getTime();		
 			});
 		}
 

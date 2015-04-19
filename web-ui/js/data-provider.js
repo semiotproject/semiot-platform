@@ -74,8 +74,13 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 	};
 
 	// TSDB support
-	instance.fetchArchiveTestimonials = function(metric, from, till) {
-		return $http.get(CONFIG.URLS.tsdb.format("1h-ago", commonUtils.parseTopicFromEndpoint(metric)), {});
+	instance.fetchArchiveTestimonials = function(metric, range) {
+		return $http.get(CONFIG.URLS.tsdb.format(
+			window.moment(range[0]).format('YYYY/MM/DD-HH:mm:ss'),
+			window.moment(range[1]).format('YYYY/MM/DD-HH:mm:ss'),
+			commonUtils.parseTopicFromEndpoint(metric), 
+			{}
+		));
 	}
 
 	instance.getSystems = function() {
