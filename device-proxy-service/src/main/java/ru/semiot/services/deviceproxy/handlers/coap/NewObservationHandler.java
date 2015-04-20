@@ -54,6 +54,9 @@ public class NewObservationHandler implements CoapHandler {
             relation.reactiveCancel();
             String message = Launcher.getConfig().mappingToOffState(
                     Launcher.getConfig().mappingToWAMP(topic));
+            logger.info("Publish into topic "
+                    + Launcher.getConfig().topicsInactive() + " message: "
+                    + message);
             wampClient.publish(Launcher.getConfig().topicsInactive(), message);
         } catch (RiotException ex) {
             logger.warn(ex.getMessage(), ex);
