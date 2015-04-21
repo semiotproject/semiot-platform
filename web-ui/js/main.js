@@ -37,21 +37,28 @@
 		"commonUtils",
 		"dataProvider",
 		"highcharts-ng", 
-		"ui.bootstrap.datetimepicker"
+		"ui.bootstrap.datetimepicker",
+		"ngRoute"
 	];
 
 	var app = angular.module('semiotApp', ng_dependencies);
 
-	app.controller('AppCtrl', function($scope, dataProvider) {
-		$scope.currentView = "List";
-		$scope.showSingle = function(system) {
-			dataProvider.trigger("currentSystemChanged", system);
-			$scope.currentView = "Single";
-		};
-		$scope.showList = function() {
-			dataProvider.trigger("currentSystemChanged", null);
-			$scope.currentView = "List";
-		};
+	app.config(function($routeProvider) {
+		$routeProvider
+			.when('/login', {
+				templateUrl: 'partials/login.html' 
+			})
+			.when('/', {
+				redirectTo: '/list'
+			})
+			.when('/list', {
+				templateUrl: 'partials/list.html',
+				controller: 'MeterListCtrl'
+			})			
+			.when('/single/:system_uri*', {
+				templateUrl: 'partials/single.html',
+				controller: 'MeterSingleCtrl'
+			});
 	});
 
 	app.controller('MeterListCtrl', function($scope, dataProvider, commonUtils) {
@@ -72,16 +79,16 @@
 		dataProvider.on('systemsUpdate', function(data) {
 			$scope.systems = data;
 		});	
-        
-        dataProvider.fetchSystems().then(function(data) {
-        	$scope.systems = data;
-        	$(".container").removeClass("preloader");
-        });
+		
+		dataProvider.fetchSystems().then(function(data) {
+			$scope.systems = data;
+			$(".container").removeClass("preloader");
+		});
 
 
 	});
 
-	app.controller('MeterSingleCtrl', function($scope, $interval, dataProvider, commonUtils, rdfUtils) {
+	app.controller('MeterSingleCtrl', function($scope, $routeParams, $interval, dataProvider, commonUtils, rdfUtils) {
 
 		$scope.setDefault = function() {
 			$scope.title = "";
@@ -104,6 +111,10 @@
 		};
 		$scope.init = function(uri) {
 			// get extended info
+			var system = dataProvider.getSystemByURI(uri);
+			if (system) {
+				$scope.title = system.name;
+			}
 			dataProvider.fetchSystemEndpoint(uri, function(data) {
 				var sensors = [];
 				data.results.bindings.forEach(function(binding) {
@@ -152,14 +163,6 @@
 
 		$scope.setDefault();
 
-		dataProvider.on("currentSystemChanged", function(system) {
-			if (system !== null) {
-				console.log(system);
-				$scope.title = system.name;
-				$scope.init(system.uri);
-			} else {
-				$scope.setDefault();
-			}
-		}); 
+		$scope.init($routeParams.system_uri);
 	});
 }()); 

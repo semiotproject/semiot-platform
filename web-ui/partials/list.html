@@ -1,0 +1,36 @@
+<section>
+	<h4>Registered systems ({{ systems.length }})</h4>
+	<div class="table-responsive system-list">
+		<table class="table table-striped" id="systems-list">
+			<thead>
+				<tr>
+					<th>
+						<label>№</label>
+					</th>							
+					<th>
+						<input type=text ng-model="search.name" class="form-control" placeholder="Name"/>
+					</th>
+					<th>
+					
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-show="systems.length === 0">
+					<td>No systems registered</td>
+					<td></td>
+				</tr>
+				<tr ng-repeat="system in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle(system)">
+					<td>{{ $index + 1 }}</td>
+					<td><a href="{{ '#/single/' + system.uri }}">{{ system.name }}</a></td>
+					<td>
+						<button class="btn btn-primary btn-sm">
+							<i class="glyphicon glyphicon-remove" ng-click="removeSystem(system.uri); $event.stopPropagation();" title="Remove this system"></i>
+							
+						</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>

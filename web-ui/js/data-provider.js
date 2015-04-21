@@ -100,6 +100,11 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 	instance.getSystems = function() {
 		return this.systems;
 	}
+	instance.getSystemByURI = function(uri) {
+		return this.systems.find(function(system) {
+			return system.uri === uri;
+		});
+	}
 
 	// WAMP support
 	instance.onMessage = function(args) {
