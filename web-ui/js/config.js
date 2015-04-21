@@ -8,7 +8,8 @@ var CONFIG = (function() {
 			tsdb: "http://machine2-ailab.tk:4242/api/query?start={0}&end={1}&m=sum:{2}"
 		},
 		TOPICS: {
-			"device_registered": 'ru.semiot.devices.newandobserving'
+			"device_registered": 'ru.semiot.devices.newandobserving',
+			"device_remove": 'ru.semiot.devices.remove'
 		},
 		SPARQL: {
 			prefixes: {

@@ -8,9 +8,11 @@
 	<link rel="stylesheet" type="text/css" href="css/lib/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/lib/datetimepicker.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+
+<script src="js/lib/less.js"></script>
 </head>
 <body>
-	<div class="container" ng-controller="AppCtrl">
+	<div class="container preloader" ng-controller="AppCtrl">
 		<h2>SemIoT Platform</h2>
 		<section ng-controller="MeterListCtrl" ng-show="currentView === 'List'">
 			<h4>Registered systems ({{ systems.length }})</h4>
@@ -24,6 +26,9 @@
 							<th>
 								<input type=text ng-model="search.name" class="form-control" placeholder="Name"/>
 							</th>
+							<th>
+							
+							</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -34,6 +39,12 @@
 						<tr ng-repeat="system in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle(system)">
 							<td>{{ $index + 1 }}</td>
 							<td>{{ system.name }}</td>
+							<td>
+								<button class="btn btn-primary btn-sm">
+									<i class="glyphicon glyphicon-remove" ng-click="removeSystem(system.uri); $event.stopPropagation();" title="Remove this system"></i>
+									
+								</button>
+							</td>
 						</tr>
 					</tbody>
 				</table>

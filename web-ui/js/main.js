@@ -65,11 +65,19 @@
 					(!$scope.search.name || element.name.indexOf($scope.search.name) > -1);
 		};
 
+		$scope.removeSystem = function(uri) {
+			dataProvider.removeSystem(uri);
+		};
+
 		dataProvider.on('systemsUpdate', function(data) {
 			$scope.systems = data;
 		});	
         
-        dataProvider.fetchSystems();
+        dataProvider.fetchSystems().then(function(data) {
+        	$scope.systems = data;
+        	$(".container").removeClass("preloader");
+        });
+
 
 	});
 

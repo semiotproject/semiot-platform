@@ -62,15 +62,17 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 		return this.executeQuery(CONFIG.SPARQL.queries.getSystemEndpoint.format(uri), callback);
 	};
 	instance.fetchSystems = function() {
-		return this.executeQuery(CONFIG.SPARQL.queries.getAllSystems, function(data) {
+		var defer = $q.defer();
+		this.executeQuery(CONFIG.SPARQL.queries.getAllSystems, function(data) {
 			instance.systems = data.results.bindings.map(function(binding) {
 				return {
 					name: binding.label.value,
 					uri: binding.uri.value
 				};
 			});
-			instance.trigger("systemsUpdate", instance.systems);	
+			defer.resolve(instance.systems);
         });
+		return defer.promise;
 	};
 
 	// TSDB support
@@ -81,6 +83,18 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 			commonUtils.parseTopicFromEndpoint(metric), 
 			{}
 		));
+	}
+
+	instance.removeSystem = function(uri) {
+		if (this.connection) {
+			this.connection.publish(CONFIG.TOPICS.device_remove, [uri]);
+		}
+		this.systems.forEach(function(system, i) {
+			if (system.uri === uri) {
+				this.systems.splice(i, 1);
+			}
+		}.bind(this));
+		instance.trigger("systemsUpdate", this.systems);
 	}
 
 	instance.getSystems = function() {
@@ -103,11 +117,11 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 		});
     };
 
-	commonUtils.subscribe(
+	instance.connection = commonUtils.subscribe(
 		CONFIG.URLS.messageBus,
 		CONFIG.TOPICS.device_registered,
 		instance.onMessage
-	);
+	).session;
 	
 	return instance;
 
