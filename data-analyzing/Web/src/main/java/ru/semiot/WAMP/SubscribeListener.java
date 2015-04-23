@@ -77,8 +77,10 @@ public class SubscribeListener implements Observer<String> {
     private void subscribeTopics(Model description) {
         if (description != null) {
             QueryExecution qe;
-
-            qe = getQEFromModelTopics(description);
+            //if(description==null)
+            //    qe = getQEFromStoredTopics();
+            //else                        
+                qe = getQEFromModelTopics(description);
 
             ResultSet topics = qe.execSelect();
             while (topics.hasNext()) {
