@@ -13,5 +13,5 @@ public interface DataBase {
     public void appendRequest(String request);
     public int getCount();
     public String getRequest(int id);
-    public void removeRequest(int id);
+    public String removeRequest(int id);
 }

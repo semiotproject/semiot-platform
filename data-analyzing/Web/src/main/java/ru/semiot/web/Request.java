@@ -1,11 +1,11 @@
 package ru.semiot.web;
 
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -13,9 +13,9 @@ import javax.persistence.NamedQuery;
  */
 @Entity(name = "Requests")
 @NamedQuery(name = "Requests.getAll", query = "SELECT r FROM Requests r")
-public class Request {
+public class Request implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @NotNull
     @Column(name = "id")
     private int id;
     

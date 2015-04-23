@@ -10,6 +10,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import ru.semiot.WAMP.Launcher;
+import ru.semiot.cqels.Engine;
 
 /**
  *
@@ -24,7 +26,9 @@ public class REST {
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     public void create(String request){
+        Engine.beforeClass();
         db.appendRequest(request);
+        Engine.registerSelect(request);
     }
     @GET
     @Path("count")
@@ -41,7 +45,14 @@ public class REST {
     }
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id")Integer id){
-        db.removeRequest(id);
+    @Produces(MediaType.TEXT_PLAIN)
+    public String remove(@PathParam("id")Integer id){
+        return db.removeRequest(id);
+    }
+    @GET
+    public void startLauncher(){
+        Engine.beforeClass();
+        Launcher l = new Launcher();
+        l.run();        
     }
 }

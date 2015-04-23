@@ -15,8 +15,9 @@ public class DefaultDataBase implements DataBase{
     
     @Override
     public void appendRequest(String request) {
-        int id = getCount();        
-        em.persist(new Request(id, request));
+        int id = getCount();
+        Request r = new Request(id, request);
+        em.persist(r);
     }
 
     @Override
@@ -26,15 +27,25 @@ public class DefaultDataBase implements DataBase{
 
     @Override
     public String getRequest(int id) {
-        return em.find(Request.class, id).getRequest();
+        Request r = em.find(Request.class, id);
+        if(r!=null)
+            return r.getRequest();
+        else
+            return "Not found";
     }
     
     private Request getEntity(int id){
         return em.find(Request.class, id);
     }
     @Override
-    public void removeRequest(int id) {
-        em.remove(getEntity(id));
+    public String removeRequest(int id) {
+        Request r = getEntity(id);
+        if(r != null){
+            em.remove(getEntity(id));
+            return r.getRequest();
+        }
+        else
+            return "Not found";
     }
     
 }
