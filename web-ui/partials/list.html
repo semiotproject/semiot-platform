@@ -1,5 +1,12 @@
 <section>
 	<h4>Registered systems ({{ systems.length }})</h4>
+	<pagination 
+		ng-model="currentPage"
+		items-per-page="itemsPerPage" 
+		total-items="totalItems"
+		max-size="maxSize"
+		ng-change="onChange()">
+	</pagination>
 	<div class="table-responsive system-list">
 		<table class="table table-striped" id="systems-list">
 			<thead>

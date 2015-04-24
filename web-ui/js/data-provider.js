@@ -105,6 +105,15 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 			return system.uri === uri;
 		});
 	}
+	instance.getSystemsInRange = function(from, to) {
+		var response = [];
+		for (var i = from; i < to; i++) {
+			if (this.systems[i]) {
+				response.push(this.systems[i]);
+			}
+		}
+		return response;
+	}
 
 	// WAMP support
 	instance.onMessage = function(args) {

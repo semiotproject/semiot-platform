@@ -38,6 +38,7 @@
 		"dataProvider",
 		"highcharts-ng", 
 		"ui.bootstrap.datetimepicker",
+		"ui.bootstrap",
 		"ngRoute"
 	];
 
@@ -63,6 +64,10 @@
 
 	app.controller('MeterListCtrl', function($scope, dataProvider, commonUtils) {
 		$scope.systems = [];
+		$scope.currentPage = 1;
+		$scope.itemsPerPage = 10;
+		$scope.totalItems = 1;
+		$scope.maxSize = 10;
 		$scope.search = {	
 			name: ""
 		};
@@ -71,6 +76,14 @@
 			return (!$scope.search.type || element.type == $scope.search.type) &&
 					(!$scope.search.name || element.name.indexOf($scope.search.name) > -1);
 		};
+
+		$scope.onChange = function(element) {
+			$scope.systems = dataProvider.getSystemsInRange(
+				($scope.currentPage - 1) * $scope.itemsPerPage, 
+				($scope.currentPage) * $scope.itemsPerPage
+			);
+		};
+
 
 		$scope.removeSystem = function(uri) {
 			dataProvider.removeSystem(uri);
@@ -81,7 +94,11 @@
 		});	
 		
 		dataProvider.fetchSystems().then(function(data) {
-			$scope.systems = data;
+			$scope.systems = dataProvider.getSystemsInRange(
+				($scope.currentPage - 1) * $scope.itemsPerPage, 
+				($scope.currentPage) * $scope.itemsPerPage
+			);
+			$scope.totalItems = dataProvider.getSystems().length;
 			$(".container").removeClass("preloader");
 		});
 
