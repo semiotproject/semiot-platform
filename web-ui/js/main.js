@@ -36,6 +36,7 @@
 		"rdfUtils", 
 		"commonUtils",
 		"dataProvider",
+		"loginService",
 		"highcharts-ng", 
 		"ui.bootstrap.datetimepicker",
 		"ui.bootstrap",
@@ -46,11 +47,12 @@
 
 	app.config(function($routeProvider) {
 		$routeProvider
-			.when('/login', {
-				templateUrl: 'partials/login.html' 
-			})
 			.when('/', {
 				redirectTo: '/list'
+			})
+			.when('/login', {
+				templateUrl: 'partials/login.html',
+				controller: 'LoginCtrl'
 			})
 			.when('/list', {
 				templateUrl: 'partials/list.html',
@@ -60,6 +62,21 @@
 				templateUrl: 'partials/single.html',
 				controller: 'MeterSingleCtrl'
 			});
+	});
+
+	app.controller('LoginCtrl', function($scope, $location, loginService) {
+		$scope.login = "";
+		$scope.password = "";
+		$scope.error = false;
+		$scope.submit = function() {
+			if (loginService.authenticate($scope.login, $scope.password)) {		
+				$scope.login = "";
+				$scope.password = "";		
+				$location.path('/');	
+			} else {
+				$scope.error = true;
+			}
+		}
 	});
 
 	app.controller('MeterListCtrl', function($scope, dataProvider, commonUtils) {
@@ -99,7 +116,6 @@
 				($scope.currentPage) * $scope.itemsPerPage
 			);
 			$scope.totalItems = dataProvider.getSystems().length;
-			$(".container").removeClass("preloader");
 		});
 
 
@@ -182,4 +198,14 @@
 
 		$scope.init($routeParams.system_uri);
 	});
+
+	app.run(['$rootScope', '$location', 'loginService', function ($rootScope, $location, loginService) {
+	    $rootScope.$on('$routeChangeStart', function (event) {
+			if (loginService.isLogged()) {
+
+			} else {
+				$location.path('/login');
+			}			
+	    });
+	}]);
 }()); 

@@ -1,1 +1,17 @@
-login
+<div class="login-form">
+    <h3>Authentication</h3>
+    <form>
+	    <div ng-if="error">
+	    	<p class="error">Wrong username or password</p>
+	    </div>
+        <p>
+            <input type="text" ng-model="login" size="25" placeholder="login"/>
+        </p>
+        <p>
+            <input type="password" size="15" ng-model="password" placeholder="password"/>
+        </p>
+        <p>
+            <button class="button" ng-click="submit()">Submit</button>
+        </p>
+    </form>
+</div>

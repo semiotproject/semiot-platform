@@ -1,5 +1,5 @@
-var myModule = angular.module('dataProvider', ['commonUtils', 'rdfUtils']);
-myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdfUtils) {		
+angular.module('dataProvider', ['commonUtils', 'rdfUtils'])
+.factory('dataProvider', function($q, $http, $interval, commonUtils, rdfUtils) {		
 
 	// helpers
 	var getPrefixes = function() {

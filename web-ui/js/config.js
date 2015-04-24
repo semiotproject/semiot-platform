@@ -2,6 +2,7 @@
 
 var CONFIG = (function() {
 	return {
+		COOKIE_NAME: "ru.semiot",
 		URLS: {
 			messageBus: "ws://machine3-ailab.tk/ws",
 			tripleStore: "http://machine3-ailab.tk:3030/ds/query",
