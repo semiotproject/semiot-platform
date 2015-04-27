@@ -234,24 +234,22 @@ angular.module('loginService', ['commonUtils'])
 	var USERS = [
 		"b4b8daf4b8ea9d39568719e1e320076f",
 		"5cc32e366c87c4cb49e4309b75f57d64"
-	]
+	];
+
+	var isLogged = false;
 
 	return {
 		authenticate: function(user, password) {
 			var hash = md5(user + password);
 			if (USERS.indexOf(hash) > -1) {
-				set_cookie(CONFIG.COOKIE_NAME, hash);
+				isLogged = true;
 				return true;
-			} else {
-				console.error("failed to authenticate with hash = " + hash);
 			}
+			console.error("failed to authenticate with hash = " + hash);
 			return false;
 		},
 		isLogged: function() {
-			if (get_cookie(CONFIG.COOKIE_NAME)) {
-				return true;
-			}
-			return false;
+			return isLogged;
 		}
 	};
 
