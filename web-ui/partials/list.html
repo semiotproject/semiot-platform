@@ -1,5 +1,8 @@
+<h2>SemIoT Platform</h2>
 <section>
-	<h4>Registered systems ({{ systems.length }})</h4>
+	<ol class="breadcrumb">
+		<li class="active">Systems</li>
+	</ol>	
 	<pagination 
 		ng-model="currentPage"
 		items-per-page="itemsPerPage" 
@@ -18,6 +21,9 @@
 						<input type=text ng-model="search.name" class="form-control" placeholder="Name"/>
 					</th>
 					<th>
+						State
+					</th>
+					<th>
 					
 					</th>
 				</tr>
@@ -30,6 +36,7 @@
 				<tr ng-repeat="system in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle(system)">
 					<td>{{ $index + 1 }}</td>
 					<td><a href="{{ '#/single/' + system.uri }}">{{ system.name }}</a></td>
+					<td>{{ system.state }}</td>
 					<td>
 						<button class="btn btn-primary btn-sm">
 							<i class="glyphicon glyphicon-remove" ng-click="removeSystem(system.uri); $event.stopPropagation();" title="Remove this system"></i>

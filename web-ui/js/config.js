@@ -10,6 +10,7 @@ var CONFIG = (function() {
 		},
 		TOPICS: {
 			"device_registered": 'ru.semiot.devices.newandobserving',
+			"device_turned_off": 'ru.semiot.devices.turnoff',
 			"device_remove": 'ru.semiot.devices.remove'
 		},
 		SPARQL: {
@@ -46,6 +47,11 @@ var CONFIG = (function() {
 					"	?subsystem ssn:observes ?type .",
 					"	?subsystem ssncom:hasCommunicationEndpoint ?endpoint .",
 					"	?endpoint ssncom:protocol 'WAMP' .",
+					"}"
+				].join('\n'),
+				getSystemName: [
+					"SELECT ?label {",
+					"	<{0}> rdfs:label ?label .",
 					"}"
 				].join('\n')
 			}

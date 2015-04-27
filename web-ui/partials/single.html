@@ -1,3 +1,4 @@
+<h2>SemIoT Platform</h2>
 <section>
 	<ol class="breadcrumb">
 		<li><a href="#/list">Systems</a></li>
@@ -8,7 +9,7 @@
 			<div class="range-control">
 				<label>From</label>
 				<div class="dropdown">
-					<a class="dropdown-toggle" id="dropdown{{ $index }}.0" role="button" data-toggle="dropdown" data-target="#" href="#">
+					<a class="dropdown-toggle" id="dropdown{{ $index }}.0" role="button" data-toggle="dropdown" data-target="#">
 						<div class="input-group">
 							<input type="text" class="form-control" ng-value="sensor.range[0] | date: 'yyyy-MM-dd HH:mm'">
 							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
@@ -23,9 +24,12 @@
 				</div>
 			</div>
 			<div class="range-control">
-				<label>To</label>
+				<label>
+					<span>To</span>
+					<a ng-click="onNowClicked(sensor)">[now]</a>
+				</label>
 				<div class="dropdown">
-					<a class="dropdown-toggle" id="dropdown{{ $index }}.1" role="button" data-toggle="dropdown" data-target="#" href="#">
+					<a class="dropdown-toggle" id="dropdown{{ $index }}.1" role="button" data-toggle="dropdown" data-target="#">
 						<div class="input-group">
 							<input type="text" class="form-control" ng-value="sensor.range[1] | date: 'yyyy-MM-dd HH:mm'">
 							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>

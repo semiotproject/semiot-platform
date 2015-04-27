@@ -88,28 +88,22 @@
 		$scope.search = {	
 			name: ""
 		};
-
 		$scope.filterFunction = function(element) {
 			return (!$scope.search.type || element.type == $scope.search.type) &&
 					(!$scope.search.name || element.name.indexOf($scope.search.name) > -1);
 		};
-
 		$scope.onChange = function(element) {
 			$scope.systems = dataProvider.getSystemsInRange(
 				($scope.currentPage - 1) * $scope.itemsPerPage, 
 				($scope.currentPage) * $scope.itemsPerPage
 			);
 		};
-
-
 		$scope.removeSystem = function(uri) {
 			dataProvider.removeSystem(uri);
 		};
-
 		dataProvider.on('systemsUpdate', function(data) {
 			$scope.systems = data;
-		});	
-		
+		});
 		dataProvider.fetchSystems().then(function(data) {
 			$scope.systems = dataProvider.getSystemsInRange(
 				($scope.currentPage - 1) * $scope.itemsPerPage, 
@@ -117,8 +111,6 @@
 			);
 			$scope.totalItems = dataProvider.getSystems().length;
 		});
-
-
 	});
 
 	app.controller('MeterSingleCtrl', function($scope, $routeParams, $interval, dataProvider, commonUtils, rdfUtils) {
@@ -126,6 +118,7 @@
 		$scope.setDefault = function() {
 			$scope.title = "";
 			$scope.sensors = [];
+			$scope.liveEnabled = true;
 			if ($scope.connectionPull && $scope.connectionPull.length > 0) {		
 				$scope.connectionPull.forEach(function(connection) {
 					connection.close();
@@ -135,7 +128,7 @@
 			$scope.default_range = (function() {
 				// time difference between server and client
 				// FIXME
-				var TIME_DIFF = 3 * 3600 * 1000; 
+				var TIME_DIFF = 0 * 3600 * 1000; 
 				var now = (new Date()).getTime() - TIME_DIFF;
 				var end_date = new Date(now);
 				var start_date = (new Date(now - 1 * 3600 * 1000));
@@ -144,10 +137,12 @@
 		};
 		$scope.init = function(uri) {
 			// get extended info
-			var system = dataProvider.getSystemByURI(uri);
-			if (system) {
-				$scope.title = system.name;
-			}
+			dataProvider.fetchSystemName(uri, function(data) {
+				if (data.results.bindings[0]) {
+					$scope.title = data.results.bindings[0].label.value;
+				}
+			});
+
 			dataProvider.fetchSystemEndpoint(uri, function(data) {
 				var sensors = [];
 				data.results.bindings.forEach(function(binding) {
@@ -170,29 +165,33 @@
 							function(args) {
 								$scope.onUpdated(sensor, args[0]);
 							}
-						);	
+						);
 						$scope.connectionPull.push(connection);						
 					});
 					sensors.push(sensor);
 				});
 				$scope.sensors = sensors;
 			});
-		}
+		};
 		$scope.onUpdated = function(sensor, data) {
 			rdfUtils.parseTTL(data).then(function(triples) {
 				var resource = rdfUtils.parseTriples(triples);
 				var observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
 				sensor.chartConfig.series[0].data.push([(new Date()).getTime(), observationResult]);
 			});
-		}
+		};
 		$scope.setRange = function(index) {
 			var sensor = $scope.sensors[index];
 			dataProvider.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
 				sensor.chartConfig.series[0].data = commonUtils.normalizeTSDBData(result);
 				//sensor.chartConfig.xAxis.currentMin = (sensor.range[0]).getTime();
-				//sensor.chartConfig.xAxis.currentMax = (sensor.range[1]).getTime();		
+				//sensor.chartConfig.xAxis.currentMax = (sensor.range[1]).getTime();
 			});
-		}
+		};
+
+		$scope.onNowClicked = function(sensor) {
+			sensor.range[1] = (new Date()).getTime();
+		};
 
 		$scope.setDefault();
 
