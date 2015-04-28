@@ -1,5 +1,11 @@
 package ru.semiot.web;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -10,7 +16,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import ru.semiot.WAMP.Launcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.semiot.cqels.Engine;
 
 /**
@@ -20,7 +27,8 @@ import ru.semiot.cqels.Engine;
 @Stateless
 @Path("rest")
 public class REST {
-    
+    private static final Logger logger = LoggerFactory
+            .getLogger(REST.class);
     @Inject
     private DataBase db;
     @POST
@@ -50,9 +58,21 @@ public class REST {
         return db.removeRequest(id);
     }
     @GET
-    public void startLauncher(){
-        Engine.beforeClass();
-        Launcher l = new Launcher();
-        l.run();        
+    public void startLauncher() throws MalformedURLException, IOException{
+        Engine.beforeClass();    
+        HttpURLConnection conn = (HttpURLConnection)new URL ("http://localhost:8080/WAMP-1.0-SNAPSHOT/wamp/").openConnection();
+        conn.setRequestMethod("GET");
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                                    conn.getInputStream()));
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) 
+            logger.debug(inputLine);
+        in.close();
+    }
+    @POST
+    @Path("data")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public void appendData(String data){ 
+        Engine.appendData(data);
     }
 }

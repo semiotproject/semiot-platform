@@ -1,4 +1,4 @@
-package ru.semiot.WAMP;
+package ru.semiot.wamp;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;

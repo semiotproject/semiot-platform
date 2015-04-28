@@ -1,4 +1,4 @@
-package ru.semiot.WAMP;
+package ru.semiot.wamp;
 
 import java.io.IOException;
 import org.aeonbits.owner.ConfigFactory;

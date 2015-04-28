@@ -1,4 +1,4 @@
-package ru.semiot.WAMP;
+package ru.semiot.wamp;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -9,8 +9,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import java.io.StringReader;
 import java.util.LinkedList;
+import org.apache.jena.atlas.web.auth.HttpAuthenticator;
+import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static ru.semiot.wamp.ServiceConfig.config;
 import rx.Observer;
 
 public class SubscribeListener implements Observer<String> {
@@ -18,7 +21,7 @@ public class SubscribeListener implements Observer<String> {
     private static final Logger logger = LoggerFactory
             .getLogger(SubscribeListener.class);
     public static final String LANG = "TURTLE";
-    //private final HttpAuthenticator httpAuthenticator;
+    private final HttpAuthenticator httpAuthenticator;
     private final WAMPClient wampClient = WAMPClient.getInstance();
     private static final String PREFIX_TOPIC = "topic=";
     private LinkedList<String> listTopics = new LinkedList<String>();
@@ -32,8 +35,8 @@ public class SubscribeListener implements Observer<String> {
                     .append("?q ssncom:protocol \"WAMP\"}").toString());
 
     public SubscribeListener() {
-    //    httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
-    //            config.storePassword().toCharArray());
+        httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
+                config.storePassword().toCharArray());
         subscribeTopics(null);
     }
 
@@ -75,11 +78,11 @@ public class SubscribeListener implements Observer<String> {
     }
 
     private void subscribeTopics(Model description) {
-        if (description != null) {
+        
             QueryExecution qe;
-            //if(description==null)
-            //    qe = getQEFromStoredTopics();
-            //else                        
+            if(description==null)
+                qe = getQEFromStoredTopics();
+            else                        
                 qe = getQEFromModelTopics(description);
 
             ResultSet topics = qe.execSelect();
@@ -95,13 +98,13 @@ public class SubscribeListener implements Observer<String> {
                     logger.warn("Name topic is blank");
                 }
             }
-        }
+        
     }
 
-    //private QueryExecution getQEFromStoredTopics() {
-    //    return QueryExecutionFactory.sparqlService(config.storeUrl(),
-    //            TOPICS_QUERY, httpAuthenticator);
-    //}
+    private QueryExecution getQEFromStoredTopics() {
+        return QueryExecutionFactory.sparqlService(config.storeUrl(),
+                TOPICS_QUERY, httpAuthenticator);
+    }
 
     private QueryExecution getQEFromModelTopics(Model description) {
         return QueryExecutionFactory.create(TOPICS_QUERY, description);
