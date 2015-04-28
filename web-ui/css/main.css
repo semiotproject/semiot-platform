@@ -5,6 +5,10 @@ body {
 	position: relative;
 }
 
+a {
+	cursor: pointer;
+}
+
 .container {
 	margin-top: 40px;
 }
@@ -21,7 +25,8 @@ body {
 	  padding: 5px 5px 5px 0;
 }
 
-.table thead>tr>th:first-child {
+.table thead>tr>th:first-child,
+.table thead>tr>th:nth-of-type(3) {
 	  padding: 8px;
 }
 
@@ -61,7 +66,7 @@ thead {
 
 .range-control {
 	display: inline-block;
-	width: 325px;
+	width: 225px;
 	margin: 0 20px 10px 0;
 	  vertical-align: bottom;
 }
@@ -77,11 +82,17 @@ thead {
 	box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
 	border: 1px solid rgb(219, 219, 219);
 }
+.breadcrumb {
+	margin-bottom: 0px;
+}
 
 /* highcharts */
+.sensor-view {
+	margin-top: 20px;
+}
 .highcharts-button {
 	display: none;
 }
 .highcharts-container {
-	margin-bottom: 20px;
+	margin-top: 10px;
 }

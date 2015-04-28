@@ -1,5 +1,5 @@
-var myModule = angular.module('dataProvider', ['commonUtils', 'rdfUtils']);
-myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdfUtils) {		
+angular.module('dataProvider', ['commonUtils', 'rdfUtils'])
+.factory('dataProvider', function($q, $http, $interval, commonUtils, rdfUtils) {
 
 	// helpers
 	var getPrefixes = function() {
@@ -57,6 +57,9 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 			headers: { Accept: "application/sparql-results+json" }
 		};
 		return $http.get(CONFIG.URLS.tripleStore, config).success(callback);
+	};	
+	instance.fetchSystemName = function(uri, callback) {
+		return this.executeQuery(CONFIG.SPARQL.queries.getSystemName.format(uri), callback);
 	};
 	instance.fetchSystemEndpoint = function(uri, callback) {
 		return this.executeQuery(CONFIG.SPARQL.queries.getSystemEndpoint.format(uri), callback);
@@ -67,7 +70,8 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 			instance.systems = data.results.bindings.map(function(binding) {
 				return {
 					name: binding.label.value,
-					uri: binding.uri.value
+					uri: binding.uri.value,
+					state: "online"
 				};
 			});
 			defer.resolve(instance.systems);
@@ -83,7 +87,7 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 			commonUtils.parseTopicFromEndpoint(metric), 
 			{}
 		));
-	}
+	};
 
 	instance.removeSystem = function(uri) {
 		if (this.connection) {
@@ -95,19 +99,28 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 			}
 		}.bind(this));
 		instance.trigger("systemsUpdate", this.systems);
-	}
+	};
 
 	instance.getSystems = function() {
 		return this.systems;
-	}
+	};
 	instance.getSystemByURI = function(uri) {
 		return this.systems.find(function(system) {
 			return system.uri === uri;
 		});
-	}
+	};
+	instance.getSystemsInRange = function(from, to) {
+		var response = [];
+		for (var i = from; i < to; i++) {
+			if (this.systems[i]) {
+				response.push(this.systems[i]);
+			}
+		}
+		return response;
+	};
 
 	// WAMP support
-	instance.onMessage = function(args) {
+	instance.onDeviceRegistered = function(args) {
 		rdfUtils.parseTTL(args[0]).then(function(triples) {
 			var resource = rdfUtils.parseTriples(triples);
 			if (!instance.systems.find(function(system) { // if system is new
@@ -115,17 +128,35 @@ myModule.factory('dataProvider', function($q, $http, $interval, commonUtils, rdf
 			})) {
 				instance.systems.push({
 					uri: resource.uri,
-					name: resource.get("http://www.w3.org/2000/01/rdf-schema#label")
+					name: resource.get("http://www.w3.org/2000/01/rdf-schema#label"),
+					state: "online"
 				});	
 				instance.trigger("systemsUpdate", instance.systems);					
 			}
 		});
     };
+    instance.onDeviceTurnedOff = function(uri) {
+		console.warn("Turred off!");
+		this.systems.forEach(function(system) {
+			if (system.uri === uri) {
+				this.systems.state = "offline";
+			}
+		}.bind(this));
+		instance.trigger("systemsUpdate", this.systems);
+    };
 
 	instance.connection = commonUtils.subscribe(
 		CONFIG.URLS.messageBus,
-		CONFIG.TOPICS.device_registered,
-		instance.onMessage
+		[
+			{
+				topic: 	CONFIG.TOPICS.device_registered,
+				callback: instance.onDeviceRegistered
+			},
+			{
+				topic: 	CONFIG.TOPICS.device_turned_off,
+				callback: instance.onDeviceTurnedOff
+			}
+		]
 	).session;
 	
 	return instance;

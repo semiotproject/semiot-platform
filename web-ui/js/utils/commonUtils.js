@@ -1,15 +1,7 @@
 var myModule = angular.module('commonUtils', []);
 myModule.factory('commonUtils', function($q) {
 
-	var instance = {
-		sparqlToHumanType: function(type) {
-			for (var key in CONFIG.SPARQL.types) {
-				if (CONFIG.SPARQL.types[key] === type) {
-					return key;
-				}
-			}
-			return null;
-		},
+	var instance = {	
 		getChartConfig: function(type, data) {
 			return {
             	useHighStocks: true,
@@ -57,13 +49,15 @@ myModule.factory('commonUtils', function($q) {
 			var prefix = "ws://wamprouter/ws?topic=";
 			return endpoint.substr(prefix.length);
 		},
-		subscribe: function(url, topic, callback) {
+		subscribe: function(url, listeners) {
 			var connection = new autobahn.Connection({
 				url: url,
 				realm: 'realm1'
 			});
-			connection.onopen = function (session) {
-				session.subscribe(topic, callback);
+			connection.onopen = function(session) {
+				listeners.forEach(function(listener) {
+					session.subscribe(listener.topic, listener.callback);
+				});
 			};
 			connection.open();
 			return connection;	
