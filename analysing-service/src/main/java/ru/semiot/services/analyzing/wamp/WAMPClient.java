@@ -1,11 +1,11 @@
-package ru.semiot.wamp;
+package ru.semiot.services.analyzing.wamp;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static ru.semiot.wamp.ServiceConfig.config;
+import static ru.semiot.services.analyzing.ServiceConfig.config;
 import rx.Observable;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;

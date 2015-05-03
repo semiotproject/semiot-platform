@@ -1,5 +1,6 @@
-package ru.semiot.wamp;
+package ru.semiot.services.analyzing.wamp;
 
+import ru.semiot.services.analyzing.ServiceConfig;
 import java.io.IOException;
 import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;

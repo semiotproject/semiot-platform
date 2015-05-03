@@ -1,4 +1,4 @@
-package ru.semiot.web;
+package ru.semiot.services.analyzing.rest;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -12,8 +12,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.cqels.Engine;
-import ru.semiot.wamp.Launcher;
+import ru.semiot.services.analyzing.cqels.Engine;
+import ru.semiot.services.analyzing.wamp.Launcher;
 
 /**
  *

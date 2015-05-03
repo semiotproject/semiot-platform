@@ -1,11 +1,11 @@
-package ru.semiot.wamp;
+package ru.semiot.services.analyzing.wamp;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import java.io.StringReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.cqels.Engine;
+import ru.semiot.services.analyzing.cqels.Engine;
 import rx.Observer;
 
 public class TopicListener implements Observer<String> {

@@ -1,4 +1,4 @@
-package ru.semiot.cqels;
+package ru.semiot.services.analyzing.cqels;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
@@ -16,15 +16,11 @@ import org.deri.cqels.engine.ContinuousListener;
 import org.deri.cqels.engine.ExecContext;
 import org.deri.cqels.engine.RDFStream;
 import org.slf4j.LoggerFactory;
-import ru.semiot.wamp.ServiceConfig;
-import ru.semiot.wamp.WAMPClient;
+import ru.semiot.services.analyzing.ServiceConfig;
+import ru.semiot.services.analyzing.wamp.WAMPClient;
 
-/**
- *
- * @author Даниил
- */
 public class Engine {
-    
+
     private static final org.slf4j.Logger logger = LoggerFactory
             .getLogger(Engine.class);
     private static final String CQELS_HOME = "cqels_home";
@@ -32,7 +28,7 @@ public class Engine {
     private static final String STREAM_ID = "http://example.org/simpletest/test";
     private static DefaultRDFStream stream = null;
     private static boolean init = false;
-    
+
     public static void beforeClass() {
         if (!init) {
             File home = new File(CQELS_HOME);
@@ -44,16 +40,16 @@ public class Engine {
             init = true;
         }
     }
-    
+
     public static void registerSelect(String select) {
         context.registerSelect(select).register(new ContinuousListener() {
-            
+
             @Override
             public void update(Mapping m) {
                 sendToWamp(getString(m));
             }
         });
-    }    
+    }
 
     public static void appendData(String msg) {
         Model description = ModelFactory.createDefaultModel().read(
@@ -65,7 +61,7 @@ public class Engine {
         logger.info("Get alert! " + message);
         WAMPClient.getInstance().publish(ServiceConfig.config.topicsAlert(), message);
     }
-    
+
     private static String getString(Mapping m) {
         List<Node> list = toNodeList(m);
         String message = "";
@@ -74,7 +70,7 @@ public class Engine {
         }
         return message;
     }
-    
+
     private static List<Node> toNodeList(Mapping mapping) {
         List<Node> nodes = new ArrayList<Node>();
         for (Iterator<Var> vars = mapping.vars(); vars.hasNext();) {
@@ -87,13 +83,13 @@ public class Engine {
         }
         return nodes;
     }
-    
+
     private static class DefaultRDFStream extends RDFStream {
-        
+
         public DefaultRDFStream(ExecContext context, String uri) {
             super(context, uri);
         }
-        
+
         public void stream(Model t) {
             StmtIterator iter = t.listStatements();
             Triple trip;
@@ -106,10 +102,10 @@ public class Engine {
                 super.stream(sub, pred, obj);
             }
         }
-        
+
         @Override
         public void stop() {
         }
-        
+
     }
 }
