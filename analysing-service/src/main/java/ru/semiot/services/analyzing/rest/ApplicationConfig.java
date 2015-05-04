@@ -1,11 +1,11 @@
-package ru.semiot.wamp;
+package ru.semiot.services.analyzing.rest;
 
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-@ApplicationPath("wamp")
+@ApplicationPath("web")
 public class ApplicationConfig extends Application {
 
     @Override

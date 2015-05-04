@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.semiot</groupId>
-    <artifactId>WAMP</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>analysing-service</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>WAMP</name>
+    <name>analysing-service</name>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -15,6 +15,12 @@
     </properties>
     
     <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>ws.wamp.jawampa</groupId>
             <artifactId>jawampa</artifactId>
@@ -26,18 +32,20 @@
             <version>1.0.8</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-            <version>2.13.0</version>
-        </dependency>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>7.0</version>
-            <scope>provided</scope>
+            <groupId>org.deri.cqels</groupId>
+            <artifactId>cqels</artifactId>
+            <version>1.1.0</version>           
         </dependency>
     </dependencies>
     <repositories>
+        <repository>
+            <id>cqels</id>
+            <url>https://raw.github.com/KMax/cqels/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
         <repository>
             <id>jawampa.mvn-repo</id>
             <url>https://raw.github.com/Matthias247/jawampa/mvn-repo/</url>
@@ -93,6 +101,30 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>1.1.0.Alpha1</version>
+                <executions>
+                    <execution>
+                        <id>undeploy</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>undeploy</goal>
+                        </goals>
+                        <configuration>
+                            <ignoreMissingDeployment>true</ignoreMissingDeployment>
+                        </configuration>
+                    </execution>
+
+                </executions>
+                <configuration>
+                    <!--
+                    <username>admin</username>
+<password>admin</password>
+                    -->
+                </configuration>                
             </plugin>
         </plugins>
     </build>

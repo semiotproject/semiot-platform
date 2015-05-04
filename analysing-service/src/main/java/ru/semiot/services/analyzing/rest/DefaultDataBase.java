@@ -1,4 +1,4 @@
-package ru.semiot.web;
+package ru.semiot.services.analyzing.rest;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;

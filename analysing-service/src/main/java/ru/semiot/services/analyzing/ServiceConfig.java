@@ -1,4 +1,4 @@
-package ru.semiot.wamp;
+package ru.semiot.services.analyzing;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
@@ -7,7 +7,7 @@ import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.ConfigFactory;
 
 @LoadPolicy(LoadType.FIRST)
-@Sources({"file:/semiot-platform/data-archiving-service/config.properties"})
+@Sources({"file:/semiot-platform/data-analyzing/config.properties"})
 public interface ServiceConfig extends Config {
 
     public static final ServiceConfig config = ConfigFactory
