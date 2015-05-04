@@ -82,8 +82,8 @@ angular.module('dataProvider', ['commonUtils', 'rdfUtils'])
 	// TSDB support
 	instance.fetchArchiveTestimonials = function(metric, range) {
 		return $http.get(CONFIG.URLS.tsdb.format(
-			window.moment(range[0]).format('YYYY/MM/DD-HH:mm:ss'),
-			window.moment(range[1]).format('YYYY/MM/DD-HH:mm:ss'),
+			window.moment(range[0] - CONFIG.TIMEZONE_OFFSET).format('YYYY/MM/DD-HH:mm:ss'),
+			window.moment(range[1] - CONFIG.TIMEZONE_OFFSET).format('YYYY/MM/DD-HH:mm:ss'),
 			commonUtils.parseTopicFromEndpoint(metric), 
 			{}
 		));
@@ -121,7 +121,7 @@ angular.module('dataProvider', ['commonUtils', 'rdfUtils'])
 
 	// WAMP support
 	instance.onDeviceRegistered = function(args) {
-		rdfUtils.parseTTL(args[0]).then(function(triples) {
+		rdfUtils.parseTTL(args).then(function(triples) {
 			var resource = rdfUtils.parseTriples(triples);
 			if (!instance.systems.find(function(system) { // if system is new
 				return system.uri === resource.uri;

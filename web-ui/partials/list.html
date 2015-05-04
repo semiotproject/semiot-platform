@@ -4,11 +4,11 @@
 		<li class="active">Systems</li>
 	</ol>	
 	<pagination 
-		ng-model="currentPage"
-		items-per-page="itemsPerPage" 
-		total-items="totalItems"
-		max-size="maxSize"
-		ng-change="onChange()">
+		ng-model="pagination.currentPage"
+		items-per-page="pagination.itemsPerPage" 
+		total-items="pagination.totalItems"
+		max-size="pagination.maxSize"
+		ng-change="setPagination()">
 	</pagination>
 	<div class="table-responsive system-list">
 		<table class="table table-striped" id="systems-list">

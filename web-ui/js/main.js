@@ -40,6 +40,7 @@
 		"highcharts-ng", 
 		"ui.bootstrap.datetimepicker",
 		"ui.bootstrap",
+		"ui.codemirror",
 		"ngRoute"
 	];
 
@@ -57,7 +58,11 @@
 			.when('/list', {
 				templateUrl: 'partials/list.html',
 				controller: 'MeterListCtrl'
-			})			
+			})	
+			.when('/analyze', {
+				templateUrl: 'partials/analyze.html',
+				controller: 'AnalyzeCtrl'
+			})		
 			.when('/single/:system_uri*', {
 				templateUrl: 'partials/single.html',
 				controller: 'MeterSingleCtrl'
@@ -79,37 +84,46 @@
 		}
 	});
 
+	app.controller('AnalyzeCtrl', function($scope) {
+		$scope.editorOptions = {
+			lineWrapping : true,
+			lineNumbers: true,
+			matchBrackets: true,
+			mode: 'application/sparql-query',
+		};
+		$scope.code = "fdsfds";
+	});
+
 	app.controller('MeterListCtrl', function($scope, dataProvider, commonUtils) {
 		$scope.systems = [];
-		$scope.currentPage = 1;
-		$scope.itemsPerPage = 10;
-		$scope.totalItems = 1;
-		$scope.maxSize = 10;
 		$scope.search = {	
 			name: ""
 		};
-		$scope.filterFunction = function(element) {
-			return (!$scope.search.type || element.type == $scope.search.type) &&
-					(!$scope.search.name || element.name.indexOf($scope.search.name) > -1);
+		$scope.pagination = {
+			currentPage: 1,
+			itemsPerPage: 6,
+			totalItems: 1,
+			maxSize: 1000
 		};
-		$scope.onChange = function(element) {
-			$scope.systems = dataProvider.getSystemsInRange(
-				($scope.currentPage - 1) * $scope.itemsPerPage, 
-				($scope.currentPage) * $scope.itemsPerPage
+
+		$scope.setPagination = function() {
+			var total_systems = dataProvider.getSystems().filter(function(s) {
+				return !$scope.search.name || s.name.indexOf($scope.search.name) > -1;
+			}) 
+			$scope.systems = total_systems.slice(
+				($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage, 
+				($scope.pagination.currentPage) * $scope.pagination.itemsPerPage
 			);
-		};
+			$scope.pagination.totalItems = total_systems.length;
+		}
 		$scope.removeSystem = function(uri) {
 			dataProvider.removeSystem(uri);
 		};
 		dataProvider.on('systemsUpdate', function(data) {
-			$scope.systems = data;
+			$scope.setPagination();
 		});
 		dataProvider.fetchSystems().then(function(data) {
-			$scope.systems = dataProvider.getSystemsInRange(
-				($scope.currentPage - 1) * $scope.itemsPerPage, 
-				($scope.currentPage) * $scope.itemsPerPage
-			);
-			$scope.totalItems = dataProvider.getSystems().length;
+			$scope.setPagination();
 		});
 	});
 
@@ -128,8 +142,7 @@
 			$scope.default_range = (function() {
 				// time difference between server and client
 				// FIXME
-				var TIME_DIFF = 0 * 3600 * 1000; 
-				var now = (new Date()).getTime() - TIME_DIFF;
+				var now = (new Date()).getTime();
 				var end_date = new Date(now);
 				var start_date = (new Date(now - 1 * 3600 * 1000));
 				return [start_date, end_date];
@@ -159,12 +172,18 @@
 					dataProvider.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
 						sensor.chartConfig.series[0].data = commonUtils.normalizeTSDBData(result);
 
+						console.log(commonUtils.parseTopicFromEndpoint(sensor.endpoint));
+
 						var connection = commonUtils.subscribe(
 							CONFIG.URLS.messageBus,
-							commonUtils.parseTopicFromEndpoint(sensor.endpoint),
-							function(args) {
-								$scope.onUpdated(sensor, args[0]);
-							}
+							[
+								{
+									topic: commonUtils.parseTopicFromEndpoint(sensor.endpoint),
+									callback: function(args) {
+										$scope.onUpdated(sensor, args[0]);
+									}
+								}
+							]
 						);
 						$scope.connectionPull.push(connection);						
 					});
@@ -174,12 +193,13 @@
 			});
 		};
 		$scope.onUpdated = function(sensor, data) {
+			debugger;
 			rdfUtils.parseTTL(data).then(function(triples) {
 				var resource = rdfUtils.parseTriples(triples);
 				var observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
-				sensor.chartConfig.series[0].data.push([(new Date()).getTime(), observationResult]);
+				sensor.chartConfig.series[0].data.push([(new Date()).getTime() + CONFIG.TIMEZONE_OFFSET, observationResult]);
 			});
-		};
+		};	
 		$scope.setRange = function(index) {
 			var sensor = $scope.sensors[index];
 			dataProvider.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
@@ -203,7 +223,7 @@
 			if (loginService.isLogged()) {
 
 			} else {
-				$location.path('/login');
+				// $location.path('/login');
 			}			
 	    });
 	}]);

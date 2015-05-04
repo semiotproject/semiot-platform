@@ -1,6 +1,8 @@
 var myModule = angular.module('commonUtils', []);
 myModule.factory('commonUtils', function($q) {
 
+	var counter = 666;
+
 	var instance = {	
 		getChartConfig: function(type, data) {
 			return {
@@ -18,7 +20,8 @@ myModule.factory('commonUtils', function($q) {
 					rangeSelector: {
 						enabled: false
 					},
-					useUTC: false
+					useUTC: false,
+					timezoneOffset: 3 * 60
             	},
 				series: [
 					{				
@@ -36,10 +39,10 @@ myModule.factory('commonUtils', function($q) {
 			var data = [];
 			if (result.data[0]) {
 				var dps = result.data[0].dps;
-				var localTime = (new Date()).getTime();
+				var localTime = (new Date()).getTime() + CONFIG.TIMEZONE_OFFSET;
 				for (var timestamp in dps) {
 					if (timestamp * 1000 < localTime) {
-						data.push([timestamp * 1000, dps[timestamp]]);
+						data.push([timestamp * 1000 + CONFIG.TIMEZONE_OFFSET, dps[timestamp]]);
 					}
 				}
 			}
@@ -90,10 +93,10 @@ myModule.factory('commonUtils', function($q) {
 				"@prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> .",
 				"@prefix ssncom: <http://purl.org/NET/ssnext/communication#> .",
 
-				"<coap://10.1.1.2:545/meter> a hmtr:HeatMeter ;",
+				"<coap://10.1.1.2:{0}/meter> a hmtr:HeatMeter ;".format(counter++),
 				"    rdfs:label \"Heat Meter #6666\" ;",
-				"    ssn:hasSubsystem <coap://10.1.1.2:545/meter/temperature> ;",
-				"    ssn:hasSubsystem <coap://10.1.1.2:545/meter/heat> .",
+				"    ssn:hasSubsystem <coap://10.1.1.2:{0}/meter/temperature> ;".format(counter++),
+				"    ssn:hasSubsystem <coap://10.1.1.2:{0}/meter/heat> .".format(counter++),
 
 				"<coap://10.1.1.2:545/meter/temperature> a ssn:Sensor ;",
 				"    ssn:observes hmtr:Temperature ;",
