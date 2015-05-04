@@ -43,6 +43,10 @@ public interface ServiceConfig extends Config {
     String storePassword();
 
     @DefaultValue("ru.semiot.alerts")
-    @Key("services.web.alerts")
+    @Key("services.analyzingservice.alerts")
     String topicsAlert();
+    
+    @DefaultValue("false")
+    @Key("services.analyzingservice.autoloaded")
+    boolean isAutoLoaded();
 }

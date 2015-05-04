@@ -31,6 +31,7 @@ public class Engine {
 
     public static void beforeClass() {
         if (!init) {
+            logger.info("Initialize home directory for cqels");
             File home = new File(CQELS_HOME);
             if (!home.exists()) {
                 home.mkdir();
