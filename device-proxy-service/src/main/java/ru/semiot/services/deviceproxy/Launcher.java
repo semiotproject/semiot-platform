@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.semiot.services.deviceproxy.handlers.wamp.NewDeviceHandler;
+import ru.semiot.services.deviceproxy.handlers.wamp.RemoveDeviceHandler;
 import ws.wamp.jawampa.WampClient;
 
 public class Launcher {
@@ -38,6 +39,12 @@ public class Launcher {
 											.getInstance()
 											.subscribe(config.topicsNewDevice())
 											.subscribe(new NewDeviceHandler());
+
+									WAMPClient
+											.getInstance()
+											.subscribe(config.topicsRemove())
+											.subscribe(
+													new RemoveDeviceHandler());
 								} else if (newStatus == WampClient.Status.Disconnected) {
 									logger.info("Disconnected from {}",
 											config.wampUri());

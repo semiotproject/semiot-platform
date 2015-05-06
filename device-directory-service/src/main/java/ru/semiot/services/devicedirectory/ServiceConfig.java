@@ -30,9 +30,17 @@ public interface ServiceConfig extends Config {
 	@Key("services.topics.newdevice")
 	String topicsNewDevice();
 
-	@DefaultValue("ru.semiot.devices.inactive")
+	@DefaultValue("ru.semiot.devices.turnoff")
 	@Key("services.topics.inactive")
 	String topicsInactive();
+
+	@DefaultValue("ru.semiot.devices.removeDevice")
+	@Key("services.topics.removeDevice")
+	String topicsRemoveDevice();
+
+	@DefaultValue("ru.semiot.devices.removeSensor")
+	@Key("services.topics.removeSensor")
+	String topicsRemoveSensor();
 
 	@DefaultValue("http://localhost:3030/ds/data")
 	@Key("services.devicedirectory.store.url")

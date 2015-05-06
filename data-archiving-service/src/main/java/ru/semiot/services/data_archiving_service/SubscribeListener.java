@@ -35,7 +35,6 @@ public class SubscribeListener implements Observer<String> {
 	private static final Query TOPICS_QUERY = QueryFactory
 			.create(new StringBuilder()
 					.append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
-					.append("prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> ")
 					.append("prefix ssncom: <http://purl.org/NET/ssnext/communication#> ")
 					.append("SELECT ?q where{ ?x a ssn:Sensor; ssncom:hasCommunicationEndpoint ?q. ")
 					.append("?q ssncom:protocol \"WAMP\"}").toString());
@@ -97,8 +96,10 @@ public class SubscribeListener implements Observer<String> {
 			if (StringUtils.isNotBlank(topicName)
 					&& !listTopics.contains(topicName)) {
 				listTopics.add(topicName);
-				wampClient.subscribe(topicName).subscribe(
-						new WriterMetricsListener(topicName));
+				wampClient.addSubscription(
+						topicName,
+						wampClient.subscribe(topicName).subscribe(
+								new WriterMetricsListener(topicName)));
 			} else {
 				logger.warn("Name topic is blank");
 			}

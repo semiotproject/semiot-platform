@@ -2,6 +2,7 @@ package ru.semiot.services.data_archiving_service;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.aeonbits.owner.ConfigFactory;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import rx.Observable;
+import rx.Subscription;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
@@ -21,6 +23,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
 			.create(ServiceConfig.class);
 	private static final WAMPClient INSTANCE = new WAMPClient();
 	private WampClient client;
+	private HashMap<String, Subscription> sensorSubscriptions = new HashMap<>();
 
 	private WAMPClient() {
 	}
@@ -53,6 +56,18 @@ public class WAMPClient implements Closeable, AutoCloseable {
 	@Override
 	public void close() throws IOException {
 		client.close();
+	}
+
+	public void addSubscription(String key, Subscription value) {
+		sensorSubscriptions.put(key, value);
+	}
+
+	public void unsubscribe(String key) {
+		Subscription subscription = sensorSubscriptions.get(key);
+		if (subscription != null) {
+			subscription.unsubscribe();
+			sensorSubscriptions.remove(key);
+		}
 	}
 
 }

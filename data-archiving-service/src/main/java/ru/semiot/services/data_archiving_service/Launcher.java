@@ -36,7 +36,14 @@ public class Launcher {
 											.subscribe(
 													config.topicsSubscriber())
 											.subscribe(new SubscribeListener());
+
 									WriterOpenTsdb.getInstance().start();
+
+									WAMPClient
+											.getInstance()
+											.subscribe(
+													config.topicsRemoveSensor())
+											.subscribe(new RemoveListener());
 								} else if (newStatus == WampClient.Status.Disconnected) {
 									logger.info("Disconnected from {}",
 											config.wampUri());

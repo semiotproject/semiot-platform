@@ -34,6 +34,10 @@ public interface ServiceConfig extends Config {
 	@Key("services.devicedirectory.store.url")
 	String storeUrl();
 
+	@DefaultValue("ru.semiot.devices.removeSensor")
+	@Key("services.topics.removeSensor")
+	String topicsRemoveSensor();
+
 	@DefaultValue("")
 	@Key("services.devicedirectory.store.username")
 	String storeUsername();

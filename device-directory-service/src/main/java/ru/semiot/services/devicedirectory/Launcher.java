@@ -38,7 +38,7 @@ public class Launcher {
 
 									WAMPClient.getInstance()
 											.subscribe(config.topicsInactive())
-											.subscribe(new InactiveDevice());
+											.subscribe(new InactiveDeviceListener());
 								} else if (newStatus == WampClient.Status.Disconnected) {
 									logger.info("Disconnected from {}",
 											config.wampUri());

@@ -39,7 +39,15 @@ public interface ServiceConfig extends Config {
 	@Key("services.topics.newandobserving")
 	String topicsNewAndObserving();
 
-	@DefaultValue("ru.semiot.devices.inactive")
+	@DefaultValue("ru.semiot.devices.remove")
+	@Key("services.topics.remove")
+	String topicsRemove();
+
+	@DefaultValue("ru.semiot.devices.removeDevice")
+	@Key("services.topics.removeDevice")
+	String topicsRemoveDevice();
+
+	@DefaultValue("ru.semiot.devices.turnoff")
 	@Key("services.topics.inactive")
 	String topicsInactive();
 
@@ -50,4 +58,8 @@ public interface ServiceConfig extends Config {
 	@DefaultValue("@prefix saref: <http://ontology.tno.nl/saref#>. <%s> saref:hasState saref:OffState.")
 	@Key("services.mappingToOffState")
 	String mappingToOffState(final String wampTopic);
+
+	@DefaultValue("@prefix saref: <http://ontology.tno.nl/saref#>. <%s> saref:hasState saref:OnState.")
+	@Key("services.mappingToOnState")
+	String mappingToOnState(final String wampTopic);
 }

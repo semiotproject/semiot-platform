@@ -11,10 +11,10 @@ import rx.Observer;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-public class InactiveDevice implements Observer<String> {
+public class InactiveDeviceListener implements Observer<String> {
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(InactiveDevice.class);
+			.getLogger(InactiveDeviceListener.class);
 	private static final String LANG = "TURTLE";
 	private final RDFStore rdfStore = RDFStore.getInstance();
 	private final WAMPClient wampClient = WAMPClient.getInstance();
