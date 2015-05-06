@@ -34,4 +34,4 @@ RUN service mysql start && mysql --execute="create database qwerty; connect qwer
 WORKDIR /root/semiot-platform/analysing-service/
 RUN service mysql start && start-stop-daemon --start --background --exec "/root/wildfly-8.2.0.Final/bin/standalone.sh" && mvn clean wildfly:deploy
 
-CMD rm -rf /root/wildfly-8.2.0.Final/standalone/configuration/standalone_xml_history/current && service mysql start && /root/wildfly-8.2.0.Final/bin/standalone.sh
+CMD rm -rf /root/wildfly-8.2.0.Final/standalone/configuration/standalone_xml_history/current && service mysql start && /root/wildfly-8.2.0.Final/bin/standalone.sh -b 0.0.0.0
