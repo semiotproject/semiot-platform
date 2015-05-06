@@ -223,7 +223,7 @@
 			if (loginService.isLogged()) {
 
 			} else {
-				// $location.path('/login');
+				$location.path('/login');
 			}			
 	    });
 	}]);
