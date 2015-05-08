@@ -46,6 +46,14 @@ public interface ServiceConfig extends Config {
 	@Key("services.devicedirectory.store.url")
 	String storeUrl();
 
+	@DefaultValue("http://localhost:3030/ds/query")
+	@Key("services.devicedirectory.query.url")
+	String queryUrl();
+
+	@DefaultValue("http://localhost:3030/ds/update")
+	@Key("services.devicedirectory.update.url")
+	String updateUrl();
+
 	@DefaultValue("")
 	@Key("services.devicedirectory.store.username")
 	String storeUsername();

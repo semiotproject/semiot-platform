@@ -45,7 +45,7 @@ public class Launcher {
 									WAMPClient
 											.getInstance()
 											.subscribe(
-													config.topicsRemoveSensor())
+													config.topicsRemoveDevice())
 											.subscribe(
 													new RemoveDeviceListener());
 								} else if (newStatus == WampClient.Status.Disconnected) {

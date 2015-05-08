@@ -44,16 +44,14 @@ public class RDFStore {
 	public ResultSet select(String query) {
 		Query select = QueryFactory.create(query);
 		ResultSet rs = QueryExecutionFactory.createServiceRequest(
-				config.storeUrl(), select, httpAuthenticator).execSelect();
+				config.queryUrl(), select, httpAuthenticator).execSelect();
 		return rs;
 	}
 
 	public void update(String update) {
-		// ResultSet result = QueryExecutionFactory.createServiceRequest(
-		// config.storeUrl(), query, httpAuthenticator).execSelect();
 		UpdateRequest updateRequest = UpdateFactory.create(update);
 
-		UpdateExecutionFactory.createRemote(updateRequest, config.storeUrl(),
+		UpdateExecutionFactory.createRemote(updateRequest, config.updateUrl(),
 				httpAuthenticator).execute();
 	}
 
