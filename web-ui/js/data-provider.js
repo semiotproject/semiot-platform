@@ -91,7 +91,7 @@ angular.module('dataProvider', ['commonUtils', 'rdfUtils'])
 
 	instance.removeSystem = function(uri) {
 		if (this.connection) {
-			this.connection.publish(CONFIG.TOPICS.device_remove, [uri]);
+			this.connection.publish(CONFIG.TOPICS.device_remove, ["<" + uri + ">"]);
 		}
 		this.systems.forEach(function(system, i) {
 			if (system.uri === uri) {
