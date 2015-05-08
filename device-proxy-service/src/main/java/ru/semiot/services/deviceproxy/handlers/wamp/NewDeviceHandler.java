@@ -15,7 +15,6 @@ import ru.semiot.semiot.commons.namespaces.EMTR;
 import ru.semiot.semiot.commons.namespaces.HMTR;
 import ru.semiot.semiot.commons.namespaces.SSN;
 import ru.semiot.services.deviceproxy.CoAPInterface;
-import ru.semiot.services.deviceproxy.Launcher;
 import ru.semiot.services.deviceproxy.ServiceConfig;
 import ru.semiot.services.deviceproxy.WAMPClient;
 import ru.semiot.services.deviceproxy.handlers.coap.NewObservationHandler;
@@ -84,6 +83,8 @@ public class NewDeviceHandler implements Observer<String> {
 				try (QueryExecution qexec = QueryExecutionFactory.create(query,
 						infModel)) {
 					final ResultSet results = qexec.execSelect();
+
+					boolean containsSystem = false;
 					String systemURI = StringUtils.EMPTY; // с расчетом,
 															// что в 1
 															// сообщении 1
@@ -97,6 +98,10 @@ public class NewDeviceHandler implements Observer<String> {
 							final Resource system = soln
 									.getResource(VAR_SYSTEM);
 							systemURI = system.getURI();
+							if (DeviceHandler.getInstance().containsDevice(
+									systemURI)) {
+								containsSystem = true;
+							}
 						}
 
 						logger.debug("Mapping {} to {}", coap.getURI(),
@@ -122,17 +127,9 @@ public class NewDeviceHandler implements Observer<String> {
 									handler);
 						}
 					}
-					if (DeviceHandler.getInstance().emptyHandlersInDevice(
-							systemURI)) {
-						wampClient.publish(Launcher.getConfig()
-								.topicsInactive(), Launcher.getConfig()
-								.mappingToOnState(systemURI));
-					} else {
+					if (!containsSystem) {
 						wampClient.publish(config.topicsNewAndObserving(),
-								message
-										+ " "
-										+ Launcher.getConfig()
-												.mappingToOnState(systemURI));
+								message);
 					}
 				}
 			} else {

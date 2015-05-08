@@ -38,10 +38,12 @@ public class DeviceHandler {
 
 	public void inactiveDevice(String key, String message) {
 		List<NewObservationHandler> handlers = observationHandlers.get(key);
-		for (NewObservationHandler handler : handlers) {
-			handler.stopProxying(message);
+		if (handlers != null) {
+			for (NewObservationHandler handler : handlers) {
+				handler.stopProxying(message);
+			}
+			handlers.clear();
 		}
-		handlers.clear();
 	}
 
 	public void removeDevice(String key) {

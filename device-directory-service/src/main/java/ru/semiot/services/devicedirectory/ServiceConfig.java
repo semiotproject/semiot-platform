@@ -34,11 +34,11 @@ public interface ServiceConfig extends Config {
 	@Key("services.topics.inactive")
 	String topicsInactive();
 
-	@DefaultValue("ru.semiot.devices.removeDevice")
+	@DefaultValue("ru.semiot.devices.remove.device")
 	@Key("services.topics.removeDevice")
 	String topicsRemoveDevice();
 
-	@DefaultValue("ru.semiot.devices.removeSensor")
+	@DefaultValue("ru.semiot.devices.remove.sensor")
 	@Key("services.topics.removeSensor")
 	String topicsRemoveSensor();
 
