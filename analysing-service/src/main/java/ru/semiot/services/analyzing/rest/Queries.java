@@ -50,6 +50,7 @@ public class Queries {
         logger.debug("Removing all queries");
         if(!db.removeQueries())
             return Response.status(Response.Status.FORBIDDEN).build();
+        Engine.removeAllSelects();
         logger.info("All queries removed");
         return Response.ok().build();
     }
@@ -91,6 +92,7 @@ public class Queries {
         String ret = db.removeQuery(id);
         if(ret == null)
             return Response.status(Response.Status.NOT_FOUND).build();
+        Engine.removeSelect(ret);
         logger.info("Select removed");
         return Response.status(Response.Status.OK).entity(ret).build();
     }
@@ -101,7 +103,7 @@ public class Queries {
     public Response startLauncher() {
         logger.info("Starting WAMP connection");
         Engine.beforeClass();
-        if(ServiceConfig.config.isAutoLoaded())
+        if(ServiceConfig.config.isAutoLoaded() && db.getQueries()!=null)
             for(String s : db.getQueries())
                 Engine.registerSelect(s);            
         new Thread(new Runnable() {
