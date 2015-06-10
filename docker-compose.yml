@@ -14,8 +14,8 @@ devicedirectoryservice:
     - "3030:3030"
   restart: always
 
-devicearchivingservice:
-  image: semiot/device-archiving-service
+dataarchivingservice:
+  image: semiot/data-archiving-service
   links:
       - opentsdb
   restart: always
