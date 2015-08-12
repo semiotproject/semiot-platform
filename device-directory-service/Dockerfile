@@ -16,11 +16,15 @@ RUN mkdir -p $FUSEKI_BASE
 
 WORKDIR $FUSEKI_HOME
 
-RUN wget http://apache-mirror.rbc.ru/pub/apache/jena/binaries/apache-jena-fuseki-2.0.0.zip
+RUN wget http://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-2.0.0.zip
 RUN unzip $FUSEKI_ARCHIVE_NAME.zip && rm $FUSEKI_ARCHIVE_NAME.zip
 RUN mv $FUSEKI_ARCHIVE_NAME/* . && rm -rf $FUSEKI_ARCHIVE_NAME
 ADD shiro.ini $FUSEKI_BASE/
 ADD config.ttl $FUSEKI_BASE/
+
+RUN ls -al $FUSEKI_BASE/webapp/WEB-INF/
+
+ADD web.xml $FUSEKI_BASE/webapp/WEB-INF/web.xml
 
 WORKDIR /
 
