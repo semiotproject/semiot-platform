@@ -13,3 +13,4 @@ and now you can start the containers:
 sudo docker-compose up -d
 ```
 If you want to see the logs of the containers then run the `up` command without `-d` flag.
+
