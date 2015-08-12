@@ -24,7 +24,7 @@ ADD config.ttl $FUSEKI_BASE/
 
 RUN ls -al $FUSEKI_BASE/webapp/WEB-INF/
 
-ADD web.xml $FUSEKI_BASE/webapp/WEB-INF/web.xml
+ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
 
 WORKDIR /
 
