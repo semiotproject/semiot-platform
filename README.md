@@ -8,7 +8,7 @@ Then you're ready to pull the images from Docker Hub (it takes several minutes):
 ```
 sudo docker-compose pull
 ```
-Place opentsdb.conf:"https://github.com/semiotproject/semiot-platform/blob/master/data-archiving-service/opentsdb.conf" file to `/etc/opentsdb` folder. Start up the containers:
+Place [opentsdb.conf](https://github.com/semiotproject/semiot-platform/blob/master/data-archiving-service/opentsdb.conf) file to `/etc/opentsdb` folder. Start up the containers:
 ```
 sudo docker-compose up -d
 ```
