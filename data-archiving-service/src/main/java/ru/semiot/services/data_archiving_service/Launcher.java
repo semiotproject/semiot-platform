@@ -37,7 +37,7 @@ public class Launcher {
 													config.topicsSubscriber())
 											.subscribe(new SubscribeListener());
 
-									WriterOpenTsdb.getInstance().start();
+									// WriterOpenTsdb.getInstance().start();
 
 									WAMPClient
 											.getInstance()
