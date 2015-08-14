@@ -193,7 +193,6 @@
 			});
 		};
 		$scope.onUpdated = function(sensor, data) {
-			debugger;
 			rdfUtils.parseTTL(data).then(function(triples) {
 				var resource = rdfUtils.parseTriples(triples);
 				var observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
