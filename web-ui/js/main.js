@@ -32,12 +32,12 @@
 		};
 	}
 
-	var ng_dependencies = [ 
-		"rdfUtils", 
+	var ng_dependencies = [
+		"rdfUtils",
 		"commonUtils",
 		"dataProvider",
 		"loginService",
-		"highcharts-ng", 
+		"highcharts-ng",
 		"ui.bootstrap.datetimepicker",
 		"ui.bootstrap",
 		"ui.codemirror",
@@ -58,11 +58,11 @@
 			.when('/list', {
 				templateUrl: 'partials/list.html',
 				controller: 'MeterListCtrl'
-			})	
+			})
 			.when('/analyze', {
 				templateUrl: 'partials/analyze.html',
 				controller: 'AnalyzeCtrl'
-			})		
+			})
 			.when('/single/:system_uri*', {
 				templateUrl: 'partials/single.html',
 				controller: 'MeterSingleCtrl'
@@ -74,10 +74,10 @@
 		$scope.password = "";
 		$scope.error = false;
 		$scope.submit = function() {
-			if (loginService.authenticate($scope.login, $scope.password)) {		
+			if (loginService.authenticate($scope.login, $scope.password)) {
 				$scope.login = "";
-				$scope.password = "";		
-				$location.path('/');	
+				$scope.password = "";
+				$location.path('/');
 			} else {
 				$scope.error = true;
 			}
@@ -96,22 +96,23 @@
 
 	app.controller('MeterListCtrl', function($scope, dataProvider, commonUtils) {
 		$scope.systems = [];
-		$scope.search = {	
+		$scope.search = {
 			name: ""
 		};
 		$scope.pagination = {
 			currentPage: 1,
 			itemsPerPage: 6,
 			totalItems: 1,
-			maxSize: 1000
+			numPages: 4,
+			maxSize: 4
 		};
 
 		$scope.setPagination = function() {
 			var total_systems = dataProvider.getSystems().filter(function(s) {
 				return !$scope.search.name || s.name.indexOf($scope.search.name) > -1;
-			}) 
+			})
 			$scope.systems = total_systems.slice(
-				($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage, 
+				($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage,
 				($scope.pagination.currentPage) * $scope.pagination.itemsPerPage
 			);
 			$scope.pagination.totalItems = total_systems.length;
@@ -133,11 +134,11 @@
 			$scope.title = "";
 			$scope.sensors = [];
 			$scope.liveEnabled = true;
-			if ($scope.connectionPull && $scope.connectionPull.length > 0) {		
+			if ($scope.connectionPull && $scope.connectionPull.length > 0) {
 				$scope.connectionPull.forEach(function(connection) {
 					connection.close();
 				});
-			}	
+			}
 			$scope.connectionPull = [];
 			$scope.default_range = (function() {
 				// time difference between server and client
@@ -185,7 +186,7 @@
 								}
 							]
 						);
-						$scope.connectionPull.push(connection);						
+						$scope.connectionPull.push(connection);
 					});
 					sensors.push(sensor);
 				});
@@ -198,7 +199,7 @@
 				var observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
 				sensor.chartConfig.series[0].data.push([(new Date()).getTime() + CONFIG.TIMEZONE_OFFSET, observationResult]);
 			});
-		};	
+		};
 		$scope.setRange = function(index) {
 			var sensor = $scope.sensors[index];
 			dataProvider.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
@@ -223,7 +224,7 @@
 
 			} else {
 				$location.path('/login');
-			}			
+			}
 	    });
 	}]);
-}()); 
+}());
