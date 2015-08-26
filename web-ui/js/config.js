@@ -1,7 +1,7 @@
 "use strict";
 
 // if local development, communicate with DEFAULT_HOSTNAME, otherwise - with web-UI host
-var DEFAULT_HOSTNAME = "machine3-ailab.tk";
+var DEFAULT_HOSTNAME = "demo.semiot.ru";
 var hostname = location.hostname === "localhost" ? DEFAULT_HOSTNAME : location.hostname;
 
 var CONFIG = (function() {
@@ -21,7 +21,7 @@ var CONFIG = (function() {
 			prefixes: {
 				rdfs: '<http://www.w3.org/2000/01/rdf-schema#>',
 				ssn: '<http://purl.oclc.org/NET/ssnx/ssn#>',
-				rdf: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#>', 
+				rdf: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#>',
 				ssncom: '<http://purl.org/NET/ssnext/communication#>',
 				saref: '<http://ontology.tno.nl/saref#>',
 				om: '<http://purl.org/ifgi/om#>'

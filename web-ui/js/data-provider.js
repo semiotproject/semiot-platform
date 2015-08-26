@@ -67,8 +67,11 @@ angular.module('dataProvider', ['commonUtils', 'rdfUtils'])
     instance.fetchSystems = function() {
         var defer = $q.defer();
         this.executeQuery(CONFIG.SPARQL.queries.getAllSystems, function(data) {
-            instance.systems = data.results.bindings.map(function(binding) {
+            instance.systems = data.results.bindings.sort(function(a, b) {
+                return a.label.value > b.label.value ? 1 : -1;
+            }).map(function(binding, index) {
                 return {
+                    index: index + 1,
                     name: binding.label.value,
                     uri: binding.uri.value,
                     state: "online"
@@ -121,7 +124,7 @@ angular.module('dataProvider', ['commonUtils', 'rdfUtils'])
 
     // WAMP support
     instance.onDeviceRegistered = function(args) {
-        rdfUtils.parseTTL(args).then(function(triples) {
+        rdfUtils.parseTTL(args[0]).then(function(triples) {
             var resource = rdfUtils.parseTriples(triples);
             if (!instance.systems.find(function(system) { // if system is new
                 return system.uri === resource.uri;
