@@ -2,8 +2,9 @@ FROM fedora
 
 WORKDIR /root
 
-RUN yum install libffi-devel python-pip python-devel gcc openssl openssl-devel git -y && yum clean all
-RUN yum upgrade -y && yum clean all
+RUN dnf install libffi-devel python-pip python-devel gcc openssl openssl-devel git -y && dnf clean all
+RUN dnf upgrade -y && dnf clean all
+RUN pip install --upgrade pip
 RUN pip install --upgrade twisted
 RUN pip install ez_setup six pyopenssl pycrypto wsaccel ujson
 RUN pip install --upgrade distribute
