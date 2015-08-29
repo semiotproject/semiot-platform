@@ -26,6 +26,6 @@ RUN openssl req -new -key .crossbar/server_key.pem -out .crossbar/server_csr.pem
 RUN openssl x509 -req -days 365 -in .crossbar/server_csr.pem -signkey .crossbar/server_key.pem -out .crossbar/server_cert.pem
 RUN openssl dhparam -2 1024 -out .crossbar/dhparam.pem
 
-EXPOSE 80 443
+EXPOSE 8080 8443
 
 CMD crossbar start --cbdir /root/crossbar/.crossbar

@@ -8,7 +8,7 @@ var CONFIG = (function() {
 	return {
 		COOKIE_NAME: "ru.semiot",
 		URLS: {
-			messageBus: "ws://" + hostname + "/ws",
+			messageBus: "ws://" + hostname + ":8080/ws",
 			tripleStore: "http://" + hostname + ":3030/ds/query",
 			tsdb: "http://" + hostname + ":4242/api/query?start={0}&end={1}&m=sum:{2}"
 		},

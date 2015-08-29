@@ -10,7 +10,7 @@ public interface ServiceConfig extends Config {
 	@Key("services.deviceproxy.port")
 	int port();
 
-	@DefaultValue("ws://localhost/ws")
+	@DefaultValue("ws://localhost:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
 

@@ -9,7 +9,7 @@ import org.aeonbits.owner.Config.Sources;
 @Sources({ "file:/semiot-platform/device-directory-service/config.properties" })
 public interface ServiceConfig extends Config {
 
-	@DefaultValue("ws://localhost/ws")
+	@DefaultValue("ws://localhost:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
 

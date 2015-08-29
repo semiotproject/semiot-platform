@@ -13,7 +13,7 @@ public interface ServiceConfig extends Config {
     public static final ServiceConfig config = ConfigFactory
             .create(ServiceConfig.class);
 
-    @DefaultValue("ws://localhost/ws")
+    @DefaultValue("ws://localhost:8080/ws")
     @Key("services.wamp.uri")
     String wampUri();
 

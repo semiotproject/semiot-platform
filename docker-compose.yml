@@ -18,6 +18,7 @@ dataarchivingservice:
   image: semiot/data-archiving-service
   links:
       - opentsdb
+      - wamprouter
   restart: always
 
 opentsdb:
@@ -31,11 +32,11 @@ opentsdb:
 wamprouter:
   image: semiot/wamp-router
   ports:
-    - "80:80"
+    - "8080:8080"
   restart: always
 
 webui:
   image: semiot/web-ui
   ports:
-    - "8080:80"
+    - "80:80"
   restart: always
