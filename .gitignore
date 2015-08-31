@@ -1,5 +1,5 @@
 *~
 */target
 **/run
-nb-configuration.xml
-/analysing-service/nbactions.xml
+**/nb-configuration.xml
+**/nbactions.xml
