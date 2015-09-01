@@ -1,4 +1,4 @@
-package ru.semiot.platform.deviceproxyservice.impl.devicemanager;
+package ru.semiot.platform.deviceproxyservice.manager;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;

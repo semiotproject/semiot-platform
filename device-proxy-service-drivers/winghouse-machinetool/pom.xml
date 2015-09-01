@@ -27,7 +27,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>ru.semiot.platform.deviceproxyservice</groupId>
+            <groupId>ru.semiot.platform</groupId>
             <artifactId>device-proxy-service-api</artifactId>
             <version>1.0-SNAPSHOT</version>
             <type>jar</type>

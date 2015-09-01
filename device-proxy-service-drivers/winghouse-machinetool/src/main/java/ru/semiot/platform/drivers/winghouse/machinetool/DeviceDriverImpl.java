@@ -17,7 +17,7 @@ public class DeviceDriverImpl implements DeviceDriver {
     
     public void start() {
         System.out.println("DeviceDriverImpl started!");
-        deviceManager.register(new Device("0"));
+        deviceManager.register(new Device("0", ""));
     }
     
     public void stop() {

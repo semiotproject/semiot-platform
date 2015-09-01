@@ -2,18 +2,20 @@ package ru.semiot.platform.deviceproxyservice.api.drivers;
 
 public class Device {
     
-    private String id;
+    private final String id;
+    private final String rdfDescription;
     
-    public Device() {
-        this.id = "-1";
-    }
-    
-    public Device(String id) {
+    public Device(String id, String rdfDescription) {
         this.id = id;
+        this.rdfDescription = rdfDescription;
     }
     
     public String getID() {
         return id;
+    }
+    
+    public String getRDFDescription() {
+        return rdfDescription;
     }
     
 }
