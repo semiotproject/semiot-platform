@@ -20,7 +20,7 @@ dataarchivingservice:
       - opentsdb
       - wamprouter
   restart: always
-
+  
 opentsdb:
   image: petergrace/opentsdb-docker
   ports:
@@ -29,6 +29,14 @@ opentsdb:
       - /etc/opentsdb:/etc/opentsdb
   restart: always
 
+ analyzingservice:
+  image: semiot/analyzing-service
+  links:
+    - wamprouter
+  ports:
+    - "8085:8085"
+  restart: always
+  
 wamprouter:
   image: semiot/wamp-router
   ports:
