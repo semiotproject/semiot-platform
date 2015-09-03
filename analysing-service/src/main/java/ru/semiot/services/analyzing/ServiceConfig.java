@@ -7,7 +7,7 @@ import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.ConfigFactory;
 
 @LoadPolicy(LoadType.FIRST)
-@Sources({"file:/root/semiot-platform/analysing-service/config/config.properties"})
+@Sources({"file:/semiot-platform/analysing-service/config.properties"})
 public interface ServiceConfig extends Config {
 
     public static final ServiceConfig config = ConfigFactory

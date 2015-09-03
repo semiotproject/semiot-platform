@@ -30,6 +30,9 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get -q -y install mysql-server
 #Config MySQL
 RUN service mysql start && mysql --execute="create database qwerty; connect qwerty; create table Requests(id int(3), Request text, key(id));"
 
+#Add config file
+ADD config.properties /semiot-platform/analysing-service/
+
 #Deploy to Wildfly
 WORKDIR /root/semiot-platform/analysing-service/
 RUN service mysql start && start-stop-daemon --start --background --exec "/root/wildfly-8.2.0.Final/bin/standalone.sh" && mvn clean wildfly:deploy && sh /root/wildfly-8.2.0.Final/bin/jboss-cli.sh --connect command=:shutdown
