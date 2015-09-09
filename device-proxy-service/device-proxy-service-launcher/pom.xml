@@ -11,4 +11,19 @@
     <packaging>jar</packaging>
     
     <name>Device Proxy Service Launcher</name>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.framework</artifactId>
+			<version>5.2.0</version>
+		</dependency>
+    </dependencies>
+
 </project>
