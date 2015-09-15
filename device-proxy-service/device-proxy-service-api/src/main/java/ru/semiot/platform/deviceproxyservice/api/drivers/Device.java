@@ -17,5 +17,15 @@ public class Device {
     public String getRDFDescription() {
         return rdfDescription;
     }
-    
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object != null && object instanceof Device)
+        {
+            return this.id.equals(((Device) object).getID());
+        }
+
+        return false;
+    }
 }
