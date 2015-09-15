@@ -1,0 +1,15 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix mcht: <http://purl.org/NET/ssnext/machinetools#> .
+@prefix ssncom: <http://purl.org/NET/ssnext/communication#> .
+
+<http://example.com/${MAC}> a mcht:MachineTool ;
+    rdfs:label "Machine Tool #${MAC}"@en ;
+    rdfs:label "Станок #${MAC}"@ru ;
+    ssn:hasSubsystem <http://example.com/${MAC}/machinetool> .
+
+<http://example.com/${MAC}/machinetool>  a ssn:Sensor ;
+    ssncom:hasCommunicationEndpoint <http://example.com/topic=${MAC}.machinetool.obs> .
+
+<http://example.com/topic=${MAC}.machinetool.obs> a ssncom:CommunicationEndpoint ;
+    ssncom:protocol "WAMP" .

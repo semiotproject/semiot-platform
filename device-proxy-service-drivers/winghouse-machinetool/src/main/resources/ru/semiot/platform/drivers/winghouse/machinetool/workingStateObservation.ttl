@@ -1,0 +1,14 @@
+@prefix mcht: <http://purl.org/NET/ssnext/machinetools#> .
+@prefix meter: <http://purl.org/NET/ssnext/meters/core#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://example.com/${MAC}/machinetool#> .
+
+:${TIMESTAMP} a mcht:WorkingStateObservation ;
+    ssn:observationResultTime "${DATETIME}"^^xsd:dateTime ;
+    ssn:observedBy <http://example.com/${MAC}> ;
+    ssn:observationResult :${TIMESTAMP}-result .
+
+:${TIMESTAMP}-result a ssn:SensorOutput ;
+    ssn:isProducedBy <http://example.com/${MAC}> ;
+    ssn:hasValue mcht:${STATE} .
