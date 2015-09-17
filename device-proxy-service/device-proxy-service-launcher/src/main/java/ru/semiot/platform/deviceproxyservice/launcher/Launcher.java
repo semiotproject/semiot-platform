@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
 import java.util.ServiceLoader;
 
 import org.osgi.framework.BundleContext;
@@ -13,6 +11,7 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.Bundle;
+
 
 public class Launcher {
 	
@@ -66,14 +65,15 @@ public class Launcher {
 		bundles.add(context.installBundle("http://central.maven.org/maven2/org/ow2/jonas/jonas-web-container-tomcat-7.0-core/5.3.0/jonas-web-container-tomcat-7.0-core-5.3.0.jar"));*/
 		//bundles.add(context.installBundle(""));
 		
-		
+		//String str = Launcher.class.getClassLoader().getResource("/ru/semiot/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar").getPath();
+		//System.out.println(str);
 		// resource
-		//bundles.add(context.installBundle("file:C:/Users/Ivan/workspace/semiot-platform/device-proxy-service/device-proxy-service-launcher/src/main/resources/device-proxy-service-api-1.0-SNAPSHOT.jar"));
-		bundles.add(context.installBundle("file:"+Launcher.class.getClassLoader().getResource("device-proxy-service-api-1.0-SNAPSHOT.jar").getPath()));
-		//bundles.add(context.installBundle("file:C:/Users/Ivan/workspace/semiot-platform/device-proxy-service/device-proxy-service-launcher/src/main/resources/device-proxy-service-manager-1.0-SNAPSHOT.jar"));
-		bundles.add(context.installBundle("file:"+Launcher.class.getClassLoader().getResource("device-proxy-service-manager-1.0-SNAPSHOT.jar").getPath()));
-		//bundles.add(context.installBundle("file:C:/Users/Ivan/workspace/semiot-platform/device-proxy-service/device-proxy-service-launcher/src/main/resources/winghouse-machinetool-1.0-SNAPSHOT.jar"));
-		bundles.add(context.installBundle("file:"+Launcher.class.getClassLoader().getResource("winghouse-machinetool-1.0-SNAPSHOT.jar").getPath()));
+		//bundles.add(context.installBundle("/ru/semiot/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar"));
+		//String str = Launcher.class.getClassLoader().getResource("ru/semiot/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar").getPath();
+		//System.out.println(str);
+		bundles.add(context.installBundle("device-proxy-service-api-1.0-SNAPSHOT.jar", Launcher.class.getClassLoader().getResourceAsStream("ru/semiot/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar")));
+		bundles.add(context.installBundle("device-proxy-service-manager-1.0-SNAPSHOT.jar", Launcher.class.getClassLoader().getResourceAsStream("ru/semiot/bundles/device-proxy-service-manager-1.0-SNAPSHOT.jar")));
+		bundles.add(context.installBundle("winghouse-machinetool-1.0-SNAPSHOT.jar", Launcher.class.getClassLoader().getResourceAsStream("ru/semiot/bundles/winghouse-machinetool-1.0-SNAPSHOT.jar")));
 		
 		
 		for (Bundle bundle : bundles) {
