@@ -40,7 +40,7 @@ public class Launcher {
         bundles.add(context.installBundle(
                 "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.servlet-api-1.1.2.jar"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache/felix/org.apache.felix.http.bundle-3.0.0.jar"));
+                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.api-3.0.0.jar"));
         bundles.add(context.installBundle(
                 "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.jetty-3.1.0.jar"));
         bundles.add(context.installBundle(
