@@ -8,8 +8,8 @@ public enum WorkingState {
     	this.uri = uri;
     }
 
-    private String uri;
-    private int index;
+    private final String uri;
+    private final int index;
 
     public int getIndex() {
         return index;

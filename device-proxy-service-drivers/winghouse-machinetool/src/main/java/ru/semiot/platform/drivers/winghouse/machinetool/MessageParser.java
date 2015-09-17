@@ -1,7 +1,5 @@
 package ru.semiot.platform.drivers.winghouse.machinetool;
 
-import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
-
 public class MessageParser {
 
 	public static MachineToolMessage parsePacket(byte[] res) {

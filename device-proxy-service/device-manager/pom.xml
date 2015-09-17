@@ -30,29 +30,30 @@
             <groupId>ru.semiot.platform</groupId>
             <artifactId>device-proxy-service-api</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
         </dependency>
-		<dependency>
-	        <groupId>ws.wamp.jawampa</groupId>
-	        <artifactId>jawampa</artifactId>
-	        <version>0.2.0</version>
-	    </dependency>
+        <dependency>
+            <groupId>ws.wamp.jawampa</groupId>
+            <artifactId>jawampa</artifactId>
+            <version>0.2.0</version>
+        </dependency>
     </dependencies>
 
-	<repositories>
-	    <repository>
-	        <id>jawampa.mvn-repo</id>
-	        <url>https://raw.github.com/Matthias247/jawampa/mvn-repo/</url>
-	        <snapshots>
-	            <enabled>true</enabled>
-	            <updatePolicy>always</updatePolicy>
-	        </snapshots>
-	    </repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>jawampa.mvn-repo</id>
+            <url>https://raw.github.com/Matthias247/jawampa/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -62,13 +63,16 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                    <!-- *;resolution:=optional позволяет не подгружать другие бандлы, вопрос в том
-                    какие нам необходимы  -->
-                    	<Import-Package>*;resolution:=optional</Import-Package>
-                 		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-                 		<Embed-Transitive>true</Embed-Transitive>	
+                        <Import-Package>
+                            org.apache.felix.dm;version="[4.1,5)",
+                            org.osgi.framework;version="[1.8,2)",
+                            ru.semiot.platform.deviceproxyservice.api.drivers;version="[1.0,2)",
+                            javax.net.ssl
+                        </Import-Package>
+                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>	
                         <Bundle-Activator>ru.semiot.platform.deviceproxyservice.manager.Activator</Bundle-Activator>
-                   		<Export-Package />
+                        <Export-Package />
                     </instructions>
                 </configuration>
             </plugin>

@@ -3,25 +3,16 @@ package ru.semiot.platform.drivers.winghouse.machinetool;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
 import io.netty.channel.socket.DatagramPacket;
-import io.netty.util.CharsetUtil;
-
-import org.apache.commons.io.IOUtils;
-
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 
 public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-	private DeviceDriverImpl deviceDriverImpl;
+	private final DeviceDriverImpl deviceDriverImpl;
 
-	private String templateTopic = "${MAC}.machinetool.obs";
+	private static final String templateTopic = "${MAC}.machinetool.obs";
 
 	public DeviceHandler(DeviceDriverImpl deviceDriverImpl) {
 		System.out.println("Create DeviceHandler class");

@@ -22,22 +22,22 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-	        <groupId>ws.wamp.jawampa</groupId>
-	        <artifactId>jawampa</artifactId>
-	        <version>0.2.0</version>
-	    </dependency>
+            <groupId>ws.wamp.jawampa</groupId>
+            <artifactId>jawampa</artifactId>
+            <version>0.2.0</version>
+        </dependency>
     </dependencies>
 
-	<repositories>
-	    <repository>
-	        <id>jawampa.mvn-repo</id>
-	        <url>https://raw.github.com/Matthias247/jawampa/mvn-repo/</url>
-	        <snapshots>
-	            <enabled>true</enabled>
-	            <updatePolicy>always</updatePolicy>
-	        </snapshots>
-	    </repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>jawampa.mvn-repo</id>
+            <url>https://raw.github.com/Matthias247/jawampa/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -47,9 +47,12 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                    	<Import-Package>*;resolution:=optional</Import-Package>
-                 		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-                 		<Embed-Transitive>true</Embed-Transitive>
+                        <Import-Package>
+                            org.apache.felix.dm;version="[4.1,5)",
+                            org.osgi.framework;version="[1.8,2)"
+                        </Import-Package>
+                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
                         <Bundle-Activator />
                         <Export-Package>ru.semiot.platform.deviceproxyservice.api.drivers</Export-Package>
                     </instructions>

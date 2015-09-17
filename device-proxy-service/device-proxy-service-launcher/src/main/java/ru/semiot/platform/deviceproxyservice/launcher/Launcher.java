@@ -49,12 +49,12 @@ public class Launcher {
                 "http://central.maven.org/maven2/org/apache/felix/org.apache.felix.dependencymanager/4.1.0/org.apache.felix.dependencymanager-4.1.0.jar"));
         
         //Device Proxy Service bundles
-        bundles.add(context.installBundle(
-                "device-proxy-service-api-1.0-SNAPSHOT.jar", 
-                Launcher.class.getClassLoader().getResourceAsStream("ru/semiot/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar")));
-        bundles.add(context.installBundle(
-                "device-proxy-service-manager-1.0-SNAPSHOT.jar", 
-                Launcher.class.getClassLoader().getResourceAsStream("ru/semiot/bundles/device-proxy-service-manager-1.0-SNAPSHOT.jar")));
+//        bundles.add(context.installBundle(
+//                "device-proxy-service-api-1.0-SNAPSHOT.jar", 
+//                Launcher.class.getClassLoader().getResourceAsStream("ru/semiot/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar")));
+//        bundles.add(context.installBundle(
+//                "device-proxy-service-manager-1.0-SNAPSHOT.jar", 
+//                Launcher.class.getClassLoader().getResourceAsStream("ru/semiot/bundles/device-proxy-service-manager-1.0-SNAPSHOT.jar")));
         //bundles.add(context.installBundle("winghouse-machinetool-1.0-SNAPSHOT.jar", Launcher.class.getClassLoader().getResourceAsStream("ru/semiot/bundles/winghouse-machinetool-1.0-SNAPSHOT.jar")));
         
         System.out.println("Installed all bundles!");
