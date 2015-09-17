@@ -1,8 +1,6 @@
 *~
-*/target
+**/target
 **/run
 **/nb-configuration.xml
 **/nbactions.xml
-/device-proxy-service/device-proxy-service-api/target/
-/device-proxy-service/device-manager/target/
-/device-proxy-service-drivers/winghouse-machinetool/target/
+**/felix-cache
