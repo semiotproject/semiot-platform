@@ -19,7 +19,6 @@ public class DeviceManagerImpl implements DeviceManager {
 	private final String wampUri = "ws://demo.semiot.ru:8080/ws";
 	private final String wampRealm = "realm1"; 
 	private final int wampReconnectInterval = 15;
-	private DeviceDriverImpl deviceDriver = new DeviceDriverImpl();
 	
     public void start() {
         System.out.println("Init WAMPClient!");
@@ -53,15 +52,6 @@ public class DeviceManagerImpl implements DeviceManager {
     public Observable<String> subscribe(String topic) {
     	return WAMPClient.getInstance().subscribe(topic);
     }
-    
-    public boolean containsDeviceId(String id){
-    	return deviceDriver.containsDeviceId(id);
-    }
-    
-    @Override
-	public boolean containsDevice(Device device) {
-    	return deviceDriver.containsDevice(device);
-	}
     
     private void initWampRouter() {
     	try {

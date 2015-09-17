@@ -13,7 +13,7 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(DeviceDriverImpl.class)
                 .add(createServiceDependency()
                         .setService(DeviceManager.class)
-                        .setRequired(false)));
+                        .setRequired(true)));
     }
 
 }

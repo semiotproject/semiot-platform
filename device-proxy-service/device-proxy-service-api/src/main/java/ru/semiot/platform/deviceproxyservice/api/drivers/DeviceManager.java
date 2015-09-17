@@ -12,8 +12,4 @@ public interface DeviceManager {
     
     public Observable<String> subscribe(String topic);
     
-    public boolean containsDeviceId(String id);
-    
-    public boolean containsDevice(Device device);
-    
 }
