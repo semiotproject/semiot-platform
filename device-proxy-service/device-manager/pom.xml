@@ -66,6 +66,7 @@
                         <Import-Package>
                             org.apache.felix.dm;version="[4.1,5)",
                             org.osgi.framework;version="[1.8,2)",
+                            org.osgi.service.cm;version="[1.5,2)",
                             ru.semiot.platform.deviceproxyservice.api.drivers;version="[1.0,2)",
                             javax.net.ssl
                         </Import-Package>
