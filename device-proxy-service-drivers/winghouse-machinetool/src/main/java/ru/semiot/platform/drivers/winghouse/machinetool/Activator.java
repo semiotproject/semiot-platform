@@ -8,6 +8,8 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 
 public class Activator extends DependencyActivatorBase {
 
+    public static final String SERVICE_PID = "ru.semiot.platform.drivers.winghouse.machinetool";
+
     @Override
     public void init(BundleContext bc, DependencyManager manager) throws Exception {
         manager.add(createComponent()
@@ -15,7 +17,8 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(DeviceDriverImpl.class)
                 .add(createServiceDependency()
                         .setService(DeviceManager.class)
-                        .setRequired(true)));
+                        .setRequired(true))
+                .add(createConfigurationDependency().setPid(SERVICE_PID)));
     }
 
 }

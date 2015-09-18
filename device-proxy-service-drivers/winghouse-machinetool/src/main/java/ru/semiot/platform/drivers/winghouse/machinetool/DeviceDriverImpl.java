@@ -9,14 +9,19 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 
-public class DeviceDriverImpl implements DeviceDriver {
+public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
+    private static final String UDP_PORT_KEY = Activator.SERVICE_PID + ".udp_port";
+            
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
 
     private volatile DeviceManager deviceManager;
@@ -26,6 +31,7 @@ public class DeviceDriverImpl implements DeviceDriver {
     private String templateWorkingStateObservation;
     private EventLoopGroup group;
     private Channel channel;
+    private int port;
 
     public List<Device> listDevices() {
         return listDevices;
@@ -43,7 +49,7 @@ public class DeviceDriverImpl implements DeviceDriver {
                     .option(ChannelOption.SO_BROADCAST, true)
                     .handler(new DeviceHandler(this));
 
-            channel = b.bind(9500).channel();
+            channel = b.bind(port).channel();
         } catch (Exception ex) {
             ex.printStackTrace();
 
@@ -60,6 +66,15 @@ public class DeviceDriverImpl implements DeviceDriver {
         }
 
         System.out.println("Winghouse machine-tools driver stopped!");
+    }
+
+    public void updated(Dictionary properties) throws ConfigurationException {
+        synchronized(this) {
+            System.out.println(properties == null);
+            if(properties != null) {
+                port = (Integer) properties.get(UDP_PORT_KEY);
+            }
+        }
     }
 
     public void publish(String topic, String message) {
