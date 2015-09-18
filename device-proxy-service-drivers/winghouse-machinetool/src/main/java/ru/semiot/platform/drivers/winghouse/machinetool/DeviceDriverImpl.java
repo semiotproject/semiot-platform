@@ -66,7 +66,8 @@ public class DeviceDriverImpl implements DeviceDriver {
         deviceManager.publish(topic, message);
     }
 
-    public void register(Device device) {
+    public void addDevice(Device device) {
+    	listDevices.add(device);
         deviceManager.register(device);
     }
 

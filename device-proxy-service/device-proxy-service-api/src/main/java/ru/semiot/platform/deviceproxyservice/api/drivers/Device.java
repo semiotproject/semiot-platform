@@ -21,7 +21,7 @@ public class Device {
     @Override
     public boolean equals(Object object)
     {
-        if (object != null && object instanceof Device)
+        if (this.id!=null && object != null && object instanceof Device)
         {
             return this.id.equals(((Device) object).getID());
         }

@@ -86,7 +86,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 		String message = deviceDriverImpl.getTemplateDescription().replace(
 				"${MAC}", mac);
 		System.out.println("Publish message:\n" + message);
-		deviceDriverImpl.register(new Device(templateTopic.replace("${MAC}",
+		deviceDriverImpl.addDevice(new Device(templateTopic.replace("${MAC}",
 				mac), message));
 	}
 }
