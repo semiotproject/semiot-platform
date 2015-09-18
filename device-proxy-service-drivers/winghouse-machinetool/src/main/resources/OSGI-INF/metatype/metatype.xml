@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+    <OCD description="Winghouse Driver" name="Winghouse Driver"
+         id="ru.semiot.platform.drivers.winghouse.machinetool">
+        <AD name="UDP Port" id="ru.semiot.platform.drivers.winghouse.machinetool.udp_port"
+            required="true" type="Integer" default="9500"/>
+    </OCD>
+    
+    <Designate pid="ru.semiot.platform.drivers.winghouse.machinetool">
+        <Object ocdref="ru.semiot.platform.drivers.winghouse.machinetool"/>
+    </Designate>
+</metatype:MetaData>
