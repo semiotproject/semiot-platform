@@ -20,6 +20,7 @@ public class Launcher {
         FrameworkFactory frameworkFactory = loader.iterator().next();
 
         Map<String, String> config = new HashMap<>();
+        config.put("org.osgi.service.http.port", "8181");
 
         Framework framework = frameworkFactory.newFramework(config);
         framework.start();
