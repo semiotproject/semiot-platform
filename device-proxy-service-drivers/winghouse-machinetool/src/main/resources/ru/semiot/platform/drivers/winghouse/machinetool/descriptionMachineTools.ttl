@@ -5,7 +5,6 @@
 
 <http://example.com/${MAC}> a mcht:MachineTool ;
     rdfs:label "Machine Tool #${MAC}"@en ;
-    rdfs:label "Станок #${MAC}"@ru ;
     ssn:hasSubsystem <http://example.com/${MAC}/machinetool> .
 
 <http://example.com/${MAC}/machinetool>  a ssn:Sensor ;
