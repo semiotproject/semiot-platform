@@ -37,7 +37,9 @@ public class Launcher {
         bundles.add(context.installBundle(
                 "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.metatype-1.1.2.jar"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.webconsole-4.2.10-all.jar"));
+        		"http://central.maven.org/maven2/org/apache/felix/org.osgi.compendium/1.4.0/org.osgi.compendium-1.4.0.jar"));
+        bundles.add(context.installBundle(
+                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.webconsole-4.2.12-all.jar"));
         bundles.add(context.installBundle(
                 "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.servlet-api-1.1.2.jar"));
         bundles.add(context.installBundle(
