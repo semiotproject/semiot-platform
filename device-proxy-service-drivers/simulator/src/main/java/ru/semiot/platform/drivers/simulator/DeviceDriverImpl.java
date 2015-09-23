@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 
+import org.apache.log4j.BasicConfigurator;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
@@ -38,6 +39,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
 	public void start() {
 		try {
+			BasicConfigurator.configure();
 			coap = new CoAPInterface(this);
 			coap.start();
 		} catch (Exception ex) {

@@ -43,7 +43,7 @@ public class DeviceHandler {
 	}
 
 	public void removeDevice(String key) {
-		inactiveDevice(key, "Device is removed! Stop proxying to {} topic");
+		inactiveDevice(key, "Device is removed! Stop proxying to ");
 		observationHandlers.remove(key);
 	}
 

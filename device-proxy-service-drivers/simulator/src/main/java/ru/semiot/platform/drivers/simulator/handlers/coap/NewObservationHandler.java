@@ -12,9 +12,6 @@ import ru.semiot.platform.drivers.simulator.DeviceDriverImpl;
 import ru.semiot.platform.drivers.simulator.handlers.coap.DeviceHandler;
 
 public class NewObservationHandler implements CoapHandler {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(NewObservationHandler.class);
 	private static final String templateOffState = "@prefix saref: <http://ontology.tno.nl/saref#>. <${system}> saref:hasState saref:OffState.";
 	private final String topic;
 	private final String system;
@@ -36,26 +33,25 @@ public class NewObservationHandler implements CoapHandler {
 	@Override
 	public void onLoad(CoapResponse response) {
 		if (response.getCode() == CoAP.ResponseCode.NOT_FOUND) {
-			inactiveSystem("Path {} doesn't exist. Cancel subscription!");
+			inactiveSystem("Path doesn't exist. Cancel subscription!");
 		} else if (response.getCode() == CoAP.ResponseCode.CONTENT) {
 			try {
 				deviceDriverImpl.publish(topic, response.getResponseText());
 			} catch (Exception ex) {
-				logger.error(ex.getMessage(), ex);
+				System.out.println(ex.getMessage());
 			}
 		} else {
-			logger.warn("Received unexpected response: {} {}",
-					response.getCode(), response.getResponseText());
+			System.out.println("Received unexpected response: "+response.getCode()+" " + response.getResponseText());
 		}
 	}
 
 	@Override
 	public void onError() {
-		inactiveSystem("Something went wrong! Stop proxying to {} topic");
+		inactiveSystem("Something went wrong! Stop proxying to ");
 	}
 
 	public void stopProxying(String warnMessage) {
-		logger.warn(warnMessage, topic);
+		System.out.println(warnMessage + topic);
 		relation.reactiveCancel();
 	}
 
@@ -64,16 +60,16 @@ public class NewObservationHandler implements CoapHandler {
 			if (!DeviceHandler.getInstance().emptyHandlersInDevice(system)) {
 				DeviceHandler.getInstance().inactiveDevice(system, warnMessage);
 				String message = templateOffState.replace("${system}", system);
-				logger.info("Publish into topic "
+				System.out.println("Publish into topic "
 						+ deviceDriverImpl.getTopicInactive() + " message: "
 						+ message);
 				deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(),
 						message);
 			}
 		} catch (RiotException ex) {
-			logger.warn(ex.getMessage(), ex);
+			System.out.println(ex.getMessage());
 		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
+			System.out.println(ex.getMessage());
 		}
 	}
 }

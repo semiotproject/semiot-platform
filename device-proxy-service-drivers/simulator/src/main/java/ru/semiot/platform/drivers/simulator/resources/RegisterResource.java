@@ -44,9 +44,6 @@ import ru.semiot.semiot.commons.namespaces.SSNCOM;
 
 public class RegisterResource extends CoapResource {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(RegisterResource.class);
-
 	private static final String templateWampTopic = "${services.wamp.uri}?topic=${topic}";
 	private static final String queryFile = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
 	private final Model schema;
@@ -59,6 +56,7 @@ public class RegisterResource extends CoapResource {
 
 	public RegisterResource(DeviceDriverImpl deviceDriverImpl) {
 		super("register");
+		System.out.println("register resoure");
 		this.deviceDriverImpl = deviceDriverImpl;
 
 		this.schema = FileManager.get().loadModel(SSN.URI);
@@ -68,13 +66,14 @@ public class RegisterResource extends CoapResource {
 			this.query = QueryFactory.create(IOUtils.toString(this.getClass()
 					.getResourceAsStream(queryFile)));
 		} catch (IOException ex) {
-			logger.debug(ex.getMessage(), ex);
+			System.out.println(ex.getMessage());
 			throw new IllegalArgumentException(ex);
 		}
 	}
 
 	@Override
 	public void handlePOST(CoapExchange exchange) {
+		System.out.println("handlePost");
 		Model description = toModel(exchange.getRequestText());
 
 		if (!description.isEmpty()) {
@@ -115,8 +114,7 @@ public class RegisterResource extends CoapResource {
 							systemURI = system.getURI();
 						}
 
-						logger.debug("Mapping {} to {}", coap.getURI(),
-								wamp.getURI());
+						System.out.println("Mapping " + coap.getURI() +" to "+ wamp.getURI());
 
 						String wampTopic = getWampTopic(wamp.getURI());
 
@@ -142,12 +140,12 @@ public class RegisterResource extends CoapResource {
 					}
 				}
 			} else {
-				logger.warn("Received an empty message or in a wrong format!");
+				System.out.println("Received an empty message or in a wrong format!");
 			}
 		} catch (RiotException ex) {
-			logger.warn(ex.getMessage(), ex);
+			System.out.println(ex.getMessage());
 		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
+			System.out.println(ex.getMessage());
 		}
 	}
 
