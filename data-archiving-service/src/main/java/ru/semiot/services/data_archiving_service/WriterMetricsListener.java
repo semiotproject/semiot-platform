@@ -18,6 +18,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
@@ -27,6 +28,7 @@ public class WriterMetricsListener implements Observer<String> {
 			.getLogger(WriterMetricsListener.class);
 	private static final String TIMESTAMP = "timestamp";
 	private static final String NAME_METRIC = "name";
+	private static final String ENUM_VALUE = "enum_value";
 	private static final String VALUE = "value";
 	private static final String OBSERVATION = "observation";
 	private static final Query METRICS_QUERY = QueryFactory
@@ -38,7 +40,7 @@ public class WriterMetricsListener implements Observer<String> {
 					.append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
 					.append("prefix xsd: <http://www.w3.org/2001/XMLSchema#> ")
 					.append("SELECT ?").append(TIMESTAMP).append(" ?")
-					.append(NAME_METRIC).append(" ?").append(VALUE)
+					.append(NAME_METRIC).append(" ?").append(ENUM_VALUE)
 					.append(" ?").append(OBSERVATION)
 					.append(" WHERE { {?x a hmtr:TemperatureObservation} ")
 					.append("UNION{ ?x a hmtr:HeatObservation} ")
@@ -51,8 +53,11 @@ public class WriterMetricsListener implements Observer<String> {
 					.append("; ").append("ssn:observedBy ?")
 					.append(NAME_METRIC).append("; ")
 					.append("ssn:observationResult ?result. ")
-					.append("?result ssn:hasValue ?").append(VALUE)
-					.append(". ?x a ?").append(OBSERVATION).append(".}").toString()); 
+					.append("?result ssn:hasValue ?").append(ENUM_VALUE)
+					.append(". ?x a ?").append(OBSERVATION)
+					.append(". OPTIONAL { ?").append(ENUM_VALUE)
+					.append(" meter:hasQuantityValue  ?")
+					.append(VALUE).append("}}").toString());
 					//TODO убрано meter:hasQuantityValue, сделать работу с ризонингом
 	
 	private final String nameMetric; // временное решение
@@ -85,7 +90,13 @@ public class WriterMetricsListener implements Observer<String> {
 					QuerySolution qs = metrics.next();
 					// String nameMetric = qs.getResource(NAME_METRIC).getURI();
 					String timestamp = qs.getLiteral(TIMESTAMP).getString();
-					String value = qs.getResource(VALUE).getURI();
+					Literal valueLiteral = qs.getLiteral(VALUE);
+					String value;
+					if (valueLiteral != null) {
+						value = valueLiteral.getString();
+					} else {
+						value = qs.getResource(ENUM_VALUE).getURI();
+					}
 					String observation = qs.getResource(OBSERVATION).getURI();
 					if (StringUtils.isNotBlank(nameMetric)
 							&& StringUtils.isNotBlank(value)
