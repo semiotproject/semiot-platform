@@ -44,7 +44,7 @@ import ru.semiot.semiot.commons.namespaces.SSNCOM;
 
 public class RegisterResource extends CoapResource {
 
-	private static final String templateWampTopic = "${services.wamp.uri}?topic=${topic}";
+	private static final String templateWampTopic = "ws://wamprouter/ws?topic=${topic}";
 	private static final String queryFile = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
 	private final Model schema;
 	private final Query query;
@@ -130,15 +130,16 @@ public class RegisterResource extends CoapResource {
 						// So the handler could cancel the subscription.
 						handler.setRelation(rel);
 						coapClient.shutdown();
+						Device newDevice = new Device(systemURI, toString(description));
+						if(!deviceDriverImpl.contains(newDevice)) {
+							deviceDriverImpl.addDevice(newDevice);
+						}
 						if (!DeviceHandler.getInstance().containsHandler(
 								systemURI, handler)) {
 							DeviceHandler.getInstance().addHandler(systemURI,
 									handler);
 						}
-						Device newDevice = new Device(systemURI, toString(description));
-						if(!deviceDriverImpl.contains(newDevice)) {
-							deviceDriverImpl.addDevice(newDevice);
-						}
+						
 					}
 				}
 			} else {
