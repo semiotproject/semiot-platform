@@ -132,10 +132,12 @@ public class RegisterResource extends CoapResource {
 						coapClient.shutdown();
 						if (!DeviceHandler.getInstance().containsHandler(
 								systemURI, handler)) {
-							deviceDriverImpl.addDevice(new Device(systemURI,
-									toString(description)));
 							DeviceHandler.getInstance().addHandler(systemURI,
 									handler);
+						}
+						Device newDevice = new Device(systemURI, toString(description));
+						if(!deviceDriverImpl.contains(newDevice)) {
+							deviceDriverImpl.addDevice(newDevice);
 						}
 					}
 				}
