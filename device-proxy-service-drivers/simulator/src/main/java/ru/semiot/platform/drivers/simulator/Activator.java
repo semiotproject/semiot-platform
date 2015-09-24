@@ -2,7 +2,9 @@ package ru.semiot.platform.drivers.simulator;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
+import org.apache.log4j.BasicConfigurator;
 import org.osgi.framework.BundleContext;
+
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 

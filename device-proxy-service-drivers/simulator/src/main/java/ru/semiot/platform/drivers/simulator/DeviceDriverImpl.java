@@ -39,7 +39,6 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
 	public void start() {
 		try {
-			BasicConfigurator.configure();
 			coap = new CoAPInterface(this);
 			coap.start();
 		} catch (Exception ex) {
