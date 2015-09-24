@@ -1,9 +1,7 @@
-deviceproxyservice:
-  image: semiot/device-proxy-service
-  links:
-    - wamprouter
+wamprouter:
+  image: semiot/wamp-router
   ports:
-    - "3131:3131/udp"
+    - "8080:8080"
   restart: always
 
 devicedirectoryservice:
@@ -15,10 +13,12 @@ devicedirectoryservice:
   restart: always
 
 dataarchivingservice:
-  image: semiot/data-archiving-service
+  image: semiot/data-archiving-service-osgi
   links:
       - opentsdb
       - wamprouter
+  volumes:
+      - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
   
 opentsdb:
@@ -29,22 +29,26 @@ opentsdb:
       - /etc/opentsdb:/etc/opentsdb
   restart: always
 
+webui:
+  image: semiot/web-ui
+  ports:
+    - "80:80"
+  restart: always
+
+deviceproxyservice:
+  image: semiot/device-proxy-service-osgi
+  links:
+    - wamprouter
+  ports:
+    - "8181:8181"
+    - "9500:9500/udp"
+    - "3131:3131/udp"
+  restart: always
+
  analyzingservice:
   image: semiot/analyzing-service
   links:
     - wamprouter
   ports:
     - "8085:8085"
-  restart: always
-  
-wamprouter:
-  image: semiot/wamp-router
-  ports:
-    - "8080:8080"
-  restart: always
-
-webui:
-  image: semiot/web-ui
-  ports:
-    - "80:80"
   restart: always
