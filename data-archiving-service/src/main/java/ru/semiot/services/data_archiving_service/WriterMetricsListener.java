@@ -41,7 +41,7 @@ public class WriterMetricsListener implements Observer<String> {
 					.append("prefix xsd: <http://www.w3.org/2001/XMLSchema#> ")
 					.append("SELECT ?").append(TIMESTAMP).append(" ?")
 					.append(NAME_METRIC).append(" ?").append(ENUM_VALUE)
-					.append(" ?").append(OBSERVATION)
+					.append(" ?").append(OBSERVATION).append(" ?").append(VALUE)
 					.append(" WHERE { {?x a hmtr:TemperatureObservation} ")
 					.append("UNION{ ?x a hmtr:HeatObservation} ")
 					.append("UNION{ ?x a emtr:AmperageObservation} ")
@@ -93,9 +93,9 @@ public class WriterMetricsListener implements Observer<String> {
 					Literal valueLiteral = qs.getLiteral(VALUE);
 					String value;
 					if (valueLiteral != null) {
-						value = valueLiteral.getString();
+						value = valueLiteral.getString(); // value simulator
 					} else {
-						value = qs.getResource(ENUM_VALUE).getURI();
+						value = qs.getResource(ENUM_VALUE).getURI(); // instance enum uri 
 					}
 					String observation = qs.getResource(OBSERVATION).getURI();
 					if (StringUtils.isNotBlank(nameMetric)
@@ -107,10 +107,17 @@ public class WriterMetricsListener implements Observer<String> {
 							Calendar calendar = DatatypeConverter
 									.parseDateTime(timestamp);
 							tags.put(OBSERVATION, observation.replaceAll(":", "_").replace("#", "-"));// _ - 
-							tags.put(VALUE, value.replaceAll(":", "_").replace("#", "-"));
-							WriterOpenTsdb.getInstance().send(
-									nameMetric, 0,
-									calendar.getTimeInMillis(), tags);
+							if(valueLiteral != null) { // для симуляторов
+								WriterOpenTsdb.getInstance().send(
+										nameMetric, value,
+										calendar.getTimeInMillis(), tags);
+							}
+							else {
+								tags.put(VALUE, value.replaceAll(":", "_").replace("#", "-"));
+								WriterOpenTsdb.getInstance().send(
+										nameMetric, 0,
+										calendar.getTimeInMillis(), tags);
+							}
 						} catch (IllegalArgumentException e) {
 							logger.warn("Can't convert " + timestamp
 									+ " to calendar (xsd:dateTime)");
