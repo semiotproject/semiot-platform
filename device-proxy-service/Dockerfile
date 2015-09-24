@@ -1,21 +1,18 @@
 FROM fedora
 
+MAINTAINER Shilin Ivan <proniment@gmail.com>
+
 ENV SERVICE_NAME device-proxy-service
-ENV SERVICE_JAR_NAME device-proxy-service-1.0-SNAPSHOT-jar-with-dependencies
+ENV SERVICE_JAR_NAME device-proxy-service-launcher-1.0-SNAPSHOT-jar-with-dependencies
 
-WORKDIR /
+WORKDIR /root
 
-RUN yum upgrade -y && yum clean all
-RUN yum install -y java-1.8.0-openjdk-devel maven git && yum clean all
+RUN yum upgrade -y && yum install -y java-1.8.0-openjdk-devel maven git wget unzip which && yum clean all
 
-RUN git clone https://github.com/semiotproject/semiot-platform.git
+RUN git clone -b device-proxy-on-osgi https://github.com/semiotproject/semiot-platform.git
 
-WORKDIR /semiot-platform/semiot-commons
-
-RUN mvn clean install -DskipTests=true
-
-WORKDIR /semiot-platform/$SERVICE_NAME
+WORKDIR /root/semiot-platform/$SERVICE_NAME
 
 RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
 
-CMD java -jar target/$SERVICE_JAR_NAME.jar
+CMD java -jar device-proxy-service-launcher/target/$SERVICE_JAR_NAME.jar

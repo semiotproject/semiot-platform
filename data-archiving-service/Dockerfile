@@ -9,7 +9,7 @@ WORKDIR /root
 
 RUN yum upgrade -y && yum install -y java-1.8.0-openjdk-devel maven git wget unzip which && yum clean all
 
-RUN git clone https://github.com/semiotproject/semiot-platform.git
+RUN git clone -b device-proxy-on-osgi https://github.com/semiotproject/semiot-platform.git
 
 WORKDIR /root/semiot-platform/$SERVICE_NAME
 

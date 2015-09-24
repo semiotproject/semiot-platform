@@ -32,6 +32,7 @@
             ja:externalContent <http://purl.oclc.org/NET/ssnx/ssn#> ;
             ja:externalContent <http://purl.org/NET/ssnext/electricmeters#> ;
             ja:externalContent <http://purl.org/NET/ssnext/heatmeters#> ;
+            ja:externalContent <http://purl.org/NET/ssnext/machinetools#> ;
         ];
     ];
     ja:reasoner [
