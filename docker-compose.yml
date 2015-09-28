@@ -45,7 +45,7 @@ deviceproxyservice:
     - "3131:3131/udp"
   restart: always
 
- analyzingservice:
+analyzingservice:
   image: semiot/analyzing-service
   links:
     - wamprouter
