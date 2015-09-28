@@ -17,4 +17,7 @@ RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
 
 ADD config.properties /semiot-platform/data-archiving-service/config.properties
 
-CMD java -jar target/$SERVICE_JAR_NAME.jar
+ADD run.sh ./
+RUN chmod 777 run.sh
+
+CMD ./run.sh
