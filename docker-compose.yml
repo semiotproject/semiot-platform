@@ -13,7 +13,7 @@ devicedirectoryservice:
   restart: always
 
 dataarchivingservice:
-  image: semiot/data-archiving-service-osgi
+  image: semiot/data-archiving-service
   links:
       - opentsdb
       - wamprouter
@@ -36,7 +36,7 @@ webui:
   restart: always
 
 deviceproxyservice:
-  image: semiot/device-proxy-service-osgi
+  image: semiot/device-proxy-service
   links:
     - wamprouter
   ports:
