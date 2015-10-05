@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 
-import org.apache.log4j.BasicConfigurator;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 

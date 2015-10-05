@@ -5,9 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DeviceHandler {
 	private Map<String, List<NewObservationHandler>> observationHandlers = new HashMap<>();
 	private static volatile DeviceHandler instance = null;

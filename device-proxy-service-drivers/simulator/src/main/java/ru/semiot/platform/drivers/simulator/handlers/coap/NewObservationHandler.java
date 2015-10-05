@@ -5,8 +5,6 @@ import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.CoAP;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ru.semiot.platform.drivers.simulator.DeviceDriverImpl;
 import ru.semiot.platform.drivers.simulator.handlers.coap.DeviceHandler;

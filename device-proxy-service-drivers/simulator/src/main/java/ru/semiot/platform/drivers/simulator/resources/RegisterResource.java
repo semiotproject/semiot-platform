@@ -28,8 +28,6 @@ import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.server.resources.CoapExchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.drivers.simulator.CoAPInterface;
@@ -134,12 +132,8 @@ public class RegisterResource extends CoapResource {
 						if(!deviceDriverImpl.contains(newDevice)) {
 							deviceDriverImpl.addDevice(newDevice);
 						}
-						if (!DeviceHandler.getInstance().containsHandler(
-								systemURI, handler)) {
-							DeviceHandler.getInstance().addHandler(systemURI,
-									handler);
-						}
-						
+						DeviceHandler.getInstance().addHandler(systemURI,
+								handler);
 					}
 				}
 			} else {
