@@ -46,7 +46,7 @@ deviceproxyservice:
   restart: always
 
 analyzingservice:
-  image: docker.semiot.ru/analyzing-service
+  image: docker.semiot.ru/analysing-service
   links:
     - wamprouter
   ports:
