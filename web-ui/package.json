@@ -4,7 +4,7 @@
   "description": "Web user interface for SemIoT middleware",
   "main": "index.js",
   "scripts": {
-    "install-all": "npm install && bower install",
+    "install-all": "npm install && bower --allow-root install",
     "build": "grunt build",
     "serve": "grunt serve",
     "dev": "grunt"
