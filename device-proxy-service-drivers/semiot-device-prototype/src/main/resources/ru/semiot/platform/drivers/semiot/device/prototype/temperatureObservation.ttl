@@ -1,0 +1,18 @@
+@prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> .
+@prefix meter: <http://purl.org/NET/ssnext/meters/core#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://prototype.com/${MAC}/prototype#> .
+
+:${TIMESTAMP} a hmtr:TemperatureObservation ;
+    ssn:observationResultTime "${DATETIME}"^^xsd:dateTime ;
+    ssn:observedBy <coap://${HOST}:${PORT}/meter> ;
+    ssn:observationResult :${TIMESTAMP}-result .
+
+:${TIMESTAMP}-result a hmtr:TemperatureSensorOutput ;
+    ssn:isProducedBy <coap://${HOST}:${PORT}/meter> ;
+    ssn:hasValue :${TIMESTAMP}-resultvalue .
+
+:${TIMESTAMP}-resultvalue a hmtr:TemperatureValue ;
+    meter:hasQuantityValue "${VALUE}"^^xsd:float ;
+    om:hasQuantityUnitOfMeasurement <http://purl.oclc.org/NET/muo/ucum/unit/temperature/degree-Celsius> .
