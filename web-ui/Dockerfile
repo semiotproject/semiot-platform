@@ -1,5 +1,5 @@
 # pull base image
-FROM dockerfile/ubuntu
+FROM ubuntu
 
 # install NGINX
 RUN \
