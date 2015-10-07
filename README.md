@@ -18,3 +18,12 @@ If you want to see the logs of the containers then run:
 sudo docker-compose logs
 ```
 
+## How to add a device driver
+Open osgi-webconsole, for example if the system is deployed locally, then address:
+```
+localhost:8181/system/console
+```
+Next, you must instal your bundle and set its configuration. More detail on [apache-felix-web-console](http://felix.apache.org/documentation/subprojects/apache-felix-web-console.html).
+
+For example, you can create a bundles of [existing drivers](https://github.com/semiotproject/semiot-platform/tree/master/device-proxy-service-drivers).
+
