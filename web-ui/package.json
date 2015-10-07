@@ -40,7 +40,6 @@
     "autobahn": "~0.9.6",
     "highcharts": "0.0.9",
     "highcharts-ng": "0.0.11",
-    "angular-bootstrap-datetimepicker": "~0.3.13",
     "jquery": "~2.1.4",
     "moment": "~2.10.6",
     "n3": "~0.4.5"
