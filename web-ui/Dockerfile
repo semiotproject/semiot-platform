@@ -1,6 +1,9 @@
 # pull base image
 FROM ubuntu
 
+# install git (bower require it)
+RUN apt-get install -y git
+
 # install NGINX
 RUN apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:nginx/stable && \
