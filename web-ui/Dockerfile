@@ -27,7 +27,7 @@ RUN update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
 # build app
 ADD . /webapp
 RUN cd /webapp && npm i -g grunt-cli && npm i -g bower &&  npm run install-all && npm run build
-RUN cp -rf /webapp/dist /var/www
+RUN cp -rf /webapp/dist/* /var/www/html
 
 # Define working directory.
 WORKDIR /etc/nginx
