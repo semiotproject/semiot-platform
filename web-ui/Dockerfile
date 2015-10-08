@@ -10,7 +10,8 @@ RUN apt-get install -y software-properties-common && \
     apt-get update && \
     apt-get install -y nginx && \
     rm -rf /var/lib/apt/lists/* && \
-    chown -R www-data:www-data /var/lib/nginx
+    chown -R www-data:www-data /var/lib/nginx && \
+    useradd nginx
 
 # add NGINX conf
 ADD ./nginx.conf /etc/nginx/nginx.conf
