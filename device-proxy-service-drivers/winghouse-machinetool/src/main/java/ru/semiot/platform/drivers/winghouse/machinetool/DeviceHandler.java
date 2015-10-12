@@ -11,6 +11,7 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
 	private final DeviceDriverImpl deviceDriverImpl;
+	private MachineToolState oldStateMachineTool;
 
 	private static final String templateTopic = "${MAC}.machinetool.obs";
 
@@ -40,14 +41,16 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
 	private void processingPacket(byte[] res) {
 		MachineToolMessage mess = MessageParser.parsePacket(res);
-
 		if (!deviceDriverImpl.contains(new Device(templateTopic.replace(
 				"${MAC}", mess.getMac()), ""))) {
 			System.out.println(mess.getMac() + " not exist");
 			addDevice(mess.getMac());
 		}
-
-		sendMessage(mess, System.currentTimeMillis());
+		if(mess.getMachineToolState() != null 
+				&& oldStateMachineTool != mess.getMachineToolState()) {
+			sendMessage(mess, System.currentTimeMillis());
+			oldStateMachineTool = mess.getMachineToolState();
+		}
 	}
 
 	private void sendMessage(MachineToolMessage mess, long timestamp) {
@@ -57,28 +60,17 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 		final String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 				.format(new Date(timestamp));
 
-		System.out.println("StateButtonsObservation "
-				+ mess.getPauseState().getUri());
-		String messageButtons = deviceDriverImpl
-				.getTemplateButtonsObservation()
+		System.out.println("State "
+				+ mess.getMachineToolState().getUri());
+		String message = deviceDriverImpl
+				.getTemplateObservation()
 				.replace("${MAC}", mess.getMac())
 				.replace("${TIMESTAMP}", String.valueOf(timestamp))
 				.replace("${DATETIME}", date)
 				.replace("${STATE}",
-						String.valueOf(mess.getPauseState().getUri()));
+						String.valueOf(mess.getMachineToolState().getUri()));
 
-		System.out.println("StateWorkingObservation "
-				+ mess.getWorkingState().getUri());
-		String messageWorkingState = deviceDriverImpl
-				.getTemplateWorkingStateObservation()
-				.replace("${MAC}", mess.getMac())
-				.replace("${TIMESTAMP}", String.valueOf(timestamp))
-				.replace("${DATETIME}", date)
-				.replace("${STATE}",
-						String.valueOf(mess.getWorkingState().getUri()));
-
-		deviceDriverImpl.publish(topic, messageButtons);
-		deviceDriverImpl.publish(topic, messageWorkingState);
+		deviceDriverImpl.publish(topic, message);
 	}
 
 	private void addDevice(String mac) {

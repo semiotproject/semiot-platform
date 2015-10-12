@@ -28,8 +28,7 @@ public class MessageParser {
 		int stateOfInputs = getUInt8_t(res[index += 1]);
 		System.out.println("StateOfInputs " + String.valueOf(stateOfInputs));
 
-		return new MachineToolMessage(mac, PauseState.get(stateOfButtons),
-				WorkingState.get(stateOfInputs));
+		return new MachineToolMessage(mac, MachineToolState.get(stateOfButtons, stateOfInputs));
 	}
 
 	private static int getUInt8_t(byte value) {
