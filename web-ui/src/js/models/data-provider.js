@@ -172,8 +172,8 @@ export default function(
 
 /*
     setInterval(function() {
-        instance.onDeviceRegistered(commonUtils.getMockNewSystem());
-    }, 100);
+        instance.onDeviceRegistered([commonUtils.getMockNewSystem()]);
+    }, 1000);
 */
 
     return instance;

@@ -21,7 +21,7 @@ module.exports = function (grunt) {
             index: {
                 expand: true,
                 cwd: BUILD_CONFIG.src_dir,
-                src: ['**/*.less'],
+                src: ['css/main.less'],
                 dest: BUILD_CONFIG.dist_dir,
                 ext: '.css'
             }
@@ -98,6 +98,14 @@ module.exports = function (grunt) {
                         'angular-bootstrap-datetimepicker/src/css/datetimepicker.css'
                     ],
                     dest: BUILD_CONFIG.dist_dir + "css/lib/"
+                }, {
+                    expand: true,
+                    flatten: true,
+                    cwd: './bower_components/',
+                    src: [
+                        'bootstrap/fonts/*'
+                    ],
+                    dest: BUILD_CONFIG.dist_dir + "fonts/"
                 }]
             }
         },

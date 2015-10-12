@@ -7,8 +7,8 @@ export default function($q, CONFIG) {
     let N3Utils = N3.Util;
 
     // helpers
-    let toQName = function(uri) {
-        if(!N3.Util.isQName(uri)) {
+    let toPrefixedName = function(uri) {
+        if(!N3.Util.isPrefixedName(uri)) {
             Object.keys(CONFIG.SPARQL.prefixes).every(function(prefix) {
                 let index = uri.indexOf(CONFIG.SPARQL.prefixes[prefix]);
                 if(index > -1) {
@@ -20,9 +20,9 @@ export default function($q, CONFIG) {
         }
         return uri;
     };
-    let expandQName = function(qname) {
-        if(qname && N3Utils.isQName(qname)) {
-            return N3Utils.expandQName(qname, CONFIG.SPARQL.prefixes);
+    let expandPrefixedName = function(qname) {
+        if(qname && N3Utils.isPrefixedName(qname)) {
+            return N3Utils.expandPrefixedName(qname, CONFIG.SPARQL.prefixes);
         }
         return qname;
     };
@@ -52,13 +52,13 @@ export default function($q, CONFIG) {
             if(Array.isArray(type)) {
                 let result = -1;
                 type.some(function(element, index) {
-                    let expandedType = expandQName(element);
+                    let expandedType = expandPrefixedName(element);
                     result = index;
                     return this['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'].indexOf(expandedType) > -1;
                 }, this);
                 return result;
             }
-            let expandedType = expandQName(type);
+            let expandedType = expandPrefixedName(type);
             return this['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'].indexOf(expandedType) > -1;
         }
     };
@@ -81,7 +81,8 @@ export default function($q, CONFIG) {
             if(triples.length) {
                 let resource = new Resource();
                 triples.forEach(function(triple) {
-                    let p = toQName(triple.predicate);
+
+                    let p = toPrefixedName(triple.predicate);
                     if(p === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' && !resource.uri) { // FIXME: get root URI
                         resource.uri = triple.subject;
                     }

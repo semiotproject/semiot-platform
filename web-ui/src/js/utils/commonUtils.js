@@ -97,9 +97,9 @@ export default function($q, CONFIG) {
                 "@prefix ssncom: <http://purl.org/NET/ssnext/communication#> .",
 
                 "<coap://10.1.1.2:{0}/meter> a hmtr:HeatMeter ;".format(counter++),
-                "    rdfs:label \"Heat Meter #6666\" ;",
-                "    ssn:hasSubsystem <coap://10.1.1.2:{0}/meter/temperature> ;".format(counter++),
-                "    ssn:hasSubsystem <coap://10.1.1.2:{0}/meter/heat> .".format(counter++),
+                "    rdfs:label \"Heat Meter #{0}\" ;".format(counter),
+                "    ssn:hasSubsystem <coap://10.1.1.2:{0}/meter/temperature> ;".format(counter),
+                "    ssn:hasSubsystem <coap://10.1.1.2:{0}/meter/heat> .".format(counter),
 
                 "<coap://10.1.1.2:545/meter/temperature> a ssn:Sensor ;",
                 "    ssn:observes hmtr:Temperature ;",

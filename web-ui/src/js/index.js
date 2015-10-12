@@ -31,13 +31,7 @@ if (!Array.prototype.find) {
     };
 }
 
-import routing from './routing';
-import LoginCtrl from './controllers/login';
-import AnalyzeCtrl from './controllers/analyse';
-import MeterListCtrl from './controllers/meter-list';
-import MeterSingleCtrl from './controllers/meter-single';
-
-let app = angular.module('semiotApp', [
+const app = window.angular.module('semiotApp', [
     "highcharts-ng",
     require('angular-ui-bootstrap'),
     require('angular-route')
@@ -57,13 +51,14 @@ app.factory('loginService', require('./services/login-service'));
 app.factory('dataProvider', require('./models/data-provider'));
 
 // controllers
-app.controller('LoginCtrl', LoginCtrl);
-app.controller('AnalyzeCtrl', AnalyzeCtrl);
-app.controller('MeterListCtrl', MeterListCtrl);
-app.controller('MeterSingleCtrl', MeterSingleCtrl);
+app.controller('LoginCtrl', require('./controllers/login'));
+app.controller('AnalyzeCtrl', require('./controllers/analyse'));
+app.controller('MeterListCtrl', require('./controllers/meter-list'));
+app.controller('MeterSingleCtrl', require('./controllers/meter-single'));
 
-app.config(routing);
+app.config(require('./routing'));
 
+// redirect to login page if unauthorized
 app.run(['$rootScope', '$location', 'loginService', function ($rootScope, $location, loginService) {
     $rootScope.$on('$routeChangeStart', function (event) {
         if (!loginService.isLogged()) {
