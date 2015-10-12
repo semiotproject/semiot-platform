@@ -41,20 +41,23 @@ const app = window.angular.module('semiotApp', [
 app.constant("CONFIG", require('./config'));
 
 // utils
-app.factory('commonUtils', require('./utils/commonUtils'));
-app.factory('rdfUtils', require('./utils/rdfUtils.js'));
+app.factory('commonUtils', require('./utils/common'));
+app.factory('wampUtils', require('./utils/wamp'));
+app.factory('rdfUtils', require('./utils/rdf'));
+app.factory('sparqlUtils', require('./utils/sparql'));
 
 // services
 app.factory('loginService', require('./services/login-service'));
 
 // models
-app.factory('dataProvider', require('./models/data-provider'));
+app.factory('systemList', require('./models/system-list'));
+app.factory('systemDetail', require('./models/system-detail'));
 
 // controllers
 app.controller('LoginCtrl', require('./controllers/login'));
 app.controller('AnalyzeCtrl', require('./controllers/analyse'));
-app.controller('MeterListCtrl', require('./controllers/meter-list'));
-app.controller('MeterSingleCtrl', require('./controllers/meter-single'));
+app.controller('SystemListCtrl', require('./controllers/system-list'));
+app.controller('SystemDetailCtrl', require('./controllers/system-detail'));
 
 app.config(require('./routing'));
 

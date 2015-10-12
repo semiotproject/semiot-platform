@@ -3,22 +3,22 @@
 export default function($routeProvider) {
     $routeProvider
         .when('/', {
-            redirectTo: '/list'
+            redirectTo: '/systems'
         })
         .when('/login', {
             templateUrl: 'partials/login.html',
             controller: 'LoginCtrl'
         })
-        .when('/list', {
-            templateUrl: 'partials/list.html',
-            controller: 'MeterListCtrl'
+        .when('/systems', {
+            templateUrl: 'partials/system-list.html',
+            controller: 'SystemListCtrl'
         })
         .when('/analyze', {
             templateUrl: 'partials/analyze.html',
             controller: 'AnalyzeCtrl'
         })
-        .when('/single/:system_uri*', {
-            templateUrl: 'partials/single.html',
-            controller: 'MeterSingleCtrl'
+        .when('/systems/:system_uri*', {
+            templateUrl: 'partials/system-detail.html',
+            controller: 'SystemDetailCtrl'
         });
 }

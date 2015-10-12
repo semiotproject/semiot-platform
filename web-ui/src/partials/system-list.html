@@ -38,7 +38,7 @@
                 </tr>
                 <tr ng-repeat="system in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle(system)">
                     <td>{{ system.index }}</td>
-                    <td><a href="{{ '#/single/' + system.uri }}">{{ system.name }}</a></td>
+                    <td><a href="{{ '#/systems/' + system.uri }}">{{ system.name }}</a></td>
                     <td>{{ system.state }}</td>
                     <td>
                         <button class="btn btn-primary btn-sm">

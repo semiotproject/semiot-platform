@@ -3,8 +3,7 @@
 export default function(
     $scope,
     $routeParams,
-    $interval,
-    dataProvider,
+    systemDetail,
     commonUtils,
     rdfUtils,
     CONFIG
@@ -30,14 +29,17 @@ export default function(
         })();
     };
     $scope.init = function(uri) {
+
         // get extended info
-        dataProvider.fetchSystemName(uri, function(data) {
+        systemDetail.fetchSystemName(uri, function(data) {
             if (data.results.bindings[0]) {
                 $scope.title = data.results.bindings[0].label.value;
+            } else {
+                $scope.title = "Unknown system";
             }
         });
 
-        dataProvider.fetchSystemEndpoint(uri, function(data) {
+        systemDetail.fetchSystemEndpoint(uri, function(data) {
             let sensors = [];
             data.results.bindings.forEach(function(binding) {
                 let sensor = {
@@ -50,7 +52,7 @@ export default function(
 
                 // get TSDB archive testimonial
 
-                dataProvider.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
+                systemDetail.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
                     sensor.chartConfig.series[0].data = commonUtils.normalizeTSDBData(result);
 
                     console.log(commonUtils.parseTopicFromEndpoint(sensor.endpoint));
@@ -82,7 +84,7 @@ export default function(
     };
     $scope.setRange = function(index) {
         let sensor = $scope.sensors[index];
-        dataProvider.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
+        systemDetail.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
             sensor.chartConfig.series[0].data = commonUtils.normalizeTSDBData(result);
             // sensor.chartConfig.xAxis.currentMin = (sensor.range[0]).getTime();
             // sensor.chartConfig.xAxis.currentMax = (sensor.range[1]).getTime();

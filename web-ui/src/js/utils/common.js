@@ -1,7 +1,5 @@
 "use strict";
 
-import autobahn from 'autobahn';
-
 export default function($q, CONFIG) {
 
     let counter = 666;
@@ -54,19 +52,6 @@ export default function($q, CONFIG) {
         parseTopicFromEndpoint: function(endpoint) {
             let prefix = "ws://wamprouter/ws?topic=";
             return endpoint.substr(prefix.length);
-        },
-        subscribe: function(url, listeners) {
-            let connection = new autobahn.Connection({
-                url: url,
-                realm: 'realm1'
-            });
-            connection.onopen = function(session) {
-                listeners.forEach(function(listener) {
-                    session.subscribe(listener.topic, listener.callback);
-                });
-            };
-            connection.open();
-            return connection;
         },
         getMockHeatObservation: function() {
             return  [

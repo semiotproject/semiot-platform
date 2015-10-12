@@ -1,6 +1,6 @@
 "use strict";
 
-export default function($scope, dataProvider, commonUtils) {
+export default function($scope, systemList, commonUtils) {
     $scope.systems = [];
     $scope.search = {
         name: ""
@@ -14,7 +14,7 @@ export default function($scope, dataProvider, commonUtils) {
     };
 
     $scope.setPagination = function() {
-        let total_systems = dataProvider.getSystems().filter(function(s) {
+        let total_systems = systemList.getSystems().filter(function(s) {
             return !$scope.search.name || s.name.indexOf($scope.search.name) > -1;
         });
         $scope.systems = total_systems.slice(
@@ -24,12 +24,12 @@ export default function($scope, dataProvider, commonUtils) {
         $scope.pagination.totalItems = total_systems.length;
     };
     $scope.removeSystem = function(uri) {
-        dataProvider.removeSystem(uri);
+        systemList.removeSystem(uri);
     };
-    dataProvider.on('systemsUpdate', function(data) {
+    systemList.on('systemsUpdate', function(data) {
         $scope.setPagination();
     });
-    dataProvider.fetchSystems().then(function(data) {
+    systemList.fetchSystems().then(function(data) {
         $scope.setPagination();
     });
 }
