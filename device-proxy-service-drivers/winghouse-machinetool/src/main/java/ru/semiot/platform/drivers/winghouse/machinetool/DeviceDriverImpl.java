@@ -27,8 +27,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private volatile DeviceManager deviceManager;
 
     private String templateDescription;
-    private String templateButtonsObservation;
-    private String templateWorkingStateObservation;
+    private String templateObservation;
     private EventLoopGroup group;
     private Channel channel;
     private int port;
@@ -94,22 +93,16 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         return templateDescription;
     }
 
-    public String getTemplateButtonsObservation() {
-        return templateButtonsObservation;
-    }
-
-    public String getTemplateWorkingStateObservation() {
-        return templateWorkingStateObservation;
+    public String getTemplateObservation() {
+        return templateObservation;
     }
 
     private void readTemplates() {
         try {
             this.templateDescription = IOUtils.toString(DeviceHandler.class
                     .getResourceAsStream("/ru/semiot/platform/drivers/winghouse/machinetool/descriptionMachineTools.ttl"));
-            this.templateButtonsObservation = IOUtils.toString(DeviceHandler.class
-                    .getResourceAsStream("/ru/semiot/platform/drivers/winghouse/machinetool/buttonsObservation.ttl"));
-            this.templateWorkingStateObservation = IOUtils.toString(DeviceHandler.class
-                    .getResourceAsStream("/ru/semiot/platform/drivers/winghouse/machinetool/workingStateObservation.ttl"));
+            this.templateObservation = IOUtils.toString(DeviceHandler.class
+                    .getResourceAsStream("/ru/semiot/platform/drivers/winghouse/machinetool/observation.ttl"));
         } catch (IOException ex) {
             System.out.println("Can't read templates");
             throw new IllegalArgumentException(ex);

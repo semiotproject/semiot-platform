@@ -4,11 +4,15 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix : <http://example.com/${MAC}/machinetool#> .
 
-:${TIMESTAMP} a mcht:WorkingStateObservation ;
+:${TIMESTAMP} a ssn:Observation ;
+	ssn:observedProperty mcht:MachineToolWorkingState;
+	ssn:observedBy <http://example.com/${MAC}> ;
     ssn:observationResultTime "${DATETIME}"^^xsd:dateTime ;
-    ssn:observedBy <http://example.com/${MAC}> ;
     ssn:observationResult :${TIMESTAMP}-result .
 
 :${TIMESTAMP}-result a ssn:SensorOutput ;
     ssn:isProducedBy <http://example.com/${MAC}> ;
-    ssn:hasValue mcht:${STATE} .
+    ssn:hasValue :${TIMESTAMP}-resultvalue .
+    
+:${TIMESTAMP}-resultvalue a qudt:Enumeration ;
+	ssn:hasValue mcht:${STATE} .

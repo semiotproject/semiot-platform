@@ -7,7 +7,8 @@
     rdfs:label "Machine Tool #${MAC}"@en ;
     ssn:hasSubsystem <http://example.com/${MAC}/machinetool> .
 
-<http://example.com/${MAC}/machinetool>  a ssn:Sensor ;
+<http://example.com/${MAC}/machinetool>  a ssn:SensingDevice ;
+	ssn:observes mcht:MachineToolWorkingState ;
     ssncom:hasCommunicationEndpoint <http://example.com/topic=${MAC}.machinetool.obs> .
 
 <http://example.com/topic=${MAC}.machinetool.obs> a ssncom:CommunicationEndpoint ;

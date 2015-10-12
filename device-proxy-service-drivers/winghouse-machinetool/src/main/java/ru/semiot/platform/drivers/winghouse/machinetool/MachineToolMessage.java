@@ -2,37 +2,27 @@ package ru.semiot.platform.drivers.winghouse.machinetool;
 
 public class MachineToolMessage {
 	private String mac;
-	private PauseState pauseState;
-	private WorkingState workingState;
+	private MachineToolState machineToolState;
 
-	public MachineToolMessage(String mac, PauseState pauseState,
-			WorkingState workingState) {
+	public MachineToolMessage(String mac, MachineToolState machineToolState) {
 		this.mac = mac;
-		this.pauseState = pauseState;
-		this.workingState = workingState;
+		this.machineToolState = machineToolState;
 	}
 
 	public void setMac(String mac) {
 		this.mac = mac;
 	}
 
-	public void setPauseState(PauseState pauseState) {
-		this.pauseState = pauseState;
-	}
-
-	public void setWorkingState(WorkingState workingState) {
-		this.workingState = workingState;
+	public void setMachineToolState(MachineToolState machineToolState) {
+		this.machineToolState = machineToolState;
 	}
 
 	public String getMac() {
 		return mac;
 	}
 
-	public PauseState getPauseState() {
-		return pauseState;
+	public MachineToolState getMachineToolState() {
+		return machineToolState;
 	}
 
-	public WorkingState getWorkingState() {
-		return workingState;
-	}
 }
