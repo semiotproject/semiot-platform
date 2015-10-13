@@ -37,7 +37,7 @@ public class Launcher {
         bundles.add(context.installBundle(
                 "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.metatype-1.1.2.jar?raw=true"));
         bundles.add(context.installBundle(
-        		"https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.osgi.compendium-1.4.0.jar?raw=true"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.osgi.compendium-1.4.0.jar?raw=true"));
         bundles.add(context.installBundle(
                 "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.webconsole-4.2.12-all.jar?raw=true"));
         bundles.add(context.installBundle(
@@ -50,22 +50,24 @@ public class Launcher {
                 "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.eventadmin-1.4.4.jar?raw=true"));
         bundles.add(context.installBundle(
                 "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.dependencymanager-4.1.0.jar?raw=true"));
-                
+
+        bundles.add(context.installBundle("http://central.maven.org/maven2/com/github/livesense/org.liveSense.fragment.sun.misc/1.0.5/org.liveSense.fragment.sun.misc-1.0.5.jar"));
+        
         //Device Proxy Service bundles
         bundles.add(context.installBundle(
-                "device-proxy-service-api-1.0-SNAPSHOT.jar", 
+                "device-proxy-service-api-1.0-SNAPSHOT.jar",
                 Launcher.class.getResourceAsStream("/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar")));
         bundles.add(context.installBundle(
-                "device-proxy-service-manager-1.0-SNAPSHOT.jar", 
+                "device-proxy-service-manager-1.0-SNAPSHOT.jar",
                 Launcher.class.getResourceAsStream("/bundles/device-proxy-service-manager-1.0-SNAPSHOT.jar")));
-        
+
         System.out.println("Installed all bundles!");
-        
+
         System.out.println("Starting all of them...");
         for (Bundle bundle : bundles) {
             bundle.start();
-            
-            System.out.format("Started [%s:%s]. Current state: %s\n", 
+
+            System.out.format("Started [%s:%s]. Current state: %s\n",
                     bundle.getSymbolicName(), bundle.getVersion(), bundle.getState());
         }
     }
