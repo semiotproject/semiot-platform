@@ -4,6 +4,8 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 @Stateless
 public class DefaultDataBase implements DataBase{
@@ -11,27 +13,28 @@ public class DefaultDataBase implements DataBase{
     private EntityManager em;
     
     @Override
-    public void appendQuery(String request) {
-        List l = em.createNamedQuery("Requests.getAll",Query.class).getResultList();
-        int id;
-        if(l == null || l.isEmpty())
-            id=0;
-        else
-            id = ((Query)l.get(l.size()-1)).getId();
-        Query r = new Query(++id, request);
-        em.persist(r);
+    public JSONObject appendQuery(String request, String name) {        
+        //Bad, bad function
+        int id = 0;
+        if(getCount()>0)
+            id = (Integer)em.createQuery("SELECT MAX(q.id) FROM Query q").getSingleResult();
+        Query r = new Query(request, name, ++id);
+        em.merge(r);
+        return new JSONObject(r.toString());
     }
 
     @Override
-    public int getCount() {
-        return em.createNamedQuery("Requests.getAll",Query.class).getResultList().size();
+    public long getCount() {
+        return (Long)em.createQuery("SELECT COUNT(q.id) FROM Query q").getSingleResult();
     }
 
     @Override
-    public String getQuery(int id) {
+    public JSONObject getQuery(int id) {
         Query r = em.find(Query.class, id);
-        if(r!=null)
-            return r.getRequest();
+        if(r!=null){
+            JSONObject object = new JSONObject(r.toString());
+            return object;
+        }            
         else
             return null;
     }
@@ -40,33 +43,32 @@ public class DefaultDataBase implements DataBase{
         return em.find(Query.class, id);
     }
     @Override
-    public String removeQuery(int id) {
+    public JSONObject removeQuery(int id) {
         Query r = getEntity(id);
-        if(r != null){
+        if(r != null){            
             em.remove(getEntity(id));
-            return r.getRequest();
+            return new JSONObject(r.toString());
         }
         else
             return null;
     }
 
     @Override
-    public String [] getQueries() {
-        List l = em.createNamedQuery("Requests.getAll",Query.class).getResultList();
+    public JSONArray getQueries() {
+        List l = em.createNamedQuery("Query.findAll",Query.class).getResultList();
         if(l == null || l.isEmpty())
             return null;
-        String [] queries = new String [l.size()];
-        int i = 0;
+        JSONArray array = new JSONArray();
         for (Object q : l) {
-            queries[i++] = ((Query)q).getRequest();
+            array.put(new JSONObject((Query)q).toString());
         }
-        return queries;
+        return array;
     }
 
     @Override
     public boolean removeQueries() {
         try{
-            em.createNamedQuery("Requests.removeAll").executeUpdate();
+            //em.createNamedQuery("Requests.removeAll").executeUpdate();
             return true;
         }
         catch(Exception e){

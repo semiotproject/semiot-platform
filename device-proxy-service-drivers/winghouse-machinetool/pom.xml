@@ -58,7 +58,8 @@
                             org.osgi.framework;version="[1.8,2)",
                             org.osgi.service.cm;version="[1.5,2)",
                             ru.semiot.platform.deviceproxyservice.api.drivers;version="[1.0,2)",
-                            javax.security.cert
+                            javax.security.cert,
+                            sun.misc
                         </Import-Package>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>

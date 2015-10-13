@@ -11,19 +11,19 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.services.analyzing.ServiceConfig;
 import ru.semiot.services.analyzing.cqels.Engine;
 import ru.semiot.services.analyzing.database.DataBase;
-import ru.semiot.services.analyzing.wamp.Launcher;
 
 /**
  *
  * @author Daniil Garayzuev <garayzuev@gmail.com>
  */
 @Stateless
-@Path("/")
+@Path("query")
 public class Queries {
 
     private static final Logger logger = LoggerFactory
@@ -33,86 +33,58 @@ public class Queries {
     private DataBase db;
     
     @GET
-    @Path("qs")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getQueries(){
         logger.debug("Return queries");
-        String [] ret = db.getQueries();
+        JSONArray ret = db.getQueries();
         if(ret == null)
             return Response.status(Response.Status.NOT_FOUND).build();        
-        return Response.ok().type(MediaType.WILDCARD_TYPE).entity(ret).build();
-    }
-    
-    @DELETE
-    @Path("qs")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response removeAllQueries(){
-        logger.debug("Removing all queries");
-        if(!db.removeQueries())
-            return Response.status(Response.Status.FORBIDDEN).build();
-        Engine.removeAllSelects();
-        logger.info("All queries removed");
-        return Response.ok().build();
+        return Response.ok().entity(ret.toString()).build();
     }
     
     @POST
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response create(String request) {
-        logger.debug("Appending select");
-        db.appendQuery(request);
-        Engine.beforeClass();
-        Engine.registerSelect(request);
-        logger.info("Select appended");
-        return Response.ok().build();
+        logger.debug("Appending query");
+        JSONObject object = new JSONObject(request);
+        if(request==null || !object.has("name") || !object.has("text"))
+            return Response.status(Response.Status.BAD_REQUEST).build();        
+        if(!Engine.getInstance().registerQuery(object.getString("text")))
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
+        logger.info("Query appended");
+        return Response.ok(ret.toString()).build();
     }
 
     @GET
     @Path("count")
     @Produces(MediaType.TEXT_PLAIN)
     public String count() {
-        return Integer.toString(db.getCount());
+        return Long.toString(db.getCount());
     }
 
     @GET
     @Path("{id}")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getQuery(@PathParam("id") Integer id) {
         logger.debug("Return query");
-        String ret = db.getQuery(id);
+        JSONObject ret = db.getQuery(id);
         if(ret == null)
             return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(ret).build();
+        return Response.ok(ret.toString()).build();
     }
 
     @DELETE
     @Path("{id}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response remove(@PathParam("id") Integer id) {
-        logger.debug("Removing select");
-        String ret = db.removeQuery(id);
+        logger.debug("Removing query");
+        JSONObject ret = db.removeQuery(id);
         if(ret == null)
             return Response.status(Response.Status.NOT_FOUND).build();
-        Engine.removeSelect(ret);
-        logger.info("Select removed");
-        return Response.status(Response.Status.OK).entity(ret).build();
-    }
-    
-    
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response startLauncher() {
-        logger.info("Starting WAMP connection");
-        Engine.beforeClass();
-        if(ServiceConfig.config.isAutoLoaded() && db.getQueries()!=null)
-            for(String s : db.getQueries())
-                Engine.registerSelect(s);            
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                new Launcher().run();
-            }
-        }).start();
-        return Response.ok().entity("WAMP connection started").build();
+        Engine.getInstance().removeQuery(ret.getString("text"));
+        logger.info("Query removed");
+        return Response.ok().build();
     }
 }

@@ -31,41 +31,43 @@ public class Launcher {
 
         //Apache Felix bundles
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.configadmin-1.8.8.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.configadmin-1.8.8.jar?raw=true"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.log-1.0.1.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.log-1.0.1.jar?raw=true"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.metatype-1.1.2.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.metatype-1.1.2.jar?raw=true"));
         bundles.add(context.installBundle(
-        		"http://central.maven.org/maven2/org/apache/felix/org.osgi.compendium/1.4.0/org.osgi.compendium-1.4.0.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.osgi.compendium-1.4.0.jar?raw=true"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.webconsole-4.2.12-all.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.webconsole-4.2.12-all.jar?raw=true"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.servlet-api-1.1.2.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.http.servlet-api-1.1.2.jar?raw=true"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.api-3.0.0.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.http.api-3.0.0.jar?raw=true"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.jetty-3.1.0.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.http.jetty-3.1.0.jar?raw=true"));
         bundles.add(context.installBundle(
-                "http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.eventadmin-1.4.4.jar"));
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.eventadmin-1.4.4.jar?raw=true"));
         bundles.add(context.installBundle(
-                "http://central.maven.org/maven2/org/apache/felix/org.apache.felix.dependencymanager/4.1.0/org.apache.felix.dependencymanager-4.1.0.jar"));
-                
+                "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.dependencymanager-4.1.0.jar?raw=true"));
+
+        bundles.add(context.installBundle("http://central.maven.org/maven2/com/github/livesense/org.liveSense.fragment.sun.misc/1.0.5/org.liveSense.fragment.sun.misc-1.0.5.jar"));
+        
         //Device Proxy Service bundles
         bundles.add(context.installBundle(
-                "device-proxy-service-api-1.0-SNAPSHOT.jar", 
+                "device-proxy-service-api-1.0-SNAPSHOT.jar",
                 Launcher.class.getResourceAsStream("/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar")));
         bundles.add(context.installBundle(
-                "device-proxy-service-manager-1.0-SNAPSHOT.jar", 
+                "device-proxy-service-manager-1.0-SNAPSHOT.jar",
                 Launcher.class.getResourceAsStream("/bundles/device-proxy-service-manager-1.0-SNAPSHOT.jar")));
-        
+
         System.out.println("Installed all bundles!");
-        
+
         System.out.println("Starting all of them...");
         for (Bundle bundle : bundles) {
             bundle.start();
-            
-            System.out.format("Started [%s:%s]. Current state: %s\n", 
+
+            System.out.format("Started [%s:%s]. Current state: %s\n",
                     bundle.getSymbolicName(), bundle.getVersion(), bundle.getState());
         }
     }

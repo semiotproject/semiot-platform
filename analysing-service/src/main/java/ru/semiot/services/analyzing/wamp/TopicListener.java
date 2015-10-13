@@ -13,7 +13,7 @@ public class TopicListener implements Observer<String> {
     private static final Logger logger = LoggerFactory
             .getLogger(TopicListener.class);
     private final String topicName;
-
+    
     public TopicListener(String topicName) {
         this.topicName = topicName;
     }
@@ -27,13 +27,13 @@ public class TopicListener implements Observer<String> {
     public void onError(Throwable e) {
         logger.warn(e.getMessage(), e);
     }
-
+    
     @Override
     public void onNext(String message) {
         Model description = ModelFactory.createDefaultModel().read(
                 new StringReader(message), null, SubscribeListener.LANG);
         if (!description.isEmpty()) {
-            Engine.appendData(message);
+            Engine.getInstance().appendData(message);
         }
     }
 

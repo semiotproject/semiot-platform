@@ -135,7 +135,7 @@
         <subsystem xmlns="urn:jboss:domain:datasources:2.0">
             <datasources>
                 <datasource jndi-name="java:jboss/datasources/SemiotDS" pool-name="SemiotDS" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:mysql://localhost:3306/qwerty?useUnicode=yes&amp;characterEncoding=UTF-8</connection-url>
+                    <connection-url>jdbc:mysql://localhost:3306/analyzis?useUnicode=yes&amp;characterEncoding=UTF-8</connection-url>
                     <driver>com.mysql</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>

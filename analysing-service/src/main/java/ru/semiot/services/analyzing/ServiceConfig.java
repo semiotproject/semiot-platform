@@ -1,11 +1,13 @@
 package ru.semiot.services.analyzing;
 
 import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Config.HotReload;
 import org.aeonbits.owner.Config.LoadPolicy;
 import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.ConfigFactory;
 
+@HotReload
 @LoadPolicy(LoadType.FIRST)
 @Sources({"file:/semiot-platform/analysing-service/config.properties"})
 public interface ServiceConfig extends Config {

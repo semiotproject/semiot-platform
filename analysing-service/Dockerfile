@@ -28,15 +28,15 @@ RUN cp semiot-platform/analysing-service/wildfly_conf/standalone.xml wildfly-8.2
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get -q -y install mysql-server
 
 #Config MySQL
-RUN service mysql start && mysql --execute="create database qwerty; connect qwerty; create table Requests(id int(3), Request text, key(id));"
+RUN service mysql start && mysql --execute="create database analyzis; connect analyzis; create table queries(id int(3), name text, query text, time text, primary key(id));"
 
 #Add config file
 ADD config.properties /semiot-platform/analysing-service/
 
 #Deploy to Wildfly
 WORKDIR /root/semiot-platform/analysing-service/
-RUN service mysql start && start-stop-daemon --start --background --exec "/root/wildfly-8.2.0.Final/bin/standalone.sh" && mvn clean wildfly:deploy && sh /root/wildfly-8.2.0.Final/bin/jboss-cli.sh --connect command=:shutdown
+RUN mvn clean install && cp /root/semiot-platform/analysing-service/target/ROOT.war /root/wildfly-8.2.0.Final/standalone/deployments/
 
 EXPOSE 8085
 
-CMD rm -rf /root/wildfly-8.2.0.Final/standalone/configuration/standalone_xml_history/current/ && service mysql start && /root/wildfly-8.2.0.Final/bin/standalone.sh -b 0.0.0.0
+CMD service mysql start && /root/wildfly-8.2.0.Final/bin/standalone.sh -b 0.0.0.0
