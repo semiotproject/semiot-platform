@@ -36,7 +36,13 @@
             <artifactId>cqels</artifactId>
             <version>1.1.1-SNAPSHOT</version>           
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20150729</version>
+        </dependency>
     </dependencies>
+    
     <repositories>
         <repository>
             <id>cqels</id>
@@ -56,6 +62,7 @@
         </repository>
     </repositories>
     <build>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

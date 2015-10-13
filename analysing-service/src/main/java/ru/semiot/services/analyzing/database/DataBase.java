@@ -1,10 +1,13 @@
 package ru.semiot.services.analyzing.database;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public interface DataBase {
-    public void appendQuery(String request);
-    public int getCount();
-    public String getQuery(int id);
-    public String [] getQueries();
-    public String removeQuery(int id);
+    public JSONObject appendQuery(String request, String name);
+    public long getCount();
+    public JSONObject getQuery(int id);
+    public JSONArray getQueries();
+    public JSONObject removeQuery(int id);
     public boolean removeQueries();
 }
