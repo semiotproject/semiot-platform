@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 import org.deri.cqels.data.Mapping;
 import org.deri.cqels.engine.ConstructListener;
 import org.deri.cqels.engine.ContinuousConstruct;
@@ -23,6 +24,7 @@ import org.deri.cqels.engine.OpRouter1;
 import org.deri.cqels.engine.RDFStream;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.ServiceConfig;
+import ru.semiot.services.analyzing.database.DataBase;
 import ru.semiot.services.analyzing.wamp.WAMPClient;
 
 public class Engine {
@@ -35,51 +37,56 @@ public class Engine {
     private final String STREAM_ID = "http://example.org/simpletest/test";
     private DefaultRDFStream stream = null;
     private Map<String, OpRouter1> queries = null;
+    
+    @Inject private DataBase db; 
 
-    
     private Engine() {
-            logger.info("Initialize home directory for cqels");
-            File home = new File(CQELS_HOME);
-            if (!home.exists()) {
-                home.mkdir();
-            }
-            context = new ExecContext(home.getAbsolutePath(), true);
-            stream = new DefaultRDFStream(context, STREAM_ID);
-            queries = new HashMap<>();
-            
+        logger.info("Initialize home directory for cqels");
+        File home = new File(CQELS_HOME);
+        if (!home.exists()) {
+            home.mkdir();
+        }
+        context = new ExecContext(home.getAbsolutePath(), true);
+        stream = new DefaultRDFStream(context, STREAM_ID);
+        queries = new HashMap<>();
+
     }
-    
-    public static Engine getInstance(){
-        if(engine == null){
+
+    public static Engine getInstance() {
+        if (engine == null) {
             engine = new Engine();
         }
         return engine;
     }
-    
+
     public boolean registerQuery(String query) {
+        try {
+            if (query.toLowerCase().contains("select") || query.toLowerCase().contains("construct")) {
+                if (query.toLowerCase().contains("construct")) {
+                    ContinuousConstruct cc = context.registerConstruct(query);
+                    cc.register(new ConstructListener(context) {
 
-        if (query.toLowerCase().contains("select") || query.toLowerCase().contains("construct")) {
-            if (query.toLowerCase().contains("construct")) {
-                ContinuousConstruct cc = context.registerConstruct(query);
-                cc.register(new ConstructListener(context) {
+                        @Override
+                        public void update(List<Triple> graph) {
+                            sendToWamp(getString(graph));
+                        }
+                    });
+                    queries.put(query, cc);
+                } else {
+                    ContinuousSelect cs = context.registerSelect(query);
+                    cs.register(new ContinuousListener() {
 
-                    @Override
-                    public void update(List<Triple> graph) {
-
-                    }
-                });
-                queries.put(query, cc);
-            } else {
-                ContinuousSelect cs = context.registerSelect(query);
-                cs.register(new ContinuousListener() {
-
-                    @Override
-                    public void update(Mapping m) {
-                        sendToWamp(getString(m));
-                    }
-                });
-                queries.put(query, cs);
+                        @Override
+                        public void update(Mapping m) {
+                            sendToWamp(getString(m));
+                        }
+                    });
+                    queries.put(query, cs);
+                }
             }
+        }
+        catch(com.hp.hpl.jena.query.QueryException e){
+            return false;
         }
         return true;
     }
@@ -93,10 +100,10 @@ public class Engine {
 
     public void removeQuery(String query) {
         if (query != null && !query.isEmpty() && queries.containsKey(query)) {
-            logger.debug("Removing select");
+            logger.debug("Removing query");
             OpRouter1 op = queries.get(query);
             if (op instanceof ContinuousConstruct) {
-
+                context.unregisterConstruct((ContinuousConstruct) op);
             } else {
                 context.unregisterSelect((ContinuousSelect) op);
             }
@@ -107,13 +114,13 @@ public class Engine {
         }
     }
 
-    public void appendData(String msg) {        
+    public void appendData(String msg) {
         Model description = ModelFactory.createDefaultModel().read(
                 new StringReader(msg), null, "TURTLE");
         stream.stream(description);
     }
 
-    private static void sendToWamp(String message) {
+    private void sendToWamp(String message) {
         //logger.info("Get alert! " + message);
         WAMPClient.getInstance().publish(ServiceConfig.config.topicsAlert(), message);
     }
@@ -123,6 +130,14 @@ public class Engine {
         String message = "";
         for (Node n : list) {
             message += n.toString() + "\n";
+        }
+        return message;
+    }
+
+    private String getString(List<Triple> list) {
+        String message = "";
+        for (Triple t : list) {
+            message += t.toString() + "\n";
         }
         return message;
     }

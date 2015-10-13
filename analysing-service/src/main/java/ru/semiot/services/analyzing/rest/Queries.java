@@ -50,7 +50,8 @@ public class Queries {
         JSONObject object = new JSONObject(request);
         if(request==null || !object.has("name") || !object.has("text"))
             return Response.status(Response.Status.BAD_REQUEST).build();        
-        Engine.getInstance().registerQuery(object.getString("text"));
+        if(!Engine.getInstance().registerQuery(object.getString("text")))
+            return Response.status(Response.Status.BAD_REQUEST).build();
         JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
         logger.info("Query appended");
         return Response.ok(ret.toString()).build();
