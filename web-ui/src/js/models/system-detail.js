@@ -1,6 +1,7 @@
 "use strict";
 
 import { EventEmitter } from 'events';
+import moment from 'moment';
 
 export default function(
     $http,
@@ -21,8 +22,8 @@ export default function(
         }
         fetchArchiveTestimonials(metric, range) {
             return $http.get(CONFIG.URLS.tsdb.format(
-                window.moment(range[0] - CONFIG.TIMEZONE_OFFSET).format('YYYY/MM/DD-HH:mm:ss'),
-                window.moment(range[1] - CONFIG.TIMEZONE_OFFSET).format('YYYY/MM/DD-HH:mm:ss'),
+                moment(range[0] - CONFIG.TIMEZONE_OFFSET).format('YYYY/MM/DD-HH:mm:ss'),
+                moment(range[1] - CONFIG.TIMEZONE_OFFSET).format('YYYY/MM/DD-HH:mm:ss'),
                 commonUtils.parseTopicFromEndpoint(metric),
                 {}
             ));
