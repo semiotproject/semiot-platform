@@ -31,7 +31,7 @@ export default function(
                 ]
             ).session;
 
-            this.launchTestSystems();
+            // this.launchTestSystems();
         }
 
         launchTestSystems() {
