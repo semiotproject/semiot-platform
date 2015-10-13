@@ -1,7 +1,0 @@
-*~
-**/target
-**/run
-**/nb-configuration.xml
-**/nbactions.xml
-**/felix-cache
-**/bundles/*.jar
