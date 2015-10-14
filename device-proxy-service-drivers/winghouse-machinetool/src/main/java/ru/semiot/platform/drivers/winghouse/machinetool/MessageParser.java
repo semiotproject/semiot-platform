@@ -18,17 +18,16 @@ public class MessageParser {
 		System.out.println("MAC " + mac);
 		// uint16_t CaseOfTransmission;
 		// 0x1 - timer 0x2 - buttons 0x4 - inputs 0x8 - restart
-		int caseOfTransmission = getUInt16_t(res, index);
-		System.out.println("CaseOfTransmission "
-				+ String.valueOf(caseOfTransmission));
+		// int caseOfTransmission = getUInt16_t(res, index);
+		//System.out.println("CaseOfTransmission " + String.valueOf(caseOfTransmission));
 		// uint8_t StateOfButtons;
-		int stateOfButtons = getUInt8_t(res[index += 4]);
+		int stateOfButtons = getUInt8_t(res[index += 6]);
 		System.out.println("StateOfButtons " + String.valueOf(stateOfButtons));
 		// uint8_t StateOfInputs;
 		int stateOfInputs = getUInt8_t(res[index += 1]);
 		System.out.println("StateOfInputs " + String.valueOf(stateOfInputs));
 
-		return new MachineToolMessage(mac, MachineToolState.get(stateOfButtons, stateOfInputs));
+		return new MachineToolMessage(mac, MachineToolState.get(stateOfInputs, stateOfButtons));
 	}
 
 	private static int getUInt8_t(byte value) {
