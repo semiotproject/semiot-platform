@@ -51,4 +51,6 @@ analyzingservice:
     - wamprouter
   ports:
     - "8085:8085"
+  volumed:
+	- /semiot-platform/analysing-service/:/semiot-platform/analysing-service/
   restart: always
