@@ -15,18 +15,18 @@ devicedirectoryservice:
 dataarchivingservice:
   image: docker.semiot.ru/data-archiving-service
   links:
-      - opentsdb
-      - wamprouter
+    - opentsdb
+    - wamprouter
   volumes:
-      - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
+    - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
   
 opentsdb:
   image: docker.semiot.ru/opentsdb-docker
   ports:
-      - "4242:4242"
+    - "4242:4242"
   volumes:
-      - /etc/opentsdb:/etc/opentsdb
+    - /etc/opentsdb:/etc/opentsdb
   restart: always
 
 webui:
@@ -51,6 +51,6 @@ analyzingservice:
     - wamprouter
   ports:
     - "8085:8085"
-  volumed:
-	- /semiot-platform/analysing-service/:/semiot-platform/analysing-service/
+  volumes:
+    - /semiot-platform/analysing-service/:/semiot-platform/analysing-service/
   restart: always
