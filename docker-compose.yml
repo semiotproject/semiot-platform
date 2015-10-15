@@ -10,6 +10,8 @@ devicedirectoryservice:
     - wamprouter
   ports:
     - "3030:3030"
+  volumes:
+    - /semiot-platform/fuseki/base:/fuseki/base
   restart: always
 
 dataarchivingservice:
@@ -17,6 +19,7 @@ dataarchivingservice:
   links:
     - opentsdb
     - wamprouter
+    - devicedirectoryservice
   volumes:
     - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
@@ -27,6 +30,7 @@ opentsdb:
     - "4242:4242"
   volumes:
     - /etc/opentsdb:/etc/opentsdb
+    - /semiot-platform/opentsdb/data/hbase:/data/hbase
   restart: always
 
 webui:
@@ -43,6 +47,8 @@ deviceproxyservice:
     - "8181:8181"
     - "9500:9500/udp"
     - "3131:3131/udp"
+  volumes:
+    - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
   restart: always
 
 analyzingservice:

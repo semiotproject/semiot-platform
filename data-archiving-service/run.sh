@@ -1,5 +1,5 @@
 #!/bin/sh
-while ! curl -I http://demo.semiot.ru:3030
+while ! curl -I http://devicedirectoryservice:3030
 do
   sleep 1;
 done
