@@ -52,6 +52,7 @@ app.factory('loginService', require('./services/login-service'));
 // models
 app.factory('systemList', require('./models/system-list'));
 app.factory('systemDetail', require('./models/system-detail'));
+app.factory('machineToolStates', require('./models/machine-tool-states'));
 
 // controllers
 app.controller('LoginCtrl', require('./controllers/login'));

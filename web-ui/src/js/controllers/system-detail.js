@@ -4,7 +4,9 @@ export default function(
     $scope,
     $routeParams,
     systemDetail,
+    machineToolStates,
     commonUtils,
+    wampUtils,
     rdfUtils,
     CONFIG
 ) {
@@ -57,7 +59,7 @@ export default function(
 
                     console.log(commonUtils.parseTopicFromEndpoint(sensor.endpoint));
 
-                    let connection = commonUtils.subscribe(
+                    let connection = wampUtils.subscribe(
                         CONFIG.URLS.messageBus,
                         [
                             {
@@ -97,5 +99,7 @@ export default function(
 
     $scope.setDefault();
 
-    $scope.init($routeParams.system_uri);
+    machineToolStates.fetchStates().then(() => {
+        $scope.init($routeParams.system_uri);
+    });
 }
