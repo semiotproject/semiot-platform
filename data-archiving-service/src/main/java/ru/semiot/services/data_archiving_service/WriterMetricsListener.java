@@ -18,47 +18,35 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 public class WriterMetricsListener implements Observer<String> {
-
+	
 	private static final Logger logger = LoggerFactory
 			.getLogger(WriterMetricsListener.class);
 	private static final String TIMESTAMP = "timestamp";
-	private static final String NAME_METRIC = "name";
-	private static final String ENUM_VALUE = "enum_value";
+	private static final String VALUE_TYPE = "value_type";
 	private static final String VALUE = "value";
-	private static final String OBSERVATION = "observation";
+	private static final String PROPERTY = "property";
+	private static final String ENUM_VALUE = "enum_value";
+	private static final String FEATURE_OF_INTEREST = "feature_of_interest";
+	
+	private static final String QUDT_ENUMERATION = "http://www.qudt.org/qudt/owl/1.0.0/qudt/#Enumeration";
 	private static final Query METRICS_QUERY = QueryFactory
-			.create(new StringBuilder()
-					.append("prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> ")
-					.append("prefix emtr: <http://purl.org/NET/ssnext/electricmeters#> ")
-					.append("prefix mcht: <http://purl.org/NET/ssnext/machinetools#> ")
-					.append("prefix meter: <http://purl.org/NET/ssnext/meters/core#> ")
-					.append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
-					.append("prefix xsd: <http://www.w3.org/2001/XMLSchema#> ")
-					.append("SELECT ?").append(TIMESTAMP).append(" ?")
-					.append(NAME_METRIC).append(" ?").append(ENUM_VALUE)
-					.append(" ?").append(OBSERVATION).append(" ?").append(VALUE)
-					.append(" WHERE { {?x a hmtr:TemperatureObservation} ")
-					.append("UNION{ ?x a hmtr:HeatObservation} ")
-					.append("UNION{ ?x a emtr:AmperageObservation} ")
-					.append("UNION{ ?x a emtr:VoltageObservation} ")
-					.append("UNION{ ?x a emtr:PowerObservation} ")
-					.append("UNION{ ?x a mcht:ButtonsObservation} ")
-					.append("UNION{ ?x a mcht:WorkingStateObservation} ")
-					.append("?x ssn:observationResultTime ?").append(TIMESTAMP)
-					.append("; ").append("ssn:observedBy ?")
-					.append(NAME_METRIC).append("; ")
-					.append("ssn:observationResult ?result. ")
-					.append("?result ssn:hasValue ?").append(ENUM_VALUE)
-					.append(". ?x a ?").append(OBSERVATION)
-					.append(". OPTIONAL { ?").append(ENUM_VALUE)
-					.append(" meter:hasQuantityValue  ?")
-					.append(VALUE).append("}}").toString());
-					//TODO убрано meter:hasQuantityValue, сделать работу с ризонингом
+			.create("prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> "
+					+ "prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> "
+					+ "SELECT ?timestamp ?property ?value_type ?value ?feature_of_interest "
+					+ "WHERE { ?x a ssn:Observation;"
+					+ " ssn:observedProperty ?property;"
+					+ " ssn:observationResultTime ?timestamp; "
+					+ "ssn:observationResult ?result. "
+					+ "?result ssn:hasValue ?res_value. "
+					+ "?res_value a ?value_type. "
+					+ "{?res_value ssn:hasValue  ?value} "
+					+ "UNION {?res_value qudt:quantityValue ?value}"
+					+ "OPTIONAL {?x ssn:featureOfInterest ?feature_of_interest}}");
 	
 	private final String nameMetric; // временное решение
 
@@ -88,34 +76,38 @@ public class WriterMetricsListener implements Observer<String> {
 
 				while (metrics.hasNext()) {
 					QuerySolution qs = metrics.next();
-					// String nameMetric = qs.getResource(NAME_METRIC).getURI();
 					String timestamp = qs.getLiteral(TIMESTAMP).getString();
-					Literal valueLiteral = qs.getLiteral(VALUE);
+					String valueType = qs.getResource(VALUE_TYPE).getURI();
+					Resource featureOfInterest = qs.getResource(FEATURE_OF_INTEREST);
 					String value;
-					if (valueLiteral != null) {
-						value = valueLiteral.getString(); // value simulator
+					if (valueType.equals(QUDT_ENUMERATION)) {
+						value = qs.getResource(VALUE).getURI(); // instance enum uri 
 					} else {
-						value = qs.getResource(ENUM_VALUE).getURI(); // instance enum uri 
+						value =  qs.getLiteral(VALUE).getString(); // value simulator
 					}
-					String observation = qs.getResource(OBSERVATION).getURI();
+					String property = qs.getResource(PROPERTY).getURI();
 					if (StringUtils.isNotBlank(nameMetric)
 							&& StringUtils.isNotBlank(value)
-							&& StringUtils.isNotBlank(observation)
+							&& StringUtils.isNotBlank(property)
 							&& StringUtils.isNotBlank(timestamp)) {
 						HashMap<String, String> tags = new HashMap<String, String>();
 						try {
 							Calendar calendar = DatatypeConverter
 									.parseDateTime(timestamp);
-							tags.put(OBSERVATION, observation.replaceAll(":", "_").replace("#", "-"));// _ - 
-							if(valueLiteral != null) { // для симуляторов
+							tags.put(PROPERTY, property.replaceAll(":", "_").replace("#", "-"));// _ - 
+							tags.put(VALUE_TYPE, valueType.replaceAll(":", "_").replace("#", "-"));
+							if(featureOfInterest != null) {
+								tags.put(FEATURE_OF_INTEREST, featureOfInterest.getURI().replaceAll(":", "_").replace("#", "-"));
+							}
+							if(valueType.equals(QUDT_ENUMERATION)) { // для симуляторов
+								tags.put(ENUM_VALUE, value.replaceAll(":", "_").replace("#", "-"));
 								WriterOpenTsdb.getInstance().send(
-										nameMetric, value,
+										nameMetric, 0,
 										calendar.getTimeInMillis(), tags);
 							}
 							else {
-								tags.put(VALUE, value.replaceAll(":", "_").replace("#", "-"));
 								WriterOpenTsdb.getInstance().send(
-										nameMetric, 0,
+										nameMetric, value,
 										calendar.getTimeInMillis(), tags);
 							}
 						} catch (IllegalArgumentException e) {
