@@ -25,6 +25,11 @@ ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
 
 WORKDIR /
 
+#
+# No cache workaround.
+#
+ADD build.number /root/build.number
+
 #Install Device Directory Service
 RUN git clone https://github.com/semiotproject/semiot-platform.git
 
