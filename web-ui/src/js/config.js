@@ -2,7 +2,7 @@
 
 // if local development, communicate with DEFAULT_HOSTNAME, otherwise - with web-UI host
 let DEFAULT_HOSTNAME = "demo.semiot.ru";
-let hostname = location.hostname !== "localhost" ? DEFAULT_HOSTNAME : location.hostname;
+let hostname = location.hostname === "localhost" ? DEFAULT_HOSTNAME : location.hostname;
 
 export default {
     COOKIE_NAME: "ru.semiot",
