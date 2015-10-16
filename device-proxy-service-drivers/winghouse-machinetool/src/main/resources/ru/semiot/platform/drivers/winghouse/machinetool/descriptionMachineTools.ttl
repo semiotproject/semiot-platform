@@ -8,7 +8,18 @@
     ssn:hasSubsystem <http://example.com/${MAC}/machinetool> .
 
 <http://example.com/${MAC}/machinetool>  a ssn:SensingDevice ;
-	ssn:observes mcht:MachineToolWorkingState ;
+    ssn:observes mcht:MachineToolWorkingState ;
+    ssn:hasMeasurementCapability [
+        a ssn:MeasurementCapability ;
+        ssn:forProperty mcht:MachineToolWorkingState ;
+        ssn:hasMeasurementProperty [
+            a qudt:Unit ;
+            ssn:hasValue [
+                a qudt:Enumeration ;
+                ssn:hasValue mcht:MachineToolWorkingStateValue ;
+            ] ;
+        ] ;
+    ] ;
     ssncom:hasCommunicationEndpoint <http://example.com/topic=${MAC}.machinetool.obs> .
 
 <http://example.com/topic=${MAC}.machinetool.obs> a ssncom:CommunicationEndpoint ;
