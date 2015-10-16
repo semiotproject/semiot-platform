@@ -33,6 +33,7 @@ if (!Array.prototype.find) {
 
 const app = window.angular.module('semiotApp', [
     "highcharts-ng",
+    "ui.bootstrap.datetimepicker",
     require('angular-ui-bootstrap'),
     require('angular-route')
 ]);

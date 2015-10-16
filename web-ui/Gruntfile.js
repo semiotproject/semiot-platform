@@ -84,6 +84,7 @@ module.exports = function (grunt) {
                         'angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
                         'jquery/dist/jquery.js',
                         'angular/angular.js',
+                        'moment/moment.js',
                         'highcharts/adapters/standalone-framework.js',
                         'highcharts/highcharts.js',
                         'highcharts-ng/dist/highcharts-ng.js',

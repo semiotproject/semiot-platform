@@ -1,6 +1,6 @@
 "use strict";
 
-export default function($q, CONFIG) {
+export default function($q, machineToolStates, CONFIG) {
 
     let counter = 666;
 
@@ -36,7 +36,79 @@ export default function($q, CONFIG) {
                 }
             };
         },
-        normalizeTSDBData: function(result) {
+        getStepChartConfig: function(type, data) {
+            let map = {};
+
+            let states = machineToolStates.getStates();
+            states.forEach((s, index) => {
+                let uri = s.uri.replace(':', '_').replace('#', '-');
+                map[uri] = {
+                    index: index + 1,
+                    label: s.label,
+                    description: s.description
+                };
+            });
+
+            function getItemByURI(uri) {
+                let item = {};
+                for (let key in map) {
+                    if (key === uri) {
+                        item = map[key];
+                        break;
+                    }
+                }
+                return item;
+            }
+
+            let values = [];
+
+            data.map((item) => {
+                for (let timestamp in item.dps) {
+                    values.push([timestamp * 1000, map[item.tags.enum_value] ? map[item.tags.enum_value].index : 0 ]);
+                }
+            });
+            values = values.sort((a, b) => {
+                return a[0] > b[0] ? 1 : -1;
+            });
+
+            console.log('parsed data is: ', values);
+
+            return {
+                xAxis: {
+                    type: 'datetime'
+                },
+                yAxis: {
+                    categories: Object.keys(map),
+                    labels: {
+                        formatter: function() {
+                            console.log(getItemByURI(this.value));
+                            return getItemByURI(this.value).label;
+                        }
+                    }
+                },
+                options: {
+                    useUTC: false
+                },
+                series: [
+                    {
+                        pointStart: (new Date()).getTime(),
+                        name: type,
+                        step: 'center',
+                        data: values
+                    }
+                ],
+                tooltip: {
+                    formatter: function () {
+                        console.log(this.y);
+                        return getItemByURI(this.y).label;
+                    }
+                },
+                title: {
+                    text: type
+                }
+            };
+        },
+        normalizeTSDBData: function(type, result) {
             let data = [];
             if (result.data[0]) {
                 let dps = result.data[0].dps;

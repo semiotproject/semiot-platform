@@ -30,6 +30,7 @@ export default function(
             return [start_date, end_date];
         })();
     };
+
     $scope.init = function(uri) {
 
         // get extended info
@@ -45,34 +46,13 @@ export default function(
             let sensors = [];
             data.results.bindings.forEach(function(binding) {
                 let sensor = {
-                    testimonials: [],
                     endpoint: binding.endpoint.value,
                     type: binding.type.value,
-                    chartConfig: commonUtils.getChartConfig(binding.type.value, []),
-                    range: $scope.default_range
+                    range: $scope.default_range,
+                    chartConfig: {}
                 };
-
-                // get TSDB archive testimonial
-
-                systemDetail.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
-                    sensor.chartConfig.series[0].data = commonUtils.normalizeTSDBData(result);
-
-                    console.log(commonUtils.parseTopicFromEndpoint(sensor.endpoint));
-
-                    let connection = wampUtils.subscribe(
-                        CONFIG.URLS.messageBus,
-                        [
-                            {
-                                topic: commonUtils.parseTopicFromEndpoint(sensor.endpoint),
-                                callback: function(args) {
-                                    $scope.onUpdated(sensor, args[0]);
-                                }
-                            }
-                        ]
-                    );
-                    $scope.connectionPull.push(connection);
-                });
                 sensors.push(sensor);
+                $scope.drawChart(sensor);
             });
             $scope.sensors = sensors;
         });
@@ -86,10 +66,34 @@ export default function(
     };
     $scope.setRange = function(index) {
         let sensor = $scope.sensors[index];
+        $scope.drawChart(sensor);
+    };
+
+    $scope.drawChart = function (sensor) {
+
+        // get TSDB archive testimonial
         systemDetail.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
-            sensor.chartConfig.series[0].data = commonUtils.normalizeTSDBData(result);
-            // sensor.chartConfig.xAxis.currentMin = (sensor.range[0]).getTime();
-            // sensor.chartConfig.xAxis.currentMax = (sensor.range[1]).getTime();
+            if (sensor.type ===  "http://purl.org/NET/ssnext/machinetools#MachineToolWorkingState") {
+                sensor.chartConfig = commonUtils.getStepChartConfig(sensor.type, result.data);
+            } else {
+                sensor.chartConfig = commonUtils.getChartConfig(sensor.type, result.data);
+            }
+
+            /*
+            console.log(commonUtils.parseTopicFromEndpoint(sensor.endpoint));
+            let connection = wampUtils.subscribe(
+                CONFIG.URLS.messageBus,
+                [
+                    {
+                        topic: commonUtils.parseTopicFromEndpoint(sensor.endpoint),
+                        callback: function(args) {
+                            $scope.onUpdated(sensor, args[0]);
+                        }
+                    }
+                ]
+            );
+            $scope.connectionPull.push(connection);
+            */
         });
     };
 
@@ -103,3 +107,5 @@ export default function(
         $scope.init($routeParams.system_uri);
     });
 }
+
+// "http://purl.org/NET/ssnext/machinetools#MachineToolWorkingState"
