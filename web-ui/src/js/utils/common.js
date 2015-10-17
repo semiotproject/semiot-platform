@@ -77,32 +77,40 @@ export default function($q, machineToolStates, CONFIG) {
                 xAxis: {
                     type: 'datetime'
                 },
+                useHighStocks: true,
                 yAxis: {
                     categories: Object.keys(map),
+                    endOnTick: false,
+                    minRange: states.length + 4,
+                    minPadding: 10,
                     labels: {
                         formatter: function() {
-                            console.log(getItemByURI(this.value));
                             return getItemByURI(this.value).label;
                         }
                     }
                 },
                 options: {
-                    useUTC: false
+                    useUTC: false,
+                    navigator: {
+                        enabled: true
+                    },
+                    rangeSelector: {
+                        enabled: false
+                    }
                 },
                 series: [
                     {
                         pointStart: (new Date()).getTime(),
                         name: type,
-                        step: 'center',
+                        step: "center",
+                        tooltip: {
+                            pointFormatter: function () {
+                                return states[this.y].description;
+                            }
+                        },
                         data: values
                     }
                 ],
-                tooltip: {
-                    formatter: function () {
-                        console.log(this.y);
-                        return getItemByURI(this.y).label;
-                    }
-                },
                 title: {
                     text: type
                 }

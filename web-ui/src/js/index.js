@@ -67,7 +67,7 @@ app.config(require('./routing'));
 app.run(['$rootScope', '$location', 'loginService', function ($rootScope, $location, loginService) {
     $rootScope.$on('$routeChangeStart', function (event) {
         if (!loginService.isLogged()) {
-            $location.path('/login');
+            // $location.path('/login');
         }
     });
 }]);

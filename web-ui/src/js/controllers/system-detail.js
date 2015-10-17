@@ -26,7 +26,7 @@ export default function(
             // FIXME
             let now = (new Date()).getTime();
             let end_date = new Date(now);
-            let start_date = (new Date(now - 1 * 3600 * 1000));
+            let start_date = (new Date(now - 24 * 3600 * 1000));
             return [start_date, end_date];
         })();
     };

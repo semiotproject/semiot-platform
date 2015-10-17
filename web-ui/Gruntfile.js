@@ -85,8 +85,7 @@ module.exports = function (grunt) {
                         'jquery/dist/jquery.js',
                         'angular/angular.js',
                         'moment/moment.js',
-                        'highcharts/adapters/standalone-framework.js',
-                        'highcharts/highcharts.js',
+                        'highstock/highstock.js',
                         'highcharts-ng/dist/highcharts-ng.js',
                         'bootstrap/dist/js/bootstrap.min.js'
                     ],

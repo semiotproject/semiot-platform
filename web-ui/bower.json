@@ -22,6 +22,7 @@
     "bootstrap": "~3.3.5",
     "angular-bootstrap-datetimepicker": "~0.3.14",
     "highcharts-ng": "~0.0.11",
-    "highcharts": "~4.1.8"
+    "highcharts": "~4.1.8",
+    "highstock": "highstock-release#~2.1.9"
   }
 }
