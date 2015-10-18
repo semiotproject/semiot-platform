@@ -44,6 +44,8 @@ public class RegisterResource extends CoapResource {
 
 	private static final String templateWampTopic = "ws://wamprouter/ws?topic=${topic}";
 	private static final String queryFile = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
+	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
+			+ "<${system}> saref:hasState saref:OnState.";
 	private final Model schema;
 	private final Query query;
 	private static final String VAR_COAP = "coap";
@@ -131,6 +133,9 @@ public class RegisterResource extends CoapResource {
 						Device newDevice = new Device(systemURI, toString(description));
 						if(!deviceDriverImpl.contains(newDevice)) {
 							deviceDriverImpl.addDevice(newDevice);
+						} else {
+							deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(), 
+									templateOnState.replace("${system}", systemURI));
 						}
 						DeviceHandler.getInstance().addHandler(systemURI,
 								handler);

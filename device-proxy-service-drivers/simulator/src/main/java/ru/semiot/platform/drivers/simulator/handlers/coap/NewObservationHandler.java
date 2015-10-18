@@ -10,7 +10,8 @@ import ru.semiot.platform.drivers.simulator.DeviceDriverImpl;
 import ru.semiot.platform.drivers.simulator.handlers.coap.DeviceHandler;
 
 public class NewObservationHandler implements CoapHandler {
-	private static final String templateOffState = "@prefix saref: <http://ontology.tno.nl/saref#>. <${system}> saref:hasState saref:OffState.";
+	private static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
+			+ "<${system}> saref:hasState saref:OffState.";
 	private final String topic;
 	private final String system;
 	private DeviceDriverImpl deviceDriverImpl;
