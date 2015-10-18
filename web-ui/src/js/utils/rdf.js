@@ -81,7 +81,6 @@ export default function($q, CONFIG) {
             if(triples.length) {
                 let resource = new Resource();
                 triples.forEach(function(triple) {
-
                     let p = toPrefixedName(triple.predicate);
                     if(p === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' && !resource.uri) { // FIXME: get root URI
                         resource.uri = triple.subject;

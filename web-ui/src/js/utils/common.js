@@ -22,6 +22,38 @@ export default function($q, CONFIG) {
             let prefix = "ws://wamprouter/ws?topic=";
             return endpoint.substr(prefix.length);
         },
+        getMockMachineToolStateObservation: function() {
+            const TIMESTAMP = "43534654";
+            const DATETIME = "fgdfgfdgfd";
+
+            const STATES = [
+                "IsTurnedOff",
+                "IsInExecutionOfTask",
+                "IsOutOfMaterial",
+                "IsUnderMaintenance",
+                "IsOutOfCommission"
+            ].map((i) => { return `mcht:${i}`; });
+
+            return `
+                @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
+                @prefix mcht: <http://purl.org/NET/ssnext/machinetools#> .
+                @prefix : <http://example.com/222.173.190.239.254.113> .
+
+                :mt-0-${TIMESTAMP} a ssn:Observation ;
+                  ssn:observedProperty mcht:MachineToolWorkingState ;
+                  ssn:observedBy :mt-0-st ;
+                  ssn:observationResultTime "${DATETIME}"^^xsd:dateTime;
+                  ssn:observationResult :mt-0-${TIMESTAMP}-result .
+
+                :mt-0-${TIMESTAMP}-result a ssn:SensorOutput ;
+                    ssn:hasValue :mt-0-${TIMESTAMP}-result-value .
+
+                :mt-0-${TIMESTAMP}-result-value a qudt:Enumeration ;
+                    ssn:hasValue ${STATES[Math.floor(Math.random() * 5)]} .
+            `;
+        },
         getMockHeatObservation: function() {
             return  [
                 "@prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> .",

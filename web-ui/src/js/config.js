@@ -23,13 +23,13 @@ export default {
     },
     SPARQL: {
         prefixes: {
-            rdfs: '<http://www.w3.org/2000/01/rdf-schema#>',
-            ssn: '<http://purl.oclc.org/NET/ssnx/ssn#>',
-            rdf: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#>',
-            ssncom: '<http://purl.org/NET/ssnext/communication#>',
-            saref: '<http://ontology.tno.nl/saref#>',
-            mcht: '<http://purl.org/NET/ssnext/machinetools#>',
-            om: '<http://purl.org/ifgi/om#>'
+            rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+            ssn: 'http://purl.oclc.org/NET/ssnx/ssn#',
+            rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            ssncom: 'http://purl.org/NET/ssnext/communication#',
+            saref: 'http://ontology.tno.nl/saref#',
+            mcht: 'http://purl.org/NET/ssnext/machinetools#',
+            om: 'http://purl.org/ifgi/om#'
         },
         types: {
             heatSystem: "http://purl.org/NET/ssnext/heatmeters#HeatMeter",

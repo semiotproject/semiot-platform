@@ -6,7 +6,7 @@ export default function($http, CONFIG) {
     let getPrefixes = function() {
         let str = [];
         for (let key in CONFIG.SPARQL.prefixes) {
-            str.push("PREFIX " + key + ": " + CONFIG.SPARQL.prefixes[key]);
+            str.push(`PREFIX ${key}: <${CONFIG.SPARQL.prefixes[key]}>`);
         }
         return str.join('\n') + '\n';
     };

@@ -42,9 +42,9 @@ export default function() {
             STATE_MAP = {};
 
             states.forEach((s, index) => {
-                let uri = s.uri.replace(':', '_').replace('#', '-');
+                let uri = this.convertValueToTSDBNotation(s.uri);
                 STATE_MAP[uri] = {
-                    index: index + 1,
+                    index: index,
                     label: s.label,
                     description: s.description
                 };
@@ -65,7 +65,7 @@ export default function() {
                 yAxis: {
                     categories: Object.keys(STATE_MAP),
                     endOnTick: true,
-                    minRange: states.length + 5, // 5 is magic empirical number. for somehow, states.length is not enough to show all labels
+                    minRange: states.length,
                     labels: {
                         formatter: function() {
                             return getItemByURI(this.value).label;
@@ -96,13 +96,20 @@ export default function() {
 
             data.map((item) => {
                 for (let timestamp in item.dps) {
-                    values.push([timestamp * 1000, STATE_MAP[item.tags.enum_value] ? STATE_MAP[item.tags.enum_value].index : 0 ]);
+                    values.push([timestamp * 1000, this.parseStateChartValue(item.tags.enum_value)]);
                 }
             });
 
             return values.sort((a, b) => {
                 return a[0] > b[0] ? 1 : -1;
             });
+        },
+        convertValueToTSDBNotation(value) {
+            return value.replace(':', '_').replace('#', '-');
+        },
+        parseStateChartValue(value) {
+            value = this.convertValueToTSDBNotation(value);
+            return STATE_MAP[value] ? STATE_MAP[value].index : 0;
         }
     };
 
