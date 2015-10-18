@@ -42,7 +42,7 @@ rules:
     comma-dangle: 2            # disallow trailing commas in object literals
     no-cond-assign: 2          # disallow assignment in conditional expressions
     no-console: 0              # disallow use of console
-    no-constant-condition: 2   # disallow use of constant expressions in conditions
+    no-constant-condition: 0   # disallow use of constant expressions in conditions
     no-control-regex: 2        # disallow control characters in regular expressions
     no-debugger: 1             # disallow use of debugger
     no-dupe-args: 2            # disallow duplicate arguments in functions

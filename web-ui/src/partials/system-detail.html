@@ -4,8 +4,7 @@
         <li><a href="#/systems">Systems</a></li>
         <li class="active">{{ title }}</li>
     </ol>
-    <div id="single-system-wrapper">
-        <div ng-show="sensors.length === 0">System has no observable sensors</div>
+    <div id="single-system-wrapper" ng-class="{preloader: isLoading}">
         <div ng-repeat="sensor in sensors" class="sensor-view">
             <div class="range-control">
                 <label>From</label>
@@ -42,9 +41,9 @@
                 </div>
             </div>
             <div class="range-control">
-                <button class="btn btn-primary" ng-click="setRange($index)">Select</button>
+                <button class="btn btn-primary" ng-click="onSetRangeClick($index)">Select</button>
             </div>
-            <highchart config="sensor.chartConfig"></highchart>
+            <highchart ng-if="!sensor.isLoading" config="sensor.chartConfig"></highchart>
         </div>
     </div>
 </section>

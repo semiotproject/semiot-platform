@@ -1,15 +1,20 @@
 "use strict";
 
 // if local development, communicate with DEFAULT_HOSTNAME, otherwise - with web-UI host
-let DEFAULT_HOSTNAME = "demo.semiot.ru";
-let hostname = location.hostname === "localhost" ? DEFAULT_HOSTNAME : location.hostname;
+const DEFAULT_HOSTNAME = "demo.semiot.ru";
+const hostname = location.hostname === "localhost" ? DEFAULT_HOSTNAME : location.hostname;
+
+const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
 
 export default {
     COOKIE_NAME: "ru.semiot",
     URLS: {
         messageBus: "ws://" + hostname + ":8080/ws",
         tripleStore: "http://" + hostname + ":3030/ds/query",
-        tsdb: "http://" + hostname + ":4242/api/query?start={0}&end={1}&m=sum:{2}{enum_value=*}"
+        tsdb: {
+            archive: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{enum_value=*}`,
+            last: `${TSDB_BASE_URL}/last/{0}`
+        }
     },
     TOPICS: {
         "device_registered": 'ru.semiot.devices.newandobserving',

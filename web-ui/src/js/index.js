@@ -46,6 +46,8 @@ app.factory('commonUtils', require('./utils/common'));
 app.factory('wampUtils', require('./utils/wamp'));
 app.factory('rdfUtils', require('./utils/rdf'));
 app.factory('sparqlUtils', require('./utils/sparql'));
+app.factory('tsdbUtils', require('./utils/tsdb'));
+app.factory('chartUtils', require('./utils/chart'));
 
 // services
 app.factory('loginService', require('./services/login-service'));

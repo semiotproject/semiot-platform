@@ -7,6 +7,7 @@ export default function(
     $http,
     commonUtils,
     sparqlUtils,
+    tsdbUtils,
     CONFIG
 ) {
 
@@ -21,12 +22,10 @@ export default function(
             return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemEndpoint.format(uri), callback);
         }
         fetchArchiveTestimonials(metric, range) {
-            return $http.get(CONFIG.URLS.tsdb.format(
-                moment(range[0] - CONFIG.TIMEZONE_OFFSET).format('YYYY/MM/DD-HH:mm:ss'),
-                moment(range[1] - CONFIG.TIMEZONE_OFFSET).format('YYYY/MM/DD-HH:mm:ss'),
-                commonUtils.parseTopicFromEndpoint(metric),
-                {}
-            ));
+            return tsdbUtils.getArchiveObservations(metric, range);
+        }
+        fetchLastTestimonials(metric) {
+            return tsdbUtils.getLastObservation(metric);
         }
     }
 
