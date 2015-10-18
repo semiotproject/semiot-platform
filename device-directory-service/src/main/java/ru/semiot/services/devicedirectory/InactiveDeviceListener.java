@@ -8,6 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import rx.Observer;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
@@ -17,7 +23,13 @@ public class InactiveDeviceListener implements Observer<String> {
 			.getLogger(InactiveDeviceListener.class);
 	private static final String LANG = "TURTLE";
 	private final RDFStore rdfStore = RDFStore.getInstance();
-	private final WAMPClient wampClient = WAMPClient.getInstance();
+	private static final Query SYSTEM_QUERY = QueryFactory
+			.create("prefix saref: <http://ontology.tno.nl/saref#> "
+					+ "SELECT ?uri_system ?state where{ ?uri_system saref:hasState ?state }");
+	private static final String QUERY_UPDATE_STATE_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
+			+ "DELETE { ${URI_SYSTEM} saref:hasState ?x } "
+			+ "INSERT { ${URI_SYSTEM} saref:hasState ${STATE} } "
+			+ "WHERE { ${URI_SYSTEM} saref:hasState ?x }";
 
 	@Override
 	public void onCompleted() {
@@ -28,7 +40,7 @@ public class InactiveDeviceListener implements Observer<String> {
 	public void onError(Throwable e) {
 		logger.warn(e.getMessage(), e);
 	}
-
+	
 	@Override
 	public void onNext(String message) {
 		try {
@@ -38,9 +50,24 @@ public class InactiveDeviceListener implements Observer<String> {
 				// TODO: check that the registering sensor doesn't exist
 				// already. Do
 				// we need it?
-				logger.info("Save " + message);
-				rdfStore.save(description);
+				logger.info("Update " + message);
+				
+				// rdfStore.save(description);
+				//rdfStore.select(query); // получить текущее состояние
+				// можно упростить если посылать просто uri системы без состояния
+				
+				QueryExecution qe = QueryExecutionFactory.create(SYSTEM_QUERY,
+						description);
+				ResultSet systems = qe.execSelect();
 
+				while (systems.hasNext()) {
+					QuerySolution qs = systems.next();
+					String uriSystem = qs.getResource("uri_system").getURI();
+					String state = qs.getResource("state").getURI();
+				
+					rdfStore.update(QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
+							.replace("${STATE}", state)); 
+				}
 			} else {
 				logger.warn("Received an empty message or in a wrong format!");
 			}
