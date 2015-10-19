@@ -27,9 +27,9 @@ public class InactiveDeviceListener implements Observer<String> {
 			.create("prefix saref: <http://ontology.tno.nl/saref#> "
 					+ "SELECT ?uri_system ?state where{ ?uri_system saref:hasState ?state }");
 	protected static final String QUERY_UPDATE_STATE_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "DELETE { ${URI_SYSTEM} saref:hasState ?x } "
-			+ "INSERT { ${URI_SYSTEM} saref:hasState ${STATE} } "
-			+ "WHERE { ${URI_SYSTEM} saref:hasState ?x }";
+			+ "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
+			+ "INSERT { <${URI_SYSTEM}> saref:hasState <${STATE}> } "
+			+ "WHERE { <${URI_SYSTEM}> saref:hasState ?x }";
 
 	@Override
 	public void onCompleted() {
@@ -65,7 +65,7 @@ public class InactiveDeviceListener implements Observer<String> {
 					String uriSystem = qs.getResource("uri_system").getURI();
 					String state = qs.getResource("state").getURI();
 					if(uriSystem != null && state != null) {
-					rdfStore.update(QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
+						rdfStore.update(QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
 							.replace("${STATE}", state)); 
 					}
 				}
