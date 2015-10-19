@@ -81,5 +81,5 @@ export default {
             `
         }
     },
-    TIMEZONE_OFFSET: 0 * 3600 * 1000
+    TIMEZONE_OFFSET: 3 * 3600 * 1000
 };

@@ -52,15 +52,15 @@ export default function(
 
         // get archive data
         systemDetail.fetchSystemEndpoint(uri, function(data) {
-            let sensors = [];
+            $scope.sensors = [];
 
             // create sensor list
             data.results.bindings.forEach(function(binding) {
-                let sensor = {
+                var sensor = {
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     type: binding.type.value,
                     observationType: binding.observationType.value,
-                    range: $scope.default_range,
+                    range: $.extend({}, $scope.default_range),
                     isLoading: true,
                     chartConfig: {}
                 };
@@ -76,7 +76,7 @@ export default function(
                         sensor.isLoading = false;
                         // append sensor
                         console.info('sensor ready; appending it to sensor list...');
-                        sensors.push(sensor);
+                        $scope.sensors.push(sensor);
 
                         // TODO: reset flag after all sensors are loaded
                         $scope.isLoading = false;
@@ -89,8 +89,6 @@ export default function(
                     });
                 });
             });
-
-            $scope.sensors = sensors;
             $scope.isLoading = false;
         });
     };
