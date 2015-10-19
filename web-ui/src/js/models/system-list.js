@@ -18,16 +18,17 @@ export default function(
         constructor() {
             super();
 
+            console.info('subscribing to WAMP..');
             this.connection = wampUtils.subscribe(
                 CONFIG.URLS.messageBus,
                 [
                     {
                         topic:  CONFIG.TOPICS.device_registered,
-                        callback: this.onDeviceRegistered
+                        callback: this.onDeviceRegistered.bind(this)
                     },
                     {
                         topic:  CONFIG.TOPICS.device_turned_off,
-                        callback: this.onDeviceTurnedOff
+                        callback: this.onDeviceTurnedOff.bind(this)
                     }
                 ]
             ).session;

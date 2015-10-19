@@ -55,7 +55,7 @@ export default function(
             $scope.sensors = [];
 
             // create sensor list
-            data.results.bindings.forEach(function(binding) {
+            data.results.bindings.forEach((binding) => {
                 var sensor = {
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     type: binding.type.value,
