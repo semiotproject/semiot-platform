@@ -2,7 +2,7 @@ package ru.semiot.platform.drivers.winghouse.machinetool;
 
 public class MessageParser {
 
-	public static MachineToolMessage parsePacket(byte[] res) {
+	public static MachineToolValue parsePacket(byte[] res) {
 		int index = 0;
 		// uint8_t MAC[6];
 		String mac = new String();
@@ -27,7 +27,7 @@ public class MessageParser {
 		int stateOfInputs = getUInt8_t(res[index += 1]);
 		System.out.println("StateOfInputs " + String.valueOf(stateOfInputs));
 
-		return new MachineToolMessage(mac, MachineToolState.get(stateOfInputs, stateOfButtons));
+		return new MachineToolValue(mac, MachineToolState.get(stateOfInputs, stateOfButtons), System.currentTimeMillis());
 	}
 
 	private static int getUInt8_t(byte value) {

@@ -1,19 +1,28 @@
 package ru.semiot.platform.drivers.winghouse.machinetool;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
@@ -21,9 +30,19 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     private static final String UDP_PORT_KEY = Activator.SERVICE_PID + ".udp_port";
+    private static final String TOPIC_INACTIVE = Activator.SERVICE_PID
+			+ ".topic_inactive";
             
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
-
+    private Map<String, MachineToolValue> oldStateMachineTools = 
+			Collections.synchronizedMap(new HashMap<String, MachineToolValue>());
+    private static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
+			+ "<http://example.com/${MAC}> saref:hasState saref:OffState.";
+    
+    private ScheduledExecutorService scheduler;
+	private ScheduledDeviceStatus scheduledDeviceStatus;
+	private ScheduledFuture handle = null;
+    
     private volatile DeviceManager deviceManager;
 
     private String templateDescription;
@@ -31,6 +50,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private EventLoopGroup group;
     private Channel channel;
     private int port;
+    private String topicInactive;
 
     public List<Device> listDevices() {
         return listDevices;
@@ -40,8 +60,11 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         System.out.println("Winghouse machine-tools driver started!");
 
         readTemplates();
-
+        
         group = new NioEventLoopGroup();
+        this.scheduler = Executors.newScheduledThreadPool(1);
+		this.scheduledDeviceStatus = new ScheduledDeviceStatus();
+		startSheduled();
         try {
             Bootstrap b = new Bootstrap();
             b.group(group).channel(NioDatagramChannel.class)
@@ -63,7 +86,13 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         if (group != null) {
             group.shutdownGracefully();
         }
-
+        
+        // перевод всех устройств в статус офф
+        for (Device device : listDevices)
+		{
+        	publish(topicInactive, templateOffState.replace("${MAC}", device.getID()));
+		}
+        
         System.out.println("Winghouse machine-tools driver stopped!");
     }
 
@@ -72,6 +101,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             System.out.println(properties == null);
             if(properties != null) {
                 port = (Integer) properties.get(UDP_PORT_KEY);
+                topicInactive = (String) properties.get(TOPIC_INACTIVE);
             }
         }
     }
@@ -96,7 +126,19 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     public String getTemplateObservation() {
         return templateObservation;
     }
+    
+    public int getPort() {
+		return port;
+	}
 
+	public String getTopicInactive() {
+		return topicInactive;
+	}
+
+    public Map<String, MachineToolValue> getOldStateMachineTools() {
+    	return oldStateMachineTools;
+    }
+    
     private void readTemplates() {
         try {
             this.templateDescription = IOUtils.toString(DeviceHandler.class
@@ -108,5 +150,40 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             throw new IllegalArgumentException(ex);
         }
     }
+    
+    public void startSheduled() {
+		if (this.handle != null)
+			stopSheduled();
+
+		int nDelay = 30;
+		this.handle = this.scheduler.scheduleAtFixedRate(this.scheduledDeviceStatus,
+				0, nDelay, SECONDS);
+		System.out.println("UScheduled started. Repeat will do every "
+				+ String.valueOf(nDelay) + " seconds");
+	}
+
+	public void stopSheduled() {
+		if (handle == null)
+			return;
+
+		handle.cancel(true);
+		handle = null;
+		System.out.println("UScheduled stoped");
+	}
+    
+    private class ScheduledDeviceStatus implements Runnable {
+		public void run() {
+			System.out.println("ScheduledRecording start");
+
+			long currentTimestamp = System.currentTimeMillis();
+			for (Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet())
+			{
+				if(entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
+					publish(topicInactive, templateOffState.replace("${MAC}", entry.getKey()));
+				}
+			}
+			System.out.println("ScheduledRecording complete");
+		}
+	}
 
 }

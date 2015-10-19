@@ -4,6 +4,8 @@
          id="ru.semiot.platform.drivers.winghouse.machinetool">
         <AD name="UDP Port" id="ru.semiot.platform.drivers.winghouse.machinetool.udp_port"
             required="true" type="Integer" default="9500"/>
+        <AD name="Topic inactive" id="ru.semiot.platform.drivers..winghouse.machinetool.topic_inactive"
+            required="true" type="String" default="ru.semiot.devices.turnoff"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.drivers.winghouse.machinetool">

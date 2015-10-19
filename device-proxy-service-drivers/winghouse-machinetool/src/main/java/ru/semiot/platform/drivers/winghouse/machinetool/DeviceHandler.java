@@ -4,10 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.netty.channel.socket.DatagramPacket;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
@@ -15,10 +12,10 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
 	private final DeviceDriverImpl deviceDriverImpl;
-	private Map<String, MachineToolState> oldStateMachineTools = 
-			Collections.synchronizedMap(new HashMap<String, MachineToolState>());
 
 	private static final String templateTopic = "${MAC}.machinetool.obs";
+	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
+			+ "<http://example.com/${MAC}> saref:hasState saref:OnState.";
 
 	public DeviceHandler(DeviceDriverImpl deviceDriverImpl) {
 		System.out.println("Create DeviceHandler class");
@@ -45,33 +42,41 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 	}
 
 	private void processingPacket(byte[] res) {
-		MachineToolMessage mess = MessageParser.parsePacket(res);
-		if (!deviceDriverImpl.contains(new Device(templateTopic.replace(
-				"${MAC}", mess.getMac()), ""))) {
+		MachineToolValue mess = MessageParser.parsePacket(res);
+		if (!deviceDriverImpl.contains(new Device( mess.getMac(), ""))) {
 			System.out.println(mess.getMac() + " not exist");
 			addDevice(mess.getMac());
-			sendMessage(mess, System.currentTimeMillis());
-			oldStateMachineTools.put(mess.getMac(), mess.getMachineToolState()); // поправить?
-		} else if(oldStateMachineTools.containsKey(mess.getMac()) &&
-					oldStateMachineTools.get(mess.getMac()) != mess.getMachineToolState()) {
-			sendMessage(mess, System.currentTimeMillis());
-			oldStateMachineTools.replace(mess.getMac(), mess.getMachineToolState());
+			sendMessage(mess);
+			deviceDriverImpl.getOldStateMachineTools().put(mess.getMac(), mess); // поправить?
+		} else {
+			if(deviceDriverImpl.getOldStateMachineTools().containsKey(mess.getMac())) {
+				if(!deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).equals(mess)) {
+					sendMessage(mess);
+				} 
+				if(!deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).getTurnOn()) {
+					deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(),
+							templateOnState.replace("${MAC}", mess.getMac()));
+				}
+				deviceDriverImpl.getOldStateMachineTools().replace(mess.getMac(), mess);
+			} else {
+				deviceDriverImpl.getOldStateMachineTools().put(mess.getMac(), mess);
+			}
 		}
 	}
 
-	private void sendMessage(MachineToolMessage mess, long timestamp) {
+	private void sendMessage(MachineToolValue mess) {
 
 		String topic = templateTopic.replace("${MAC}", mess.getMac());
 
 		final String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-				.format(new Date(timestamp));
+				.format(new Date(mess.getTimestemp()));
 
 		System.out.println("State "
 				+ mess.getMachineToolState().getUri());
 		String message = deviceDriverImpl
 				.getTemplateObservation()
 				.replace("${MAC}", mess.getMac())
-				.replace("${TIMESTAMP}", String.valueOf(timestamp))
+				.replace("${TIMESTAMP}", String.valueOf(mess.getTimestemp()))
 				.replace("${DATETIME}", date)
 				.replace("${STATE}",
 						String.valueOf(mess.getMachineToolState().getUri()));
@@ -84,7 +89,6 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 		String message = deviceDriverImpl.getTemplateDescription().replace(
 				"${MAC}", mac);
 		System.out.println("Publish message:\n" + message);
-		deviceDriverImpl.addDevice(new Device(templateTopic.replace("${MAC}",
-				mac), message));
+		deviceDriverImpl.addDevice(new Device(mac, message));
 	}
 }
