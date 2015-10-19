@@ -19,6 +19,8 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 	private volatile DeviceManager deviceManager;
 	private final List<Device> listDevices = Collections
 			.synchronizedList(new ArrayList<Device>());
+	private static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
+			+ "<${system}> saref:hasState saref:OffState.";
 
 	CoAPInterface coap;
 	// properties
@@ -51,6 +53,14 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
+		
+		
+		for (Device device : listDevices)
+		{
+        	publish(topicInactive, templateOffState.replace("${system}", device.getID()));
+		}
+        
+        System.out.println("Simulator driver stopped!");
 	}
 
 	public void updated(Dictionary properties) throws ConfigurationException {
