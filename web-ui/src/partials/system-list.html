@@ -39,7 +39,7 @@
                 <tr ng-repeat="system in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle(system)">
                     <td>{{ system.index }}</td>
                     <td><a href="{{ '#/systems/' + system.uri }}">{{ system.name }}</a></td>
-                    <td>{{ system.state }}</td>
+                    <td>{{ system.isOnline ? "online" : "offline" }}</td>
                     <td>
                         <button class="btn btn-primary btn-sm">
                             <i class="glyphicon glyphicon-remove" ng-click="removeSystem(system.uri); $event.stopPropagation();" title="Remove this system"></i>

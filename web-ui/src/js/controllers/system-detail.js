@@ -59,6 +59,7 @@ export default function(
                 let sensor = {
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     type: binding.type.value,
+                    observationType: binding.observationType.value,
                     range: $scope.default_range,
                     isLoading: true,
                     chartConfig: {}
@@ -74,7 +75,7 @@ export default function(
 
                         sensor.isLoading = false;
                         // append sensor
-                        console.info('sensor is ready: ', sensor);
+                        console.info('sensor ready; appending it to sensor list...');
                         sensors.push(sensor);
 
                         // TODO: reset flag after all sensors are loaded
@@ -118,18 +119,21 @@ export default function(
     // calls after init and when range was changed
     // @return Promise
     $scope.fillChart = function(sensor) {
+        console.info(`setting new values to ${sensor.endpoint} sensor..`);
         let defer = $q.defer();
 
         // get TSDB archive testimonial
-        systemDetail.fetchArchiveTestimonials(sensor.endpoint, sensor.range).then(function(result) {
-            if ($scope.isStateSensor(sensor)) {
+        if ($scope.isStateSensor(sensor)) {
+            systemDetail.fetchArchiveStates(sensor.endpoint, sensor.range).then(function(result) {
                 sensor.chartConfig.series[0].data = chartUtils.parseStateChartData(result.data);
-            } else {
+                defer.resolve();
+            });
+        } else {
+            systemDetail.fetchArchiveObservations(sensor.endpoint, sensor.range).then(function(result) {
                 sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result.data);
-            }
-
-           defer.resolve();
-        });
+                defer.resolve();
+            });
+        }
 
         return defer.promise;
     };
@@ -152,8 +156,7 @@ export default function(
 
     // determine if it is state or observation sensor
     $scope.isStateSensor = function(sensor) {
-        // FIXME
-        return sensor.type === "http://purl.org/NET/ssnext/machinetools#MachineToolWorkingState";
+        return sensor.observationType === "http://www.qudt.org/qudt/owl/1.0.0/qudt/#Enumeration";
     };
 
     // event handlers
@@ -164,14 +167,10 @@ export default function(
     $scope.onUpdated = function(sensor, data) {
         console.info(`received message from ${sensor.endpoint}: `, data);
         rdfUtils.parseTTL(data).then(function(triples) {
-            console.log(triples);
-            let resource = rdfUtils.parseTriples(triples);
-            console.log(resource);
 
+            //
+            let N3Store = N3.Store();
             if ($scope.isStateSensor(sensor)) {
-
-                // TODO: make it as a service
-                let N3Store = N3.Store();
 
                 N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
                 N3Store.addTriples(triples);
@@ -186,10 +185,22 @@ export default function(
                 console.info(`appended new state: now chartConfig data  is `, sensor.chartConfig.series[0]);
             } else {
 
-                // let observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
-                // sensor.chartConfig.series[0].data.push([(new Date()).getTime() + CONFIG.TIMEZONE_OFFSET, observationResult]);
+            /*
+                N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
+                N3Store.addTriples(triples);
 
-                console.error('not implemented');
+                let obs = N3Store.find(null, "rdf:type", "ssn:Observation", "")[0].subject;
+                let obsResult = N3Store.find(obs, "ssn:observationResult", null, "")[0].object;
+                let obsResultValue = N3Store.find(obsResult, "ssn:hasValue", null, "")[0].object;
+
+                let state =  N3Store.find(obsResultValue, "ssn:hasValue", null, "")[0].object;
+
+                sensor.chartConfig.series[0].data.push([(new Date()).getTime(), chartUtils.parseStateChartValue(state)]);
+                console.info(`appended new state: now chartConfig data  is `, sensor.chartConfig.series[0]);
+
+                let observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
+                sensor.chartConfig.series[0].data.push([(new Date()).getTime() + CONFIG.TIMEZONE_OFFSET, observationResult]);
+            */
             }});
     };
     $scope.onSetRangeClick = function(index) {

@@ -1,6 +1,7 @@
 "use strict";
 
 import { EventEmitter } from 'events';
+import N3 from 'n3';
 
 export default function(
     $q,
@@ -56,14 +57,30 @@ export default function(
                 }
             });
         }
-        onDeviceTurnedOff(uri) {
-            console.warn(`Device with URI = ${uri} was turned off; updating status..`);
-            systems.forEach((system) => {
-                if (system.uri === uri) {
-                    systems.state = "offline";
-                }
+        onDeviceTurnedOff(payload) {
+            console.info('received message on `turnOff` topic, processing..');
+            // prefix saref: <http://ontology.tno.nl/saref#> <coap://winghouse.semiot.ru:60005/meter> saref:hasState saref:OnState.
+
+            rdfUtils.parseTTL(payload[0]).then((triples) => {
+                let N3Store = N3.Store();
+
+                N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
+                N3Store.addTriples(triples);
+
+                let triple = N3Store.find(null, "saref:hasState", null, "")[0];
+
+                let uri = triple.subject;
+                let state = triple.object;
+
+                systems.forEach((system, index) => {
+                    if (system.uri === uri) {
+                        systems[index].isOnline = state === "http://ontology.tno.nl/saref#OnState";
+                        console.info(`changin network state for ${uri}; now is ${systems[index].isOnline ? "online" : "offline"}`);
+
+                        this.emit("systemsUpdate", systems);
+                    }
+                });
             });
-            this.emit("systemsUpdate", systems);
         }
         fetchSystems() {
             let defer = $q.defer();
@@ -75,7 +92,7 @@ export default function(
                         index: index + 1,
                         name: binding.label.value,
                         uri: binding.uri.value,
-                        state: "online"
+                        isOnline: binding.state.value === "http://ontology.tno.nl/saref#OnState"
                     };
                 });
                 defer.resolve(systems);
