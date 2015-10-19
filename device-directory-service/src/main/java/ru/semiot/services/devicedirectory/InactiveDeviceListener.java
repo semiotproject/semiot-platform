@@ -23,10 +23,10 @@ public class InactiveDeviceListener implements Observer<String> {
 			.getLogger(InactiveDeviceListener.class);
 	private static final String LANG = "TURTLE";
 	private final RDFStore rdfStore = RDFStore.getInstance();
-	private static final Query SYSTEM_QUERY = QueryFactory
+	protected static final Query SYSTEM_QUERY = QueryFactory
 			.create("prefix saref: <http://ontology.tno.nl/saref#> "
 					+ "SELECT ?uri_system ?state where{ ?uri_system saref:hasState ?state }");
-	private static final String QUERY_UPDATE_STATE_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
+	protected static final String QUERY_UPDATE_STATE_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "DELETE { ${URI_SYSTEM} saref:hasState ?x } "
 			+ "INSERT { ${URI_SYSTEM} saref:hasState ${STATE} } "
 			+ "WHERE { ${URI_SYSTEM} saref:hasState ?x }";
@@ -64,9 +64,10 @@ public class InactiveDeviceListener implements Observer<String> {
 					QuerySolution qs = systems.next();
 					String uriSystem = qs.getResource("uri_system").getURI();
 					String state = qs.getResource("state").getURI();
-				
+					if(uriSystem != null && state != null) {
 					rdfStore.update(QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
 							.replace("${STATE}", state)); 
+					}
 				}
 			} else {
 				logger.warn("Received an empty message or in a wrong format!");
