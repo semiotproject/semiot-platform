@@ -173,16 +173,17 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     
     private class ScheduledDeviceStatus implements Runnable {
 		public void run() {
-			System.out.println("ScheduledRecording start");
+			System.out.println("ScheduledDeviceStatus start");
 
 			long currentTimestamp = System.currentTimeMillis();
 			for (Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet())
 			{
 				if(entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
 					publish(topicInactive, templateOffState.replace("${MAC}", entry.getKey()));
+					System.out.println(entry.getKey() + "saref:OffState" );
 				}
 			}
-			System.out.println("ScheduledRecording complete");
+			System.out.println("ScheduledDeviceStatus complete");
 		}
 	}
 
