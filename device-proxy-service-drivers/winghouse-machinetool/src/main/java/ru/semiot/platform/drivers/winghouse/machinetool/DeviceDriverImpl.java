@@ -88,6 +88,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
         
         // перевод всех устройств в статус офф
+        stopSheduled();
         for (Device device : listDevices)
 		{
         	publish(topicInactive, templateOffState.replace("${MAC}", device.getID()));
