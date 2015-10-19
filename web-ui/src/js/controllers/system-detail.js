@@ -166,22 +166,29 @@ export default function(
         console.info(`received message from ${sensor.endpoint}: `, data);
         rdfUtils.parseTTL(data).then(function(triples) {
 
-            //
+            debugger;
+
             let N3Store = N3.Store();
+
+            N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
+            N3Store.addTriples(triples);
+
+            let obs = N3Store.find(null, "rdf:type", "ssn:Observation", "")[0].subject;
+            let obsResult = N3Store.find(obs, "ssn:observationResult", null, "")[0].object;
+            let obsResultValue = N3Store.find(obsResult, "ssn:hasValue", null, "")[0].object;
+
             if ($scope.isStateSensor(sensor)) {
-
-                N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
-                N3Store.addTriples(triples);
-
-                let obs = N3Store.find(null, "rdf:type", "ssn:Observation", "")[0].subject;
-                let obsResult = N3Store.find(obs, "ssn:observationResult", null, "")[0].object;
-                let obsResultValue = N3Store.find(obsResult, "ssn:hasValue", null, "")[0].object;
 
                 let state =  N3Store.find(obsResultValue, "ssn:hasValue", null, "")[0].object;
 
                 sensor.chartConfig.series[0].data.push([(new Date()).getTime(), chartUtils.parseStateChartValue(state)]);
                 console.info(`appended new state: now chartConfig data  is `, sensor.chartConfig.series[0]);
             } else {
+
+                let quantity = N3Store.find(obsResultValue, "qudt:quantityValue", null, "")[0].object;
+
+                sensor.chartConfig.series[0].data.push([(new Date()).getTime(), parseFloat(quantity)]);
+                console.info(`appended new quantity: now chartConfig data  is `, sensor.chartConfig.series[0]);
 
             /*
                 N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
