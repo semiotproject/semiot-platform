@@ -3,6 +3,7 @@
 @prefix mcht: <http://purl.org/NET/ssnext/machinetools#> .
 @prefix ssncom: <http://purl.org/NET/ssnext/communication#> .
 @prefix saref: <http://ontology.tno.nl/saref#> .
+@prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 
 <http://example.com/${MAC}> a mcht:MachineTool ;
     rdfs:label "Machine Tool #${MAC}"@en ;
