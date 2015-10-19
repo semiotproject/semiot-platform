@@ -56,6 +56,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 				if(!deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).getTurnOn()) {
 					deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(),
 							templateOnState.replace("${MAC}", mess.getMac()));
+					deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).setTurnOn(true);
 					System.out.println(mess.getMac() + "saref:OnState" );
 				}
 				deviceDriverImpl.getOldStateMachineTools().replace(mess.getMac(), mess);
