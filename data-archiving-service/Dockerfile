@@ -9,6 +9,11 @@ WORKDIR /root
 
 RUN yum upgrade -y && yum install -y java-1.8.0-openjdk-devel maven git wget unzip which && yum clean all
 
+#
+# No cache workaround. Once the content of build.number file changed, the cache will be invalidated.
+#
+ADD build.number /root/build.number
+
 RUN git clone https://github.com/semiotproject/semiot-platform.git
 
 WORKDIR /root/semiot-platform/$SERVICE_NAME
