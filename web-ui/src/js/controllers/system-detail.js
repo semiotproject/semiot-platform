@@ -187,25 +187,9 @@ export default function(
 
                 let quantity = N3Store.find(obsResultValue, "qudt:quantityValue", null, "")[0].object;
 
-                sensor.chartConfig.series[0].data.push([(new Date()).getTime(), parseFloat(quantity)]);
+                sensor.chartConfig.series[0].data.push([(new Date()).getTime(), parseFloat(N3.Util.getLiteralValue(quantity))]);
                 console.info(`appended new quantity: now chartConfig data  is `, sensor.chartConfig.series[0]);
 
-            /*
-                N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
-                N3Store.addTriples(triples);
-
-                let obs = N3Store.find(null, "rdf:type", "ssn:Observation", "")[0].subject;
-                let obsResult = N3Store.find(obs, "ssn:observationResult", null, "")[0].object;
-                let obsResultValue = N3Store.find(obsResult, "ssn:hasValue", null, "")[0].object;
-
-                let state =  N3Store.find(obsResultValue, "ssn:hasValue", null, "")[0].object;
-
-                sensor.chartConfig.series[0].data.push([(new Date()).getTime(), chartUtils.parseStateChartValue(state)]);
-                console.info(`appended new state: now chartConfig data  is `, sensor.chartConfig.series[0]);
-
-                let observationResult = parseFloat(resource.get(CONFIG.SPARQL.types.observationResult));
-                sensor.chartConfig.series[0].data.push([(new Date()).getTime() + CONFIG.TIMEZONE_OFFSET, observationResult]);
-            */
             }});
     };
     $scope.onSetRangeClick = function(index) {
