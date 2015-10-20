@@ -41,9 +41,6 @@
                     <td><a href="{{ '#/systems/' + system.uri }}">{{ system.name }}</a></td>
                     <td>{{ system.isOnline ? "online" : "offline" }}</td>
                     <td>
-                        <button class="btn btn-primary btn-sm">
-                            <i class="glyphicon glyphicon-remove" ng-click="removeSystem(system.uri); $event.stopPropagation();" title="Remove this system"></i>
-                        </button>
                     </td>
                 </tr>
             </tbody>
