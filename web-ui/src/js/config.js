@@ -29,6 +29,8 @@ export default {
             ssncom: 'http://purl.org/NET/ssnext/communication#',
             saref: 'http://ontology.tno.nl/saref#',
             mcht: 'http://purl.org/NET/ssnext/machinetools#',
+            qudt: 'http://www.qudt.org/qudt/owl/1.0.0/qudt/#',
+            "qudt-quantity": 'http://qudt.org/1.1/vocab/quantity#',
             om: 'http://purl.org/ifgi/om#'
         },
         types: {
