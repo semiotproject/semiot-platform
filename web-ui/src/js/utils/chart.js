@@ -27,12 +27,12 @@ export default function(CONFIG) {
     const instance = {
         getObservationChartConfig: function(title) {
             return $.extend({}, baseChartConfig, {
-                options: {
+                options: $.extend({}, baseChartConfig.options, {
                     chart: {
                         type: "spline"
                     },
                     timezoneOffset: 3 * 60
-                },
+                }),
                 title: {
                     text: title
                 }

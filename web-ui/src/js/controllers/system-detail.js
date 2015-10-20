@@ -56,14 +56,13 @@ export default function(
 
             // create sensor list
             data.results.bindings.forEach((binding) => {
-                var sensor = {
+                var sensor = $.extend({}, {
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     type: binding.type.value,
                     observationType: binding.observationType.value,
                     range: $.extend({}, $scope.default_range),
-                    isLoading: true,
                     chartConfig: {}
-                };
+                });
 
                 // set initial chart config
                 $scope.initChart(sensor).then(() => {
@@ -71,15 +70,13 @@ export default function(
                     // set chart data
                     $scope.fillChart(sensor).then(() => {
 
-                        $scope.subscribe(sensor);
-
-                        sensor.isLoading = false;
                         // append sensor
                         console.info('sensor ready; appending it to sensor list...');
-                        $scope.sensors.push(sensor);
 
-                        // TODO: reset flag after all sensors are loaded
-                        $scope.isLoading = false;
+                        // SUPER WEIRD
+                        let s = JSON.parse(JSON.stringify(sensor));
+                        $scope.sensors.push(s);
+                        $scope.subscribe(s);
 
                         /*
                         $interval(() => {
@@ -129,6 +126,7 @@ export default function(
         } else {
             systemDetail.fetchArchiveObservations(sensor.endpoint, sensor.range).then(function(result) {
                 sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result.data);
+                console.log(sensor);
                 defer.resolve();
             });
         }
@@ -163,10 +161,8 @@ export default function(
         sensor.range[1] = (new Date()).getTime();
     };
     $scope.onUpdated = function(sensor, data) {
-        console.info(`received message from ${sensor.endpoint}: `, data);
+        // console.info(`received message from ${sensor.endpoint}: `, data);
         rdfUtils.parseTTL(data).then(function(triples) {
-
-            debugger;
 
             let N3Store = N3.Store();
 
@@ -187,8 +183,8 @@ export default function(
 
                 let quantity = N3Store.find(obsResultValue, "qudt:quantityValue", null, "")[0].object;
 
-                sensor.chartConfig.series[0].data.push([(new Date()).getTime(), parseFloat(N3.Util.getLiteralValue(quantity))]);
-                console.info(`appended new quantity: now chartConfig data  is `, sensor.chartConfig.series[0]);
+                sensor.chartConfig.series[0].data.push([(new Date()).getTime() + CONFIG.TIMEZONE_OFFSET, parseFloat(N3.Util.getLiteralValue(quantity))]);
+                console.info(`appended new quantity ${parseFloat(N3.Util.getLiteralValue(quantity))}: now chartConfig data  is `, sensor.chartConfig.series[0]);
 
             }});
     };
