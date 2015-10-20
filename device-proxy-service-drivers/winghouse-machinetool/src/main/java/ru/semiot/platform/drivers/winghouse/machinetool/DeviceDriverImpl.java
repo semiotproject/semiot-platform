@@ -88,6 +88,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
         
         // перевод всех устройств в статус офф
+        stopSheduled();
         for (Device device : listDevices)
 		{
         	publish(topicInactive, templateOffState.replace("${MAC}", device.getID()));
@@ -157,7 +158,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
 		int nDelay = 30;
 		this.handle = this.scheduler.scheduleAtFixedRate(this.scheduledDeviceStatus,
-				0, nDelay, SECONDS);
+				40, nDelay, SECONDS);
 		System.out.println("UScheduled started. Repeat will do every "
 				+ String.valueOf(nDelay) + " seconds");
 	}
@@ -173,16 +174,19 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     
     private class ScheduledDeviceStatus implements Runnable {
 		public void run() {
-			System.out.println("ScheduledRecording start");
+			System.out.println("ScheduledDeviceStatus start");
 
 			long currentTimestamp = System.currentTimeMillis();
 			for (Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet())
 			{
-				if(entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
+				if(entry.getValue().getTurnOn() == true &&
+						entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
 					publish(topicInactive, templateOffState.replace("${MAC}", entry.getKey()));
+					entry.getValue().setTurnOn(false);
+					System.out.println(entry.getKey() + " saref:OffState" );
 				}
 			}
-			System.out.println("ScheduledRecording complete");
+			System.out.println("ScheduledDeviceStatus complete");
 		}
 	}
 

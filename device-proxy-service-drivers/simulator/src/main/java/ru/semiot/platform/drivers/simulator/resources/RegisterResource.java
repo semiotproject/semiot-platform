@@ -136,6 +136,7 @@ public class RegisterResource extends CoapResource {
 						} else {
 							deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(), 
 									templateOnState.replace("${system}", systemURI));
+							System.out.println(systemURI + "saref:OnState" );
 						}
 						DeviceHandler.getInstance().addHandler(systemURI,
 								handler);

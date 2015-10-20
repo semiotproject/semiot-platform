@@ -21,8 +21,11 @@ export default function(
         fetchSystemEndpoint(uri, callback) {
             return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemEndpoint.format(uri), callback);
         }
-        fetchArchiveTestimonials(metric, range) {
+        fetchArchiveObservations(metric, range) {
             return tsdbUtils.getArchiveObservations(metric, range);
+        }
+        fetchArchiveStates(metric, range) {
+            return tsdbUtils.getArchiveStates(metric, range);
         }
         fetchLastTestimonials(metric) {
             return tsdbUtils.getLastObservation(metric);

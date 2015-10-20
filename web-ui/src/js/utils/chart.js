@@ -1,6 +1,6 @@
 "use strict";
 
-export default function() {
+export default function(CONFIG) {
 
     const baseChartConfig = {
         useHighStocks: true,
@@ -89,7 +89,19 @@ export default function() {
         },
 
         parseObservationChartData(data) {
-            // TODO
+            let values = [];
+
+            if (data.length > 0) {
+                let dps = data[0].dps;
+                let localTime = (new Date()).getTime() + CONFIG.TIMEZONE_OFFSET;
+                for (let timestamp in dps) {
+                    if (timestamp * 1000 < localTime) {
+                        values.push([timestamp * 1000 + CONFIG.TIMEZONE_OFFSET, dps[timestamp]]);
+                    }
+                }
+            }
+
+            return values;
         },
         parseStateChartData(data) {
             let values = [];

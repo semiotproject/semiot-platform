@@ -26,7 +26,7 @@ public class RegisterListener implements Observer<String> {
     private final RDFStore rdfStore = RDFStore.getInstance();
     private final WAMPClient wampClient = WAMPClient.getInstance();
     private final String QUERY_SELECT_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
-					+ "SELECT ?state where{ ${URI_SYSTEM} saref:hasState ?state }";
+					+ "SELECT ?state where{ <${URI_SYSTEM}> saref:hasState ?state }";
 
     @Override
     public void onCompleted() {
