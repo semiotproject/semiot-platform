@@ -59,13 +59,11 @@ export default function(
             data.results.bindings.forEach((binding) => {
                 var sensor = $.extend({}, {
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
-                    type: binding.type.value,
+                    title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
                     range: getDefaultRange(),
                     chartConfig: {}
                 });
-
-                debugger;
 
                 // set initial chart config
                 $scope.initChart(sensor).then(() => {
@@ -103,11 +101,11 @@ export default function(
             // load state list
             // FIXME use not machineToolState service, but abstract StateEnumList service depend on sensor.type
             machineToolStates.fetchStates().then(() => {
-                sensor.chartConfig = chartUtils.getStateChartConfig(sensor.type, machineToolStates.getStates());
+                sensor.chartConfig = chartUtils.getStateChartConfig(sensor.title, machineToolStates.getStates());
                 defer.resolve();
             });
         } else {
-            sensor.chartConfig = chartUtils.getObservationChartConfig(sensor.type);
+            sensor.chartConfig = chartUtils.getObservationChartConfig(sensor.title);
             defer.resolve();
         }
 

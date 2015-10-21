@@ -58,15 +58,19 @@ export default {
                 "}"
             ].join('\n'),
             getSystemEndpoint: `
-                SELECT ?endpoint ?type ?observationType {
-                   <{0}> ssn:hasSubsystem ?subsystem .
-                   ?subsystem ssn:observes ?type .
-                   ?subsystem ssn:hasMeasurementCapability ?mc .
-                   ?mc ssn:hasMeasurementProperty ?mp .
-                   ?mp ssn:hasValue ?v .
-                   ?v a ?observationType .
-                   ?subsystem ssncom:hasCommunicationEndpoint ?endpoint .
-                   ?endpoint ssncom:protocol 'WAMP' .
+                SELECT ?endpoint ?type ?observationType ?propLabel ?valueUnitLabel {
+                  <{0}> ssn:hasSubsystem ?subsystem .
+                  ?subsystem ssn:observes ?type .
+                  ?subsystem ssn:hasMeasurementCapability ?mc .
+                  ?mc ssn:forProperty ?prop .
+                  ?prop rdfs:label ?propLabel .
+                  ?mc ssn:hasMeasurementProperty ?mp .
+                  ?mp ssn:hasValue ?v .
+                  ?v a ?observationType .
+                  ?v ssn:hasValue ?valueUnit .
+                  ?valueUnit rdfs:label ?valueUnitLabel .
+                  ?subsystem ssncom:hasCommunicationEndpoint ?endpoint .
+                  ?endpoint ssncom:protocol 'WAMP' .
                 }
             `,
             getSystemName: [
