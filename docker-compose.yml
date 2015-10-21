@@ -43,6 +43,7 @@ deviceproxyservice:
   image: docker.semiot.ru/device-proxy-service
   links:
     - wamprouter
+    - devicedirectoryservice
   ports:
     - "8181:8181"
     - "9500:9500/udp"
