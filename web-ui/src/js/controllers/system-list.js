@@ -7,7 +7,7 @@ export default function($scope, systemList, commonUtils) {
     };
     $scope.pagination = {
         currentPage: 1,
-        itemsPerPage: 6,
+        itemsPerPage: 10,
         totalItems: 1,
         numPages: 4,
         maxSize: 4
@@ -15,7 +15,7 @@ export default function($scope, systemList, commonUtils) {
 
     $scope.setPagination = function() {
         let total_systems = systemList.getSystems().filter(function(s) {
-            return !$scope.search.name || s.name.indexOf($scope.search.name) > -1;
+            return !$scope.search.name || s.name.toLowerCase().indexOf($scope.search.name.toLowerCase()) > -1;
         });
         $scope.systems = total_systems.slice(
             ($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage,
