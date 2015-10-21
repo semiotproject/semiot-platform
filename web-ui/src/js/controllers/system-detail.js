@@ -15,6 +15,15 @@ export default function(
     CONFIG
 ) {
 
+    function getDefaultRange() {
+        // time difference between server and client
+        // FIXME
+        let now = (new Date()).getTime();
+        let end_date = new Date(now);
+        let start_date = (new Date(now - 1 * 3600 * 1000));
+        return [start_date.getTime(), end_date.getTime()];
+    }
+
     // reset params, clear WAMP connections, etc
     $scope.setDefault = function() {
         $scope.title = "";
@@ -27,14 +36,6 @@ export default function(
             });
         }
         $scope.connectionPull = [];
-        $scope.default_range = (function() {
-            // time difference between server and client
-            // FIXME
-            let now = (new Date()).getTime();
-            let end_date = new Date(now);
-            let start_date = (new Date(now - 24 * 3600 * 1000));
-            return [start_date, end_date];
-        })();
     };
 
     // call when page is loaded
@@ -60,9 +61,11 @@ export default function(
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     type: binding.type.value,
                     observationType: binding.observationType.value,
-                    range: $.extend({}, $scope.default_range),
+                    range: getDefaultRange(),
                     chartConfig: {}
                 });
+
+                debugger;
 
                 // set initial chart config
                 $scope.initChart(sensor).then(() => {
