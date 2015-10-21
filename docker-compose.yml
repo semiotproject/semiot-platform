@@ -51,13 +51,3 @@ deviceproxyservice:
   volumes:
     - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
   restart: always
-
-analyzingservice:
-  image: docker.semiot.ru/analysing-service
-  links:
-    - wamprouter
-  ports:
-    - "8085:8085"
-  volumes:
-    - /semiot-platform/analysing-service/:/semiot-platform/analysing-service/
-  restart: always
