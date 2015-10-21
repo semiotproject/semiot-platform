@@ -27,7 +27,9 @@ public class RegisterListener implements Observer<String> {
     private final WAMPClient wampClient = WAMPClient.getInstance();
     private final String QUERY_SELECT_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
 					+ "SELECT ?state where{ <${URI_SYSTEM}> saref:hasState ?state }";
-
+    private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
+			+ "<${URI_SYSTEM}> saref:hasState saref:OnState.";
+    
     @Override
     public void onCompleted() {
 
@@ -58,8 +60,11 @@ public class RegisterListener implements Observer<String> {
 					if (uriSystem != null) {
 						ResultSet rs = rdfStore.select(QUERY_SELECT_SYSTEM.replace("${URI_SYSTEM}", uriSystem));
 						if(rs.hasNext()) {
-							rdfStore.update(InactiveDeviceListener.QUERY_UPDATE_STATE_SYSTEM
-									.replace("${URI_SYSTEM}", uriSystem).replace("${STATE}", "saref:OnState")); 
+							// для обновления и в интерфейсе
+							WAMPClient.getInstance().publish(Launcher.getConfig().topicsInactive(), 
+									templateOnState.replace("${URI_SYSTEM}", uriSystem));
+							/*rdfStore.update(InactiveDeviceListener.QUERY_UPDATE_STATE_SYSTEM
+									.replace("${URI_SYSTEM}", uriSystem).replace("${STATE}", "saref:OnState"));*/
 						}
 						else {
 							rdfStore.save(description);
