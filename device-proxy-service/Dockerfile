@@ -21,4 +21,7 @@ WORKDIR /root/semiot-platform/$SERVICE_NAME
 
 RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
 
-CMD java -jar device-proxy-service-launcher/target/$SERVICE_JAR_NAME.jar
+ADD run.sh ./
+RUN chmod 777 run.sh
+
+CMD ./run.sh

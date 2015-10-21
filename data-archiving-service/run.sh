@@ -1,5 +1,5 @@
 #!/bin/sh
-while ! curl -I http://devicedirectoryservice:3030
+while ! curl -Is http://devicedirectoryservice:3030 || ! curl -Is http://opentsdb:4242
 do
   sleep 1;
 done
