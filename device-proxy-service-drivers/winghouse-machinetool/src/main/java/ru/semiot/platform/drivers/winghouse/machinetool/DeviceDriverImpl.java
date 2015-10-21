@@ -89,8 +89,12 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         
         // перевод всех устройств в статус офф
         stopSheduled();
+        for(Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet()) {
+        	entry.getValue().setTurnOn(false);
+        }
         for (Device device : listDevices)
 		{
+        	System.out.println(templateOffState.replace("${MAC}", device.getID()));
         	publish(topicInactive, templateOffState.replace("${MAC}", device.getID()));
 		}
         
