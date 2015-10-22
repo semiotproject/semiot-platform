@@ -26,7 +26,7 @@ public interface ServiceConfig extends Config {
 	@Key("services.topics.subscriber")
 	String topicsSubscriber();
 
-	@DefaultValue("localhost:4242")
+	@DefaultValue("http://localhost:4242")
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 

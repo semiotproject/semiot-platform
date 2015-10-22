@@ -1,6 +1,8 @@
 package ru.semiot.services.data_archiving_service;
 
 import java.io.StringReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.LinkedList;
 
 import org.aeonbits.owner.ConfigFactory;
@@ -84,13 +86,28 @@ public class SubscribeListener implements Observer<String> {
 
 	private void subscribeTopics(Model description) {
 		QueryExecution qe;
+		ResultSet topics = null;
 		if (description == null) {
 			qe = getQEFromStoredTopics();
+			boolean isConnected = false;
+			while(!isConnected) {
+				try {
+					topics = qe.execSelect();
+					isConnected = true;
+				} catch (Exception ex) {
+					logger.warn(ex.getMessage());
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						logger.error(e.getMessage());
+					}
+				}
+			}
 		} else {
 			qe = getQEFromModelTopics(description);
+			topics = qe.execSelect();
 		}
-		ResultSet topics = qe.execSelect();
-		while (topics.hasNext()) {
+		while (topics != null && topics.hasNext()) {
 			String topicName = parseTopicName(topics.next().get("q")
 					.asResource().getURI());
 			if (StringUtils.isNotBlank(topicName)
@@ -108,7 +125,7 @@ public class SubscribeListener implements Observer<String> {
 
 	private QueryExecution getQEFromStoredTopics() {
 		return QueryExecutionFactory.sparqlService(config.storeUrl(),
-				TOPICS_QUERY, httpAuthenticator);
+			TOPICS_QUERY, httpAuthenticator);
 	}
 
 	private QueryExecution getQEFromModelTopics(Model description) {
