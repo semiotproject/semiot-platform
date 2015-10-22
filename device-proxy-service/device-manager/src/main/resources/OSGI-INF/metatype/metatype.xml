@@ -3,7 +3,7 @@
     <OCD description="Device Proxy Service Manager" name="Device Proxy Service Manager"
         id="ru.semiot.platform.deviceproxyservice.manager">
         <AD name="WAMP URI" id="ru.semiot.platform.deviceproxyservice.manager.wamp_uri"
-            required="true" type="String" default="ws://demo.semiot.ru:8080/ws"/>
+            required="true" type="String" default="ws://wamprouter:8080/ws"/>
         <AD name="WAMP Realm" id="ru.semiot.platform.deviceproxyservice.manager.wamp_realm"
             required="true" type="String" default="realm1"/>
         <AD name="WAMP Reconnect interval" id="ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect"
