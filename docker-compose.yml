@@ -1,11 +1,11 @@
 wamprouter:
-  image: semiot/wamp-router:v1.0.0
+  image: docker.semiot.ru/wamp-router
   ports:
     - "8080:8080"
   restart: always
 
 devicedirectoryservice:
-  image: semiot/device-directory-service:v1.0.0
+  image: docker.semiot.ru/device-directory-service
   links:
     - wamprouter
   ports:
@@ -15,7 +15,7 @@ devicedirectoryservice:
   restart: always
 
 dataarchivingservice:
-  image: semiot/data-archiving-service:v1.0.0
+  image: docker.semiot.ru/data-archiving-service
   links:
     - opentsdb
     - wamprouter
@@ -25,7 +25,7 @@ dataarchivingservice:
   restart: always
   
 opentsdb:
-  image: semiot/opentsdb-docker:v1.0.0
+  image: docker.semiot.ru/opentsdb-docker
   ports:
     - "4242:4242"
   volumes:
@@ -34,13 +34,13 @@ opentsdb:
   restart: always
 
 webui:
-  image: semiot/web-ui:v1.0.0
+  image: docker.semiot.ru/web-ui
   ports:
     - "80:80"
   restart: always
 
 deviceproxyservice:
-  image: semiot/device-proxy-service:v1.0.0
+  image: docker.semiot.ru/device-proxy-service
   links:
     - wamprouter
     - devicedirectoryservice
