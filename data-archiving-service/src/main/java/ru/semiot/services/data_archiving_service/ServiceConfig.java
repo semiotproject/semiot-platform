@@ -9,7 +9,7 @@ import org.aeonbits.owner.Config.Sources;
 @Sources({ "file:/semiot-platform/data-archiving-service/config.properties" })
 public interface ServiceConfig extends Config {
 
-	@DefaultValue("ws://localhost:8080/ws")
+	@DefaultValue("ws://wamprouter:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
 
@@ -26,11 +26,11 @@ public interface ServiceConfig extends Config {
 	@Key("services.topics.subscriber")
 	String topicsSubscriber();
 
-	@DefaultValue("http://localhost:4242")
+	@DefaultValue("http://opentsdb:4242")
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
-	@DefaultValue("http://localhost:3030/ds/query")
+	@DefaultValue("http://devicedirectoryservice:3030/ds/query")
 	@Key("services.devicedirectory.store.url")
 	String storeUrl();
 
@@ -38,11 +38,11 @@ public interface ServiceConfig extends Config {
 	@Key("services.topics.removeSensor")
 	String topicsRemoveSensor();
 
-	@DefaultValue("")
+	@DefaultValue("admin")
 	@Key("services.devicedirectory.store.username")
 	String storeUsername();
 
-	@DefaultValue("")
+	@DefaultValue("pw")
 	@Key("services.devicedirectory.store.password")
 	String storePassword();
 }

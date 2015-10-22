@@ -9,7 +9,7 @@ import org.aeonbits.owner.Config.Sources;
 @Sources({ "file:/semiot-platform/device-directory-service/config.properties" })
 public interface ServiceConfig extends Config {
 
-	@DefaultValue("ws://localhost:8080/ws")
+	@DefaultValue("ws://wamprouter:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
 
@@ -54,11 +54,11 @@ public interface ServiceConfig extends Config {
 	@Key("services.devicedirectory.update.url")
 	String updateUrl();
 
-	@DefaultValue("")
+	@DefaultValue("admin")
 	@Key("services.devicedirectory.store.username")
 	String storeUsername();
 
-	@DefaultValue("")
+	@DefaultValue("pw")
 	@Key("services.devicedirectory.store.password")
 	String storePassword();
 }

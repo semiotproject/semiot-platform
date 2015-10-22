@@ -20,8 +20,6 @@ WORKDIR /root/semiot-platform/$SERVICE_NAME
 
 RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
 
-ADD config.properties /semiot-platform/data-archiving-service/config.properties
-
 ADD run.sh ./
 RUN chmod 777 run.sh
 
