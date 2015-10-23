@@ -71,4 +71,12 @@ public class NewObservationHandler implements CoapHandler {
 			System.out.println(ex.getMessage());
 		}
 	}
+	
+	public String getTopic() {
+		return topic;
+	}
+	
+	public String getSystemUri() {
+		return system;
+	}
 }

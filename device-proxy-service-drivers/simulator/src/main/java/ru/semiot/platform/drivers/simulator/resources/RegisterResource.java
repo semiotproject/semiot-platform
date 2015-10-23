@@ -117,29 +117,32 @@ public class RegisterResource extends CoapResource {
 						System.out.println("Mapping " + coap.getURI() +" to "+ wamp.getURI());
 
 						String wampTopic = getWampTopic(wamp.getURI());
-
-						final NewObservationHandler handler = new NewObservationHandler(
-								deviceDriverImpl, wampTopic, systemURI);
-
-						final CoapClient coapClient = new CoapClient(
-								coap.getURI());
-						coapClient.setEndpoint(CoAPInterface.getEndpoint());
-						final CoapObserveRelation rel = coapClient
-								.observe(handler);
-
-						// So the handler could cancel the subscription.
-						handler.setRelation(rel);
-						coapClient.shutdown();
+						
+						boolean containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, wampTopic);
+						if(!containsHandler) {
+							final NewObservationHandler handler = new NewObservationHandler(
+									deviceDriverImpl, wampTopic, systemURI);
+	
+							final CoapClient coapClient = new CoapClient(
+									coap.getURI());
+							coapClient.setEndpoint(CoAPInterface.getEndpoint());
+							final CoapObserveRelation rel = coapClient
+									.observe(handler);
+	
+							// So the handler could cancel the subscription.
+							handler.setRelation(rel);
+							coapClient.shutdown();
+							
+							DeviceHandler.getInstance().addHandler(handler);
+						}
 						Device newDevice = new Device(systemURI, toString(description));
 						if(!deviceDriverImpl.contains(newDevice)) {
 							deviceDriverImpl.addDevice(newDevice);
-						} else {
+						} else if(!containsHandler) {
 							deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(), 
 									templateOnState.replace("${system}", systemURI));
 							System.out.println(systemURI + "saref:OnState" );
 						}
-						DeviceHandler.getInstance().addHandler(systemURI,
-								handler);
 					}
 				}
 			} else {

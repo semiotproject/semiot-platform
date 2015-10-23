@@ -17,14 +17,14 @@ public class DeviceHandler {
 			}
 		return instance;
 	}
-
-	public void addHandler(String key, NewObservationHandler handler) {
+	
+	public void addHandler(NewObservationHandler handler) {
 		List<NewObservationHandler> handlers;
-		if (observationHandlers.containsKey(key)) {
-			handlers = observationHandlers.get(key);
+		if (observationHandlers.containsKey(handler.getSystemUri())) {
+			handlers = observationHandlers.get(handler.getSystemUri());
 		} else {
 			handlers = new LinkedList<>();
-			observationHandlers.put(key, handlers);
+			observationHandlers.put(handler.getSystemUri(), handlers);
 		}
 		handlers.add(handler);
 	}
@@ -44,11 +44,13 @@ public class DeviceHandler {
 		observationHandlers.remove(key);
 	}
 
-	public boolean containsHandler(String key, NewObservationHandler handler) {
-		if (observationHandlers.containsKey(key)) {
+	public boolean containsHandler(String key, String wampTopic) {
+		if (observationHandlers.containsKey(key) && wampTopic != null) {
 			List<NewObservationHandler> handlers = observationHandlers.get(key);
-			if (handlers.contains(handler)) {
-				return true;
+			for(NewObservationHandler handler : handlers) {
+				if (wampTopic.equals(handler.getTopic())) {
+					return true;
+				}
 			}
 		}
 		return false;
