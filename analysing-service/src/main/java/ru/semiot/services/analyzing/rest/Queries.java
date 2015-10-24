@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,33 +29,44 @@ public class Queries {
 
     private static final Logger logger = LoggerFactory
             .getLogger(Queries.class);
-    
+
     @Inject
     private DataBase db;
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getQueries(){
+    public Response getQueries() {
         logger.debug("Return queries");
         JSONArray ret = db.getQueries();
-        if(ret == null)
-            return Response.status(Response.Status.NOT_FOUND).build();        
+        if (ret == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         return Response.ok().entity(ret.toString()).build();
     }
-    
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(String request) {
         logger.debug("Appending query");
-        JSONObject object = new JSONObject(request);
-        if(request==null || !object.has("name") || !object.has("text"))
-            return Response.status(Response.Status.BAD_REQUEST).build();        
-        if(!Engine.getInstance().registerQuery(object.getString("text")))
+        if (request == null || request.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
-        JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
-        logger.info("Query appended");
-        return Response.ok(ret.toString()).build();
+        }
+        try {
+            JSONObject object = new JSONObject(request);
+
+            if (!object.has("name") || !object.has("text")) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            if (!Engine.getInstance().registerQuery(object.getString("text"))) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
+            logger.info("Query appended");
+            return Response.ok(ret.toString()).build();
+        } catch (JSONException e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
     }
 
     @GET
@@ -70,8 +82,9 @@ public class Queries {
     public Response getQuery(@PathParam("id") Integer id) {
         logger.debug("Return query");
         JSONObject ret = db.getQuery(id);
-        if(ret == null)
+        if (ret == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
         return Response.ok(ret.toString()).build();
     }
 
@@ -81,8 +94,9 @@ public class Queries {
     public Response remove(@PathParam("id") Integer id) {
         logger.debug("Removing query");
         JSONObject ret = db.removeQuery(id);
-        if(ret == null)
+        if (ret == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
         Engine.getInstance().removeQuery(ret.getString("text"));
         logger.info("Query removed");
         return Response.ok().build();
