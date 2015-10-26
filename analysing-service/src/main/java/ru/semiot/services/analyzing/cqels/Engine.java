@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 import org.deri.cqels.data.Mapping;
 import org.deri.cqels.engine.ConstructListener;
 import org.deri.cqels.engine.ContinuousConstruct;
@@ -24,7 +23,6 @@ import org.deri.cqels.engine.OpRouter1;
 import org.deri.cqels.engine.RDFStream;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.ServiceConfig;
-import ru.semiot.services.analyzing.database.DataBase;
 import ru.semiot.services.analyzing.wamp.WAMPClient;
 
 public class Engine {
@@ -37,8 +35,6 @@ public class Engine {
     private final String STREAM_ID = "http://example.org/simpletest/test";
     private DefaultRDFStream stream = null;
     private Map<String, OpRouter1> queries = null;
-    
-    @Inject private DataBase db; 
 
     private Engine() {
         logger.info("Initialize home directory for cqels");
@@ -84,8 +80,8 @@ public class Engine {
                     queries.put(query, cs);
                 }
             }
-        }
-        catch(com.hp.hpl.jena.query.QueryException e){
+        } catch (com.hp.hpl.jena.query.QueryException e) {
+            logger.debug("Query \n" + query + "\n has ERROR!\n + " + e.getMessage());
             return false;
         }
         return true;
@@ -129,7 +125,9 @@ public class Engine {
         List<Node> list = toNodeList(m);
         String message = "";
         for (Node n : list) {
-            message += n.toString() + "\n";
+            if (n != null) {
+                message += n.toString() + "\n";
+            }
         }
         return message;
     }
@@ -137,7 +135,9 @@ public class Engine {
     private String getString(List<Triple> list) {
         String message = "";
         for (Triple t : list) {
-            message += t.toString() + "\n";
+            if (t != null) {
+                message += t.toString() + "\n";
+            }
         }
         return message;
     }
