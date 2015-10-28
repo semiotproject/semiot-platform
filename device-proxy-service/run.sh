@@ -6,4 +6,4 @@ do
 done
 echo "$(date) - Connected to Fuseki successfully"
 
-java -jar device-proxy-service-launcher/target/$SERVICE_JAR_NAME.jar
+java -jar $SERVICE_JAR_NAME.jar
