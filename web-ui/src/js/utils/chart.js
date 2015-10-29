@@ -15,10 +15,7 @@ export default function(CONFIG) {
             rangeSelector: {
                 enabled: false
             }
-        },
-        series: [
-            {}
-        ]
+        }
     };
 
     // store pair `uri`: { ... }
@@ -35,7 +32,10 @@ export default function(CONFIG) {
                 }),
                 title: {
                     text: title
-                }
+                },
+                series: [
+                    {}
+                ]
             });
         },
         getStateChartConfig: function(title, states) {

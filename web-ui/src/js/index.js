@@ -66,10 +66,11 @@ app.controller('SystemDetailCtrl', require('./controllers/system-detail'));
 app.config(require('./routing'));
 
 // redirect to login page if unauthorized
-app.run(['$rootScope', '$location', 'loginService', function ($rootScope, $location, loginService) {
-    $rootScope.$on('$routeChangeStart', function (event) {
+app.run(['$rootScope', '$location', 'loginService', 'wampUtils', function ($rootScope, $location, loginService, wampUtils) {
+    $rootScope.$on('$routeChangeStart', function (event, next) {
         if (!loginService.isLogged()) {
-            // $location.path('/login');
+            $location.path('/login');
         }
+
     });
 }]);

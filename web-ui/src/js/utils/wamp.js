@@ -21,7 +21,9 @@ export default function(CONFIG) {
             realm: 'realm1'
         });
         connection.onopen = function(session) {
-            _session = session;
+            if (!_session) {
+                 _session = session;
+            }
             callback(_session);
         };
         connection.open();
