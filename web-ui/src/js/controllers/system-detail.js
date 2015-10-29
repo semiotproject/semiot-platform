@@ -75,7 +75,7 @@ export default function(
                         console.info('sensor ready; appending it to sensor list...');
 
                         // SUPER WEIRD
-                        let s = JSON.parse(JSON.stringify(sensor));
+                        let s = $.extend({}, sensor);
                         $scope.sensors.push(s);
                         $scope.subscribe(s);
 
@@ -179,7 +179,7 @@ export default function(
                 let state =  N3Store.find(obsResultValue, "ssn:hasValue", null, "")[0].object;
 
                 sensor.chartConfig.series[0].data.push([(new Date()).getTime(), chartUtils.parseStateChartValue(state)]);
-                console.info(`appended new state: now chartConfig data  is `, sensor.chartConfig.series[0]);
+                console.info(`appended new state: now chartConfig data  is `, sensor.chartConfig);
             } else {
 
                 let quantity = N3Store.find(obsResultValue, "qudt:quantityValue", null, "")[0].object;
