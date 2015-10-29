@@ -14,9 +14,16 @@
 .highcharts-container {
     margin-top: 10px;
 }
-.range-control {
+.chart-control {
     display: inline-block;
-    width: 225px;
-    margin: 0 20px 10px 0;
-      vertical-align: bottom;
+    max-width: 225px;
+    margin: 0 0 10px 10px;
+    vertical-align: bottom;
+    &.mode-control {
+        vertical-align: top;
+    }
+}
+.range-control {
+    float: right;
+    display: inline-block;
 }

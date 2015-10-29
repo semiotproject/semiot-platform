@@ -25,8 +25,6 @@ export default function(
         return [start_date.getTime(), end_date.getTime()];
     }
 
-  $scope.radioModel = 'Middle';
-
     $scope.getModes = () => {
         return {
             'archive': '0',
@@ -66,7 +64,7 @@ export default function(
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
                     range: getDefaultRange(),
-                    mode: $scope.getModes()['archive'],
+                    mode: $scope.getModes()['real-time'],
                     chartConfig: {}
                 });
 
@@ -155,11 +153,16 @@ export default function(
         wampUtils.unsubscribe(sensor.endpoint);
     };
     $scope.onSetModeClick = function(sensor, mode) {
-        sensor.mode = mode;
-        if (mode === $scope.getModes()['real-time']) {
-            $scope.subscribe(sensor);
-        } else {
-            $scope.unsubscribe(sensor);
+        if (sensor.mode !== mode) {
+            sensor.mode = mode;
+            if (mode === $scope.getModes()['real-time']) {
+                $scope.subscribe(sensor);
+                sensor.range = getDefaultRange();
+                console.log(new Date(sensor.range[0]), new Date(sensor.range[1]));
+                $scope.fillChart(sensor);
+            } else {
+                $scope.unsubscribe(sensor);
+            }
         }
     };
 
