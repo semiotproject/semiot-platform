@@ -44,17 +44,11 @@ export default {
         },
         queries: {
             getAllSystems: [
-                "SELECT ?label ?uri ?state",
+                "SELECT DISTINCT ?label ?uri ?state",
                 "WHERE {",
                 "   ?uri a ssn:System ;",
-                "       a ?type ;",
-                "       saref:hasState ?state .",
-                "       ?uri rdfs:label ?label .",
-                "   FILTER NOT EXISTS {",
-                "       ?subClass rdfs:subClassOf ?type .",
-                "       ?uri a ?subClass .",
-                "       FILTER (?subClass != ?type)",
-                "   }",
+                "       saref:hasState ?state ;",
+                "       rdfs:label ?label .",
                 "}"
             ].join('\n'),
             getSystemEndpoint: `
