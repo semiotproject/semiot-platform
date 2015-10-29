@@ -61,15 +61,20 @@ export default function(CONFIG) {
                 return item;
             }
 
-            return $.extend({}, baseChartConfig, {
+            var yFormatter = function() {
+                return getItemByURI(this.value).label;
+            };
+            var xFormatter = function() {
+                return states[this.y].description;
+            };
+
+            var conf = $.extend({}, baseChartConfig, {
                 yAxis: {
                     categories: Object.keys(STATE_MAP),
                     endOnTick: true,
                     minRange: states.length,
                     labels: {
-                        formatter: function() {
-                            return getItemByURI(this.value).label;
-                        }
+                        formatter: yFormatter
                     }
                 },
                 title: {
@@ -79,13 +84,13 @@ export default function(CONFIG) {
                     {
                         step: 'center',
                         tooltip: {
-                            pointFormatter: function() {
-                                return states[this.y].description;
-                            }
+                            pointFormatter: xFormatter
                         }
                     }
                 ]
             });
+
+            return conf;
         },
 
         parseObservationChartData(data) {

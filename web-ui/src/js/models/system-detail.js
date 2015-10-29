@@ -8,12 +8,23 @@ export default function(
     commonUtils,
     sparqlUtils,
     tsdbUtils,
+    wampUtils,
     CONFIG
 ) {
 
     class Instance extends EventEmitter {
         constructor() {
             super();
+        }
+        subscribe() {
+            wampUtils.subscribe(
+                [
+                    {
+                        topic:  CONFIG.TOPICS.device_registered,
+                        callback: this.onDeviceRegistered.bind(this)
+                    }
+                ]
+            );
         }
         fetchSystemName(uri, callback) {
             return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemName.format(uri), callback);

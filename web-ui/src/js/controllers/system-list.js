@@ -31,5 +31,7 @@ export default function($scope, systemList, commonUtils) {
     });
     systemList.fetchSystems().then(function(data) {
         $scope.setPagination();
+        systemList.subscribe();
     });
+
 }

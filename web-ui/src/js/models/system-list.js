@@ -17,23 +17,20 @@ export default function(
     class Instance extends EventEmitter {
         constructor() {
             super();
-
-            console.info('subscribing to WAMP..');
-            this.connection = wampUtils.subscribe(
-                CONFIG.URLS.messageBus,
-                [
-                    {
-                        topic:  CONFIG.TOPICS.device_registered,
-                        callback: this.onDeviceRegistered.bind(this)
-                    },
-                    {
-                        topic:  CONFIG.TOPICS.device_turned_off,
-                        callback: this.onDeviceTurnedOff.bind(this)
-                    }
-                ]
-            ).session;
-
             // this.launchTestSystems();
+        }
+
+        subscribe() {
+            wampUtils.subscribe([
+                {
+                    topic:  CONFIG.TOPICS.device_registered,
+                    callback: this.onDeviceRegistered.bind(this)
+                },
+                {
+                    topic:  CONFIG.TOPICS.device_turned_off,
+                    callback: this.onDeviceTurnedOff.bind(this)
+                }
+            ]);
         }
 
         launchTestSystems() {

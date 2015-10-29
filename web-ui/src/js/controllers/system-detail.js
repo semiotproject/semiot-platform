@@ -1,4 +1,5 @@
 "use strict";
+
 import N3 from "n3";
 
 export default function(
@@ -24,18 +25,21 @@ export default function(
         return [start_date.getTime(), end_date.getTime()];
     }
 
+  $scope.radioModel = 'Middle';
+
+    $scope.getModes = () => {
+        return {
+            'archive': '0',
+            'real-time': '1'
+        };
+    };
+
     // reset params, clear WAMP connections, etc
     $scope.setDefault = function() {
         $scope.title = "";
         $scope.sensors = [];
         $scope.liveEnabled = true;
         $scope.isLoading = true;
-        if ($scope.connectionPull && $scope.connectionPull.length > 0) {
-            $scope.connectionPull.forEach(function(connection) {
-                connection.close();
-            });
-        }
-        $scope.connectionPull = [];
     };
 
     // call when page is loaded
@@ -57,11 +61,12 @@ export default function(
 
             // create sensor list
             data.results.bindings.forEach((binding) => {
-                var sensor = $.extend({}, {
+                let sensor = $.extend({}, {
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
                     range: getDefaultRange(),
+                    mode: $scope.getModes()['archive'],
                     chartConfig: {}
                 });
 
@@ -74,14 +79,14 @@ export default function(
                         // append sensor
                         console.info('sensor ready; appending it to sensor list...');
 
-                        // SUPER WEIRD
                         let s = $.extend({}, sensor);
                         $scope.sensors.push(s);
+
                         $scope.subscribe(s);
 
                         /*
                         $interval(() => {
-                            $scope.onUpdated(sensor, commonUtils.getMockMachineToolStateObservation());
+                            $scope.onObservationReceived(sensor, commonUtils.getMockMachineToolStateObservation());
                         }, 2000);
                         */
                     });
@@ -137,18 +142,25 @@ export default function(
 
     // WAMP support
     $scope.subscribe = function(sensor) {
-        console.info(`subscribing to ${sensor.endpoint}...`);
-        $scope.connectionPull.push(wampUtils.subscribe(
-            CONFIG.URLS.messageBus,
-            [
-                {
-                    topic: sensor.endpoint,
-                    callback: function(args) {
-                        $scope.onUpdated(sensor, args[0]);
-                    }
+        wampUtils.subscribe([
+            {
+                topic: sensor.endpoint,
+                callback: function(args) {
+                    $scope.onObservationReceived(sensor, args[0]);
                 }
-            ]
-        ));
+            }
+        ]);
+    };
+    $scope.unsubscribe = function(sensor) {
+        wampUtils.unsubscribe(sensor.endpoint);
+    };
+    $scope.onSetModeClick = function(sensor, mode) {
+        sensor.mode = mode;
+        if (mode === $scope.getModes()['real-time']) {
+            $scope.subscribe(sensor);
+        } else {
+            $scope.unsubscribe(sensor);
+        }
     };
 
     // determine if it is state or observation sensor
@@ -161,7 +173,7 @@ export default function(
     $scope.onNowClicked = function(sensor) {
         sensor.range[1] = (new Date()).getTime();
     };
-    $scope.onUpdated = function(sensor, data) {
+    $scope.onObservationReceived = function(sensor, data) {
         // console.info(`received message from ${sensor.endpoint}: `, data);
         rdfUtils.parseTTL(data).then(function(triples) {
 

@@ -43,6 +43,10 @@
             <div class="range-control">
                 <button class="btn btn-primary" ng-click="onSetRangeClick($index)">Select</button>
             </div>
+            <div class="mode-control btn-group">
+                <label class="btn btn-primary" ng-click="onSetModeClick(sensor, getModes()['archive'])" ng-model="sensor.mode" btn-radio="getModes()['archive']">Archive</label>
+                <label class="btn btn-primary" ng-click="onSetModeClick(sensor, getModes()['real-time'])" ng-model="sensor.mode" btn-radio="getModes()['real-time']">Real-Time</label>
+            </div>
             <highchart config="sensor.chartConfig"></highchart>
         </div>
     </div>
