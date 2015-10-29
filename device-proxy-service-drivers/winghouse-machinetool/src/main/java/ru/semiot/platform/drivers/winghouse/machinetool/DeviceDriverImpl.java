@@ -178,7 +178,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     
     private class ScheduledDeviceStatus implements Runnable {
 		public void run() {
-			System.out.println("ScheduledDeviceStatus start");
+			//System.out.println("ScheduledDeviceStatus start");
 
 			long currentTimestamp = System.currentTimeMillis();
 			for (Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet())
@@ -190,7 +190,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 					System.out.println(entry.getKey() + " saref:OffState" );
 				}
 			}
-			System.out.println("ScheduledDeviceStatus complete");
+			//System.out.println("ScheduledDeviceStatus complete");
 		}
 	}
 

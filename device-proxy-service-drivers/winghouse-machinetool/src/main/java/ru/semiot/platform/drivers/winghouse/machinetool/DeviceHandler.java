@@ -18,7 +18,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 			+ "<http://example.com/${MAC}> saref:hasState saref:OnState.";
 
 	public DeviceHandler(DeviceDriverImpl deviceDriverImpl) {
-		System.out.println("Create DeviceHandler class");
+		// System.out.println("Create DeviceHandler class");
 		this.deviceDriverImpl = deviceDriverImpl;
 	}
 
@@ -73,8 +73,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 		final String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 				.format(new Date(mess.getTimestemp()));
 
-		System.out.println("State "
-				+ mess.getMachineToolState().getUri());
+		// System.out.println("State " + mess.getMachineToolState().getUri());
 		String message = deviceDriverImpl
 				.getTemplateObservation()
 				.replace("${MAC}", mess.getMac())
@@ -90,7 +89,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 		// инициализация нового девайса
 		String message = deviceDriverImpl.getTemplateDescription().replace(
 				"${MAC}", mac);
-		System.out.println("Publish message:\n" + message);
+		// System.out.println("Publish message:\n" + message);
 		deviceDriverImpl.addDevice(new Device(mac, message));
 	}
 }
