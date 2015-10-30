@@ -3,7 +3,7 @@ PREFIX ssncom: <http://purl.org/NET/ssnext/communication#>
 
 SELECT ?system ?coap ?wamp {
     ?system a ssn:System ;
-        ssn:hasSubsystem ?sensor .
+        ssn:hasSubSystem ?sensor .
     ?sensor a ssn:Sensor ;
         ssncom:hasCommunicationEndpoint ?coap ;
         ssncom:hasCommunicationEndpoint ?wamp .

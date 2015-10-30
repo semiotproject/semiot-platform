@@ -18,16 +18,16 @@ public class RemoveDeviceListener implements Observer<String> {
 	private static final String TOPICS_QUERY = new StringBuilder()
 			.append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
 			.append("prefix ssncom: <http://purl.org/NET/ssnext/communication#> ")
-			.append("SELECT ?q where{ <${URI_SYSTEM}> ssn:hasSubsystem ?x. ?x a ssn:Sensor; ssncom:hasCommunicationEndpoint ?q. ")
+			.append("SELECT ?q where{ <${URI_SYSTEM}> ssn:hasSubSystem ?x. ?x a ssn:Sensor; ssncom:hasCommunicationEndpoint ?q. ")
 			.append("?q ssncom:protocol \"WAMP\"}").toString();
 
 	private static final String DELETE_SYSTEM = new StringBuilder()
 			.append("PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
 			.append("PREFIX ssncom: <http://purl.org/NET/ssnext/communication#> ")
 			.append("DELETE {?comm ?ppp ?sss. ?sensor ?pp ?ss. <URI_SYSTEM> ?p ?s.} ")
-			.append("WHERE{{<URI_SYSTEM> ssn:hasSubsystem ?sensor. ")
+			.append("WHERE{{<URI_SYSTEM> ssn:hasSubSystem ?sensor. ")
 			.append("?sensor ssncom:hasCommunicationEndpoint ?comm. ?comm ?ppp ?sss. } ")
-			.append("union {<URI_SYSTEM> ssn:hasSubsystem ?sensor. ?sensor ?pp ?ss.} ")
+			.append("union {<URI_SYSTEM> ssn:hasSubSystem ?sensor. ?sensor ?pp ?ss.} ")
 			.append("union {<URI_SYSTEM> ?p ?s.}}").toString();
 
 	@Override
