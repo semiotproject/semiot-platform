@@ -7,7 +7,7 @@
 
 <http://example.com/${MAC}> a mcht:MachineTool ;
     rdfs:label "Machine Tool #${MAC}"@en ;
-    ssn:hasSubsystem <http://example.com/${MAC}/machinetool> ;
+    ssn:hasSubSystem <http://example.com/${MAC}/machinetool> ;
     saref:hasState saref:OnState .
     
 <http://example.com/${MAC}/machinetool>  a ssn:SensingDevice ;
