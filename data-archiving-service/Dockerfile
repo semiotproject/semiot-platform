@@ -1,24 +1,15 @@
-FROM fedora
+FROM fedora:22
 
 MAINTAINER Shilin Ivan <proniment@gmail.com>
 
 ENV SERVICE_NAME data-archiving-service
 ENV SERVICE_JAR_NAME data-archiving-service-1.0-SNAPSHOT-jar-with-dependencies
 
-WORKDIR /root
-
-RUN yum upgrade -y && yum install -y java-1.8.0-openjdk-devel maven git wget unzip which && yum clean all
-
-#
-# No cache workaround. Once the content of build.number file changed, the cache will be invalidated.
-#
-ADD build.number /root/build.number
-
-RUN git clone https://github.com/semiotproject/semiot-platform.git
+RUN dnf upgrade -y && dnf install -y java-1.8.0-openjdk-headless && dnf clean all
 
 WORKDIR /root/semiot-platform/$SERVICE_NAME
 
-RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
+ADD target/$SERVICE_JAR_NAME.jar $SERVICE_JAR_NAME.jar
 
 ADD run.sh ./
 RUN chmod 777 run.sh
