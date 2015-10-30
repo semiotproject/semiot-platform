@@ -32,6 +32,8 @@ export default function(
         };
     };
 
+    $scope.version = CONFIG.VERSION;
+
     // reset params, clear WAMP connections, etc
     $scope.setDefault = function() {
         $scope.title = "";

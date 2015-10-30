@@ -1,6 +1,7 @@
 "use strict";
 
-export default function($scope, systemList, commonUtils) {
+export default function($scope, systemList, commonUtils, CONFIG) {
+    $scope.version = CONFIG.VERSION;
     $scope.systems = [];
     $scope.search = {
         name: ""
