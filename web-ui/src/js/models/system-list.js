@@ -17,7 +17,7 @@ export default function(
     class Instance extends EventEmitter {
         constructor() {
             super();
-            // this.launchTestSystems();
+            this.launchTestSystems();
         }
 
         subscribe() {
@@ -41,15 +41,27 @@ export default function(
 
         onDeviceRegistered(args) {
             rdfUtils.parseTTL(args[0]).then((triples) => {
+
+                let N3Store = N3.Store();
+
+                N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
+                N3Store.addTriples(triples);
+
+                // can not find another way to get system from description
+                let system = N3Store.find(null, "ssn:hasSubSystem", null, "")[0];
+                let uri = system.subject;
+                let label = N3Store.find(uri, "rdfs:label", null, "")[0].object;
+
                 let resource = rdfUtils.parseTriples(triples);
+
                 if (!systems.find(function(system) { // if system is new
-                    return system.uri === resource.uri;
+                    return system.uri === uri;
                 })) {
                     systems.push({
                         index: systems.length + 1,
-                        uri: resource.uri,
-                        name: resource.get("http://www.w3.org/2000/01/rdf-schema#label"),
-                        state: "online"
+                        uri: uri,
+                        name: label,
+                        isOnline: true
                     });
                     this.emit("systemsUpdate", systems);
                 }

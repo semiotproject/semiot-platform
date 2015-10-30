@@ -76,30 +76,57 @@ export default function($q, CONFIG) {
             ].join('\n');
         },
         getMockNewSystem: function() {
-            return [
-                "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .",
-                "@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .",
-                "@prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> .",
-                "@prefix ssncom: <http://purl.org/NET/ssnext/communication#> .",
+            return `
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+                @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
+                @prefix qudt-unit: <http://qudt.org/vocab/unit#> .
+                @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
+                @prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> .
+                @prefix ssncom: <http://purl.org/NET/ssnext/communication#> .
+                @prefix saref: <http://ontology.tno.nl/saref#> .
 
-                "<coap://10.1.1.2:{0}/meter> a hmtr:HeatMeter ;".format(counter++),
-                "    rdfs:label \"Heat Meter #{0}\" ;".format(counter),
-                "    ssn:hasSubsystem <coap://10.1.1.2:{0}/meter/temperature> ;".format(counter),
-                "    ssn:hasSubsystem <coap://10.1.1.2:{0}/meter/heat> .".format(counter),
+                <coap://100.0.0.1/meter> a hmtr:HeatMeter ;
+                    rdfs:label "Heat Meter #3433111" ;
+                    ssn:hasSubSystem <coap://100.0.0.1/meter/temperature> ;
+                    ssn:hasSubSystem <coap://100.0.0.1/meter/heat> ;
+                    saref:hasState saref:OnState .
 
-                "<coap://10.1.1.2:545/meter/temperature> a ssn:Sensor ;",
-                "    ssn:observes hmtr:Temperature ;",
-                "    ssncom:hasCommunicationEndpoint <coap://10.1.1.2:545/meter/temperature/obs> .",
+                <coap://100.0.0.1/meter/temperature> a ssn:SensingDevice ;
+                    ssn:observes qudt-quantity:ThermodynamicTemperature ;
+                    ssn:hasMeasurementCapability [
+                        a ssn:MeasurementCapability ;
+                        ssn:forProperty qudt-quantity:ThermodynamicTemperature ;
+                        ssn:hasMeasurementProperty [
+                            a qudt:Unit ;
+                            ssn:hasValue [
+                                a qudt:Quantity ;
+                                ssn:hasValue qudt-unit:DegreeCelsius ;
+                            ] ;
+                        ] ;
+                    ] ;
+                    ssncom:hasCommunicationEndpoint <coap://100.0.0.1/meter/temperature/obs> .
 
-                "<coap://10.1.1.2:545/meter/heat> a ssn:Sensor ;",
-                "    ssn:observes hmtr:Heat ;",
-                "    ssncom:hasCommunicationEndpoint <coap://10.1.1.2:545/meter/heat/obs> .",
+                <coap://100.0.0.1/meter/heat> a ssn:SensingDevice ;
+                    ssn:observes qudt-quantity:SpecificHeatCapacity ;
+                    ssn:hasMeasurementCapability [
+                        a ssn:MeasurementCapability ;
+                        ssn:forProperty qudt-quantity:SpecificHeatCapacity ;
+                        ssn:hasMeasurementProperty [
+                            a qudt:Unit ;
+                            ssn:hasValue [
+                                a qudt:Quantity ;
+                                ssn:hasValue qudt-unit:Kilocalorie ;
+                            ] ;
+                        ]
+                    ] ;
+                    ssncom:hasCommunicationEndpoint <coap://100.0.0.1/meter/heat/obs> .
 
-                "<coap://10.1.1.2:545/meter/temperature/obs> a ssncom:CommunicationEndpoint ;",
-                "    ssncom:protocol \"COAP\" .",
-                "<coap://10.1.1.2:545/meter/heat/obs> a ssncom:CommunicationEndpoint ;",
-                "    ssncom:protocol \"COAP\" ."
-            ].join('\n');
+                <coap://100.0.0.1/meter/temperature/obs> a ssncom:CommunicationEndpoint ;
+                    ssncom:protocol "COAP" .
+                <coap://100.0.0.1/meter/heat/obs> a ssncom:CommunicationEndpoint ;
+                    ssncom:protocol "COAP" .
+            `;
         }
     };
 
