@@ -53,7 +53,7 @@ export default {
             ].join('\n'),
             getSystemEndpoint: `
                 SELECT ?endpoint ?type ?observationType ?propLabel ?valueUnitLabel {
-                  <{0}> ssn:hasSubSystem ?subsystem .
+                  <{0}> ssn:hasSubsystem ?subsystem .
                   ?subsystem ssn:observes ?type .
                   ?subsystem ssn:hasMeasurementCapability ?mc .
                   ?mc ssn:forProperty ?prop .
@@ -82,5 +82,5 @@ export default {
             `
         }
     },
-    TIMEZONE_OFFSET: 3 * 3600 * 1000
+    TIMEZONE_OFFSET: -1 * new Date().getTimezoneOffset() * 60 * 1000 // in ms
 };
