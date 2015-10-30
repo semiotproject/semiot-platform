@@ -17,7 +17,7 @@ export default function(
     class Instance extends EventEmitter {
         constructor() {
             super();
-            this.launchTestSystems();
+            // this.launchTestSystems();
         }
 
         subscribe() {

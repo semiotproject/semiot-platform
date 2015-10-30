@@ -53,7 +53,7 @@ export default {
             ].join('\n'),
             getSystemEndpoint: `
                 SELECT ?endpoint ?type ?observationType ?propLabel ?valueUnitLabel {
-                  <{0}> ssn:hasSubsystem ?subsystem .
+                  <{0}> ssn:hasSubSystem ?subsystem .
                   ?subsystem ssn:observes ?type .
                   ?subsystem ssn:hasMeasurementCapability ?mc .
                   ?mc ssn:forProperty ?prop .
