@@ -25,9 +25,12 @@ npm run build
 npm run serve
 ```
 
+### Building Docker image
+We use private DockerHub instead of [https://docs.docker.com/registry/](https://docs.docker.com/registry/), and `Dockerfile` is not standalone. То build Docker image, you must first build webapp using the above commands to `dist`(default) directory.
+
 ### Troubleshooting
 
-*Question* I have an error installing packages with bower:
+*Question*: I have an error installing packages with bower:
 ```
 Error: EACCES, permission denied '/home/username/.config/configstore/insight-bower.yml'
 You don't have access to this file.
@@ -39,7 +42,7 @@ sudo chown -R [user name] ~/.config
 sudo chown -R [user name] ~/.cache
 ```
 
-*Question* I have an error with npm:
+*Question*: I have an error with npm:
 ```
 npm i
 npm http GET https://registry.npmjs.org/highcharts/0.0.9

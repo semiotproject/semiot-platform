@@ -5,7 +5,7 @@
 
 <http://prototype.com/${MAC}> a hmtr:HeatMeter ;
     rdfs:label "Semiot device prototype #${MAC}"@en ;
-    ssn:hasSubsystem <http://prototype.com/${MAC}/prototype> .
+    ssn:hasSubSystem <http://prototype.com/${MAC}/prototype> .
 
 <http://prototype.com/${MAC}/prototype>  a ssn:Sensor ;
     ssncom:hasCommunicationEndpoint <http://prototype.com/topic=${MAC}.prototype.obs> .

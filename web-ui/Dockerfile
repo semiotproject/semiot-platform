@@ -14,7 +14,7 @@ RUN apt-get install -y software-properties-common && \
 ADD ./nginx.conf /etc/nginx/nginx.conf
 
 # add app
-ADD ./dist/* /var/www/html
+ADD ./dist /var/www/html
 
 # Define working directory.
 WORKDIR /etc/nginx
