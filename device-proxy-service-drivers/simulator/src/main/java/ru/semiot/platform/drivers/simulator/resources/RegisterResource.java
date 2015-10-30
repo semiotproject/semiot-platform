@@ -73,7 +73,6 @@ public class RegisterResource extends CoapResource {
 
 	@Override
 	public void handlePOST(CoapExchange exchange) {
-		System.out.println("handlePost");
 		Model description = toModel(exchange.getRequestText());
 
 		if (!description.isEmpty()) {
