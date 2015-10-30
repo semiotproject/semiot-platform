@@ -5,7 +5,7 @@ MAINTAINER Shilin Ivan <proniment@gmail.com>
 ENV SERVICE_NAME device-proxy-service
 ENV SERVICE_JAR_NAME device-proxy-service-launcher-1.0-SNAPSHOT-jar-with-dependencies
 
-RUN dnf upgrade -y && dnf install -y java-1.8.0-openjdk-headless && dnf clean all
+RUN dnf install -y java-1.8.0-openjdk-headless && dnf clean all
 
 WORKDIR /root/semiot-platform/$SERVICE_NAME
 
