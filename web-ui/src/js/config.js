@@ -8,6 +8,7 @@ const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
 
 export default {
     COOKIE_NAME: "ru.semiot",
+    VERSION: "@version",
     URLS: {
         messageBus: "ws://" + hostname + ":8080/ws",
         tripleStore: "http://" + hostname + ":3030/ds/query",
