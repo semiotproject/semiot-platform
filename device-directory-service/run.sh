@@ -9,4 +9,4 @@ pushd $FUSEKI_HOME
 
 popd
 
-java -jar target/$SERVICE_JAR_NAME.jar
+java -jar $SERVICE_JAR_NAME.jar

@@ -6,4 +6,4 @@ do
 done
 echo "$(date) - Connected to OpenTSDB successfully"
 
-java -jar target/$SERVICE_JAR_NAME.jar
+java -jar $SERVICE_JAR_NAME.jar
