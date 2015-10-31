@@ -8,8 +8,7 @@ ENV SERVICE_JAR_NAME device-directory-service-1.0-SNAPSHOT-jar-with-dependencies
 
 WORKDIR /
 
-RUN yum upgrade -y && yum clean all
-RUN yum install -y java-1.8.0-openjdk-devel maven git wget unzip which && yum clean all
+RUN dnf install -y java-1.8.0-openjdk-headless wget unzip && dnf clean all
 
 #Install fuseki
 RUN mkdir -p $FUSEKI_BASE
@@ -25,20 +24,7 @@ ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
 
 WORKDIR /
 
-#
-# No cache workaround.
-#
-ADD build.number /root/build.number
-
-#Install Device Directory Service
-RUN git clone https://github.com/semiotproject/semiot-platform.git
-
-WORKDIR /semiot-platform/semiot-commons
-RUN mvn clean install -DskipTests=true
-
-
-WORKDIR /semiot-platform/$SERVICE_NAME
-RUN mvn clean install -DskipTests=true && rm -rf /root/.m2/repository
+ADD target/$SERVICE_JAR_NAME.jar $SERVICE_JAR_NAME.jar
 
 ADD run.sh ./
 RUN chmod 777 run.sh
