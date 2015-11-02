@@ -22,6 +22,9 @@ export default function(
         let now = (new Date()).getTime();
         let end_date = new Date(now);
         let start_date = (new Date(now - 1 * 3600 * 1000));
+
+        console.log(`last hour: from ${new Date(start_date)} to ${new Date(end_date)}`);
+
         return [start_date.getTime(), end_date.getTime()];
     }
 
@@ -196,7 +199,7 @@ export default function(
                 let state =  N3Store.find(obsResultValue, "ssn:hasValue", null, "")[0].object;
 
                 sensor.chartConfig.series[0].data.push([(new Date()).getTime(), chartUtils.parseStateChartValue(state)]);
-                console.info(`appended new state: now chartConfig data  is `, sensor.chartConfig);
+                console.info(`appended new state ${state}: now chartConfig data  is `, sensor.chartConfig);
             } else {
 
                 let quantity = N3Store.find(obsResultValue, "qudt:quantityValue", null, "")[0].object;
@@ -206,8 +209,11 @@ export default function(
 
             }});
 
-            // updating window
-            $scope.range = $scope.getLastHourRange();
+            // remove first observation
+            sensor.chartConfig.series[0].data.shift();
+
+            // updating time window
+            sensor.range = getLastHourRange();
     };
     $scope.onSetRangeClick = function(index) {
         let sensor = $scope.sensors[index];
