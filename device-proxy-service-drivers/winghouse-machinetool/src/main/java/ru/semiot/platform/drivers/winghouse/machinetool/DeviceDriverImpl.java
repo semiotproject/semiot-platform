@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
@@ -84,9 +85,13 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             channel.close();
         }
         if (group != null) {
-            group.shutdownGracefully();
+        	try {
+                group.shutdownGracefully();
+                group.awaitTermination(15, TimeUnit.SECONDS);   	
+			} catch (InterruptedException e) {
+				System.err.println(e.getMessage());
+			}
         }
-        
         // перевод всех устройств в статус офф
         stopSheduled();
         for(Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet()) {
