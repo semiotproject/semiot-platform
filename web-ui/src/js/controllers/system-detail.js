@@ -16,7 +16,7 @@ export default function(
     CONFIG
 ) {
 
-    function getDefaultRange() {
+    function getLastHourRange() {
         // time difference between server and client
         // FIXME
         let now = (new Date()).getTime();
@@ -65,7 +65,7 @@ export default function(
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
-                    range: getDefaultRange(),
+                    range: getLastHourRange(),
                     mode: $scope.getModes()['real-time'],
                     chartConfig: {}
                 });
@@ -159,7 +159,7 @@ export default function(
             sensor.mode = mode;
             if (mode === $scope.getModes()['real-time']) {
                 $scope.subscribe(sensor);
-                sensor.range = getDefaultRange();
+                sensor.range = getLastHourRange();
                 console.log(new Date(sensor.range[0]), new Date(sensor.range[1]));
                 $scope.fillChart(sensor);
             } else {
@@ -205,6 +205,9 @@ export default function(
                 console.info(`appended new quantity ${parseFloat(N3.Util.getLiteralValue(quantity))}: now chartConfig data  is `, sensor.chartConfig.series[0]);
 
             }});
+
+            // updating window
+            $scope.range = $scope.getLastHourRange();
     };
     $scope.onSetRangeClick = function(index) {
         let sensor = $scope.sensors[index];
@@ -216,5 +219,3 @@ export default function(
 
     $scope.init($routeParams.system_uri);
 }
-
-// "http://purl.org/NET/ssnext/machinetools#MachineToolWorkingState"
