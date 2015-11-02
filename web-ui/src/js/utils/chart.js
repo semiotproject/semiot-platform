@@ -4,8 +4,10 @@ export default function(CONFIG) {
 
     const baseChartConfig = {
         useHighStocks: true,
+        ignoreHiddenSeries : false,
         xAxis: {
-            type: 'datetime'
+            type: 'datetime',
+            showEmpty: true
         },
         options: {
             useUTC: false,

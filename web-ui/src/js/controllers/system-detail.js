@@ -128,14 +128,21 @@ export default function(
 
         // get TSDB archive testimonial
         if ($scope.isStateSensor(sensor)) {
-            systemDetail.fetchArchiveStates(sensor.endpoint, sensor.range).then(function(result) {
+            systemDetail.fetchArchiveStates(sensor.endpoint, sensor.range).then((result) => {
                 sensor.chartConfig.series[0].data = chartUtils.parseStateChartData(result.data);
+                defer.resolve();
+            }, () => {
+                console.error(`failed to load archive observations for some reason...`);
+                sensor.chartConfig.series[0].data = [];
                 defer.resolve();
             });
         } else {
-            systemDetail.fetchArchiveObservations(sensor.endpoint, sensor.range).then(function(result) {
+            systemDetail.fetchArchiveObservations(sensor.endpoint, sensor.range).then((result) => {
                 sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result.data);
-                console.log(sensor);
+                defer.resolve();
+            }, () => {
+                console.error(`failed to load archive observations for some reason...`);
+                sensor.chartConfig.series[0].data = [];
                 defer.resolve();
             });
         }

@@ -50,7 +50,8 @@
                     </div>
                 </div>
             </div>
-            <highchart config="sensor.chartConfig"></highchart>
+            <highchart ng-if="sensor.chartConfig.series[0].data.length > 0" config="sensor.chartConfig"></highchart>
+            <div ng-if="sensor.chartConfig.series[0].data.length === 0" class="empty-sensor-chart">No observations found for this period</div>
         </div>
     </div>
 </section>
