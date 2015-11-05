@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
@@ -15,6 +17,8 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 import ru.semiot.platform.drivers.simulator.Activator;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(DeviceDriverImpl.class);
 
 	private volatile DeviceManager deviceManager;
 	private final List<Device> listDevices = Collections
@@ -27,12 +31,9 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 	private static final String PORT_KEY = Activator.SERVICE_PID + ".port";
 	private static final String WAMP_MESSAGE_FORMAT = Activator.SERVICE_PID
 			+ ".wamp_message_format";
-	private static final String TOPIC_INACTIVE = Activator.SERVICE_PID
-			+ ".topic_inactive";
 
 	private int port;
 	private String wampMessageFormat;
-	private String topicInactive;
 
 	public List<Device> listDevices() {
 		return listDevices;
@@ -43,7 +44,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 			coap = new CoAPInterface(this);
 			coap.start();
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -51,16 +52,16 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		try {
 			coap.close();
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			logger.error(e.getMessage(), e);
 		}
 		
 		
 		for (Device device : listDevices)
 		{
-        	publish(topicInactive, templateOffState.replace("${system}", device.getID()));
+        	inactiveDevice(templateOffState.replace("${system}", device.getID()));
 		}
         
-        System.out.println("Simulator driver stopped!");
+		logger.info("Simulator driver stopped!");
 	}
 
 	public void updated(Dictionary properties) throws ConfigurationException {
@@ -70,11 +71,14 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 				port = (Integer) properties.get(PORT_KEY);
 				wampMessageFormat = (String) properties
 						.get(WAMP_MESSAGE_FORMAT);
-				topicInactive = (String) properties.get(TOPIC_INACTIVE);
 			}
 		}
 	}
 
+	public void inactiveDevice(String message) {
+    	deviceManager.inactiveDevice(message);
+    }
+	
 	public void publish(String topic, String message) {
 		deviceManager.publish(topic, message);
 	}
@@ -94,10 +98,6 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
 	public String getWampMessageFormat() {
 		return wampMessageFormat;
-	}
-
-	public String getTopicInactive() {
-		return topicInactive;
 	}
 
 }

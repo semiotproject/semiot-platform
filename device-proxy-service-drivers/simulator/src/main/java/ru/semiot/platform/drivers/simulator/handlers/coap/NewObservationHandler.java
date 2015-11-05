@@ -5,11 +5,16 @@ import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.CoAP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.semiot.platform.drivers.simulator.DeviceDriverImpl;
 import ru.semiot.platform.drivers.simulator.handlers.coap.DeviceHandler;
 
 public class NewObservationHandler implements CoapHandler {
+	
+	private static final Logger logger = LoggerFactory.getLogger(NewObservationHandler.class);
+	
 	private static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "<${system}> saref:hasState saref:OffState.";
 	private final String topic;
@@ -37,10 +42,10 @@ public class NewObservationHandler implements CoapHandler {
 			try {
 				deviceDriverImpl.publish(topic, response.getResponseText());
 			} catch (Exception ex) {
-				System.out.println(ex.getMessage());
+				logger.error(ex.getMessage(), ex);
 			}
 		} else {
-			System.out.println("Received unexpected response: "+response.getCode()+" " + response.getResponseText());
+			logger.info("Received unexpected response: {} {}", response.getCode(), response.getResponseText());
 		}
 	}
 
@@ -59,16 +64,14 @@ public class NewObservationHandler implements CoapHandler {
 			if (!DeviceHandler.getInstance().emptyHandlersInDevice(system)) {
 				DeviceHandler.getInstance().inactiveDevice(system, warnMessage);
 				String message = templateOffState.replace("${system}", system);
-				System.out.println("Publish into topic "
-						+ deviceDriverImpl.getTopicInactive() + " message: "
+				System.out.println("Inactive device message: "
 						+ message);
-				deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(),
-						message);
+				deviceDriverImpl.inactiveDevice(message);
 			}
 		} catch (RiotException ex) {
-			System.out.println(ex.getMessage());
+			logger.error(ex.getMessage(), ex);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 	
