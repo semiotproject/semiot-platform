@@ -44,6 +44,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     private DirectoryService directoryService;
     
     public void start() {
+    	directoryService = new DirectoryService(this);
         try {
             WAMPClient
                     .getInstance()
@@ -58,7 +59,6 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
                                 	logger.info("Connecting to {}", wampUri);
                                 }
                             });
-            directoryService = new DirectoryService(this);
             logger.info("Device Proxy Service Manager started!");
         } catch (ApplicationError ex) {
         	logger.error(ex.getMessage(), ex);
@@ -73,6 +73,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     public void stop() {
         try {
             WAMPClient.getInstance().close();
+            directoryService = null;
         } catch (IOException ex) {
         	logger.error(ex.getMessage(), ex);
         }
