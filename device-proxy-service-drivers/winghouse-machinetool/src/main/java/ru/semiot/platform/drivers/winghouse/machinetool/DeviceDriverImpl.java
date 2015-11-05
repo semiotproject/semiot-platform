@@ -33,7 +33,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private static final String UDP_PORT_KEY = Activator.SERVICE_PID + ".udp_port";
             
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
-    private Map<String, MachineToolValue> oldStateMachineTools = 
+    private Map<String, MachineToolValue> oldValueMachineTools = 
 			Collections.synchronizedMap(new HashMap<String, MachineToolValue>());
     private static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "<http://example.com/${MAC}> saref:hasState saref:OffState.";
@@ -91,7 +91,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
         // перевод всех устройств в статус офф
         stopSheduled();
-        for(Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet()) {
+        for(Map.Entry<String, MachineToolValue> entry : oldValueMachineTools.entrySet()) {
         	entry.getValue().setTurnOn(false);
         }
         for (Device device : listDevices)
@@ -141,8 +141,8 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		return port;
 	}
 
-    public Map<String, MachineToolValue> getOldStateMachineTools() {
-    	return oldStateMachineTools;
+    public Map<String, MachineToolValue> getOldValueMachineTools() {
+    	return oldValueMachineTools;
     }
     
     private void readTemplates() {
@@ -180,7 +180,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private class ScheduledDeviceStatus implements Runnable {
 		public void run() {
 			long currentTimestamp = System.currentTimeMillis();
-			for (Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet())
+			for (Map.Entry<String, MachineToolValue> entry : oldValueMachineTools.entrySet())
 			{
 				if(entry.getValue().getTurnOn() == true &&
 						entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
