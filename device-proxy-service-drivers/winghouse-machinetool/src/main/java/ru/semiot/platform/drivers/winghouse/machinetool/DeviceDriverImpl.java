@@ -31,8 +31,6 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     private static final String UDP_PORT_KEY = Activator.SERVICE_PID + ".udp_port";
-    private static final String TOPIC_INACTIVE = Activator.SERVICE_PID
-			+ ".topic_inactive";
             
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
     private Map<String, MachineToolValue> oldStateMachineTools = 
@@ -51,7 +49,6 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private EventLoopGroup group;
     private Channel channel;
     private int port;
-    private String topicInactive;
 
     public List<Device> listDevices() {
         return listDevices;
@@ -100,7 +97,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         for (Device device : listDevices)
 		{
         	System.out.println(templateOffState.replace("${MAC}", device.getID()));
-        	publish(topicInactive, templateOffState.replace("${MAC}", device.getID()));
+        	inactiveDevice(templateOffState.replace("${MAC}", device.getID()));
 		}
         
         System.out.println("Winghouse machine-tools driver stopped!");
@@ -111,9 +108,12 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             System.out.println(properties == null);
             if(properties != null) {
                 port = (Integer) properties.get(UDP_PORT_KEY);
-                topicInactive = (String) properties.get(TOPIC_INACTIVE);
             }
         }
+    }
+    
+    public void inactiveDevice(String message) {
+    	deviceManager.inactiveDevice(message);
     }
 
     public void publish(String topic, String message) {
@@ -139,10 +139,6 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     
     public int getPort() {
 		return port;
-	}
-
-	public String getTopicInactive() {
-		return topicInactive;
 	}
 
     public Map<String, MachineToolValue> getOldStateMachineTools() {
@@ -183,19 +179,16 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     
     private class ScheduledDeviceStatus implements Runnable {
 		public void run() {
-			//System.out.println("ScheduledDeviceStatus start");
-
 			long currentTimestamp = System.currentTimeMillis();
 			for (Map.Entry<String, MachineToolValue> entry : oldStateMachineTools.entrySet())
 			{
 				if(entry.getValue().getTurnOn() == true &&
 						entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
-					publish(topicInactive, templateOffState.replace("${MAC}", entry.getKey()));
+					inactiveDevice(templateOffState.replace("${MAC}", entry.getKey()));
 					entry.getValue().setTurnOn(false);
 					System.out.println(entry.getKey() + " saref:OffState" );
 				}
 			}
-			//System.out.println("ScheduledDeviceStatus complete");
 		}
 	}
 

@@ -18,7 +18,6 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 			+ "<http://example.com/${MAC}> saref:hasState saref:OnState.";
 
 	public DeviceHandler(DeviceDriverImpl deviceDriverImpl) {
-		// System.out.println("Create DeviceHandler class");
 		this.deviceDriverImpl = deviceDriverImpl;
 	}
 
@@ -54,8 +53,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 					sendMessage(mess);
 				} 
 				if(!deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).getTurnOn()) {
-					deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(),
-							templateOnState.replace("${MAC}", mess.getMac()));
+					deviceDriverImpl.inactiveDevice(templateOnState.replace("${MAC}", mess.getMac()));
 					deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).setTurnOn(true);
 					System.out.println(mess.getMac() + "saref:OnState" );
 				}
