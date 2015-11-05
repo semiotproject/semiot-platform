@@ -1,9 +1,8 @@
-package ru.semiot.services.devicedirectory;
+package ru.semiot.platform.deviceproxyservice.manager;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.atlas.web.auth.HttpAuthenticator;
 import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 
@@ -22,36 +21,31 @@ public class RDFStore {
 	private static final String PREFIXES = ""
 			+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
 			+ "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
-	private static final ServiceConfig config = ConfigFactory
-			.create(ServiceConfig.class);
-	private static final RDFStore INSTANCE = new RDFStore();
 	private final HttpAuthenticator httpAuthenticator;
+	private DeviceManagerImpl dmi;
 
-	private RDFStore() {
-		httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
-				config.storePassword().toCharArray());
-	}
-
-	public static final RDFStore getInstance() {
-		return INSTANCE;
+	public RDFStore(DeviceManagerImpl dmi) {
+		this.dmi = dmi;
+		httpAuthenticator = new SimpleAuthenticator(dmi.getFusekiUsername(),
+				dmi.getFusekiPassword().toCharArray());
 	}
 
 	public void save(Model model) {
-		DatasetAccessorFactory.createHTTP(config.storeUrl(), httpAuthenticator)
+		DatasetAccessorFactory.createHTTP(dmi.getFusekiStoreUrl(), httpAuthenticator)
 				.add(model);
 	}
 
 	public ResultSet select(String query) {
 		Query select = QueryFactory.create(query);
 		ResultSet rs = QueryExecutionFactory.createServiceRequest(
-				config.queryUrl(), select, httpAuthenticator).execSelect();
+				dmi.getFusekiQueryUrl(), select, httpAuthenticator).execSelect();
 		return rs;
 	}
 
 	public void update(String update) {
 		UpdateRequest updateRequest = UpdateFactory.create(update);
 
-		UpdateExecutionFactory.createRemote(updateRequest, config.updateUrl(),
+		UpdateExecutionFactory.createRemote(updateRequest, dmi.getFusekiUpdateUrl(),
 				httpAuthenticator).execute();
 	}
 
