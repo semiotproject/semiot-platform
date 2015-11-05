@@ -17,7 +17,7 @@ export default function(
     class Instance extends EventEmitter {
         constructor() {
             super();
-            // this.launchTestSystems();
+            this.launchTestSystems();
         }
 
         subscribe() {
@@ -52,15 +52,13 @@ export default function(
                 let uri = system.subject;
                 let label = N3Store.find(uri, "rdfs:label", null, "")[0].object;
 
-                let resource = rdfUtils.parseTriples(triples);
-
                 if (!systems.find(function(system) { // if system is new
                     return system.uri === uri;
                 })) {
                     systems.push({
                         index: systems.length + 1,
                         uri: uri,
-                        name: label,
+                        name: N3.Util.getLiteralValue(label),
                         isOnline: true
                     });
                     this.emit("systemsUpdate", systems);

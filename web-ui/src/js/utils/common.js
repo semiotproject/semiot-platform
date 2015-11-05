@@ -87,7 +87,7 @@ export default function($q, CONFIG) {
                 @prefix saref: <http://ontology.tno.nl/saref#> .
 
                 <coap://100.0.0.1/meter> a hmtr:HeatMeter ;
-                    rdfs:label "Heat Meter #3433111" ;
+                    rdfs:label "Heat Meter #3433111"@en ;
                     ssn:hasSubSystem <coap://100.0.0.1/meter/temperature> ;
                     ssn:hasSubSystem <coap://100.0.0.1/meter/heat> ;
                     saref:hasState saref:OnState .
