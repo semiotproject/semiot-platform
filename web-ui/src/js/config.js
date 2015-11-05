@@ -1,7 +1,7 @@
 "use strict";
 
-// if local development, communicate with DEFAULT_HOSTNAME, otherwise - with web-UI host
-const DEFAULT_HOSTNAME = "demo.semiot.ru";
+// change it to target hostname when develop
+const DEFAULT_HOSTNAME = "localhost";
 const hostname = location.hostname === "localhost" ? DEFAULT_HOSTNAME : location.hostname;
 
 const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
