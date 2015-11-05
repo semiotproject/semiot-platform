@@ -4,22 +4,12 @@ wamprouter:
     - "8080:8080"
   restart: always
 
-devicedirectoryservice:
-  image: docker.semiot.ru/device-directory-service
-  links:
-    - wamprouter
-  ports:
-    - "3030:3030"
-  volumes:
-    - /semiot-platform/fuseki/fuseki-db:/fuseki/fuseki-db
-  restart: always
-
 dataarchivingservice:
   image: docker.semiot.ru/data-archiving-service
   links:
     - opentsdb
     - wamprouter
-    - devicedirectoryservice
+    - deviceproxyservice
   volumes:
     - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
@@ -44,9 +34,9 @@ deviceproxyservice:
   image: docker.semiot.ru/device-proxy-service
   links:
     - wamprouter
-    - devicedirectoryservice
   ports:
     - "8181:8181"
+    - "3030:3030"
     - "9500:9500/udp"
     - "3131:3131/udp"
   volumes:
