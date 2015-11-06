@@ -41,4 +41,5 @@ deviceproxyservice:
     - "3131:3131/udp"
   volumes:
     - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
+    - /semiot-platform/fuseki/fuseki-db:/fuseki/fuseki-db
   restart: always

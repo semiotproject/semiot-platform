@@ -35,7 +35,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     private int wampReconnect = 15;
     private String topicNewAndObserving;
     private String topicInactive;
-    private String fusekiPassword;
+    private String fusekiPassword = "pw";
     private String fusekiUsername;
     private String fusekiUpdateUrl;
     private String fusekiQueryUrl;
@@ -91,7 +91,9 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
                 }
                 topicNewAndObserving = (String) properties.get(TOPIC_NEWANDOBSERVING_KEY);
                 topicInactive = (String) properties.get(TOPIC_INACTIVE);
-                fusekiPassword = (String) properties.get(FUSEKI_PASSWORD);
+                if(properties.get(FUSEKI_PASSWORD) != null) {
+                	fusekiPassword = (String) properties.get(FUSEKI_PASSWORD);
+                }
                 fusekiUsername = (String) properties.get(FUSEKI_USERNAME);
                 fusekiUpdateUrl = (String) properties.get(FUSEKI_UPDATE_URL);
                 fusekiQueryUrl = (String) properties.get(FUSEKI_QUERY_URL);

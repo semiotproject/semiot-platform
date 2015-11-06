@@ -59,7 +59,7 @@ public class RegisterResource extends CoapResource {
 	DeviceDriverImpl deviceDriverImpl;
 
 	public RegisterResource(DeviceDriverImpl deviceDriverImpl) {
-		super("Register");
+		super("register");
 		logger.info("Register resoure");
 		this.deviceDriverImpl = deviceDriverImpl;
 
