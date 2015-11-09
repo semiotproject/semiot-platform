@@ -1,0 +1,53 @@
+{
+    "@context": {
+        "vocab": "${VOCABULARY_URL}#",
+        "hydra": "http://www.w3.org/ns/hydra/core#"
+    },
+    "@graph": [
+        {
+            "@id": "vocab:EntryPoint",
+            "@type": "hydra:Class",
+            "hydra:supportedOperation": [
+                {
+                    "@id": "_:entry_point",
+                    "@type": "hydra:Operation",
+                    "hydra:method": "GET",
+                    "hydra:returns": "vocab:EntryPoint"
+                }
+            ],
+            "hydra:supportedProperty": [
+                {
+                   "hydra:property": {
+                        "@id": "vocab:EntryPoint/systems/list",
+                        "@type": "hydra:Link",
+                        "domain": "vocab:EntryPoint",
+                        "range": "vocab:SystemCollection",
+                        "supportedOperation": [
+                            {
+                                "@id": "_:system_collection_retrieve",
+                                "@type": "hydra:Operation",
+                                "method": "GET",
+                                "returns": "vocab:SystemCollection"
+                            }
+                        ]
+                    },
+                    "readonly": true,
+                    "writeonly": false 
+                }
+            ]
+        },
+        {
+            "@id": "vocab:SystemCollection",
+            "@type": "hydra:Class",
+            "rdfs:subClassOf": "hydra:Collection",
+            "hydra:supportedOperation": [
+                {
+                    "@id": "_:get_systems",
+                    "@type": "hydra:Operation",
+                    "hydra:method": "GET",
+                    "hydra:returns": "vocab:SystemCollection"
+                }
+            ]  
+        }
+    ]
+}

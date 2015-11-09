@@ -5,3 +5,6 @@
 **/nbactions.xml
 **/felix-cache
 **/bundles/*.jar
+/device-proxy-service/api-gateway/nbproject/private/
+/device-proxy-service/api-gateway/build/
+/device-proxy-service/api-gateway/dist/
