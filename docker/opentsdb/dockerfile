@@ -10,5 +10,5 @@ RUN cd /opt/opentsdb/ && bash ./build.sh
 RUN mkdir /opt/tmp/
 ADD run.sh /opt/run.sh
 EXPOSE 4242
-VOLUME /opt/tmp/
+VOLUME /opt/tmp/ /etc/opentsdb/
 CMD ["sh", "/opt/run.sh"]
