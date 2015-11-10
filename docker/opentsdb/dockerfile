@@ -6,7 +6,7 @@ ADD https://github.com/OpenTSDB/opentsdb/releases/download/2.1.1/opentsdb-2.1.1.
 #RUN tar xzvf /opt/downloads/opentsdb-2.1.1.tar.gz -C /opt/downloads/ && rm -rf /opt/downloads/opentsdb-2.1.1.tar.gz && mv /opt/downloads/opentsdb-2.1.1 /opt/opentsdb/
 RUN git clone -b next --single-branch git://github.com/OpenTSDB/opentsdb.git /opt/opentsdb
 #RUN perl -i -pe 's/info/debug/;' /opt/opentsdb/src/logback.xml
-RUN cd /opt/opentsdb/ && sh build.sh
+RUN cd /opt/opentsdb/ && bash ./build.sh
 RUN mkdir /opt/tmp/
 ADD run.sh /opt/run.sh
 EXPOSE 4242
