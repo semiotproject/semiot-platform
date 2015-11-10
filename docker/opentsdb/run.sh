@@ -1,4 +1,6 @@
 #!/bin/sh
+mkdir -p /etc/opentsdb/ && touch /etc/opentsdb/opentsdb.conf && \
+echo -e "tsd.http.request.cors_domains=*\ntsd.core.meta.enable_realtime_ts=True\ntsd.core.auto_create_metrics=True" > /etc/opentsdb/opentsdb.conf
 # Bad bad practice
 #Wait until hbase creates tables
 flag=$(curl -s hbase:60010/table.jsp?name=tsdb | grep "Region Server" )
