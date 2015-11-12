@@ -44,7 +44,7 @@ deviceproxyservice:
     - /semiot-platform/fuseki/fuseki-db:/fuseki/fuseki-db
   restart: always
   
-  hbase:
+hbase:
   image: docker.semiot.ru/hbase
   ports:
     - "60000:60000"
