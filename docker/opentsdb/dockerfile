@@ -1,5 +1,5 @@
 FROM ubuntu
-RUN apt-get update && apt-get install -y tar automake build-essential python python-dev gnuplot curl
+RUN apt-get update && apt-get install -y default-jdk tar automake build-essential python python-dev gnuplot curl
 ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64/
 RUN mkdir /opt/downloads/
 ADD https://github.com/OpenTSDB/opentsdb/releases/download/2.1.1/opentsdb-2.1.1.tar.gz /opt/downloads/
