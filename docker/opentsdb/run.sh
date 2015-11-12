@@ -11,4 +11,5 @@ while [ -z "$flag" ]; do
 done
 echo "Tables created"
 echo "Start OpenTSDB"
-/opt/opentsdb/build/tsdb tsd --port=4242 --staticroot=/opt/opentsdb/build/staticroot --cachedir=/opt/tmp/ --zkquorum=hbase:2181
+/opt/opentsdb/build/tsdb tsd --port=4242 --staticroot=/opt/opentsdb/build/staticroot --cachedir=/opt/tmp/ --zkquorum=hbase:2181 >> /etc/opentsdb/log
+echo "OpenTSDB started"
