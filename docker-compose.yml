@@ -20,7 +20,6 @@ opentsdb:
     - hbase
   ports:
     - "4242:4242"
-  command: bash -c "echo \"tsd.http.request.cors_domains=*\" > /etc/opentsdb/opentsdb.conf && echo \"tsd.core.meta.enable_realtime_ts=True\" >> /etc/opentsdb/opentsdb.conf && sh /opt/run.sh"
   volumes:
     - /etc/opentsdb:/etc/opentsdb
   restart: always
