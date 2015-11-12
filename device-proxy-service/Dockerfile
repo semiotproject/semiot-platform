@@ -9,7 +9,7 @@ ENV FUSEKI_HOME /fuseki
 ENV FUSEKI_BASE /fuseki/base
 
 WORKDIR /
-RUN dnf install -y java-1.8.0-openjdk-headless wget unzip && dnf clean all
+RUN dnf install -y java-1.8.0-openjdk-headless wget unzip supervisor && dnf clean all
 
 #Install fuseki
 RUN mkdir -p $FUSEKI_BASE
@@ -30,4 +30,8 @@ ADD device-proxy-service-launcher/target/$SERVICE_JAR_NAME.jar $SERVICE_JAR_NAME
 ADD run.sh ./
 RUN chmod 777 run.sh
 
-CMD ./run.sh
+#Install Supervisord
+RUN mkdir -p /var/log/supervisor
+ADD supervisor-proxyservice.conf /etc/supervisor/conf.d/proxyservice.conf
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/proxyservice.conf"]

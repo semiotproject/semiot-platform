@@ -16,4 +16,4 @@ do
 done
 echo "$(date) - Connected to Fuseki successfully"
 
-java -jar $SERVICE_JAR_NAME.jar
+exec java -jar $SERVICE_JAR_NAME.jar >> /root/semiot-platform/$SERVICE_NAME/proxy-logs/deviceproxy.log 2>&1
