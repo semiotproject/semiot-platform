@@ -30,8 +30,8 @@ public interface ServiceConfig extends Config {
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
-	@DefaultValue("http://devicedirectoryservice:3030/ds/query")
-	@Key("services.devicedirectory.store.url")
+	@DefaultValue("http://deviceproxyservice:3030/ds/query")
+	@Key("services.fuseki.store.url")
 	String storeUrl();
 
 	@DefaultValue("ru.semiot.devices.remove.sensor")
@@ -39,10 +39,10 @@ public interface ServiceConfig extends Config {
 	String topicsRemoveSensor();
 
 	@DefaultValue("admin")
-	@Key("services.devicedirectory.store.username")
+	@Key("services.fuseki.store.username")
 	String storeUsername();
 
 	@DefaultValue("pw")
-	@Key("services.devicedirectory.store.password")
+	@Key("services.fuseki.store.password")
 	String storePassword();
 }

@@ -16,12 +16,15 @@ export default function(
     CONFIG
 ) {
 
-    function getDefaultRange() {
+    function getLastHourRange() {
         // time difference between server and client
         // FIXME
         let now = (new Date()).getTime();
         let end_date = new Date(now);
         let start_date = (new Date(now - 1 * 3600 * 1000));
+
+        console.log(`last hour: from ${new Date(start_date)} to ${new Date(end_date)}`);
+
         return [start_date.getTime(), end_date.getTime()];
     }
 
@@ -65,7 +68,7 @@ export default function(
                     endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
-                    range: getDefaultRange(),
+                    range: getLastHourRange(),
                     mode: $scope.getModes()['real-time'],
                     chartConfig: {}
                 });
@@ -125,14 +128,21 @@ export default function(
 
         // get TSDB archive testimonial
         if ($scope.isStateSensor(sensor)) {
-            systemDetail.fetchArchiveStates(sensor.endpoint, sensor.range).then(function(result) {
+            systemDetail.fetchArchiveStates(sensor.endpoint, sensor.range).then((result) => {
                 sensor.chartConfig.series[0].data = chartUtils.parseStateChartData(result.data);
+                defer.resolve();
+            }, () => {
+                console.error(`failed to load archive observations for some reason...`);
+                sensor.chartConfig.series[0].data = [];
                 defer.resolve();
             });
         } else {
-            systemDetail.fetchArchiveObservations(sensor.endpoint, sensor.range).then(function(result) {
+            systemDetail.fetchArchiveObservations(sensor.endpoint, sensor.range).then((result) => {
                 sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result.data);
-                console.log(sensor);
+                defer.resolve();
+            }, () => {
+                console.error(`failed to load archive observations for some reason...`);
+                sensor.chartConfig.series[0].data = [];
                 defer.resolve();
             });
         }
@@ -159,7 +169,7 @@ export default function(
             sensor.mode = mode;
             if (mode === $scope.getModes()['real-time']) {
                 $scope.subscribe(sensor);
-                sensor.range = getDefaultRange();
+                sensor.range = getLastHourRange();
                 console.log(new Date(sensor.range[0]), new Date(sensor.range[1]));
                 $scope.fillChart(sensor);
             } else {
@@ -196,7 +206,7 @@ export default function(
                 let state =  N3Store.find(obsResultValue, "ssn:hasValue", null, "")[0].object;
 
                 sensor.chartConfig.series[0].data.push([(new Date()).getTime(), chartUtils.parseStateChartValue(state)]);
-                console.info(`appended new state: now chartConfig data  is `, sensor.chartConfig);
+                console.info(`appended new state ${state}: now chartConfig data  is `, sensor.chartConfig);
             } else {
 
                 let quantity = N3Store.find(obsResultValue, "qudt:quantityValue", null, "")[0].object;
@@ -205,6 +215,12 @@ export default function(
                 console.info(`appended new quantity ${parseFloat(N3.Util.getLiteralValue(quantity))}: now chartConfig data  is `, sensor.chartConfig.series[0]);
 
             }});
+
+            // remove first observation
+            sensor.chartConfig.series[0].data.shift();
+
+            // updating time window
+            sensor.range = getLastHourRange();
     };
     $scope.onSetRangeClick = function(index) {
         let sensor = $scope.sensors[index];
@@ -216,5 +232,3 @@ export default function(
 
     $scope.init($routeParams.system_uri);
 }
-
-// "http://purl.org/NET/ssnext/machinetools#MachineToolWorkingState"

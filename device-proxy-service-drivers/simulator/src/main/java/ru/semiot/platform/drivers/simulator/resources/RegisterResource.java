@@ -28,6 +28,8 @@ import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.drivers.simulator.CoAPInterface;
@@ -41,6 +43,8 @@ import ru.semiot.semiot.commons.namespaces.SSN;
 import ru.semiot.semiot.commons.namespaces.SSNCOM;
 
 public class RegisterResource extends CoapResource {
+	
+	private static final Logger logger = LoggerFactory.getLogger(RegisterResource.class);
 
 	private static final String templateWampTopic = "ws://wamprouter/ws?topic=${topic}";
 	private static final String queryFile = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
@@ -56,7 +60,7 @@ public class RegisterResource extends CoapResource {
 
 	public RegisterResource(DeviceDriverImpl deviceDriverImpl) {
 		super("register");
-		System.out.println("register resoure");
+		logger.info("Register resoure");
 		this.deviceDriverImpl = deviceDriverImpl;
 
 		this.schema = FileManager.get().loadModel(SSN.URI);
@@ -66,7 +70,7 @@ public class RegisterResource extends CoapResource {
 			this.query = QueryFactory.create(IOUtils.toString(this.getClass()
 					.getResourceAsStream(queryFile)));
 		} catch (IOException ex) {
-			System.out.println(ex.getMessage());
+			logger.error(ex.getMessage(), ex);
 			throw new IllegalArgumentException(ex);
 		}
 	}
@@ -82,8 +86,7 @@ public class RegisterResource extends CoapResource {
 
 			exchange.respond(CoAP.ResponseCode.CREATED);
 		} else {
-			System.out
-					.println("Received a request without payload or in wrong format");
+			logger.info("Received a request without payload or in wrong format");
 			exchange.respond(CoAP.ResponseCode.BAD_REQUEST);
 		}
 	}
@@ -113,7 +116,7 @@ public class RegisterResource extends CoapResource {
 							systemURI = system.getURI();
 						}
 
-						System.out.println("Mapping " + coap.getURI() +" to "+ wamp.getURI());
+						logger.info("Mapping {} to {}", coap.getURI(), wamp.getURI());
 
 						String wampTopic = getWampTopic(wamp.getURI());
 						
@@ -138,19 +141,19 @@ public class RegisterResource extends CoapResource {
 						if(!deviceDriverImpl.contains(newDevice)) {
 							deviceDriverImpl.addDevice(newDevice);
 						} else if(!containsHandler) {
-							deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(), 
+							deviceDriverImpl.inactiveDevice(
 									templateOnState.replace("${system}", systemURI));
-							System.out.println(systemURI + "saref:OnState" );
+							logger.info("{} saref:OnState", systemURI);
 						}
 					}
 				}
 			} else {
-				System.out.println("Received an empty message or in a wrong format!");
+				logger.warn("Received an empty message or in a wrong format!");
 			}
 		} catch (RiotException ex) {
-			System.out.println(ex.getMessage());
+			logger.error(ex.getMessage(), ex);
 		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -200,7 +203,7 @@ public class RegisterResource extends CoapResource {
 			model.write(writer, deviceDriverImpl.getWampMessageFormat());
 			return writer.toString();
 		} catch (IOException ex) {
-			System.out.println(ex.getMessage());
+			logger.error(ex.getMessage(), ex);
 		}
 		return null;
 	}

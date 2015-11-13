@@ -1,5 +1,5 @@
-<h2>SemIoT Platform v{{ version }}</h2>
-<section>
+<h2>SemIoT Platform</h2>
+<section ng-class="{preloader: isLoading}">
     <ol class="breadcrumb">
         <li class="active">Systems</li>
     </ol>
@@ -33,6 +33,7 @@
             <tbody>
                 <tr ng-show="systems.length === 0">
                     <td>No systems registered</td>
+                    <td></td>
                     <td></td>
                     <td></td>
                 </tr>

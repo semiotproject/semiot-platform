@@ -1,7 +1,7 @@
 "use strict";
 
 export default function($scope, systemList, commonUtils, CONFIG) {
-    $scope.version = CONFIG.VERSION;
+    $scope.isLoading = true;
     $scope.systems = [];
     $scope.search = {
         name: ""
@@ -31,6 +31,7 @@ export default function($scope, systemList, commonUtils, CONFIG) {
         $scope.setPagination();
     });
     systemList.fetchSystems().then(function(data) {
+        $scope.isLoading = false;
         $scope.setPagination();
         systemList.subscribe();
     });

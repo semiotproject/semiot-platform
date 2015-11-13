@@ -2,8 +2,12 @@ package ru.semiot.platform.deviceproxyservice.manager;
 
 import java.io.IOException;
 import java.util.Dictionary;
+
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceStatus;
@@ -13,19 +17,34 @@ import ws.wamp.jawampa.WampClient;
 
 public class DeviceManagerImpl implements DeviceManager, ManagedService {
 
-    private static final String TOPIC_REGISTER_KEY = "ru.semiot.platform.deviceproxyservice.manager.topic_register";
+	private static final Logger logger = LoggerFactory.getLogger(DeviceManagerImpl.class);
+	
     private static final String TOPIC_NEWANDOBSERVING_KEY = "ru.semiot.platform.deviceproxyservice.manager.topic_newandobserving";
+    private static final String TOPIC_INACTIVE = "ru.semiot.platform.deviceproxyservice.manager.topic_inactive";
     private static final String WAMP_URI_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_uri";
     private static final String WAMP_REALM_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_realm";
     private static final String WAMP_RECONNECT_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect";
-
+    private static final String FUSEKI_PASSWORD="ru.semiot.platform.deviceproxyservice.manager.fuseki_password";
+    private static final String FUSEKI_USERNAME="ru.semiot.platform.deviceproxyservice.manager.fuseki_username";
+    private static final String FUSEKI_UPDATE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url";
+    private static final String FUSEKI_QUERY_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url";
+    private static final String FUSEKI_STORE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url";
+    
     private String wampUri;
     private String wampRealm;
     private int wampReconnect = 15;
-    private String topicRegister;
     private String topicNewAndObserving;
+    private String topicInactive;
+    private String fusekiPassword = "pw";
+    private String fusekiUsername;
+    private String fusekiUpdateUrl;
+    private String fusekiQueryUrl;
+    private String fusekiStoreUrl;
 
+    private DirectoryService directoryService;
+    
     public void start() {
+    	directoryService = new DirectoryService(this);
         try {
             WAMPClient
                     .getInstance()
@@ -33,21 +52,20 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
                     .subscribe(
                             (WampClient.Status newStatus) -> {
                                 if (newStatus == WampClient.Status.Connected) {
-                                    System.out.println("Connected to " + wampUri);
+                                	logger.info("Connected to {}", wampUri);
                                 } else if (newStatus == WampClient.Status.Disconnected) {
-                                    System.out.println("Disconnected from " + wampUri);
+                                	logger.info("Disconnected from {}",	wampUri);
                                 } else if (newStatus == WampClient.Status.Connecting) {
-                                    System.out.println("Connecting to " + wampUri);
+                                	logger.info("Connecting to {}", wampUri);
                                 }
                             });
-            
-            System.out.println("Device Proxy Service Manager started!");
+            logger.info("Device Proxy Service Manager started!");
         } catch (ApplicationError ex) {
-            System.out.println(ex.getMessage());
+        	logger.error(ex.getMessage(), ex);
             try {
                 WAMPClient.getInstance().close();
             } catch (IOException ex1) {
-                System.out.println(ex1.getMessage());
+            	logger.error(ex1.getMessage(), ex1);
             }
         }
     }
@@ -55,10 +73,11 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     public void stop() {
         try {
             WAMPClient.getInstance().close();
-        } catch (IOException ex1) {
-            System.out.println(ex1.getMessage());
+            directoryService = null;
+        } catch (IOException ex) {
+        	logger.error(ex.getMessage(), ex);
         }
-        System.out.println("Device Proxy Service Manager stopped!");
+        logger.info("Device Proxy Service Manager stopped!");
     }
 
     @Override
@@ -70,23 +89,24 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
                 if (properties.get(WAMP_RECONNECT_KEY) != null) {
                     wampReconnect = (int) properties.get(WAMP_RECONNECT_KEY);
                 }
-                topicRegister = (String) properties.get(TOPIC_REGISTER_KEY);
                 topicNewAndObserving = (String) properties.get(TOPIC_NEWANDOBSERVING_KEY);
+                topicInactive = (String) properties.get(TOPIC_INACTIVE);
+                if(properties.get(FUSEKI_PASSWORD) != null) {
+                	fusekiPassword = (String) properties.get(FUSEKI_PASSWORD);
+                }
+                fusekiUsername = (String) properties.get(FUSEKI_USERNAME);
+                fusekiUpdateUrl = (String) properties.get(FUSEKI_UPDATE_URL);
+                fusekiQueryUrl = (String) properties.get(FUSEKI_QUERY_URL);
+                fusekiStoreUrl = (String) properties.get(FUSEKI_STORE_URL);
             }
         }
     }
 
-    @Override
-    public void register(Device device) {
-        System.out.println("Register device [ID=" + device.getID() + "]");
-        publish(topicNewAndObserving, device.getRDFDescription());
-        publish(topicRegister, device.getRDFDescription());
-    }
+   
 
     @Override
     public void updateStatus(Device device, DeviceStatus status) {
-        System.out.println(
-                "Update device status [ID=" + device.getID() + ";status=" + status + "]");
+       logger.info("Update device status [ID={};status={}]", device.getID(), status);
     }
 
     @Override
@@ -97,6 +117,54 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     @Override
     public Observable<String> subscribe(String topic) {
         return WAMPClient.getInstance().subscribe(topic);
+    }
+    
+    @Override
+    public void inactiveDevice(String message) {
+    	if(directoryService != null) {
+    		directoryService.inactiveDevice(message);
+    		publish(topicInactive, message);
+    	} else {
+    		logger.error("DirectoryService has not been initialized");
+    	}
+    }
+    
+    @Override
+    public void register(Device device) {
+    	if(directoryService != null) {
+    		logger.info("Register device [ID={}]", device.getID());
+    		directoryService.registerDevice(device.getRDFDescription());
+    	} else {
+    		logger.error("DirectoryService has not been initialized");
+    	}
+    }
+    
+    public String getTopicNewAndObserving() {
+    	return topicNewAndObserving;
+    }
+    
+    public String getTopicInactive() {
+    	return topicInactive;
+    }
+    
+    public String getFusekiPassword() {
+    	return fusekiPassword;
+    }
+    
+    public String getFusekiUsername() {
+    	return fusekiUsername;
+    }
+    
+    public String getFusekiUpdateUrl() {
+    	return fusekiUpdateUrl;
+    }
+    
+    public String getFusekiQueryUrl() {
+    	return fusekiQueryUrl;
+    }
+    
+    public String getFusekiStoreUrl() {
+    	return fusekiStoreUrl;
     }
 
 }

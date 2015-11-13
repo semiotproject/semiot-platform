@@ -1,3 +1,0 @@
-@prefix emtr: <http://purl.org/NET/ssnext/electricmeters#> .
-
-<http://ex.com/meters#1> a emtr:ElectricMeter .

@@ -1,4 +1,4 @@
-<h2>SemIoT Platform v{{ version }}</h2>
+<h2>SemIoT Platform</h2>
 <section>
     <ol class="breadcrumb">
         <li><a href="#/systems">Systems</a></li>
@@ -50,7 +50,8 @@
                     </div>
                 </div>
             </div>
-            <highchart config="sensor.chartConfig"></highchart>
+            <highchart ng-if="sensor.chartConfig.series[0].data.length > 0" config="sensor.chartConfig"></highchart>
+            <div ng-if="sensor.chartConfig.series[0].data.length === 0" class="empty-sensor-chart">No observations found for this period</div>
         </div>
     </div>
 </section>

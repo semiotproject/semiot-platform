@@ -18,7 +18,6 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 			+ "<http://example.com/${MAC}> saref:hasState saref:OnState.";
 
 	public DeviceHandler(DeviceDriverImpl deviceDriverImpl) {
-		// System.out.println("Create DeviceHandler class");
 		this.deviceDriverImpl = deviceDriverImpl;
 	}
 
@@ -47,42 +46,45 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 			System.out.println(mess.getMac() + " not exist");
 			addDevice(mess.getMac());
 			sendMessage(mess);
-			deviceDriverImpl.getOldStateMachineTools().put(mess.getMac(), mess); // поправить?
+			deviceDriverImpl.getOldValueMachineTools().put(mess.getMac(), mess); // поправить?
 		} else {
-			if(deviceDriverImpl.getOldStateMachineTools().containsKey(mess.getMac())) {
-				if(!deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).equals(mess)) {
+			if(deviceDriverImpl.getOldValueMachineTools().containsKey(mess.getMac())) {
+				if(!deviceDriverImpl.getOldValueMachineTools().get(mess.getMac()).equals(mess)) {
 					sendMessage(mess);
 				} 
-				if(!deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).getTurnOn()) {
-					deviceDriverImpl.publish(deviceDriverImpl.getTopicInactive(),
-							templateOnState.replace("${MAC}", mess.getMac()));
-					deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).setTurnOn(true);
+				if(!deviceDriverImpl.getOldValueMachineTools().get(mess.getMac()).getTurnOn()) {
+					deviceDriverImpl.inactiveDevice(templateOnState.replace("${MAC}", mess.getMac()));
+					// deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).setTurnOn(true);
 					System.out.println(mess.getMac() + "saref:OnState" );
 				}
-				deviceDriverImpl.getOldStateMachineTools().replace(mess.getMac(), mess);
+				deviceDriverImpl.getOldValueMachineTools().replace(mess.getMac(), mess);
 			} else {
-				deviceDriverImpl.getOldStateMachineTools().put(mess.getMac(), mess);
+				deviceDriverImpl.getOldValueMachineTools().put(mess.getMac(), mess);
+				sendMessage(mess);
 			}
 		}
 	}
 
 	private void sendMessage(MachineToolValue mess) {
-
-		String topic = templateTopic.replace("${MAC}", mess.getMac());
-
-		final String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-				.format(new Date(mess.getTimestemp()));
-
-		// System.out.println("State " + mess.getMachineToolState().getUri());
-		String message = deviceDriverImpl
-				.getTemplateObservation()
-				.replace("${MAC}", mess.getMac())
-				.replace("${TIMESTAMP}", String.valueOf(mess.getTimestemp()))
-				.replace("${DATETIME}", date)
-				.replace("${STATE}",
-						String.valueOf(mess.getMachineToolState().getUri()));
-
-		deviceDriverImpl.publish(topic, message);
+		if(mess.getMachineToolState() != null) {
+			String topic = templateTopic.replace("${MAC}", mess.getMac());
+	
+			final String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+					.format(new Date(mess.getTimestemp()));
+	
+			// System.out.println("State " + mess.getMachineToolState().getUri());
+			String message = deviceDriverImpl
+					.getTemplateObservation()
+					.replace("${MAC}", mess.getMac())
+					.replace("${TIMESTAMP}", String.valueOf(mess.getTimestemp()))
+					.replace("${DATETIME}", date)
+					.replace("${STATE}",
+							String.valueOf(mess.getMachineToolState().getUri()));
+	
+			deviceDriverImpl.publish(topic, message);
+		} else {
+			System.err.println(mess.getMac() + " has unknown state (null)");
+		}
 	}
 
 	private void addDevice(String mac) {

@@ -6,6 +6,8 @@ public interface DeviceManager {
 
     public void register(Device device);
     
+    public void inactiveDevice(String message);
+    
     public void updateStatus(Device device, DeviceStatus status);
     
     public void publish(String topic, String message);
