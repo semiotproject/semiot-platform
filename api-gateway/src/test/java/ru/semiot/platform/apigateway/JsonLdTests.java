@@ -55,7 +55,7 @@ public class JsonLdTests {
                 .add("@id", "http://example.com/a#")
                 .add("@type", "hydra:ApiDocumentation")
                 .add("hydra:entrypoint", "http://example.com/api")
-                .array("hydra:member");
+                .add("hydra:member", new HashMap<>());
 
         System.out.println(builder.toCompactedString());
     }

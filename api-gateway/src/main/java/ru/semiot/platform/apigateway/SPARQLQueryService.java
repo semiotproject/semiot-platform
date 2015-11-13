@@ -23,9 +23,9 @@ public class SPARQLQueryService {
     private static final String PREFIXES
             = "PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#>\n"
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-            + "prefix owl: <http://www.w3.org/2002/07/owl#>\n"
-            + "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-            + "prefix ssncom: <http://purl.org/NET/ssnext/communication#>\n";
+            + "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
+            + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
+            + "PREFIX ssncom: <http://purl.org/NET/ssnext/communication#>\n";
 
     private final HttpAuthenticator httpAuthenticator;
 

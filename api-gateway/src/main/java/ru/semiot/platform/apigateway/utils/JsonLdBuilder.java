@@ -29,28 +29,25 @@ public class JsonLdBuilder {
         this.content = content;
     }
     
-    public JsonLdBuilder add(String key, String value) {
-        content.put(key, value);
-        
-        return this;
-    }
-    
-    public JsonLdBuilder array(String key) {
-        content.put(key, new ArrayList<>());
-        
-        return this;
-    }
-    
-    public JsonLdBuilder arrayAdd(String key, Map<String, Object> value) {
-        final Object o = content.get(key);
-        if(o != null && o instanceof List) {
-            final List lo = (List) o;
-            lo.add(value);
+    public JsonLdBuilder add(String key, Object value) {
+        if(content.containsKey(key)) {
+            List<Object> lo;
+            Object o = content.get(key);
+            
+            if(o instanceof List) {
+                lo = (List<Object>) o;
+                lo.add(value);
+            } else {
+                lo = new ArrayList<>();
+                lo.add(content.get(key));
+                lo.add(value);
+            }
             
             content.put(key, lo);
         } else {
-            throw new IllegalArgumentException();
+            content.put(key, value);
         }
+        
         return this;
     }
     

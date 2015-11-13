@@ -1,7 +1,8 @@
 {
     "@context": {
         "vocab": "${VOCABULARY_URL}#",
-        "hydra": "http://www.w3.org/ns/hydra/core#"
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
     },
     "@graph": [
         {
@@ -9,7 +10,6 @@
             "@type": "hydra:Class",
             "hydra:supportedOperation": [
                 {
-                    "@id": "_:entry_point",
                     "@type": "hydra:Operation",
                     "hydra:method": "GET",
                     "hydra:returns": "vocab:EntryPoint"
@@ -24,7 +24,6 @@
                         "range": "vocab:SystemCollection",
                         "supportedOperation": [
                             {
-                                "@id": "_:system_collection_retrieve",
                                 "@type": "hydra:Operation",
                                 "method": "GET",
                                 "returns": "vocab:SystemCollection"
@@ -42,12 +41,16 @@
             "rdfs:subClassOf": "hydra:Collection",
             "hydra:supportedOperation": [
                 {
-                    "@id": "_:get_systems",
                     "@type": "hydra:Operation",
                     "hydra:method": "GET",
                     "hydra:returns": "vocab:SystemCollection"
                 }
             ]  
+        },
+        {
+            "@id": "vocab:observations",
+            "@type": "hydra:Link",
+            "rdfs:range": "hydra:Resource"
         }
     ]
 }

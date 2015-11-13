@@ -10,7 +10,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 
-@WebFilter(urlPatterns = {"/*"})
+@WebFilter(urlPatterns = {"/*"}, asyncSupported = true)
 public class IndexFilter implements Filter {
 
     @Override
