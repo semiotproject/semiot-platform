@@ -30,7 +30,7 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
-    private static final String UDP_PORT_KEY = Activator.SERVICE_PID + ".udp_port";
+    private static final String UDP_PORT_KEY = Activator.PID + ".udp_port";
             
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
     private Map<String, MachineToolValue> oldValueMachineTools = 
@@ -48,7 +48,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private String templateObservation;
     private EventLoopGroup group;
     private Channel channel;
-    private int port;
+    private int port = 9500;
 
     public List<Device> listDevices() {
         return listDevices;

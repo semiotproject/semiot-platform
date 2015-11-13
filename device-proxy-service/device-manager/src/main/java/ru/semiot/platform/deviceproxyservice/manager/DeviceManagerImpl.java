@@ -19,27 +19,27 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
 
 	private static final Logger logger = LoggerFactory.getLogger(DeviceManagerImpl.class);
 	
-    private static final String TOPIC_NEWANDOBSERVING_KEY = "ru.semiot.platform.deviceproxyservice.manager.topic_newandobserving";
-    private static final String TOPIC_INACTIVE = "ru.semiot.platform.deviceproxyservice.manager.topic_inactive";
-    private static final String WAMP_URI_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_uri";
-    private static final String WAMP_REALM_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_realm";
-    private static final String WAMP_RECONNECT_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect";
-    private static final String FUSEKI_PASSWORD="ru.semiot.platform.deviceproxyservice.manager.fuseki_password";
-    private static final String FUSEKI_USERNAME="ru.semiot.platform.deviceproxyservice.manager.fuseki_username";
-    private static final String FUSEKI_UPDATE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url";
-    private static final String FUSEKI_QUERY_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url";
-    private static final String FUSEKI_STORE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url";
+	private static final String TOPIC_NEWANDOBSERVING_KEY = "ru.semiot.platform.deviceproxyservice.manager.topic_newandobserving";
+	private static final String TOPIC_INACTIVE = "ru.semiot.platform.deviceproxyservice.manager.topic_inactive";
+	private static final String WAMP_URI_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_uri";
+	private static final String WAMP_REALM_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_realm";
+	private static final String WAMP_RECONNECT_KEY = "ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect";
+	private static final String FUSEKI_PASSWORD="ru.semiot.platform.deviceproxyservice.manager.fuseki_password";
+	private static final String FUSEKI_USERNAME="ru.semiot.platform.deviceproxyservice.manager.fuseki_username";
+	private static final String FUSEKI_UPDATE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url";
+	private static final String FUSEKI_QUERY_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url";
+	private static final String FUSEKI_STORE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url";
     
-    private String wampUri;
-    private String wampRealm;
+    private String wampUri = "ws://wamprouter:8080/ws";
+    private String wampRealm = "realm1";
     private int wampReconnect = 15;
-    private String topicNewAndObserving;
-    private String topicInactive;
+    private String topicNewAndObserving = "ru.semiot.devices.newandobserving";
+    private String topicInactive = "ru.semiot.devices.turnoff";
     private String fusekiPassword = "pw";
-    private String fusekiUsername;
-    private String fusekiUpdateUrl;
-    private String fusekiQueryUrl;
-    private String fusekiStoreUrl;
+    private String fusekiUsername = "admin";
+    private String fusekiUpdateUrl = "http://localhost:3030/ds/update";
+    private String fusekiQueryUrl = "http://localhost:3030/ds/query";
+    private String fusekiStoreUrl = "http://localhost:3030/ds/data";
 
     private DirectoryService directoryService;
     

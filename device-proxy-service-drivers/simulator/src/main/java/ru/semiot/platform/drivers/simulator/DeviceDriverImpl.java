@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -28,12 +29,12 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
 	CoAPInterface coap;
 	// properties
-	private static final String PORT_KEY = Activator.SERVICE_PID + ".port";
-	private static final String WAMP_MESSAGE_FORMAT = Activator.SERVICE_PID
+	private static final String PORT_KEY = Activator.PID + ".port";
+	private static final String WAMP_MESSAGE_FORMAT = Activator.PID
 			+ ".wamp_message_format";
 
-	private int port;
-	private String wampMessageFormat;
+	private int port = 3131;
+	private String wampMessageFormat = "TURTLE";
 
 	public List<Device> listDevices() {
 		return listDevices;
@@ -59,6 +60,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		for (Device device : listDevices)
 		{
         	inactiveDevice(templateOffState.replace("${system}", device.getID()));
+        	logger.info(templateOffState.replace("${system}", device.getID()));
 		}
         
 		logger.info("Simulator driver stopped!");
