@@ -18,7 +18,7 @@
             "hydra:supportedProperty": [
                 {
                    "hydra:property": {
-                        "@id": "vocab:EntryPoint/systems/list",
+                        "@id": "vocab:EntryPoint/systems",
                         "@type": "hydra:Link",
                         "domain": "vocab:EntryPoint",
                         "range": "vocab:SystemCollection",
@@ -45,7 +45,7 @@
                     "hydra:method": "GET",
                     "hydra:returns": "vocab:SystemCollection"
                 }
-            ]  
+            ]
         },
         {
             "@id": "vocab:observations",

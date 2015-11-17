@@ -119,12 +119,16 @@ public class SystemResource {
     public void getSystem(@Suspended final AsyncResponse response,
             @QueryParam("uri") String uri) {
         final String requestUri = context.getRequestUri().toASCIIString();
+        final UriBuilder uriBuilder = context.getBaseUriBuilder();
 
         query.select(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_URI}", uri)).subscribe((r) -> {
             JsonLdBuilder builder = new JsonLdBuilder(CONTEXT)
                     .add(JsonLdKeys.ID, requestUri)
                     .add(JsonLdKeys.TYPE, "ssn:System")
-                    .add("vocab:observations", "/ws/observations?system_uri=" + uri);
+                    .add("vocab:observations", 
+                            uriBuilder.scheme("ws").path("../ws/observations")
+                                    .queryParam("system_uri", uri)
+                                    .build());
 
             while (r.hasNext()) {
                 final QuerySolution qs = r.next();
