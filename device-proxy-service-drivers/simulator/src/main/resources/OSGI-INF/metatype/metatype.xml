@@ -6,8 +6,6 @@
             required="true" type="Integer" default="3131"/>
 		<AD name="Wamp message format" id="ru.semiot.platform.drivers.simulator.wamp_message_format"
             required="true" type="String" default="TURTLE"/>
-		<AD name="Topic inactive" id="ru.semiot.platform.drivers.simulator.topic_inactive"
-            required="true" type="String" default="ru.semiot.devices.turnoff"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.drivers.simulator">

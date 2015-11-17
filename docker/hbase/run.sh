@@ -14,9 +14,13 @@ trap 'echo STOPING HBASE >> $log; $HBASE_HOME/bin/stop-hbase.sh >> $log;
 echo "Starting hbase" >> $log
 $HBASE_HOME/bin/start-hbase.sh >> $log
 echo "HBase started" >> $log
-echo "Create tables for OpenTSDB" >> $log
-/opt/create_table.sh >> $log
-echo "Tables created" >> $log
+if [ ! -e /opt/hbase/logs/isCreatedTables ]
+then
+        echo "Create tables for OpenTSDB" >> $log
+        /opt/create_table.sh >> $log
+        echo "Tables created" >> $log
+        touch /opt/hbase/logs/isCreatedTables
+fi
 while :
 do
 sleep 30
