@@ -4,6 +4,8 @@
          id="ru.semiot.platform.drivers.winghouse.machinetool">
         <AD name="UDP Port" id="ru.semiot.platform.drivers.winghouse.machinetool.udp_port"
             required="true" type="Integer" default="9500"/>
+        <AD name="Uri Domain" id="ru.semiot.platform.drivers.winghouse.machinetool.domain"
+            required="true" type="String" default="demo.semiot.ru"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.drivers.winghouse.machinetool">

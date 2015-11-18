@@ -5,12 +5,12 @@
 @prefix saref: <http://ontology.tno.nl/saref#> .
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 
-<http://example.com/${MAC}> a mcht:MachineTool ;
-    rdfs:label "Machine Tool #${MAC}"@en ;
-    ssn:hasSubSystem <http://example.com/${MAC}/machinetool> ;
+<http://${DOMAIN}/systems/${DEVICE_HASH}> a mcht:MachineTool ;
+    rdfs:label "Machine Tool #${DEVICE_HASH}"@en ;
+    ssn:hasSubSystem <http://${DOMAIN}/systems/${DEVICE_HASH}/machinetool> ;
     saref:hasState saref:OnState .
     
-<http://example.com/${MAC}/machinetool>  a ssn:SensingDevice ;
+<http://${DOMAIN}/systems/${DEVICE_HASH}/machinetool>  a ssn:SensingDevice ;
     ssn:observes mcht:MachineToolWorkingState ;
     ssn:hasMeasurementCapability [
         a ssn:MeasurementCapability ;
@@ -23,7 +23,7 @@
             ] ;
         ] ;
     ] ;
-    ssncom:hasCommunicationEndpoint <http://example.com/topic=${MAC}.machinetool.obs> .
+    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/systems/topic=${DEVICE_HASH}.machinetool.obs> .
 
-<http://example.com/topic=${MAC}.machinetool.obs> a ssncom:CommunicationEndpoint ;
+<http://${DOMAIN}/systems/topic=${DEVICE_HASH}.machinetool.obs> a ssncom:CommunicationEndpoint ;
     ssncom:protocol "WAMP" .

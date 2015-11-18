@@ -31,16 +31,18 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     private static final String UDP_PORT_KEY = Activator.PID + ".udp_port";
+    private static final String DOMAIN = Activator.PID + ".domain";
             
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
     private Map<String, MachineToolValue> oldValueMachineTools = 
 			Collections.synchronizedMap(new HashMap<String, MachineToolValue>());
     private static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "<http://example.com/${MAC}> saref:hasState saref:OffState.";
+			+ "<http://${DOMAIN}/systems/${DEVICE_HASH}> saref:hasState saref:OffState.";
     
     private ScheduledExecutorService scheduler;
 	private ScheduledDeviceStatus scheduledDeviceStatus;
 	private ScheduledFuture handle = null;
+	private final String driverName = "Winghouse-machinetool";
     
     private volatile DeviceManager deviceManager;
 
@@ -48,7 +50,9 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private String templateObservation;
     private EventLoopGroup group;
     private Channel channel;
+    private Bootstrap bootstrap;
     private int port = 9500;
+    private String domain = "demo.semiot.ru";
 
     public List<Device> listDevices() {
         return listDevices;
@@ -64,12 +68,12 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		this.scheduledDeviceStatus = new ScheduledDeviceStatus();
 		startSheduled();
         try {
-            Bootstrap b = new Bootstrap();
-            b.group(group).channel(NioDatagramChannel.class)
+        	bootstrap = new Bootstrap();
+            bootstrap.group(group).channel(NioDatagramChannel.class)
                     .option(ChannelOption.SO_BROADCAST, true)
                     .handler(new DeviceHandler(this));
 
-            channel = b.bind(port).channel();
+            channel = bootstrap.bind(port).channel();
         } catch (Exception ex) {
             ex.printStackTrace();
 
@@ -96,8 +100,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
         for (Device device : listDevices)
 		{
-        	System.out.println(templateOffState.replace("${MAC}", device.getID()));
-        	inactiveDevice(templateOffState.replace("${MAC}", device.getID()));
+        	System.out.println(templateOffState.replace("${DOMAIN}", domain)
+        			.replace("${DEVICE_HASH}", device.getID()));
+        	inactiveDevice(templateOffState.replace("${DOMAIN}", domain)
+        			.replace("${DEVICE_HASH}", device.getID()));
 		}
         
         System.out.println("Winghouse machine-tools driver stopped!");
@@ -107,7 +113,13 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         synchronized(this) {
             System.out.println(properties == null);
             if(properties != null) {
-                port = (Integer) properties.get(UDP_PORT_KEY);
+            	int newPort = (Integer) properties.get(UDP_PORT_KEY);
+            	domain = (String) properties.get(DOMAIN);
+            	if(newPort != port) {
+	            	channel.close();
+	            	channel = bootstrap.bind(port).channel();
+	                port = newPort;
+            	}
             }
         }
     }
@@ -139,6 +151,14 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     
     public int getPort() {
 		return port;
+	}
+    
+    public String getDomain() {
+    	return domain;
+    }
+    
+    public String getDriverName() {
+		return driverName;
 	}
 
     public Map<String, MachineToolValue> getOldValueMachineTools() {
@@ -184,7 +204,8 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 			{
 				if(entry.getValue().getTurnOn() == true &&
 						entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
-					inactiveDevice(templateOffState.replace("${MAC}", entry.getKey()));
+					inactiveDevice(templateOffState.replace("${DOMAIN}", domain)
+		        			.replace("${DEVICE_HASH}", entry.getKey()));
 					entry.getValue().setTurnOn(false);
 					System.out.println(entry.getKey() + " saref:OffState" );
 				}

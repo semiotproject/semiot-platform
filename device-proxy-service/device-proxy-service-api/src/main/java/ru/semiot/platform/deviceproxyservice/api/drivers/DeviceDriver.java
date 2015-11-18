@@ -6,4 +6,6 @@ public interface DeviceDriver {
     
     public List<Device> listDevices();
     
+    public String getDriverName();
+    
 }
