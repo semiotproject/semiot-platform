@@ -2,8 +2,8 @@ package ru.semiot.platform.deviceproxyservice.api.drivers;
 
 public class Device {
     
-    private final String id;
-    private final String rdfDescription;
+    private String id;
+    private String rdfDescription;
     
     public Device(String id, String rdfDescription) {
         this.id = id;
@@ -17,6 +17,15 @@ public class Device {
     public String getRDFDescription() {
         return rdfDescription;
     }
+    
+    public void setID(String id) {
+    	this.id = id;
+    }
+    
+    public void setRDFDescription(String rdfDescription) {
+    	this.rdfDescription = rdfDescription;
+    }
+    
 
     @Override
     public boolean equals(Object object)

@@ -6,6 +6,8 @@
             required="true" type="Integer" default="3131"/>
 		<AD name="Wamp message format" id="ru.semiot.platform.drivers.simulator.wamp_message_format"
             required="true" type="String" default="TURTLE"/>
+        <AD name="Uri Domain" id="ru.semiot.platform.drivers.simulator.domain"
+            required="true" type="String" default="demo.semiot.ru"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.drivers.simulator">

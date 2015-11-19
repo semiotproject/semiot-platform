@@ -44,11 +44,11 @@ public class DeviceHandler {
 		observationHandlers.remove(key);
 	}
 
-	public boolean containsHandler(String key, String wampTopic) {
-		if (observationHandlers.containsKey(key) && wampTopic != null) {
+	public boolean containsHandler(String key, String coapUri) {
+		if (observationHandlers.containsKey(key) && coapUri != null) {
 			List<NewObservationHandler> handlers = observationHandlers.get(key);
 			for(NewObservationHandler handler : handlers) {
-				if (wampTopic.equals(handler.getTopic())) {
+				if (coapUri.equals(handler.getCoapUri())) {
 					return true;
 				}
 			}

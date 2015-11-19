@@ -5,8 +5,6 @@ SELECT ?system ?coap ?wamp {
     ?system a ssn:System ;
         ssn:hasSubSystem ?sensor .
     ?sensor a ssn:Sensor ;
-        ssncom:hasCommunicationEndpoint ?coap ;
-        ssncom:hasCommunicationEndpoint ?wamp .
+        ssncom:hasCommunicationEndpoint ?coap .
     ?coap ssncom:protocol "COAP" .
-    ?wamp ssncom:protocol "WAMP" .
 }

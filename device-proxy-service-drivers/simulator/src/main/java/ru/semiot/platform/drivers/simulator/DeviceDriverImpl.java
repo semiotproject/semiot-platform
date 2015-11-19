@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -32,9 +31,11 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 	private static final String PORT_KEY = Activator.PID + ".port";
 	private static final String WAMP_MESSAGE_FORMAT = Activator.PID
 			+ ".wamp_message_format";
+	private static final String DOMAIN = Activator.PID + ".domain";
 
 	private int port = 3131;
 	private String wampMessageFormat = "TURTLE";
+	private String domain = "demo.semiot.ru";
 
 	public List<Device> listDevices() {
 		return listDevices;
@@ -73,6 +74,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 				port = (Integer) properties.get(PORT_KEY);
 				wampMessageFormat = (String) properties
 						.get(WAMP_MESSAGE_FORMAT);
+				domain = (String) properties.get(DOMAIN);
 			}
 		}
 	}
@@ -100,6 +102,15 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
 	public String getWampMessageFormat() {
 		return wampMessageFormat;
+	}
+	
+	public String getDomain() {
+		return domain;
+	}
+
+	@Override
+	public String getDriverName() {
+		return domain;
 	}
 
 }

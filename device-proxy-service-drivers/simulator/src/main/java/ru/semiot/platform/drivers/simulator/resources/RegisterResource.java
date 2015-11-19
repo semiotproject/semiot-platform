@@ -50,6 +50,7 @@ public class RegisterResource extends CoapResource {
 	private static final String queryFile = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "<${system}> saref:hasState saref:OnState.";
+	private static final String templateSystemUri = "http://${DOMAIN}/systems/${DEVICE_HASH}";
 	private final Model schema;
 	private final Query query;
 	private static final String VAR_COAP = "coap";
@@ -57,6 +58,9 @@ public class RegisterResource extends CoapResource {
 	private static final String VAR_SYSTEM = "system";
 	private static final String WAMP = "WAMP";
 	DeviceDriverImpl deviceDriverImpl;
+	
+	private static final int FNV_32_INIT = 0x811c9dc5;
+    private static final int FNV_32_PRIME = 0x01000193;
 
 	public RegisterResource(DeviceDriverImpl deviceDriverImpl) {
 		super("register");
@@ -80,8 +84,6 @@ public class RegisterResource extends CoapResource {
 		Model description = toModel(exchange.getRequestText());
 
 		if (!description.isEmpty()) {
-			mapEndpoints(description);
-
 			addDevice(description);
 
 			exchange.respond(CoAP.ResponseCode.CREATED);
@@ -105,25 +107,23 @@ public class RegisterResource extends CoapResource {
 															// что в 1
 															// сообщении 1
 															// устройство
+					String hash = StringUtils.EMPTY;
+					Resource system = null;
 					while (results.hasNext()) {
 						final QuerySolution soln = results.next();
 
 						final Resource coap = soln.getResource(VAR_COAP);
-						final Resource wamp = soln.getResource(VAR_WAMP);
 						if (systemURI.isEmpty()) {
-							final Resource system = soln
-									.getResource(VAR_SYSTEM);
-							systemURI = system.getURI();
+							system = soln.getResource(VAR_SYSTEM);
+							hash = getHash(system.getURI());
+							systemURI = templateSystemUri.replace("${DOMAIN}", deviceDriverImpl.getDomain())
+									.replace("${DEVICE_HASH}", hash);
 						}
-
-						logger.info("Mapping {} to {}", coap.getURI(), wamp.getURI());
-
-						String wampTopic = getWampTopic(wamp.getURI());
 						
-						boolean containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, wampTopic);
+						boolean containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, coap.getURI());
 						if(!containsHandler) {
 							final NewObservationHandler handler = new NewObservationHandler(
-									deviceDriverImpl, wampTopic, systemURI);
+									deviceDriverImpl, hash, systemURI, coap.getURI()); // можно оставить только hash
 	
 							final CoapClient coapClient = new CoapClient(
 									coap.getURI());
@@ -137,8 +137,13 @@ public class RegisterResource extends CoapResource {
 							
 							DeviceHandler.getInstance().addHandler(handler);
 						}
-						Device newDevice = new Device(systemURI, toString(description));
+						Device newDevice = new Device(systemURI, ""); // TODO отрефакторить!!!
 						if(!deviceDriverImpl.contains(newDevice)) {
+							String desc = toString(description
+									.add(getModelEndpoint(system, hash)));
+							newDevice.setRDFDescription(
+									desc.replace("<" + system.getURI() + ">", "<" + systemURI + ">")); // TODO отрефакторить!!!
+							
 							deviceDriverImpl.addDevice(newDevice);
 						} else if(!containsHandler) {
 							deviceDriverImpl.inactiveDevice(
@@ -156,6 +161,18 @@ public class RegisterResource extends CoapResource {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
+	
+	private String getHash(String systemUri) {
+		String name = systemUri + deviceDriverImpl.getDriverName();
+		int h = FNV_32_INIT;
+        final int len = name.length();
+        for(int i = 0; i < len; i++) {
+        	h ^= name.charAt(i);
+        	h *= FNV_32_PRIME;
+        }
+        long longHash = h & 0xffffffffl;
+        return String.valueOf(longHash);
+	}
 
 	@Override
 	public void handleDELETE(CoapExchange exchange) {
@@ -168,30 +185,20 @@ public class RegisterResource extends CoapResource {
 				deviceDriverImpl.getWampMessageFormat());
 	}
 
-	private void mapEndpoints(final Model source) {
+	private Model getModelEndpoint(Resource system, String hash) {
 		final Model tmp = ModelFactory.createDefaultModel();
-		ResIterator sensors = source
-				.listResourcesWithProperty(SSNCOM.hasCommunicationEndpoint);
 
-		sensors.forEachRemaining((Resource sensor) -> {
-			StmtIterator stmts = sensor
-					.listProperties(SSNCOM.hasCommunicationEndpoint);
-
-			stmts.forEachRemaining((Statement stmt) -> {
-				final String uri = stmt.getObject().asResource().getURI();
-				final Resource wampEndpoint = ResourceFactory
-						.createResource(templateWampTopic.replace("${topic}",
-								coapUriToWAMPUri(uri)));
-
-				// Declare a new CommunicationEndpoint (WAMP)
-				tmp.add(sensor, SSNCOM.hasCommunicationEndpoint, wampEndpoint)
-						.add(wampEndpoint, RDF.type,
-								SSNCOM.CommunicationEndpoint)
-						.add(wampEndpoint, SSNCOM.protocol, WAMP);
-			});
-		});
-
-		source.add(tmp);
+		final Resource wampEndpoint = ResourceFactory
+				.createResource(templateWampTopic.replace("${topic}",
+						hash));
+	
+		// Declare a new CommunicationEndpoint (WAMP)
+		tmp.add(system, SSNCOM.hasCommunicationEndpoint, wampEndpoint)
+				.add(wampEndpoint, RDF.type,
+						SSNCOM.CommunicationEndpoint)
+				.add(wampEndpoint, SSNCOM.protocol, WAMP);
+		
+		return tmp;
 	}
 
 	private String coapUriToWAMPUri(final String coapUri) {

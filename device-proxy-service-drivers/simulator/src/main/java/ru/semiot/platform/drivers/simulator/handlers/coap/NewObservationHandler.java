@@ -19,15 +19,17 @@ public class NewObservationHandler implements CoapHandler {
 			+ "<${system}> saref:hasState saref:OffState.";
 	private final String topic;
 	private final String system;
+	private final String coapUri;
 	private DeviceDriverImpl deviceDriverImpl;
 
 	private CoapObserveRelation relation;
 
 	public NewObservationHandler(DeviceDriverImpl deviceDriverImpl,
-			final String topic, final String system) {
+			final String topic, final String system, final String coapUri) {
 		this.deviceDriverImpl = deviceDriverImpl;
-		this.topic = topic;
-		this.system = system;
+		this.topic = topic; // hash 
+		this.system = system; // TODO оставить только hash, сейчас оставлен и хэш и systemUri, т.к. домэин может измениться и изменится uri
+		this.coapUri = coapUri;
 	}
 
 	public void setRelation(final CoapObserveRelation relation) {
@@ -81,5 +83,9 @@ public class NewObservationHandler implements CoapHandler {
 	
 	public String getSystemUri() {
 		return system;
+	}
+	
+	public String getCoapUri() {
+		return coapUri;
 	}
 }
