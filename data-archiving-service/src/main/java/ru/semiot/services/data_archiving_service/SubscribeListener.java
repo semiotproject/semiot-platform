@@ -38,7 +38,7 @@ public class SubscribeListener implements Observer<String> {
 			.create(new StringBuilder()
 					.append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
 					.append("prefix ssncom: <http://purl.org/NET/ssnext/communication#> ")
-					.append("SELECT ?q where{ ?x a ssn:SensingDevice; ssncom:hasCommunicationEndpoint ?q. ")
+					.append("SELECT ?q where{ ?x ssncom:hasCommunicationEndpoint ?q. ") // TODO добавить проверку на тип System
 					.append("?q ssncom:protocol \"WAMP\"}").toString());
 
 	public SubscribeListener() {
