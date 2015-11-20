@@ -7,23 +7,23 @@
 
 <http://${DOMAIN}/systems/${DEVICE_HASH}> a mcht:MachineTool ;
     rdfs:label "Machine Tool #${DEVICE_HASH}"@en ;
-    ssn:hasSubSystem <http://${DOMAIN}/systems/${DEVICE_HASH}/machinetool> ;
-    saref:hasState saref:OnState .
-    
-<http://${DOMAIN}/systems/${DEVICE_HASH}/machinetool>  a ssn:SensingDevice ;
-    ssn:observes mcht:MachineToolWorkingState ;
-    ssn:hasMeasurementCapability [
-        a ssn:MeasurementCapability ;
-        ssn:forProperty mcht:MachineToolWorkingState ;
-        ssn:hasMeasurementProperty [
-            a qudt:Unit ;
-            ssn:hasValue [
-                a qudt:Enumeration ;
-                ssn:hasValue mcht:MachineToolWorkingStateValue ;
-            ] ;
-        ] ;
+    ssn:hasSubSystem [
+    	a ssn:SensingDevice ;
+	    ssn:observes mcht:MachineToolWorkingState ;
+	    ssn:hasMeasurementCapability [
+	        a ssn:MeasurementCapability ;
+	        ssn:forProperty mcht:MachineToolWorkingState ;
+	        ssn:hasMeasurementProperty [
+	            a qudt:Unit ;
+	            ssn:hasValue [
+	                a qudt:Enumeration ;
+	                ssn:hasValue mcht:MachineToolWorkingStateValue ;
+	            ] ;
+	        ] ;
+	    ] ;
     ] ;
-    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/systems/topic=${DEVICE_HASH}.machinetool.obs> .
-
+    saref:hasState saref:OnState ;
+    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/systems/topic=${DEVICE_HASH}> .
+    
 <http://${DOMAIN}/systems/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
     ssncom:protocol "WAMP" .

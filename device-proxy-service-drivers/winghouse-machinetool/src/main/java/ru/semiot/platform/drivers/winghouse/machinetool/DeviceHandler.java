@@ -76,7 +76,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 			// System.out.println("State " + mess.getMachineToolState().getUri());
 			String message = deviceDriverImpl
 					.getTemplateObservation()
-					.replace("", deviceDriverImpl.getDomain())
+					.replace("${DOMAIN}", deviceDriverImpl.getDomain())
 					.replace("${DEVICE_HASH}", mvalue.getHash())
 					.replace("${TIMESTAMP}", String.valueOf(mvalue.getTimestemp()))
 					.replace("${DATETIME}", date)

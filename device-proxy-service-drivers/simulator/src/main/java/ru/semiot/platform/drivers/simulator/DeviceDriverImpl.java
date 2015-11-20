@@ -108,7 +108,6 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		return domain;
 	}
 
-	@Override
 	public String getDriverName() {
 		return domain;
 	}
