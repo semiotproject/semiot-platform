@@ -13,7 +13,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
 	private final DeviceDriverImpl deviceDriverImpl;
 
-	private static final String templateTopic = "${DEVICE_HASH}.machinetool.obs";
+	private static final String templateTopic = "${DEVICE_HASH}";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "<http://${DOMAIN}/systems/${DEVICE_HASH}> saref:hasState saref:OnState.";
 

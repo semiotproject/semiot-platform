@@ -25,5 +25,5 @@
     ] ;
     ssncom:hasCommunicationEndpoint <http://${DOMAIN}/systems/topic=${DEVICE_HASH}.machinetool.obs> .
 
-<http://${DOMAIN}/systems/topic=${DEVICE_HASH}.machinetool.obs> a ssncom:CommunicationEndpoint ;
+<http://${DOMAIN}/systems/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
     ssncom:protocol "WAMP" .
