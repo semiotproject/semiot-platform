@@ -117,8 +117,8 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             	domain = (String) properties.get(DOMAIN);
             	if(newPort != port) {
 	            	channel.close();
+	            	port = newPort;
 	            	channel = bootstrap.bind(port).channel();
-	                port = newPort;
             	}
             }
         }
