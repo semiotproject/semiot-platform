@@ -93,11 +93,13 @@ public class SubscribeListener implements Observer<String> {
 			while(!isConnected) {
 				try {
 					topics = qe.execSelect();
+					logger.info("Connect to fuseki successfuly.");
 					isConnected = true;
 				} catch (Exception ex) {
 					logger.warn(ex.getMessage());
+					logger.warn("Can`t connect to fuseki. A new connection attempt after 5 seconds.");
 					try {
-						Thread.sleep(3000);
+						Thread.sleep(5000);
 					} catch (InterruptedException e) {
 						logger.error(e.getMessage());
 					}
