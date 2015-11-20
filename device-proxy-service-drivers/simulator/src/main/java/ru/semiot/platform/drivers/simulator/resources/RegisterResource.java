@@ -109,6 +109,7 @@ public class RegisterResource extends CoapResource {
 															// устройство
 					String hash = StringUtils.EMPTY;
 					Resource system = null;
+					boolean containsHandler = false;
 					while (results.hasNext()) {
 						final QuerySolution soln = results.next();
 
@@ -120,7 +121,7 @@ public class RegisterResource extends CoapResource {
 									.replace("${DEVICE_HASH}", hash);
 						}
 						
-						boolean containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, coap.getURI());
+						containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, coap.getURI());
 						if(!containsHandler) {
 							final NewObservationHandler handler = new NewObservationHandler(
 									deviceDriverImpl, hash, systemURI, coap.getURI()); // можно оставить только hash
@@ -137,6 +138,8 @@ public class RegisterResource extends CoapResource {
 							
 							DeviceHandler.getInstance().addHandler(handler);
 						}
+					}
+					if(system != null && !hash.isEmpty() && !systemURI.isEmpty()) {
 						Device newDevice = new Device(systemURI, ""); // TODO отрефакторить!!!
 						if(!deviceDriverImpl.contains(newDevice)) {
 							String desc = toString(description
