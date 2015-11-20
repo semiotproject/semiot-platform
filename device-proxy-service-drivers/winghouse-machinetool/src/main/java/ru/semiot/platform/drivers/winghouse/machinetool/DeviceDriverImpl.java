@@ -31,7 +31,6 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     private static final String UDP_PORT_KEY = Activator.PID + ".udp_port";
-    private static final String DOMAIN = Activator.PID + ".domain";
             
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
     private Map<String, MachineToolValue> oldValueMachineTools = 
@@ -52,7 +51,6 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private Channel channel;
     private Bootstrap bootstrap;
     private int port = 9500;
-    private String domain = "demo.semiot.ru";
 
     public List<Device> listDevices() {
         return listDevices;
@@ -100,9 +98,9 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
         for (Device device : listDevices)
 		{
-        	System.out.println(templateOffState.replace("${DOMAIN}", domain)
+        	System.out.println(templateOffState.replace("${DOMAIN}", getDomain())
         			.replace("${DEVICE_HASH}", device.getID()));
-        	inactiveDevice(templateOffState.replace("${DOMAIN}", domain)
+        	inactiveDevice(templateOffState.replace("${DOMAIN}", getDomain())
         			.replace("${DEVICE_HASH}", device.getID()));
 		}
         
@@ -114,7 +112,6 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             System.out.println(properties == null);
             if(properties != null) {
             	int newPort = (Integer) properties.get(UDP_PORT_KEY);
-            	domain = (String) properties.get(DOMAIN);
             	if(newPort != port) {
 	            	channel.close();
 	            	port = newPort;
@@ -154,7 +151,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 	}
     
     public String getDomain() {
-    	return domain;
+    	return deviceManager.getDomain();
     }
     
     public String getDriverName() {
@@ -204,7 +201,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 			{
 				if(entry.getValue().getTurnOn() == true &&
 						entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
-					inactiveDevice(templateOffState.replace("${DOMAIN}", domain)
+					inactiveDevice(templateOffState.replace("${DOMAIN}", getDomain())
 		        			.replace("${DEVICE_HASH}", entry.getKey()));
 					entry.getValue().setTurnOn(false);
 					System.out.println(entry.getKey() + " saref:OffState" );

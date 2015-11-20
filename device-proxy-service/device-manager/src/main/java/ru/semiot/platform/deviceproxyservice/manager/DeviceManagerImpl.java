@@ -2,6 +2,7 @@ package ru.semiot.platform.deviceproxyservice.manager;
 
 import java.io.IOException;
 import java.util.Dictionary;
+import java.util.Properties;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -29,6 +30,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
 	private static final String FUSEKI_UPDATE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url";
 	private static final String FUSEKI_QUERY_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url";
 	private static final String FUSEKI_STORE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url";
+	private static final String DOMAIN = "ru.semiot.platform.deviceproxyservice.manager.domain";
     
     private String wampUri = "ws://wamprouter:8080/ws";
     private String wampRealm = "realm1";
@@ -40,6 +42,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     private String fusekiUpdateUrl = "http://localhost:3030/ds/update";
     private String fusekiQueryUrl = "http://localhost:3030/ds/query";
     private String fusekiStoreUrl = "http://localhost:3030/ds/data";
+    private String domain = "localhost";
 
     private DirectoryService directoryService;
     
@@ -98,6 +101,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
                 fusekiUpdateUrl = (String) properties.get(FUSEKI_UPDATE_URL);
                 fusekiQueryUrl = (String) properties.get(FUSEKI_QUERY_URL);
                 fusekiStoreUrl = (String) properties.get(FUSEKI_STORE_URL);
+                domain = (String) properties.get(DOMAIN);
             }
         }
     }
@@ -165,6 +169,10 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     
     public String getFusekiStoreUrl() {
     	return fusekiStoreUrl;
+    }
+    
+    public String getDomain() {
+    	return domain;
     }
 
 }

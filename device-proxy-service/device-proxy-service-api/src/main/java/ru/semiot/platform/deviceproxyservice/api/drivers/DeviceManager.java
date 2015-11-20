@@ -14,4 +14,6 @@ public interface DeviceManager {
     
     public Observable<String> subscribe(String topic);
     
+    public String getDomain();
+    
 }

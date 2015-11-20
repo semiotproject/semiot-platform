@@ -22,6 +22,8 @@
             required="true" type="String" default="http://localhost:3030/ds/query"/>
 		<AD name="Fuseki store url" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url"
             required="true" type="String" default="http://localhost:3030/ds/data"/>
+        <AD name="Domain" id="ru.semiot.platform.deviceproxyservice.manager.domain"
+            required="true" type="String" default="localhost"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.deviceproxyservice.manager">
