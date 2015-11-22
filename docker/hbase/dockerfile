@@ -6,7 +6,7 @@ ENV HBASE_HOME /opt/hbase/
 ENV COMPRESSION "NONE"
 
 #Download Hbase and extract
-RUN cd /opt/ && wget http://apache-mirror.rbc.ru/pub/apache/hbase/0.98.15/hbase-0.98.15-hadoop2-bin.tar.gz && \
+RUN cd /opt/ && wget http://archive.apache.org/dist/hbase/0.98.15/hbase-0.98.15-hadoop2-bin.tar.gz && \
 tar xzvf hbase-0.98.15-hadoop2-bin.tar.gz && rm -rf hbase-0.98.15-hadoop2-bin.tar.gz && mv hbase-0.98.15-hadoop2 hbase
 
 #Initialize sshd
