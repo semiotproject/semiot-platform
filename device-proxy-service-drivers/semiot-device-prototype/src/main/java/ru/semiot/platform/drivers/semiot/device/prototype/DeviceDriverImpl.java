@@ -6,14 +6,17 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
@@ -108,5 +111,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             throw new IllegalArgumentException(ex);
         }
     }
+
+	public String getDriverName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

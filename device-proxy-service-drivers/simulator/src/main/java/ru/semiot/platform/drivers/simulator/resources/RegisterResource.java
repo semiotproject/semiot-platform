@@ -1,5 +1,6 @@
 package ru.semiot.platform.drivers.simulator.resources;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -7,6 +8,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.InfModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -46,7 +48,9 @@ public class RegisterResource extends CoapResource {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RegisterResource.class);
 
-	private static final String templateWampTopic = "ws://wamprouter/ws?topic=${topic}";
+	private static final String templateWampURI = "ws://wamprouter/ws?topic=${topic}";
+	private static final String templateWampTopic = "\"${topic}\"^^xsd:string";
+	
 	private static final String queryFile = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "<${system}> saref:hasState saref:OnState.";
@@ -192,13 +196,17 @@ public class RegisterResource extends CoapResource {
 		final Model tmp = ModelFactory.createDefaultModel();
 
 		final Resource wampEndpoint = ResourceFactory
-				.createResource(templateWampTopic.replace("${topic}",
+				.createResource(templateWampURI.replace("${topic}",
 						hash));
+		final Literal wampTopic = ResourceFactory
+				.createTypedLiteral(hash);
 	
 		// Declare a new CommunicationEndpoint (WAMP)
+		//tmp.setNsPrefix("xsd", "<http://www.w3.org/2001/XMLSchema#>");
 		tmp.add(system, SSNCOM.hasCommunicationEndpoint, wampEndpoint)
 				.add(wampEndpoint, RDF.type,
 						SSNCOM.CommunicationEndpoint)
+				.add(wampEndpoint, SSNCOM.topic, wampTopic)
 				.add(wampEndpoint, SSNCOM.protocol, WAMP);
 		
 		return tmp;

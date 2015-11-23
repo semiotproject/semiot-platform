@@ -38,8 +38,8 @@ public class SubscribeListener implements Observer<String> {
 			.create(new StringBuilder()
 					.append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
 					.append("prefix ssncom: <http://purl.org/NET/ssnext/communication#> ")
-					.append("SELECT ?q where{ ?x ssncom:hasCommunicationEndpoint ?q. ") // TODO добавить проверку на тип System
-					.append("?q ssncom:protocol \"WAMP\"}").toString());
+					.append("SELECT ?q where{ ?x ssncom:hasCommunicationEndpoint ?e. ") // TODO добавить проверку на тип System
+					.append("?e ssncom:protocol \"WAMP\"; ssncom:topic ?q}").toString());
 
 	public SubscribeListener() {
 		httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
@@ -72,7 +72,7 @@ public class SubscribeListener implements Observer<String> {
 		}
 	}
 
-	private String parseTopicName(String uri) {
+	/* private String parseTopicName(String uri) {
 		int index = uri.indexOf(PREFIX_TOPIC);
 		if (index != -1) {
 			int lastIndex = uri.lastIndexOf(">", index);
@@ -82,7 +82,7 @@ public class SubscribeListener implements Observer<String> {
 		} else {
 			return null;
 		}
-	}
+	} */
 
 	private void subscribeTopics(Model description) {
 		QueryExecution qe;
@@ -110,8 +110,8 @@ public class SubscribeListener implements Observer<String> {
 			topics = qe.execSelect();
 		}
 		while (topics != null && topics.hasNext()) {
-			String topicName = parseTopicName(topics.next().get("q")
-					.asResource().getURI());
+			String topicName = topics.next().get("q")
+					.asLiteral().getString();
 			if (StringUtils.isNotBlank(topicName)
 					&& !listTopics.contains(topicName)) {
 				listTopics.add(topicName);

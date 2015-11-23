@@ -3,6 +3,7 @@
 @prefix mcht: <http://purl.org/NET/ssnext/machinetools#> .
 @prefix ssncom: <http://purl.org/NET/ssnext/communication#> .
 @prefix saref: <http://ontology.tno.nl/saref#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 
 <http://${DOMAIN}/systems/${DEVICE_HASH}> a mcht:MachineTool ;
@@ -26,4 +27,5 @@
     ssncom:hasCommunicationEndpoint <http://${DOMAIN}/systems/topic=${DEVICE_HASH}> .
     
 <http://${DOMAIN}/systems/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
+	ssncom:topic "${DEVICE_HASH}"^^xsd:string ;
     ssncom:protocol "WAMP" .
