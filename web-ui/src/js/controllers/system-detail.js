@@ -40,6 +40,7 @@ export default function(
     // reset params, clear WAMP connections, etc
     $scope.setDefault = function() {
         $scope.title = "";
+        $scope.topic = null;
         $scope.sensors = [];
         $scope.liveEnabled = true;
         $scope.isLoading = true;
@@ -47,25 +48,31 @@ export default function(
 
     // call when page is loaded
     $scope.init = function(uri) {
+
+        console.info(`loading detail info about ${uri} system...`);
+
         $scope.setDefault();
 
-        // get extended info
-        systemDetail.fetchSystemName(uri, function(data) {
+        // get name and WAMP endpoint
+        systemDetail.fetchSystemDetail(uri, function(data) {
             if (data.results.bindings[0]) {
                 $scope.title = data.results.bindings[0].label.value;
+
+                // store topic in scope to make available unsubscribe
+                $scope.topic = data.results.bindings[0].topic.value;
+                $scope.subscribe();
             } else {
                 $scope.title = "Unknown system";
             }
         });
 
-        // get archive data
-        systemDetail.fetchSystemEndpoint(uri, function(data) {
+        // get sensors info
+        systemDetail.fetchSystemSensors(uri, function(data) {
             $scope.sensors = [];
 
             // create sensor list
             data.results.bindings.forEach((binding) => {
                 let sensor = $.extend({}, {
-                    endpoint: commonUtils.parseTopicFromEndpoint(binding.endpoint.value),
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
                     range: getLastHourRange(),
@@ -84,14 +91,6 @@ export default function(
 
                         let s = $.extend({}, sensor);
                         $scope.sensors.push(s);
-
-                        $scope.subscribe(s);
-
-                        /*
-                        $interval(() => {
-                            $scope.onObservationReceived(sensor, commonUtils.getMockMachineToolStateObservation());
-                        }, 2000);
-                        */
                     });
                 });
             });
@@ -99,7 +98,7 @@ export default function(
         });
     };
 
-    // call once when endpoint is received.
+    // call once when sensor info is received.
     // set perticular chart config
     // @return Promise
     $scope.initChart = function(sensor) {
@@ -123,7 +122,7 @@ export default function(
     // calls after init and when range was changed
     // @return Promise
     $scope.fillChart = function(sensor) {
-        console.info(`setting new values to ${sensor.endpoint} sensor..`);
+        console.info(`setting new values to ${sensor.title} sensor..`);
         let defer = $q.defer();
 
         // get TSDB archive testimonial
@@ -151,18 +150,18 @@ export default function(
     };
 
     // WAMP support
-    $scope.subscribe = function(sensor) {
+    $scope.subscribe = function() {
         wampUtils.subscribe([
             {
-                topic: sensor.endpoint,
+                topic: $scope.topic,
                 callback: function(args) {
-                    $scope.onObservationReceived(sensor, args[0]);
+                    $scope.onObservationReceived(args[0]);
                 }
             }
         ]);
     };
-    $scope.unsubscribe = function(sensor) {
-        wampUtils.unsubscribe(sensor.endpoint);
+    $scope.unsubscribe = function() {
+        wampUtils.unsubscribe($scope.topic);
     };
     $scope.onSetModeClick = function(sensor, mode) {
         if (sensor.mode !== mode) {
@@ -173,7 +172,7 @@ export default function(
                 console.log(new Date(sensor.range[0]), new Date(sensor.range[1]));
                 $scope.fillChart(sensor);
             } else {
-                $scope.unsubscribe(sensor);
+                $scope.unsubscribe();
             }
         }
     };
@@ -188,7 +187,11 @@ export default function(
     $scope.onNowClicked = function(sensor) {
         sensor.range[1] = (new Date()).getTime();
     };
-    $scope.onObservationReceived = function(sensor, data) {
+    $scope.onObservationReceived = function(data) {
+
+        console.info(`received message: `, data);
+
+        /*
         // console.info(`received message from ${sensor.endpoint}: `, data);
         rdfUtils.parseTTL(data).then(function(triples) {
 
@@ -221,6 +224,8 @@ export default function(
 
             // updating time window
             sensor.range = getLastHourRange();
+
+        */
     };
     $scope.onSetRangeClick = function(index) {
         let sensor = $scope.sensors[index];
@@ -230,5 +235,5 @@ export default function(
         });
     };
 
-    $scope.init($routeParams.system_uri);
+    $scope.init(decodeURIComponent($routeParams.system_uri));
 }

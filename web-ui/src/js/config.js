@@ -1,7 +1,7 @@
 "use strict";
 
 // change it to target hostname when develop
-const DEFAULT_HOSTNAME = "localhost";
+const DEFAULT_HOSTNAME = "demo.semiot.ru";
 const hostname = location.hostname === "localhost" ? DEFAULT_HOSTNAME : location.hostname;
 
 const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
@@ -52,8 +52,8 @@ export default {
                 "       rdfs:label ?label .",
                 "}"
             ].join('\n'),
-            getSystemEndpoint: `
-                SELECT ?endpoint ?type ?observationType ?propLabel ?valueUnitLabel {
+            getSystemSensors: `
+                SELECT ?type ?observationType ?propLabel ?valueUnitLabel {
                   <{0}> ssn:hasSubSystem ?subsystem .
                   ?subsystem ssn:observes ?type .
                   ?subsystem ssn:hasMeasurementCapability ?mc .
@@ -64,15 +64,21 @@ export default {
                   ?v a ?observationType .
                   ?v ssn:hasValue ?valueUnit .
                   ?valueUnit rdfs:label ?valueUnitLabel .
-                  ?subsystem ssncom:hasCommunicationEndpoint ?endpoint .
-                  ?endpoint ssncom:protocol 'WAMP' .
                 }
             `,
             getSystemName: [
                 "SELECT ?label {",
-                "   <{0}> rdfs:label ?label .",
+                "   <{0}> rdfs:label ?label, .",
                 "}"
             ].join('\n'),
+            getSystemDetail: `
+                SELECT ?label ?topic {
+                    <{0}> rdfs:label ?label ;
+                        ssncom:hasCommunicationEndpoint ?endpoint .
+                    ?endpoint ssncom:protocol "WAMP" ;
+                        ssncom:topic ?topic .
+                }
+            `,
             getMachineToolStates: `
                 SELECT ?stateURI ?stateLabel ?stateDescription
                 WHERE {
