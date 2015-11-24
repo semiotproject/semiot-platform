@@ -24,7 +24,10 @@ RUN echo "StrictHostKeyChecking no" > /root/.ssh/config && chmod 777 /opt/create
 ADD run.sh /opt/
 ADD hbase.conf /etc/supervisor/conf.d/hbase.conf
 
+ADD backup.sh /opt/
+ADD restore.sh /opt/
 RUN mkdir $HBASE_HOME/logs && touch $HBASE_HOME/logs/log
+WORKDIR /opt/
 
 EXPOSE 60000
 EXPOSE 60010
