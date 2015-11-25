@@ -43,17 +43,23 @@ export default function(
         $scope.topic = null;
         $scope.sensors = [];
         $scope.liveEnabled = true;
-        $scope.isLoading = true;
     };
 
     // call when page is loaded
     $scope.init = function(uri) {
+        $scope.setDefault();
+        $scope.isLoading = true;
 
+        $scope.getSystemInfo(uri).then(() => {
+            $scope.getSystemSensors(uri);
+        });
+    };
+
+    $scope.getSystemInfo = (uri) => {
         console.info(`loading detail info about ${uri} system...`);
 
-        $scope.setDefault();
+        let defer = $q.defer();
 
-        // get name and WAMP endpoint
         systemDetail.fetchSystemDetail(uri, function(data) {
             if (data.results.bindings[0]) {
                 $scope.title = data.results.bindings[0].label.value;
@@ -64,9 +70,14 @@ export default function(
             } else {
                 $scope.title = "Unknown system";
             }
+            defer.resolve();
         });
 
-        // get sensors info
+        return defer.promise;
+    };
+    $scope.getSystemSensors = (uri) => {
+        console.info(`loading ${uri} sensors...`);
+
         systemDetail.fetchSystemSensors(uri, function(data) {
             $scope.sensors = [];
 
@@ -75,6 +86,7 @@ export default function(
                 let sensor = $.extend({}, {
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
+                    sensorType: binding.type.value,
                     range: getLastHourRange(),
                     mode: $scope.getModes()['real-time'],
                     chartConfig: {}
@@ -127,7 +139,7 @@ export default function(
 
         // get TSDB archive testimonial
         if ($scope.isStateSensor(sensor)) {
-            systemDetail.fetchArchiveStates(sensor.endpoint, sensor.range).then((result) => {
+            systemDetail.fetchArchiveStates($scope.topic, sensor.range, sensor.type).then((result) => {
                 sensor.chartConfig.series[0].data = chartUtils.parseStateChartData(result.data);
                 defer.resolve();
             }, () => {
@@ -136,7 +148,7 @@ export default function(
                 defer.resolve();
             });
         } else {
-            systemDetail.fetchArchiveObservations(sensor.endpoint, sensor.range).then((result) => {
+            systemDetail.fetchArchiveObservations($scope.topic, sensor.range, sensor.sensorType).then((result) => {
                 sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result.data);
                 defer.resolve();
             }, () => {

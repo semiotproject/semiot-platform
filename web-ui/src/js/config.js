@@ -13,7 +13,8 @@ export default {
         messageBus: "ws://" + hostname + ":8080/ws",
         tripleStore: "http://" + hostname + ":3030/ds/query",
         tsdb: {
-            archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}`,
+            // archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}`,
+            archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{property={3}}`,
             archiveEnum: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{enum_value=*}`,
             last: `${TSDB_BASE_URL}/last/{0}`
         }

@@ -35,8 +35,8 @@ export default function(
         fetchSystemDetail(uri, callback) {
             return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemDetail.format(uri), callback);
         }
-        fetchArchiveObservations(metric, range) {
-            return tsdbUtils.getArchiveObservations(metric, range);
+        fetchArchiveObservations(metric, range, type) {
+            return tsdbUtils.getArchiveObservations(metric, range, type);
         }
         fetchArchiveStates(metric, range) {
             return tsdbUtils.getArchiveStates(metric, range);
