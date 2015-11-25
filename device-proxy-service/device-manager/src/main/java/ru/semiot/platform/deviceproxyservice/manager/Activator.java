@@ -30,7 +30,8 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(new String[] {DeviceManager.class.getName(), 
                 		ManagedService.class.getName()}, properties)
-                .setImplementation(DeviceManagerImpl.class));
+                .setImplementation(DeviceManagerImpl.class)
+                .add(createConfigurationDependency().setPid(PID)));
     }
     
 }
