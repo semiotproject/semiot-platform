@@ -51,7 +51,8 @@
                 </div>
             </div>
             <highchart ng-if="sensor.chartConfig.series[0].data.length > 0" config="sensor.chartConfig"></highchart>
-            <div ng-if="sensor.chartConfig.series[0].data.length === 0" class="empty-sensor-chart">No observations found for this period</div>
+            <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['archive']" class="empty-sensor-chart">No observations found for this period</div>
+            <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['real-time']" class="empty-sensor-chart">Waiting for the first observation..</div>
         </div>
     </div>
 </section>

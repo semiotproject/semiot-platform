@@ -57,7 +57,7 @@ export default function(
                 })) {
                     systems.push({
                         index: systems.length + 1,
-                        uri: uri,
+                        uri,
                         name: N3.Util.getLiteralValue(label),
                         isOnline: true
                     });
@@ -107,7 +107,9 @@ export default function(
             });
             return defer.promise;
         }
-        removeSystem(uri) {
+        removeSystem(id) {
+            console.warn(`remove method is not implemented`);
+            /*
             if (this.connection) {
                 this.connection.publish(CONFIG.TOPICS.device_remove, [uri]);
             }
@@ -117,6 +119,7 @@ export default function(
                 }
             });
             this.emit("systemsUpdate", systems);
+            */
         }
         getSystems() {
             return systems;

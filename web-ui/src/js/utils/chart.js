@@ -1,6 +1,6 @@
 "use strict";
 
-export default function(CONFIG) {
+export default function(CONFIG, commonUtils) {
 
     const baseChartConfig = {
         useHighStocks: true,
@@ -44,7 +44,7 @@ export default function(CONFIG) {
             STATE_MAP = {};
 
             states.forEach((s, index) => {
-                let uri = this.convertValueToTSDBNotation(s.uri);
+                let uri = commonUtils.parseMetricFromType(s.uri);
                 STATE_MAP[uri] = {
                     index: index,
                     label: s.label,
@@ -123,11 +123,8 @@ export default function(CONFIG) {
                 return a[0] > b[0] ? 1 : -1;
             });
         },
-        convertValueToTSDBNotation(value) {
-            return value.replace(':', '_').replace('#', '-');
-        },
         parseStateChartValue(value) {
-            value = this.convertValueToTSDBNotation(value);
+            value = commonUtils.parseMetricFromType(value);
             return STATE_MAP[value] ? STATE_MAP[value].index : 0;
         }
     };

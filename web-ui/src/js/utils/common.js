@@ -22,6 +22,9 @@ export default function($q, CONFIG) {
             let prefix = "ws://wamprouter/ws?topic=";
             return endpoint.substr(prefix.length);
         },
+        parseMetricFromType(sensorType) {
+            return sensorType.replace(':', '_').replace('#', '-');
+        },
         getMockMachineToolStateObservation: function() {
             const TIMESTAMP = "43534654";
             const DATETIME = "fgdfgfdgfd";

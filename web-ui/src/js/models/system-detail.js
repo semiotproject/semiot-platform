@@ -29,11 +29,14 @@ export default function(
         fetchSystemName(uri, callback) {
             return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemName.format(uri), callback);
         }
-        fetchSystemEndpoint(uri, callback) {
-            return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemEndpoint.format(uri), callback);
+        fetchSystemSensors(uri, callback) {
+            return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemSensors.format(uri), callback);
         }
-        fetchArchiveObservations(metric, range) {
-            return tsdbUtils.getArchiveObservations(metric, range);
+        fetchSystemDetail(uri, callback) {
+            return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemDetail.format(uri), callback);
+        }
+        fetchArchiveObservations(metric, range, type) {
+            return tsdbUtils.getArchiveObservations(metric, range, type);
         }
         fetchArchiveStates(metric, range) {
             return tsdbUtils.getArchiveStates(metric, range);

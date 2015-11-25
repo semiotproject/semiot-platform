@@ -13,7 +13,8 @@ export default {
         messageBus: "ws://" + hostname + ":8080/ws",
         tripleStore: "http://" + hostname + ":3030/ds/query",
         tsdb: {
-            archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}`,
+            // archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}`,
+            archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{property={3}}`,
             archiveEnum: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{enum_value=*}`,
             last: `${TSDB_BASE_URL}/last/{0}`
         }
@@ -52,8 +53,8 @@ export default {
                 "       rdfs:label ?label .",
                 "}"
             ].join('\n'),
-            getSystemEndpoint: `
-                SELECT ?endpoint ?type ?observationType ?propLabel ?valueUnitLabel {
+            getSystemSensors: `
+                SELECT ?type ?observationType ?propLabel ?valueUnitLabel {
                   <{0}> ssn:hasSubSystem ?subsystem .
                   ?subsystem ssn:observes ?type .
                   ?subsystem ssn:hasMeasurementCapability ?mc .
@@ -64,15 +65,21 @@ export default {
                   ?v a ?observationType .
                   ?v ssn:hasValue ?valueUnit .
                   ?valueUnit rdfs:label ?valueUnitLabel .
-                  ?subsystem ssncom:hasCommunicationEndpoint ?endpoint .
-                  ?endpoint ssncom:protocol 'WAMP' .
                 }
             `,
             getSystemName: [
                 "SELECT ?label {",
-                "   <{0}> rdfs:label ?label .",
+                "   <{0}> rdfs:label ?label, .",
                 "}"
             ].join('\n'),
+            getSystemDetail: `
+                SELECT ?label ?topic {
+                    <{0}> rdfs:label ?label ;
+                        ssncom:hasCommunicationEndpoint ?endpoint .
+                    ?endpoint ssncom:protocol "WAMP" ;
+                        ssncom:topic ?topic .
+                }
+            `,
             getMachineToolStates: `
                 SELECT ?stateURI ?stateLabel ?stateDescription
                 WHERE {
