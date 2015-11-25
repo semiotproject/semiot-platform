@@ -29,10 +29,9 @@ public class SubscribeListener implements Observer<String> {
     private static final Query TOPICS_QUERY = QueryFactory
             .create(new StringBuilder()
                     .append("prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> ")
-                    .append("prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> ")
                     .append("prefix ssncom: <http://purl.org/NET/ssnext/communication#> ")
-                    .append("SELECT ?q where{ ?x a ssn:Sensor; ssncom:hasCommunicationEndpoint ?q. ")
-                    .append("?q ssncom:protocol \"WAMP\"}").toString());
+                    .append("SELECT ?q where{ ?x ssncom:hasCommunicationEndpoint ?e. ")
+                    .append("?e ssncom:protocol \"WAMP\"; ssncom:topic ?q}").toString());
 
     public SubscribeListener() {
         httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
@@ -78,27 +77,27 @@ public class SubscribeListener implements Observer<String> {
     }
 
     private void subscribeTopics(Model description) {
-        
-            QueryExecution qe;
-            if(description==null)
-                qe = getQEFromStoredTopics();
-            else                        
-                qe = getQEFromModelTopics(description);
 
-            ResultSet topics = qe.execSelect();
-            while (topics.hasNext()) {
-                String topicName = parseTopicName(topics.next().get("q")
-                        .asResource().getURI());
-                if (!topicName.isEmpty()
-                        && !listTopics.contains(topicName)) {
-                    listTopics.add(topicName);
-                    wampClient.subscribe(topicName).subscribe(
-                            new TopicListener(topicName));
-                } else {
-                    logger.warn("Name topic is blank");
-                }
+        QueryExecution qe;
+        if (description == null) {
+            qe = getQEFromStoredTopics();
+        } else {
+            qe = getQEFromModelTopics(description);
+        }
+
+        ResultSet topics = qe.execSelect();
+        while (topics.hasNext()) {
+            String topicName = topics.next().get("q").asLiteral().getString();
+            if (!topicName.isEmpty()
+                    && !listTopics.contains(topicName)) {
+                listTopics.add(topicName);
+                wampClient.subscribe(topicName).subscribe(
+                        new TopicListener(topicName));
+            } else {
+                logger.warn("Name topic is blank");
             }
-        
+        }
+
     }
 
     private QueryExecution getQEFromStoredTopics() {

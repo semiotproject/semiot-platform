@@ -62,7 +62,7 @@ public class Queries {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
             JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
-            logger.info("Query appended");
+            logger.info("Query " + ret.getString("name") + " appended");
             return Response.ok(ret.toString()).build();
         } catch (JSONException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -98,7 +98,7 @@ public class Queries {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         Engine.getInstance().removeQuery(ret.getString("text"));
-        logger.info("Query removed");
+        logger.info("Query " + ret.getString("name") + " removed");
         return Response.ok().build();
     }
 }

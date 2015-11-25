@@ -35,6 +35,7 @@ public class Engine {
     private final String STREAM_ID = "http://example.org/simpletest/test";
     private DefaultRDFStream stream = null;
     private Map<String, OpRouter1> queries = null;
+    //private Map<String, DefaultRDFStream> streams = null;
 
     private Engine() {
         logger.info("Initialize home directory for cqels");
@@ -44,6 +45,7 @@ public class Engine {
         }
         context = new ExecContext(home.getAbsolutePath(), true);
         stream = new DefaultRDFStream(context, STREAM_ID);
+        //streams = new HashMap<>();
         queries = new HashMap<>();
 
     }
@@ -64,7 +66,9 @@ public class Engine {
 
                         @Override
                         public void update(List<Triple> graph) {
-                            sendToWamp(getString(graph));
+                            String message = getString(graph);
+                            sendToWamp(message);
+                            appendData(message);
                         }
                     });
                     queries.put(query, cc);
@@ -114,13 +118,19 @@ public class Engine {
         Model description = ModelFactory.createDefaultModel().read(
                 new StringReader(msg), null, "TURTLE");
         stream.stream(description);
+        /*
+        String streamName = description.getNsPrefixURI("");
+        if(!streams.containsKey(streamName))
+            streams.put(streamName, new DefaultRDFStream(context, streamName));
+        streams.get(streamName).stream(description);        
+        */
     }
 
     private void sendToWamp(String message) {
-        //logger.info("Get alert! " + message);
+        logger.info("Get alert! " + message);
         WAMPClient.getInstance().publish(ServiceConfig.config.topicsAlert(), message);
     }
-
+    
     private String getString(Mapping m) {
         List<Node> list = toNodeList(m);
         String message = "";
@@ -134,9 +144,20 @@ public class Engine {
 
     private String getString(List<Triple> list) {
         String message = "";
+        String object;
         for (Triple t : list) {
             if (t != null) {
-                message += t.toString() + "\n";
+                if (t.getObject().isURI())
+                    object = "<" + t.getObject().getURI() + ">";
+                else{
+                    object = t.getObject().toString();
+                    object = object.replace("^^", "^^<").concat(">");
+                }
+                    
+                message += "<" + t.getSubject().getURI() + "> <" + 
+                        t.getPredicate().getURI() + "> " + 
+                        object + " .\n";
+                //message += t.toString() + "\n";
             }
         }
         return message;
