@@ -5,8 +5,10 @@
 @prefix saref: <http://ontology.tno.nl/saref#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
+@prefix dcterms: <http://purl.org/dc/terms/#> .
 
 <http://${DOMAIN}/${PATH}/${DEVICE_HASH}> a mcht:MachineTool ;
+	dcterms:identifier "${DEVICE_HASH}"^^xsd:string ;
     rdfs:label "Machine Tool #${DEVICE_HASH}"@en ;
     ssn:hasSubSystem [
     	a ssn:SensingDevice ;

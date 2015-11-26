@@ -34,6 +34,7 @@ import ru.semiot.platform.drivers.simulator.CoAPInterface;
 import ru.semiot.platform.drivers.simulator.DeviceDriverImpl;
 import ru.semiot.platform.drivers.simulator.handlers.coap.DeviceHandler;
 import ru.semiot.platform.drivers.simulator.handlers.coap.NewObservationHandler;
+import ru.semiot.semiot.commons.namespaces.DCTERMS;
 import ru.semiot.semiot.commons.namespaces.EMTR;
 import ru.semiot.semiot.commons.namespaces.HMTR;
 import ru.semiot.semiot.commons.namespaces.RDF;
@@ -195,15 +196,16 @@ public class RegisterResource extends CoapResource {
 		final Resource wampEndpoint = ResourceFactory
 				.createResource(templateWampURI.replace("${topic}",
 						hash));
-		final Literal wampTopic = ResourceFactory
+		final Literal hashLiteral = ResourceFactory
 				.createTypedLiteral(hash);
 	
 		// Declare a new CommunicationEndpoint (WAMP)
-		//tmp.setNsPrefix("xsd", "<http://www.w3.org/2001/XMLSchema#>");
+		// tmp.setNsPrefix("xsd", "<http://www.w3.org/2001/XMLSchema#>");
 		tmp.add(system, SSNCOM.hasCommunicationEndpoint, wampEndpoint)
+				.add(system, DCTERMS.identifier, hashLiteral)
 				.add(wampEndpoint, RDF.type,
 						SSNCOM.CommunicationEndpoint)
-				.add(wampEndpoint, SSNCOM.topic, wampTopic)
+				.add(wampEndpoint, SSNCOM.topic, hashLiteral)
 				.add(wampEndpoint, SSNCOM.protocol, WAMP);
 		
 		return tmp;
