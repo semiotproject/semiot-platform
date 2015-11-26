@@ -43,6 +43,8 @@
         ja:externalContent <http://qudt.org/1.1/vocab/quantity#> ;
         ja:externalContent <http://www.qudt.org/qudt/owl/1.0.0/qudt.owl> ;
         ja:externalContent <http://ontology.tno.nl/saref.ttl> ;
+        ja:externalContent <http://dublincore.org/2012/06/14/dcterms.ttl> ;
+        ja:externalContent <http://www.w3.org/2003/01/geo/wgs84_pos#> ;
     ];
     ja:reasoner [
         ja:reasonerURL <http://jena.hpl.hp.com/2003/RDFSExptRuleReasoner> ;
