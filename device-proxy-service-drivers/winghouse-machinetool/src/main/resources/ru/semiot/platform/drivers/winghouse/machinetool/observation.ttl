@@ -3,16 +3,16 @@
 @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
-@prefix : <http://${DOMAIN}/systems/${DEVICE_HASH}/machinetool#> .
+@prefix : <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/machinetool#> .
 
 :${TIMESTAMP} a ssn:Observation ;
 	ssn:observedProperty mcht:MachineToolWorkingState;
-	ssn:observedBy <http://${DOMAIN}/systems/${DEVICE_HASH}> ;
+	ssn:observedBy <http://${DOMAIN}/${PATH}/${DEVICE_HASH}> ;
     ssn:observationResultTime "${DATETIME}"^^xsd:dateTime ;
     ssn:observationResult :${TIMESTAMP}-result .
 
 :${TIMESTAMP}-result a ssn:SensorOutput ;
-    ssn:isProducedBy <http://${DOMAIN}/systems/${DEVICE_HASH}> ;
+    ssn:isProducedBy <http://${DOMAIN}/${PATH}/${DEVICE_HASH}> ;
     ssn:hasValue :${TIMESTAMP}-resultvalue .
     
 :${TIMESTAMP}-resultvalue a qudt:Enumeration ;

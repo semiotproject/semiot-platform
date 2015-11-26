@@ -6,7 +6,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 
-<http://${DOMAIN}/systems/${DEVICE_HASH}> a mcht:MachineTool ;
+<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> a mcht:MachineTool ;
     rdfs:label "Machine Tool #${DEVICE_HASH}"@en ;
     ssn:hasSubSystem [
     	a ssn:SensingDevice ;
@@ -24,8 +24,8 @@
 	    ] ;
     ] ;
     saref:hasState saref:OnState ;
-    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/systems/topic=${DEVICE_HASH}> .
+    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> .
     
-<http://${DOMAIN}/systems/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
+<http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
 	ssncom:topic "${DEVICE_HASH}"^^xsd:string ;
     ssncom:protocol "WAMP" .

@@ -36,7 +36,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private Map<String, MachineToolValue> oldValueMachineTools = 
 			Collections.synchronizedMap(new HashMap<String, MachineToolValue>());
     private static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "<http://${DOMAIN}/systems/${DEVICE_HASH}> saref:hasState saref:OffState.";
+			+ "<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> saref:hasState saref:OffState.";
     
     private ScheduledExecutorService scheduler;
 	private ScheduledDeviceStatus scheduledDeviceStatus;
@@ -99,8 +99,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         for (Device device : listDevices)
 		{
         	System.out.println(templateOffState.replace("${DOMAIN}", getDomain())
+        			.replace("${PATH}", getPathSystemUri())
         			.replace("${DEVICE_HASH}", device.getID()));
         	inactiveDevice(templateOffState.replace("${DOMAIN}", getDomain())
+        			.replace("${PATH}", getPathSystemUri())
         			.replace("${DEVICE_HASH}", device.getID()));
 		}
         
@@ -154,6 +156,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     	return deviceManager.getDomain();
     }
     
+    public String getPathSystemUri() {
+    	return deviceManager.getPathSystemUri();
+    }
+    
     public String getDriverName() {
 		return driverName;
 	}
@@ -202,6 +208,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 				if(entry.getValue().getTurnOn() == true &&
 						entry.getValue().getTimestemp() + 30000 < currentTimestamp ) {
 					inactiveDevice(templateOffState.replace("${DOMAIN}", getDomain())
+							.replace("${PATH}", getPathSystemUri())
 		        			.replace("${DEVICE_HASH}", entry.getKey()));
 					entry.getValue().setTurnOn(false);
 					System.out.println(entry.getKey() + " saref:OffState" );

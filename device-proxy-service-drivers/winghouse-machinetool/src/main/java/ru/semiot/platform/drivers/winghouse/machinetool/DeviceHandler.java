@@ -15,7 +15,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
 	private static final String templateTopic = "${DEVICE_HASH}";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "<http://${DOMAIN}/systems/${DEVICE_HASH}> saref:hasState saref:OnState.";
+			+ "<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> saref:hasState saref:OnState.";
 
 	public DeviceHandler(DeviceDriverImpl deviceDriverImpl) {
 		this.deviceDriverImpl = deviceDriverImpl;
@@ -54,7 +54,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 				} 
 				if(!deviceDriverImpl.getOldValueMachineTools().get(mvalue.getHash()).getTurnOn()) {
 					deviceDriverImpl.inactiveDevice(templateOnState.replace("${DOMAIN}", deviceDriverImpl.getDomain())
-							.replace("${DEVICE_HASH}", mvalue.getHash()));
+							.replace("${PATH}", deviceDriverImpl.getPathSystemUri()).replace("${DEVICE_HASH}", mvalue.getHash()));
 					// deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).setTurnOn(true);
 					System.out.println(mvalue.getHash() + " saref:OnState" );
 				}
@@ -77,6 +77,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 			String message = deviceDriverImpl
 					.getTemplateObservation()
 					.replace("${DOMAIN}", deviceDriverImpl.getDomain())
+					.replace("${PATH}", deviceDriverImpl.getPathSystemUri())
 					.replace("${DEVICE_HASH}", mvalue.getHash())
 					.replace("${TIMESTAMP}", String.valueOf(mvalue.getTimestemp()))
 					.replace("${DATETIME}", date)
@@ -92,7 +93,8 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 	private void addDevice(String hashDevice) {
 		// инициализация нового девайса
 		String message = deviceDriverImpl.getTemplateDescription().replace(
-				"${DEVICE_HASH}", hashDevice).replace("${DOMAIN}", deviceDriverImpl.getDomain());
+				"${DEVICE_HASH}", hashDevice).replace("${PATH}", deviceDriverImpl.getPathSystemUri())
+				.replace("${DOMAIN}", deviceDriverImpl.getDomain());
 		// System.out.println("Publish message:\n" + message);
 		deviceDriverImpl.addDevice(new Device(hashDevice, message));
 	}

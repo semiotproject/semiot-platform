@@ -106,6 +106,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 	public String getDomain() {
 		return deviceManager.getDomain();
 	}
+	
+	public String getPathSystemUri() {
+		return deviceManager.getPathSystemUri();
+	}
 
 	public String getDriverName() {
 		return driverName;

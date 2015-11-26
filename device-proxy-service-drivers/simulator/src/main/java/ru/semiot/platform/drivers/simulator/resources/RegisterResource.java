@@ -1,6 +1,5 @@
 package ru.semiot.platform.drivers.simulator.resources;
 
-import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -11,11 +10,8 @@ import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.FileManager;
 
 import java.io.IOException;
@@ -54,7 +50,7 @@ public class RegisterResource extends CoapResource {
 	private static final String queryFile = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "<${system}> saref:hasState saref:OnState.";
-	private static final String templateSystemUri = "http://${DOMAIN}/systems/${DEVICE_HASH}";
+	private static final String templateSystemUri = "http://${DOMAIN}/${PATH}/${DEVICE_HASH}";
 	private final Model schema;
 	private final Query query;
 	private static final String VAR_COAP = "coap";
@@ -122,7 +118,8 @@ public class RegisterResource extends CoapResource {
 							system = soln.getResource(VAR_SYSTEM);
 							hash = getHash(system.getURI());
 							systemURI = templateSystemUri.replace("${DOMAIN}", deviceDriverImpl.getDomain())
-									.replace("${DEVICE_HASH}", hash);
+									.replace("${DEVICE_HASH}", hash)
+									.replace("${PATH}", deviceDriverImpl.getPathSystemUri());
 						}
 						
 						containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, coap.getURI());
