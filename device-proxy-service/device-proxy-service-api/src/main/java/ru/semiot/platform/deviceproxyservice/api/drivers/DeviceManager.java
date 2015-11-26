@@ -16,4 +16,6 @@ public interface DeviceManager {
     
     public String getDomain();
     
+    public String getPathSystemUri();
+    
 }

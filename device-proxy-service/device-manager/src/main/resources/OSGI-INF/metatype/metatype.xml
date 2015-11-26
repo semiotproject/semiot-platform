@@ -24,6 +24,8 @@
             required="true" type="String" default="http://localhost:3030/ds/data"/>
         <AD name="Domain" id="ru.semiot.platform.deviceproxyservice.manager.domain"
             required="true" type="String" default="localhost"/>
+        <AD name="Path in System Uri" id="ru.semiot.platform.deviceproxyservice.manager.path"
+            required="true" type="String" default="systems"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.deviceproxyservice.manager">
