@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+    <OCD description="Narodmon Temperature Driver" name="Narodmon Temperature Driver"
+         id="ru.semiot.platform.drivers.narodmon.temperature">
+        <AD name="UDP Port" id="ru.semiot.platform.drivers.narodmon.temperature.url"
+            required="true" type="String" default="http://narodmon.ru"/>
+    </OCD>
+    
+    <Designate pid="ru.semiot.platform.drivers.narodmon.temperature">
+        <Object ocdref="ru.semiot.platform.drivers.narodmon.temperature"/>
+    </Designate>
+</metatype:MetaData>
