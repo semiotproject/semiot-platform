@@ -2,7 +2,8 @@
     "@context": {
         "vocab": "${VOCABULARY_URL}#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "sp": "http://spinrdf.org/sp#"
     },
     "@graph": [
         {
@@ -29,9 +30,29 @@
                                 "returns": "vocab:SystemCollection"
                             }
                         ]
-                    },
-                    "readonly": true,
-                    "writeonly": false 
+                    }
+                },
+                {
+                    "hydra:property": {
+                        "@id": "vocab:EntryPoint/sparql",
+                        "@type": ["hydra:TemplatedLink", "hydra:IriTemplate"],
+                        "hydra:template": "${HOST_URI}sparql?query={q}",
+                        "hydra:mapping": [
+                            {
+                                "@type": "hydra:IriTemplateMapping",
+                                "hydra:variable": "q",
+                                "hydra:property": "sp:Select",
+                                "hydra:required": true
+                            }
+                        ],
+                        "hydra:supportedOperation": [
+                            {
+                                "@type": "hydra:Operation",
+                                "hydra:method": "GET",
+                                "hydra:returns": "rdf:List"
+                            }
+                        ]
+                    }
                 }
             ]
         },

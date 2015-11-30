@@ -42,7 +42,10 @@ public class RootResource {
         JsonLdBuilder builder = new JsonLdBuilder(CONTEXT)
                 .add(JsonLdKeys.ID, uriInfo.getRequestUri().toASCIIString())
                 .add(JsonLdKeys.TYPE, "vocab:EntryPoint")
-                .add("vocab:EntryPoint/systems", uriInfo.resolve(new URI("systems")).toASCIIString());
+                .add("vocab:EntryPoint/systems", 
+                        uriInfo.resolve(new URI("systems")).toASCIIString())
+                .add("vocab:EntryPoint/sparql", 
+                        uriInfo.getBaseUriBuilder().replacePath("sparql").build());
 
         return builder.toCompactedString();
     }
@@ -66,9 +69,10 @@ public class RootResource {
         final String context = IOUtils.toString(
                 this.getClass().getResourceAsStream("/ru/semiot/platform/apigateway/context.jsonld"));
         
-        return context.replace(
-                "${VOCABULARY_URL}", 
-                uriInfo.getBaseUriBuilder().path("vocab").build().toASCIIString());
+        return context
+                .replace("${VOCABULARY_URL}", 
+                uriInfo.getBaseUriBuilder().path("vocab").build().toASCIIString())
+                .replace("${HOST_URI}", uriInfo.getBaseUri().toASCIIString());
     }
 
 }

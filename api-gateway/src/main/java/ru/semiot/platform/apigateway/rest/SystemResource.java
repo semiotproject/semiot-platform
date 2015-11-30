@@ -52,8 +52,14 @@ public class SystemResource {
             new AbstractMap.SimpleEntry<>("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"),
             new AbstractMap.SimpleEntry<>("dul", "http://www.loa-cnr.it/ontologies/DUL.owl#")
     ).collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue()));
+    
+    @Context
+    UriInfo uriInfo;
 
-    public SystemResource() {
+    public SystemResource() throws URISyntaxException {
+        final String defaultVocabURL = 
+                uriInfo.resolve(new URI("vocab#")).toASCIIString();
+        CONTEXT.put("vocab", defaultVocabURL);
     }
 
     public SystemResource(@Context UriInfo uriInfo) throws URISyntaxException {
