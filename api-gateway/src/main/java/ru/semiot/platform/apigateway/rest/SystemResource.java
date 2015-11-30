@@ -18,7 +18,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.UriBuilder;
@@ -34,13 +34,15 @@ public class SystemResource {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
     private static final String QUERY_GET_ALL_SYSTEMS
-            = "SELECT DISTINCT ?uri ?label {"
+            = "SELECT DISTINCT ?uri ?label ?id {"
             + "?uri a ssn:System ;"
-            + "rdfs:label ?label ."
+            + "rdfs:label ?label ;"
+            + "dcterms:identifier ?id ."
             + "}";
     private static final String QUERY_DESCRIBE_SYSTEM
             = "SELECT * {"
-            + "<${SYSTEM_URI}> ?p ?o ."
+            + "?uri dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
+            + "?uri ?p ?o ."
             + "FILTER (isBlank(?o) = False)"
             + "}";
     private static final Map<String, Object> CONTEXT = Stream.of(
@@ -67,7 +69,6 @@ public class SystemResource {
     private UriInfo context;
 
     @GET
-    @Path("/list")
     @Produces("application/ld+json")
     public void listSystems(@Suspended final AsyncResponse response)
             throws JsonLdError, IOException {
@@ -84,9 +85,8 @@ public class SystemResource {
                 
                 final QuerySolution qs = r.next();
                 final String uri = ub
-                        .path("systems/single")
-                        .queryParam("uri", qs.get("uri"))
-                        .buildFromEncoded().toASCIIString();
+                        .path("systems/{a}")
+                        .buildFromEncoded(qs.getLiteral("id").getString()).toASCIIString();
                 final String label = qs.getLiteral("label").getString();
 
                 builder.add("hydra:member", new HashMap<String, Object>() {
@@ -114,21 +114,21 @@ public class SystemResource {
     }
 
     @GET
-    @Path("/single")
+    @Path("{id}")
     @Produces("application/ld+json")
-    public void getSystem(@Suspended final AsyncResponse response,
-            @QueryParam("uri") String uri) {
+    public void getSystem(
+            @Suspended final AsyncResponse response,
+            @PathParam("id") String id) {
         final String requestUri = context.getRequestUri().toASCIIString();
         final UriBuilder uriBuilder = context.getBaseUriBuilder();
 
-        query.select(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_URI}", uri)).subscribe((r) -> {
+        query.select(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id)).subscribe((r) -> {
             JsonLdBuilder builder = new JsonLdBuilder(CONTEXT)
                     .add(JsonLdKeys.ID, requestUri)
                     .add(JsonLdKeys.TYPE, "ssn:System")
-                    .add("vocab:observations", 
-                            uriBuilder.scheme("ws").path("../ws/observations")
-                                    .queryParam("system_uri", uri)
-                                    .build());
+                    .add("vocab:observations", uriBuilder.scheme("ws")
+                            .replacePath("/ws/observations/systems/{a}")
+                            .build(id));
 
             while (r.hasNext()) {
                 final QuerySolution qs = r.next();

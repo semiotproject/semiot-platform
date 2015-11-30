@@ -58,15 +58,15 @@ hbase:
     - /semiot-platform/hbase/data/:/etc/hbase
   restart: always
 
-apigateway:
-  image: docker.semiot.ru/api-gateway
-  links:
-    - wamprouter
-    - opentsdb
-    - deviceproxyservice
-  ports:
-    - "8383:8080"
-  volumes:
-    - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
-  restart: always
+#apigateway:
+#  image: docker.semiot.ru/api-gateway
+#  links:
+#    - wamprouter
+#    - opentsdb
+#    - deviceproxyservice
+#  ports:
+#    - "8383:8080"
+#  volumes:
+#    - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
+#  restart: always
 

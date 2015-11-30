@@ -50,7 +50,21 @@
         {
             "@id": "vocab:observations",
             "@type": "hydra:Link",
-            "rdfs:range": "hydra:Resource"
+            "rdfs:range": "vocab:WebSocketResource",
+            "hydra:supportedOperation": [
+                "@type": "vocab:WebSocketOperation",
+                "hydra:returns": "ssn:Observation"
+            ]
+        },
+        {
+            "@id": "vocab:WebSocketResource",
+            "@type": "hydra:Class",
+            "rdfs:subClassOf": "hydra:Resource"
+        },
+        {
+            "@id": "vocab:WebSocketOperation",
+            "@type": "hydra:Class",
+            "rdfs:subClassOf": "hydra:Operation"
         }
     ]
 }

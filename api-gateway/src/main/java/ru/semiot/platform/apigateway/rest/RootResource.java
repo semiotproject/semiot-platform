@@ -42,7 +42,7 @@ public class RootResource {
         JsonLdBuilder builder = new JsonLdBuilder(CONTEXT)
                 .add(JsonLdKeys.ID, uriInfo.getRequestUri().toASCIIString())
                 .add(JsonLdKeys.TYPE, "vocab:EntryPoint")
-                .add("vocab:EntryPoint/systems", uriInfo.resolve(new URI("systems/list")).toASCIIString());
+                .add("vocab:EntryPoint/systems", uriInfo.resolve(new URI("systems")).toASCIIString());
 
         return builder.toCompactedString();
     }
