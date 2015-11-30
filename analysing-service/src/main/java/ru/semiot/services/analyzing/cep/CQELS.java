@@ -1,4 +1,4 @@
-package ru.semiot.services.analyzing.cqels;
+package ru.semiot.services.analyzing.cep;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 import org.deri.cqels.data.Mapping;
 import org.deri.cqels.engine.ConstructListener;
 import org.deri.cqels.engine.ContinuousConstruct;
@@ -25,19 +27,21 @@ import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.ServiceConfig;
 import ru.semiot.services.analyzing.wamp.WAMPClient;
 
-public class Engine {
+@Named
+@ApplicationScoped
+public class CQELS implements Engine{
 
     private final org.slf4j.Logger logger = LoggerFactory
-            .getLogger(Engine.class);
+            .getLogger(CQELS.class);
     private final String CQELS_HOME = "cqels_home";
-    private static Engine engine = null;
+    private static CQELS engine = null;
     private ExecContext context = null;
     private final String STREAM_ID = "http://example.org/simpletest/test";
     private DefaultRDFStream stream = null;
     private Map<String, OpRouter1> queries = null;
     //private Map<String, DefaultRDFStream> streams = null;
-
-    private Engine() {
+    
+    public CQELS() {
         logger.info("Initialize home directory for cqels");
         File home = new File(CQELS_HOME);
         if (!home.exists()) {
@@ -50,13 +54,14 @@ public class Engine {
 
     }
 
-    public static Engine getInstance() {
+    public static CQELS getInstance() {
         if (engine == null) {
-            engine = new Engine();
+            engine = new CQELS();
         }
         return engine;
     }
 
+    @Override
     public boolean registerQuery(String query) {
         try {
             if (query.toLowerCase().contains("select") || query.toLowerCase().contains("construct")) {
@@ -67,7 +72,7 @@ public class Engine {
                         @Override
                         public void update(List<Triple> graph) {
                             String message = getString(graph);
-                            sendToWamp(message);
+                            sendToWAMP(message);
                             appendData(message);
                         }
                     });
@@ -78,7 +83,7 @@ public class Engine {
 
                         @Override
                         public void update(Mapping m) {
-                            sendToWamp(getString(m));
+                            sendToWAMP(getString(m));
                         }
                     });
                     queries.put(query, cs);
@@ -98,6 +103,7 @@ public class Engine {
         queries.clear();
     }
 
+    @Override
     public void removeQuery(String query) {
         if (query != null && !query.isEmpty() && queries.containsKey(query)) {
             logger.debug("Removing query");
@@ -114,6 +120,7 @@ public class Engine {
         }
     }
 
+    @Override
     public void appendData(String msg) {
         Model description = ModelFactory.createDefaultModel().read(
                 new StringReader(msg), null, "TURTLE");
@@ -126,7 +133,7 @@ public class Engine {
         */
     }
 
-    private void sendToWamp(String message) {
+    public void sendToWAMP(String message) {
         logger.info("Get alert! " + message);
         WAMPClient.getInstance().publish(ServiceConfig.config.topicsAlert(), message);
     }

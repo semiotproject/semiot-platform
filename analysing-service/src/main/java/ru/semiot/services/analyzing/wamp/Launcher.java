@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateful;
 import javax.faces.bean.ManagedBean;
+import javax.inject.Inject;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -26,7 +27,7 @@ public class Launcher {
 
     private static final Logger logger = LoggerFactory
             .getLogger(Launcher.class);
-
+    @Inject SubscribeListener subscribeListener;
     @PostConstruct
     public void run() {
         logger.info("Start WAMP");
@@ -77,12 +78,12 @@ public class Launcher {
                             if (newStatus == WampClient.Status.Connected) {
                                 logger.info("Connected to {}",
                                         config.wampUri());
-
+                                subscribeListener.start();
                                 WAMPClient
                                 .getInstance()
                                 .subscribe(
                                         config.topicsSubscriber())
-                                .subscribe(new SubscribeListener());
+                                .subscribe(subscribeListener);
                             } else if (newStatus == WampClient.Status.Disconnected) {
                                 logger.info("Disconnected from {}",
                                         config.wampUri());

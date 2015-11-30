@@ -16,7 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.services.analyzing.cqels.Engine;
+import ru.semiot.services.analyzing.cep.Engine;
 import ru.semiot.services.analyzing.database.DataBase;
 
 /**
@@ -32,7 +32,8 @@ public class Queries {
 
     @Inject
     private DataBase db;
-
+    @Inject Engine engine;
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQueries() {
@@ -58,7 +59,7 @@ public class Queries {
             if (!object.has("name") || !object.has("text")) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            if (!Engine.getInstance().registerQuery(object.getString("text"))) {
+            if (!engine.registerQuery(object.getString("text"))) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
             JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
@@ -97,7 +98,7 @@ public class Queries {
         if (ret == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        Engine.getInstance().removeQuery(ret.getString("text"));
+        engine.removeQuery(ret.getString("text"));
         logger.info("Query " + ret.getString("name") + " removed");
         return Response.ok().build();
     }
