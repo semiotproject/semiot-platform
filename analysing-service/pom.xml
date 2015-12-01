@@ -41,6 +41,11 @@
             <artifactId>json</artifactId>
             <version>20150729</version>
         </dependency>
+        <dependency>
+            <groupId>eu.larkc.csparql</groupId>
+            <artifactId>csparql-core</artifactId>
+            <version>0.9.5</version>
+        </dependency>
     </dependencies>
     
     <repositories>
@@ -59,6 +64,12 @@
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
+        </repository>
+        <repository>
+            <id>streamreasoning_repository</id>
+            <name>Csparql server repository</name>
+            <url>http://streamreasoning.org/maven/</url>
+            <layout>default</layout>
         </repository>
     </repositories>
     <build>

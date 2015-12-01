@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Named;
 import org.deri.cqels.data.Mapping;
 import org.deri.cqels.engine.ConstructListener;
@@ -28,8 +29,9 @@ import ru.semiot.services.analyzing.ServiceConfig;
 import ru.semiot.services.analyzing.wamp.WAMPClient;
 
 @Named
+@Alternative
 @ApplicationScoped
-public class CQELS implements Engine{
+public class CQELS implements Engine {
 
     private final org.slf4j.Logger logger = LoggerFactory
             .getLogger(CQELS.class);
@@ -40,17 +42,17 @@ public class CQELS implements Engine{
     private DefaultRDFStream stream = null;
     private Map<String, OpRouter1> queries = null;
     //private Map<String, DefaultRDFStream> streams = null;
-    
+
     public CQELS() {
-        logger.info("Initialize home directory for cqels");
-        File home = new File(CQELS_HOME);
-        if (!home.exists()) {
-            home.mkdir();
-        }
-        context = new ExecContext(home.getAbsolutePath(), true);
-        stream = new DefaultRDFStream(context, STREAM_ID);
-        //streams = new HashMap<>();
-        queries = new HashMap<>();
+            logger.info("Initialize home directory for cqels");
+            File home = new File(CQELS_HOME);
+            if (!home.exists()) {
+                home.mkdir();
+            }
+            context = new ExecContext(home.getAbsolutePath(), true);
+            stream = new DefaultRDFStream(context, STREAM_ID);
+            //streams = new HashMap<>();
+            queries = new HashMap<>();
 
     }
 
@@ -126,18 +128,18 @@ public class CQELS implements Engine{
                 new StringReader(msg), null, "TURTLE");
         stream.stream(description);
         /*
-        String streamName = description.getNsPrefixURI("");
-        if(!streams.containsKey(streamName))
-            streams.put(streamName, new DefaultRDFStream(context, streamName));
-        streams.get(streamName).stream(description);        
-        */
+         String streamName = description.getNsPrefixURI("");
+         if(!streams.containsKey(streamName))
+         streams.put(streamName, new DefaultRDFStream(context, streamName));
+         streams.get(streamName).stream(description);        
+         */
     }
 
     public void sendToWAMP(String message) {
         logger.info("Get alert! " + message);
         WAMPClient.getInstance().publish(ServiceConfig.config.topicsAlert(), message);
     }
-    
+
     private String getString(Mapping m) {
         List<Node> list = toNodeList(m);
         String message = "";
@@ -154,16 +156,16 @@ public class CQELS implements Engine{
         String object;
         for (Triple t : list) {
             if (t != null) {
-                if (t.getObject().isURI())
+                if (t.getObject().isURI()) {
                     object = "<" + t.getObject().getURI() + ">";
-                else{
+                } else {
                     object = t.getObject().toString();
                     object = object.replace("^^", "^^<").concat(">");
                 }
-                    
-                message += "<" + t.getSubject().getURI() + "> <" + 
-                        t.getPredicate().getURI() + "> " + 
-                        object + " .\n";
+
+                message += "<" + t.getSubject().getURI() + "> <"
+                        + t.getPredicate().getURI() + "> "
+                        + object + " .\n";
                 //message += t.toString() + "\n";
             }
         }
