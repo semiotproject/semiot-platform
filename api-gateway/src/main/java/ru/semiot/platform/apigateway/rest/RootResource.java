@@ -37,7 +37,7 @@ public class RootResource {
     UriInfo uriInfo;
 
     @GET
-    @Produces("application/ld+json")
+    @Produces(MediaType.APPLICATION_LD_JSON)
     public String entrypoint() throws JsonLdError, IOException, URISyntaxException {
         JsonLdBuilder builder = new JsonLdBuilder(CONTEXT)
                 .add(JsonLdKeys.ID, uriInfo.getRequestUri().toASCIIString())
@@ -52,7 +52,7 @@ public class RootResource {
 
     @GET
     @Path("/doc")
-    @Produces("application/ld+json")
+    @Produces(MediaType.APPLICATION_LD_JSON)
     public String documentation() throws JsonLdError, IOException {
         JsonLdBuilder builder = new JsonLdBuilder(CONTEXT)
                 .add(JsonLdKeys.ID, uriInfo.getRequestUri().toASCIIString())
@@ -64,7 +64,7 @@ public class RootResource {
     
     @GET
     @Path("/vocab")
-    @Produces("application/ld+json")
+    @Produces(MediaType.APPLICATION_LD_JSON)
     public String vocabulary() throws IOException {
         final String context = IOUtils.toString(
                 this.getClass().getResourceAsStream("/ru/semiot/platform/apigateway/context.jsonld"));

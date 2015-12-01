@@ -51,6 +51,10 @@ public class JsonLdBuilder {
         return this;
     }
     
+    public Map<String, Object> toJsonLdObject() throws JsonLdError {
+        return JsonLdProcessor.compact(content, context, new JsonLdOptions());
+    }
+    
     public String toCompactedString() throws JsonLdError, IOException {
         return JsonUtils.toString(
                 JsonLdProcessor.compact(content, context, new JsonLdOptions()));

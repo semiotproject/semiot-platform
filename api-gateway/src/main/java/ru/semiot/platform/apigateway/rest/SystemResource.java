@@ -75,7 +75,7 @@ public class SystemResource {
     private UriInfo context;
 
     @GET
-    @Produces("application/ld+json")
+    @Produces(MediaType.APPLICATION_LD_JSON)
     public void listSystems(@Suspended final AsyncResponse response)
             throws JsonLdError, IOException {
         final UriBuilder uriBuilder = context.getBaseUriBuilder();
@@ -121,7 +121,7 @@ public class SystemResource {
 
     @GET
     @Path("{id}")
-    @Produces("application/ld+json")
+    @Produces(MediaType.APPLICATION_LD_JSON)
     public void getSystem(
             @Suspended final AsyncResponse response,
             @PathParam("id") String id) {
