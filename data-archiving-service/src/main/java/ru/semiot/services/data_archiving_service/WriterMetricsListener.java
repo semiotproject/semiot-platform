@@ -32,15 +32,19 @@ public class WriterMetricsListener implements Observer<String> {
 	private static final String PROPERTY = "property";
 	private static final String ENUM_VALUE = "enum_value";
 	private static final String FEATURE_OF_INTEREST = "feature_of_interest";
+	private static final String SOURCE = "source";
 	
 	private static final String QUDT_ENUMERATION = "http://www.qudt.org/qudt/owl/1.0.0/qudt/#Enumeration";
 	private static final Query METRICS_QUERY = QueryFactory
 			.create("prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> "
+					+ "prefix dcterms: <http://purl.org/dc/terms/#> "
 					+ "prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> "
-					+ "SELECT ?timestamp ?property ?value_type ?value ?feature_of_interest "
-					+ "WHERE { ?x a ssn:Observation;"
-					+ " ssn:observedProperty ?property;"
-					+ " ssn:observationResultTime ?timestamp; "
+					+ "SELECT ?timestamp ?property ?value_type ?value ?feature_of_interest ?identifier "
+					+ "WHERE { ?x a ssn:Observation; "
+					+ "ssn:observedProperty ?property; "
+					+ "ssn:observationResultTime ?timestamp; "
+					+ "ssn:observedBy ?sensor. "
+					+ "?sensor dcterms:identifier ?source. "
 					+ "ssn:observationResult ?result. "
 					+ "?result ssn:hasValue ?res_value. "
 					+ "?res_value a ?value_type. "
@@ -78,6 +82,7 @@ public class WriterMetricsListener implements Observer<String> {
 					QuerySolution qs = metrics.next();
 					String timestamp = qs.getLiteral(TIMESTAMP).getString();
 					String valueType = qs.getResource(VALUE_TYPE).getURI();
+					String source = qs.getLiteral(SOURCE).getString();
 					Resource featureOfInterest = qs.getResource(FEATURE_OF_INTEREST);
 					String value;
 					if (valueType.equals(QUDT_ENUMERATION)) {
@@ -89,13 +94,15 @@ public class WriterMetricsListener implements Observer<String> {
 					if (StringUtils.isNotBlank(nameMetric)
 							&& StringUtils.isNotBlank(value)
 							&& StringUtils.isNotBlank(property)
-							&& StringUtils.isNotBlank(timestamp)) {
+							&& StringUtils.isNotBlank(timestamp)
+							&& StringUtils.isNoneBlank(source)) {
 						HashMap<String, String> tags = new HashMap<String, String>();
 						try {
 							Calendar calendar = DatatypeConverter
 									.parseDateTime(timestamp);
 							tags.put(PROPERTY, property.replaceAll(":", "_").replace("#", "-"));// _ - 
 							tags.put(VALUE_TYPE, valueType.replaceAll(":", "_").replace("#", "-"));
+							tags.put(SOURCE, source);
 							if(featureOfInterest != null) {
 								tags.put(FEATURE_OF_INTEREST, featureOfInterest.getURI().replaceAll(":", "_").replace("#", "-"));
 							}
