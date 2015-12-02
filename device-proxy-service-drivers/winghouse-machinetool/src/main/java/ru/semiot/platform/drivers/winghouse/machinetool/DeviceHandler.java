@@ -79,6 +79,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 					.replace("${DOMAIN}", deviceDriverImpl.getDomain())
 					.replace("${PATH}", deviceDriverImpl.getPathSystemUri())
 					.replace("${DEVICE_HASH}", mvalue.getHash())
+					.replace("${SENSOR_ID}", "1")
 					.replace("${TIMESTAMP}", String.valueOf(mvalue.getTimestemp()))
 					.replace("${DATETIME}", date)
 					.replace("${STATE}",
@@ -94,7 +95,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 		// инициализация нового девайса
 		String message = deviceDriverImpl.getTemplateDescription().replace(
 				"${DEVICE_HASH}", hashDevice).replace("${PATH}", deviceDriverImpl.getPathSystemUri())
-				.replace("${DOMAIN}", deviceDriverImpl.getDomain());
+				.replace("${SENSOR_ID}", "1").replace("${DOMAIN}", deviceDriverImpl.getDomain());
 		// System.out.println("Publish message:\n" + message);
 		deviceDriverImpl.addDevice(new Device(hashDevice, message));
 	}

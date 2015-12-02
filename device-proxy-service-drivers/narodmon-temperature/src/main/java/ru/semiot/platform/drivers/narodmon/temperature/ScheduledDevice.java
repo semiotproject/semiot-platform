@@ -95,6 +95,7 @@ public class ScheduledDevice implements Runnable {
                         	else {
                         		device.setRDFDescription(ddi.getTemplateDescription().replace(
 									"${DEVICE_HASH}", hash).replace("${PATH}", ddi.getPathSystemUri())
+									.replace("${SENSOR_ID}", "1")
 									.replace("${DOMAIN}", ddi.getDomain())
 									.replace("${LATITUDE}", String.valueOf(jDevice.get("lat")))
 									.replace("${LONGITUDE}", String.valueOf(jDevice.get("lng"))));
@@ -132,6 +133,7 @@ public class ScheduledDevice implements Runnable {
 					.replace("${DOMAIN}", ddi.getDomain())
 					.replace("${PATH}", ddi.getPathSystemUri())
 					.replace("${DEVICE_HASH}", hash)
+					.replace("${SENSOR_ID}", "1")
 					.replace("${TIMESTAMP}", String.valueOf(timestamp))
 					.replace("${DATETIME}", date)
 					.replace("${VALUE}", value);

@@ -17,6 +17,8 @@ import com.hp.hpl.jena.util.FileManager;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,11 +54,12 @@ public class RegisterResource extends CoapResource {
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "<${system}> saref:hasState saref:OnState.";
 	private static final String templateSystemUri = "http://${DOMAIN}/${PATH}/${DEVICE_HASH}";
+	public static final String templateSensorUri = "http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}";
 	private final Model schema;
 	private final Query query;
 	private static final String VAR_COAP = "coap";
-	private static final String VAR_WAMP = "wamp";
 	private static final String VAR_SYSTEM = "system";
+	private static final String VAR_SENSOR = "sensor";
 	private static final String WAMP = "WAMP";
 	DeviceDriverImpl deviceDriverImpl;
 	
@@ -111,10 +114,14 @@ public class RegisterResource extends CoapResource {
 					String hash = StringUtils.EMPTY;
 					Resource system = null;
 					boolean containsHandler = false;
+					List<Resource> sensors = new ArrayList<Resource>();
 					while (results.hasNext()) {
 						final QuerySolution soln = results.next();
 
 						final Resource coap = soln.getResource(VAR_COAP);
+						final Resource sensor = soln.getResource(VAR_SENSOR);
+						sensors.add(sensor);
+						
 						if (systemURI.isEmpty()) {
 							system = soln.getResource(VAR_SYSTEM);
 							hash = getHash(system.getURI());
@@ -123,10 +130,10 @@ public class RegisterResource extends CoapResource {
 									.replace("${PATH}", deviceDriverImpl.getPathSystemUri());
 						}
 						
-						containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, coap.getURI());
+						containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, sensors.size());
 						if(!containsHandler) {
 							final NewObservationHandler handler = new NewObservationHandler(
-									deviceDriverImpl, hash, systemURI, coap.getURI()); // можно оставить только hash
+									deviceDriverImpl, hash, systemURI, sensor, sensors.size()); // можно оставить только hash
 	
 							final CoapClient coapClient = new CoapClient(
 									coap.getURI());
@@ -145,9 +152,16 @@ public class RegisterResource extends CoapResource {
 						Device newDevice = new Device(systemURI, ""); // TODO отрефакторить!!!
 						if(!deviceDriverImpl.contains(newDevice)) {
 							String desc = toString(description
-									.add(getModelEndpoint(system, hash)));
-							newDevice.setRDFDescription(
-									desc.replace("<" + system.getURI() + ">", "<" + systemURI + ">")); // TODO отрефакторить!!!
+									.add(getModelEndpoint(system, hash, sensors)));
+							desc = desc.replace("<" + system.getURI() + ">", "<" + systemURI + ">");
+							for(int i = 0; i<sensors.size(); i++) {
+								desc = desc.replace(sensors.get(i).getURI(), templateSensorUri
+									.replace("${DOMAIN}", deviceDriverImpl.getDomain())
+									.replace("${PATH}", deviceDriverImpl.getPathSystemUri())
+									.replace("${DEVICE_HASH}", hash)
+									.replace("${SENSOR_ID}", String.valueOf(i+1)));
+							}
+							newDevice.setRDFDescription(desc); // TODO отрефакторить!!!
 							
 							deviceDriverImpl.addDevice(newDevice);
 						} else if(!containsHandler) {
@@ -190,7 +204,7 @@ public class RegisterResource extends CoapResource {
 				deviceDriverImpl.getWampMessageFormat());
 	}
 
-	private Model getModelEndpoint(Resource system, String hash) {
+	private Model getModelEndpoint(Resource system, String hash, List<Resource> sensors) {
 		final Model tmp = ModelFactory.createDefaultModel();
 
 		final Resource wampEndpoint = ResourceFactory
@@ -207,6 +221,12 @@ public class RegisterResource extends CoapResource {
 						SSNCOM.CommunicationEndpoint)
 				.add(wampEndpoint, SSNCOM.topic, hashLiteral)
 				.add(wampEndpoint, SSNCOM.protocol, WAMP);
+		
+		for(int i = 0; i<sensors.size(); i++) {
+			final Literal sensorIdLiteral = ResourceFactory
+					.createTypedLiteral(hash + "/" + String.valueOf(i+1));
+			tmp.add(sensors.get(i), DCTERMS.identifier, sensorIdLiteral);
+		}
 		
 		return tmp;
 	}

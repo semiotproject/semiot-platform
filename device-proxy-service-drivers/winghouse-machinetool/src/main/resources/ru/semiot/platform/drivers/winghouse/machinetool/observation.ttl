@@ -4,10 +4,11 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 @prefix : <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/machinetool#> .
+@prefix dcterms: <http://purl.org/dc/terms/#> .
 
 :${TIMESTAMP} a ssn:Observation ;
 	ssn:observedProperty mcht:MachineToolWorkingState;
-	ssn:observedBy <http://${DOMAIN}/${PATH}/${DEVICE_HASH}> ;
+	ssn:observedBy <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}> ;
     ssn:observationResultTime "${DATETIME}"^^xsd:dateTime ;
     ssn:observationResult :${TIMESTAMP}-result .
 
@@ -17,3 +18,5 @@
     
 :${TIMESTAMP}-resultvalue a qudt:Enumeration ;
 	ssn:hasValue mcht:${STATE} .
+	
+<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}> dcterms:identifier "${DEVICE_HASH}/${SENSOR_ID}"^^xsd:string .
