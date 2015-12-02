@@ -19,4 +19,4 @@
 :${TIMESTAMP}-resultvalue a qudt:Enumeration ;
 	ssn:hasValue mcht:${STATE} .
 	
-<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}> dcterms:identifier "${DEVICE_HASH}${SENSOR_ID}/"^^xsd:string .
+<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}> dcterms:identifier "${DEVICE_HASH}/${SENSOR_ID}"^^xsd:string .

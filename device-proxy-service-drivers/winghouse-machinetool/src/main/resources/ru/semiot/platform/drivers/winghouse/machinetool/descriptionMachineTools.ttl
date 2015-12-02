@@ -11,7 +11,7 @@
 	dcterms:identifier "${DEVICE_HASH}"^^xsd:string ;
     rdfs:label "Machine Tool #${DEVICE_HASH}"@en ;
     saref:hasState saref:OnState ;
-    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> 
+    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> ;
     ssn:hasSubSystem <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}>.
     
 <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}> a ssn:SensingDevice ;
