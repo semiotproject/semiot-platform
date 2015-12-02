@@ -149,7 +149,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		this.handle = this.scheduler.scheduleAtFixedRate(this.scheduledDevice,
 				1, nDelay, MINUTES);
 		System.out.println("UScheduled started. Repeat will do every "
-				+ String.valueOf(nDelay) + " seconds");
+				+ String.valueOf(nDelay) + " minutes");
 	}
 
 	public void stopSheduled() {

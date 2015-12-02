@@ -5,10 +5,11 @@
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
 @prefix : <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/temperature#> .
+@prefix dcterms: <http://purl.org/dc/terms/#> .
 
 :${TIMESTAMP} a ssn:Observation ;
     ssn:observedProperty qudt-quantity:ThermodynamicTemperature ;
-    ssn:observedBy <http://${DOMAIN}/${PATH}/${DEVICE_HASH}> ;
+    ssn:observedBy <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}> ;
     ssn:observationResultTime "${DATETIME}"^^xsd:dateTime ;
     ssn:observationResult :${TIMESTAMP}-result .
 
@@ -18,3 +19,5 @@
 
 :${TIMESTAMP}-resultvalue a qudt:QuantityValue ;
     qudt:quantityValue "${VALUE}"^^xsd:double .
+    
+<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}> dcterms:identifier "${DEVICE_HASH}/${SENSOR_ID}"^^xsd:string .
