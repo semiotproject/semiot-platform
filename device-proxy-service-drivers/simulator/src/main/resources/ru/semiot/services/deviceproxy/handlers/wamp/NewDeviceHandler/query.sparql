@@ -1,7 +1,7 @@
 PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#>
 PREFIX ssncom: <http://purl.org/NET/ssnext/communication#>
 
-SELECT ?system ?coap ?wamp {
+SELECT ?system ?sensor ?coap {
     ?system a ssn:System ;
         ssn:hasSubSystem ?sensor .
     ?sensor a ssn:Sensor ;

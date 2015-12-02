@@ -44,11 +44,11 @@ public class DeviceHandler {
 		observationHandlers.remove(key);
 	}
 
-	public boolean containsHandler(String key, String coapUri) {
-		if (observationHandlers.containsKey(key) && coapUri != null) {
+	public boolean containsHandler(String key, int sensor_id) {
+		if (observationHandlers.containsKey(key)) {
 			List<NewObservationHandler> handlers = observationHandlers.get(key);
 			for(NewObservationHandler handler : handlers) {
-				if (coapUri.equals(handler.getCoapUri())) {
+				if (sensor_id == handler.getSensorId()) {
 					return true;
 				}
 			}
