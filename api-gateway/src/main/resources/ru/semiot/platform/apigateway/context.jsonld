@@ -3,7 +3,17 @@
         "vocab": "${VOCABULARY_URL}#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "sp": "http://spinrdf.org/sp#"
+        "sp": "http://spinrdf.org/sp#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
+        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+
+        "ssn:observes": {"@id": "ssn:observes", "@type": "@id"},
+        "ssn:hasValue": {"@id": "ssn:hasValue", "@type": "@id"},
+        "ssn:hasSubSystem": {"@id": "ssn:hasSubSystem", "@type": "@id"},
+        "ssn:forProperty": {"@id": "ssn:forProperty", "@type": "@id"},
+        "saref:hasState": {"@id": "http://ontology.tno.nl/saref#hasState", "@type":"@id"},
+        "rdfs:label": {"@id": "rdfs:label", "@type": "@id"}
     },
     "@graph": [
         {

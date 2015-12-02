@@ -4,6 +4,7 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
 import javax.annotation.Resource;
 import javax.ejb.Singleton;
 import javax.enterprise.concurrent.ManagedExecutorService;
@@ -44,6 +45,17 @@ public class SPARQLQueryService {
             o.onNext(rs);
             o.onCompleted();
         }).subscribeOn(Schedulers.from(mes)).cast(ResultSet.class);
+    }
+    
+    public Observable<Model> describe(String query) {
+        return Observable.create(o -> {
+            Query describe = QueryFactory.create(PREFIXES + query);
+            Model model = QueryExecutionFactory.createServiceRequest(
+                    config.sparqlEndpoint(), describe, httpAuthenticator).execDescribe();
+            
+            o.onNext(model);
+            o.onCompleted();
+        }).subscribeOn(Schedulers.from(mes)).cast(Model.class);
     }
 
 }

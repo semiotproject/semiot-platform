@@ -36,9 +36,9 @@
     ];
     ja:content [
         #ja:externalContent <http://purl.oclc.org/NET/ssnx/ssn#> ;
-        #ja:externalContent <http://purl.org/NET/ssnext/electricmeters#> ;
-        #ja:externalContent <http://purl.org/NET/ssnext/heatmeters#> ;
-        #ja:externalContent <http://purl.org/NET/ssnext/machinetools#> ;
+        ja:externalContent <http://purl.org/NET/ssnext/electricmeters#> ;
+        ja:externalContent <http://purl.org/NET/ssnext/heatmeters#> ;
+        ja:externalContent <http://purl.org/NET/ssnext/machinetools#> ;
         ja:externalContent <http://qudt.org/1.1/vocab/unit#> ;
         ja:externalContent <http://qudt.org/1.1/vocab/quantity#> ;
         ja:externalContent <http://www.qudt.org/qudt/owl/1.0.0/qudt.owl> ;

@@ -60,6 +60,10 @@ public class JsonLdBuilder {
                 JsonLdProcessor.compact(content, context, new JsonLdOptions()));
     }
     
+    public String toFlattenString() throws JsonLdError, IOException {
+        return JsonUtils.toString(JsonLdProcessor.flatten(content, context, new JsonLdOptions()));
+    }
+    
     public String toExpandedString() throws IOException, JsonLdError {
         return JsonUtils.toString(
                 JsonLdProcessor.expand(content));
