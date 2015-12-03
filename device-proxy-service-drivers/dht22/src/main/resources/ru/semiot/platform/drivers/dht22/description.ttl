@@ -1,0 +1,59 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix mcht: <http://purl.org/NET/ssnext/machinetools#> .
+@prefix ssncom: <http://purl.org/NET/ssnext/communication#> .
+@prefix saref: <http://ontology.tno.nl/saref#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
+@prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
+@prefix qudt-unit: <http://qudt.org/vocab/unit#> .
+@prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
+@prefix dcterms: <http://purl.org/dc/terms/#> .
+
+<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> a ssn:System ;
+    rdfs:label "Dht22 Meter #${DEVICE_HASH}"@en ;
+    dcterms:identifier "${DEVICE_HASH}"^^xsd:string ;
+	dul:hasLocation [
+		a geo:Point ;
+		geo:lat "${LATITUDE}"^^xsd:string ;
+		geo:long "${LONGITUDE}"^^xsd:string
+	] ;
+	saref:hasState saref:OnState ;
+    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> ;
+    ssn:hasSubSystem <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/1> ;
+    ssn:hasSubSystem <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/2> .
+    	
+<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/1> a ssn:SensingDevice ;
+    ssn:observes qudt-quantity:ThermodynamicTemperature ;
+    ssn:hasMeasurementCapability [
+        a ssn:MeasurementCapability ;
+        ssn:forProperty qudt-quantity:ThermodynamicTemperature ;
+        ssn:hasMeasurementProperty [
+            a qudt:Unit ;
+            ssn:hasValue [
+                a qudt:Quantity ;
+                ssn:hasValue qudt-unit:DegreeCelsius ;
+            ] ;
+        ] ;
+    ] .
+    
+<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/2> a ssn:SensingDevice ;
+    ssn:observes qudt-quantity:ThermodynamicTemperature ;
+    ssn:hasMeasurementCapability [
+        a ssn:MeasurementCapability ;
+        ssn:forProperty qudt-quantity:ThermodynamicTemperature ;
+        ssn:hasMeasurementProperty [
+            a qudt:Unit ;
+            ssn:hasValue [
+                a qudt:Quantity ;
+                ssn:hasValue qudt-unit:DegreeCelsius ;
+            ] ;
+        ] ;
+    ] .
+    
+    
+<http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
+	ssncom:topic "${DEVICE_HASH}"^^xsd:string ;
+    ssncom:protocol "WAMP" .
