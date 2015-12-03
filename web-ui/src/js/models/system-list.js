@@ -100,7 +100,7 @@ export default function(
                         index: index + 1,
                         name: binding.label.value,
                         uri: binding.uri.value,
-                        isOnline: binding.state.value === "http://ontology.tno.nl/saref#OnState"
+                        isOnline: binding.state.value === "saref:OnState"
                     };
                 });
                 defer.resolve(systems);

@@ -41,11 +41,6 @@ public class ScheduledDevice implements Runnable {
 		this.ddi = ddi;
 	}
 	
-	public static void main(String[] args) {
-		ScheduledDevice sd = new ScheduledDevice(null);
-		sd.run();
-	}
-	
 	public void run() {
 		long currentTimestamp = System.currentTimeMillis();
 		try {
