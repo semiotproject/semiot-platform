@@ -1,0 +1,5 @@
+{
+    "@context": {
+        "vocab": "${HOST}/api/doc#"
+    }
+}

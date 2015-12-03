@@ -43,12 +43,6 @@ public class SystemResource {
             + "dcterms:identifier ?id ."
             + "}";
 
-//    private static final String QUERY_DESCRIBE_SYSTEM
-//            = "SELECT * {"
-//            + "?uri dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
-//            + "?uri ?p ?o ."
-//            + "FILTER (isBlank(?o) = False)"
-//            + "}";
     private static final String QUERY_DESCRIBE_SYSTEM
             = "DESCRIBE ?system_uri {"
             + "?system_uri dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
@@ -56,13 +50,7 @@ public class SystemResource {
 
     private static volatile Map<String, Object> context;
 
-    public SystemResource() throws IOException {
-        synchronized (SystemResource.class) {
-            if (SystemResource.context == null) {
-                SystemResource.context = (Map<String, Object>) JsonUtils.fromInputStream(
-                        this.getClass().getResourceAsStream("/ru/semiot/platform/apigateway/context.jsonld"));
-            }
-        }
+    public SystemResource() {
     }
 
     @Inject

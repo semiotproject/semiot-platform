@@ -1,21 +1,17 @@
 {
     "@context": {
-        "vocab": "${VOCABULARY_URL}#",
+        "vocab": "${HOST}/api/doc#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "sp": "http://spinrdf.org/sp#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
-        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
-
-        "ssn:observes": {"@id": "ssn:observes", "@type": "@id"},
-        "ssn:hasValue": {"@id": "ssn:hasValue", "@type": "@id"},
-        "ssn:hasSubSystem": {"@id": "ssn:hasSubSystem", "@type": "@id"},
-        "ssn:forProperty": {"@id": "ssn:forProperty", "@type": "@id"},
-        "saref:hasState": {"@id": "http://ontology.tno.nl/saref#hasState", "@type":"@id"},
-        "rdfs:label": {"@id": "rdfs:label", "@type": "@id"}
+        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#"
     },
-    "@graph": [
+    "@id": "${HOST}/api/doc",
+    "@type": "hydra:ApiDocumentation",
+    "hydra:entrypoint": "${HOST}/api",
+    "supportedClass": [
         {
             "@id": "vocab:EntryPoint",
             "@type": "hydra:Class",
@@ -43,10 +39,25 @@
                     }
                 },
                 {
+                   "hydra:property": {
+                        "@id": "vocab:EntryPoint/sensors",
+                        "@type": "hydra:Link",
+                        "domain": "vocab:EntryPoint",
+                        "range": "vocab:SensorCollection",
+                        "supportedOperation": [
+                            {
+                                "@type": "hydra:Operation",
+                                "method": "GET",
+                                "returns": "vocab:SensorCollection"
+                            }
+                        ]
+                    }
+                },
+                {
                     "hydra:property": {
                         "@id": "vocab:EntryPoint/sparql",
                         "@type": ["hydra:TemplatedLink", "hydra:IriTemplate"],
-                        "hydra:template": "${HOST_URI}sparql?query={q}",
+                        "hydra:template": "${HOST}/api/sparql?query={q}",
                         "hydra:mapping": [
                             {
                                 "@type": "hydra:IriTemplateMapping",
@@ -79,11 +90,24 @@
             ]
         },
         {
+            "@id": "vocab:SensorCollection",
+            "@type": "hydra:Class",
+            "rdfs:subClassOf": "hydra:Collection",
+            "hydra:supportedOperation": [
+                {
+                    "@type": "hydra:Operation",
+                    "hydra:method": "GET",
+                    "hydra:returns": "vocab:SensorCollection"
+                }
+            ]
+        },
+        {
             "@id": "vocab:observations",
             "@type": "hydra:Link",
             "rdfs:range": "vocab:WebSocketResource",
             "hydra:supportedOperation": [
-                "@type": "vocab:WebSocketOperation",
+                "@type": "vocab:WAMPSubscribeOperation",
+                "hydra:expects": "vocab:WAMPTopic",
                 "hydra:returns": "ssn:Observation"
             ]
         },
@@ -93,9 +117,19 @@
             "rdfs:subClassOf": "hydra:Resource"
         },
         {
-            "@id": "vocab:WebSocketOperation",
+            "@id": "vocab:WAMPResource",
+            "@type": "hydra:Class",
+            "rdfs:subClassOf": "vocab:WebSocketResource"
+        },
+        {
+            "@id": "vocab:WAMPSubscribeOperation",
             "@type": "hydra:Class",
             "rdfs:subClassOf": "hydra:Operation"
+        },
+        {
+            "@id": "vocab:WAMPTopic",
+            "@type": "hydra:Class",
+            "rdfs:subClassOf": "rdf:Literal"
         }
     ]
 }
