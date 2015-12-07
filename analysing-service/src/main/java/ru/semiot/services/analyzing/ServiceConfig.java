@@ -15,7 +15,7 @@ public interface ServiceConfig extends Config {
     public static final ServiceConfig config = ConfigFactory
             .create(ServiceConfig.class);
 
-    @DefaultValue("ws://localhost:8080/ws")
+    @DefaultValue("ws://wamprouter:8080/ws")
     @Key("services.wamp.uri")
     String wampUri();
 
@@ -32,15 +32,15 @@ public interface ServiceConfig extends Config {
     @Key("services.topics.subscriber")
     String topicsSubscriber();
 
-    @DefaultValue("http://localhost:3030/ds/query")
+    @DefaultValue("http://deviceproxyservice:3030/ds/query")
     @Key("services.devicedirectory.store.url")
     String storeUrl();
 
-    @DefaultValue("")
+    @DefaultValue("admin")
     @Key("services.devicedirectory.store.username")
     String storeUsername();
 
-    @DefaultValue("")
+    @DefaultValue("pw")
     @Key("services.devicedirectory.store.password")
     String storePassword();
 
