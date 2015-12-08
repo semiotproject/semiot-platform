@@ -24,8 +24,10 @@
             required="true" type="String" default="http://localhost:3030/ds/data"/>
         <AD name="Domain" id="ru.semiot.platform.deviceproxyservice.manager.domain"
             required="true" type="String" default="localhost"/>
-        <AD name="Path in System Uri" id="ru.semiot.platform.deviceproxyservice.manager.path"
-            required="true" type="String" default="systems"/>
+        <AD name="Path in System Uri" id="ru.semiot.platform.deviceproxyservice.manager.system_path"
+            required="true" type="String" default="api/systems"/>
+        <AD name="Path in Sensor Uri" id="ru.semiot.platform.deviceproxyservice.manager.sensor_path"
+            required="true" type="String" default="api/sensors"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.deviceproxyservice.manager">

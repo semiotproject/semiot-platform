@@ -102,7 +102,7 @@ public class ScheduledDevice implements Runnable {
                     }
 	            }
 	            for(Device dev : ddi.listDevices()) {
-	            	if(!list.contains(dev)) {
+	            	if(!list.contains(dev) && dev.getTurnOn()) {
 	            		dev.setTurnOn(false);
 	            		ddi.inactiveDevice(DeviceDriverImpl.templateOffState
 	            				.replace("${DEVICE_HASH}", dev.getID())

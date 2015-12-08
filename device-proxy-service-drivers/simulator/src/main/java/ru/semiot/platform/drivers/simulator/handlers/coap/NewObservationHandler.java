@@ -80,7 +80,7 @@ public class NewObservationHandler implements CoapHandler {
 				String obs = toString(model);
 				obs = obs.replace(sensor.getURI(), RegisterResource.templateSensorUri
 						.replace("${DOMAIN}", deviceDriverImpl.getDomain())
-						.replace("${PATH}", deviceDriverImpl.getPathSystemUri())
+						.replace("${SENSOR_PATH}", deviceDriverImpl.getPathSensorUri())
 						.replace("${DEVICE_HASH}", topic)
 						.replace("${SENSOR_ID}", String.valueOf(sensor_id)));
 				

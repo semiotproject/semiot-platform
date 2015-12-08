@@ -18,4 +18,6 @@ public interface DeviceManager {
     
     public String getPathSystemUri();
     
+    public String getPathSensorUri();
+    
 }
