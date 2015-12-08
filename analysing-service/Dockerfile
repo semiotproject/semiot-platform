@@ -11,28 +11,24 @@ RUN apt-get update && apt-get install -y wget binutils java-common unzip && echo
 
 # Utils
 
-RUN apt-get update && apt-get install -y maven git
+RUN apt-get update && apt-get install -y maven
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle/jre
-
-RUN git clone https://github.com/semiotproject/semiot-platform.git
 
 #Setup Wildfly
 RUN wget $WLDFL && tar xvzf wildfly-8.2.0.Final.tar.gz && rm wildfly-8.2.0.Final.tar.gz && mkdir -p wildfly-8.2.0.Final/modules/system/layers/base/mysql/mysql-connector-java/main
 
 #Config Wildfly
 RUN wget -P wildfly-8.2.0.Final/modules/system/layers/base/mysql/mysql-connector-java/main $MYSQL_CONNECTOR
-RUN cp semiot-platform/analysing-service/wildfly_conf/standalone.xml wildfly-8.2.0.Final/standalone/configuration && cp semiot-platform/analysing-service/wildfly_conf/module.xml wildfly-8.2.0.Final/modules/system/layers/base/mysql/mysql-connector-java/main
-
+ADD https://github.com/semiotproject/semiot-platform/raw/master/analysing-service/wildfly_conf/standalone.xml wildfly-8.2.0.Final/standalone/configuration/ 
+ADD https://github.com/semiotproject/semiot-platform/raw/master/analysing-service/wildfly_conf/module.xml wildfly-8.2.0.Final/modules/system/layers/base/mysql/mysql-connector-java/main/
 #Setup MySQL
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get -q -y install mysql-server
 
 #Config MySQL
 RUN service mysql start && mysql --execute="create database analyzis; connect analyzis; create table queries(id int(3), name text, query text, time text, primary key(id));"
-
-#Add config file
-ADD config.properties /semiot-platform/analysing-service/
-
+ADD https://github.com/semiotproject/semiot-platform/archive/master.zip /root/
+RUN unzip /root/master.zip && mv semiot-platform-master semiot-platform
 #Deploy to Wildfly
 WORKDIR /root/semiot-platform/analysing-service/
 RUN mvn clean install && cp /root/semiot-platform/analysing-service/target/ROOT.war /root/wildfly-8.2.0.Final/standalone/deployments/
