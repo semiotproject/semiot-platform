@@ -9,7 +9,6 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ejb.Stateless;
@@ -30,40 +29,39 @@ import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.JsonLdBuilder;
 import ru.semiot.platform.apigateway.utils.JsonLdKeys;
 
-@Path("/systems")
+@Path("/sensors")
 @Stateless
-public class SystemResource {
+public class SensorResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
-    private static final String QUERY_GET_ALL_SYSTEMS
+    private static final Logger logger = LoggerFactory.getLogger(SensorResource.class);
+    private static final String QUERY_GET_ALL_SENSORS
             = "SELECT DISTINCT ?uri ?label ?id {"
-            + "?uri a ssn:System ;"
-            + "rdfs:label ?label ;"
+            + "?uri a ssn:SensingDevice ;"
             + "dcterms:identifier ?id ."
+            + "OPTIONAL {?uri rdfs:label ?label .}"
             + "}";
 
-    private static final String QUERY_DESCRIBE_SYSTEM
-            = "DESCRIBE ?system_uri ?subsystem_uri {"
-            + "	?system_uri dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ;"
-            + "    ssn:hasSubSystem ?subsystem_uri ."
+    private static final String QUERY_DESCRIBE_SENSOR
+            = "DESCRIBE ?uri {"
+            + "	?uri dcterms:identifier \"${SENSOR_ID}\"^^xsd:string ."
             + "}";
-
-    public SystemResource() {
-    }
-
-    @Inject
-    SPARQLQueryService query;
 
     @Inject
     JsonLdContextProviderService contextProvider;
 
+    @Inject
+    SPARQLQueryService query;
+
     @Context
     private UriInfo uriInfo;
 
+    public SensorResource() {
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_LD_JSON)
-    public void listSystems(@Suspended final AsyncResponse response)
-            throws JsonLdError, IOException {
+    public void listSensors(@Suspended final AsyncResponse response)
+            throws IOException {
         final Map<String, Object> context = contextProvider.getContextAsJsonLd(
                 JsonLdContextProviderService.ENTRYPOINT_CONTEXT,
                 uriInfo.getRequestUri());
@@ -71,26 +69,34 @@ public class SystemResource {
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
         final String requstUri = uriInfo.getRequestUri().toASCIIString();
 
-        query.select(QUERY_GET_ALL_SYSTEMS).subscribe((ResultSet r) -> {
+        query.select(QUERY_GET_ALL_SENSORS).subscribe((ResultSet r) -> {
             JsonLdBuilder builder = new JsonLdBuilder(context)
                     .add(JsonLdKeys.ID, requstUri)
-                    .add(JsonLdKeys.TYPE, "vocab:SystemCollection");
+                    .add(JsonLdKeys.TYPE, "vocab:SensorCollection");
 
             while (r.hasNext()) {
                 final UriBuilder ub = uriBuilder.clone();
 
                 final QuerySolution qs = r.next();
                 final String uri = ub
-                        .path("systems/{a}")
+                        .path("sensors/{a}")
                         .buildFromEncoded(qs.getLiteral("id").getString()).toASCIIString();
-                final String label = qs.getLiteral("label").getString();
+                final String label;
+                if (qs.contains("label")) {
+                    label = qs.getLiteral("label").getString();
+                } else {
+                    label = null;
+                }
 
                 builder.add("hydra:member", new HashMap<String, Object>() {
                     {
                         {
                             put(JsonLdKeys.ID, uri);
-                            put(JsonLdKeys.TYPE, "ssn:System");
-                            put("rdfs:label", label);
+                            put(JsonLdKeys.TYPE, "ssn:SensingDevice");
+
+                            if (label != null) {
+                                put("rdfs:label", label);
+                            }
                         }
                     }
                 });
@@ -112,13 +118,12 @@ public class SystemResource {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_LD_JSON)
-    public void getSystem(
-            @Suspended final AsyncResponse response,
-            @PathParam("id") String id) throws URISyntaxException, IOException {
+    public void getSensor(@Suspended final AsyncResponse response,
+            @PathParam("id") String id) throws IOException {
         final Map<String, Object> frame = contextProvider.getContextAsJsonLd(
-                JsonLdContextProviderService.SYSTEM_FRAME, uriInfo.getRequestUri());
+                JsonLdContextProviderService.SENSOR_FRAME, uriInfo.getRequestUri());
 
-        query.describe(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id)).subscribe((model) -> {
+        query.describe(QUERY_DESCRIBE_SENSOR.replace("${SENSOR_ID}", id)).subscribe((model) -> {
             StringWriter sw = new StringWriter();
             model.write(sw, "N-TRIPLE");
 

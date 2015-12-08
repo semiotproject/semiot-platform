@@ -21,7 +21,9 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(ru.semiot.platform.apigateway.rest.ObservationsResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.RootResource.class);
+        resources.add(ru.semiot.platform.apigateway.rest.SensorResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SystemResource.class);
     }
     

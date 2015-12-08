@@ -4,6 +4,7 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
 import javax.annotation.Resource;
 import javax.ejb.Singleton;
 import javax.enterprise.concurrent.ManagedExecutorService;
@@ -25,7 +26,9 @@ public class SPARQLQueryService {
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-            + "PREFIX ssncom: <http://purl.org/NET/ssnext/communication#>\n";
+            + "PREFIX ssncom: <http://purl.org/NET/ssnext/communication#>\n"
+            + "PREFIX dcterms: <http://purl.org/dc/terms/#>\n"
+            + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
 
     private final HttpAuthenticator httpAuthenticator;
 
@@ -42,6 +45,17 @@ public class SPARQLQueryService {
             o.onNext(rs);
             o.onCompleted();
         }).subscribeOn(Schedulers.from(mes)).cast(ResultSet.class);
+    }
+    
+    public Observable<Model> describe(String query) {
+        return Observable.create(o -> {
+            Query describe = QueryFactory.create(PREFIXES + query);
+            Model model = QueryExecutionFactory.createServiceRequest(
+                    config.sparqlEndpoint(), describe, httpAuthenticator).execDescribe();
+            
+            o.onNext(model);
+            o.onCompleted();
+        }).subscribeOn(Schedulers.from(mes)).cast(Model.class);
     }
 
 }
