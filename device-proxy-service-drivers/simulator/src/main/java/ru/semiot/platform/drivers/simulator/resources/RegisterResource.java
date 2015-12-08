@@ -224,7 +224,7 @@ public class RegisterResource extends CoapResource {
 		
 		for(int i = 0; i<sensors.size(); i++) {
 			final Literal sensorIdLiteral = ResourceFactory
-					.createTypedLiteral(hash + "/" + String.valueOf(i+1));
+					.createTypedLiteral(hash + "-" + String.valueOf(i+1));
 			tmp.add(sensors.get(i), DCTERMS.identifier, sensorIdLiteral);
 		}
 		

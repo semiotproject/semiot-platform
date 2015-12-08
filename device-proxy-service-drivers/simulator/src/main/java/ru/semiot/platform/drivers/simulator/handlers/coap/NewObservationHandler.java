@@ -75,7 +75,7 @@ public class NewObservationHandler implements CoapHandler {
 					}
 				}*/
 				final Literal sensorIdLiteral = ResourceFactory
-						.createTypedLiteral(topic + "/" + String.valueOf(sensor_id));
+						.createTypedLiteral(topic + "-" + String.valueOf(sensor_id));
 				model.add(sensor, DCTERMS.identifier, sensorIdLiteral);
 				String obs = toString(model);
 				obs = obs.replace(sensor.getURI(), RegisterResource.templateSensorUri
