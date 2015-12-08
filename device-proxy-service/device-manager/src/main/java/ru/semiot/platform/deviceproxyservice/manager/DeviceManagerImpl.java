@@ -31,7 +31,8 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
 	private static final String FUSEKI_QUERY_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url";
 	private static final String FUSEKI_STORE_URL="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url";
 	private static final String DOMAIN = "ru.semiot.platform.deviceproxyservice.manager.domain";
-	private static final String PATH_SYSTEM_URI = "ru.semiot.platform.deviceproxyservice.manager.path";
+	private static final String PATH_SYSTEM_URI = "ru.semiot.platform.deviceproxyservice.manager.system_path";
+	private static final String PATH_SENSOR_URI = "ru.semiot.platform.deviceproxyservice.manager.sensor_path";
     
     private String wampUri = "ws://wamprouter:8080/ws";
     private String wampRealm = "realm1";
@@ -44,7 +45,8 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     private String fusekiQueryUrl = "http://localhost:3030/ds/query";
     private String fusekiStoreUrl = "http://localhost:3030/ds/data";
     private String domain = "localhost";
-    private String pathSystemUri = "systems";
+    private String pathSystemUri = "api/systems";
+    private String pathSensorUri = "api/sensors";
 
     private DirectoryService directoryService;
     
@@ -105,6 +107,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
                 fusekiStoreUrl = (String) properties.get(FUSEKI_STORE_URL);
                 domain = (String) properties.get(DOMAIN);
                 pathSystemUri = (String) properties.get(PATH_SYSTEM_URI);
+                pathSensorUri = (String) properties.get(PATH_SENSOR_URI);
             }
         }
     }
@@ -180,6 +183,10 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
 
 	public String getPathSystemUri() {
 		return pathSystemUri;
+	}
+	
+	public String getPathSensorUri() {
+		return pathSensorUri;
 	}
     
 

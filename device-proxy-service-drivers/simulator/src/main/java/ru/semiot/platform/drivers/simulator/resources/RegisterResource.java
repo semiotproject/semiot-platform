@@ -53,8 +53,8 @@ public class RegisterResource extends CoapResource {
 	private static final String queryFile = "/ru/semiot/services/deviceproxy/handlers/wamp/NewDeviceHandler/query.sparql";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "<${system}> saref:hasState saref:OnState.";
-	private static final String templateSystemUri = "http://${DOMAIN}/${PATH}/${DEVICE_HASH}";
-	public static final String templateSensorUri = "http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}";
+	private static final String templateSystemUri = "http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}";
+	public static final String templateSensorUri = "http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-${SENSOR_ID}";
 	private final Model schema;
 	private final Query query;
 	private static final String VAR_COAP = "coap";
@@ -127,7 +127,7 @@ public class RegisterResource extends CoapResource {
 							hash = getHash(system.getURI());
 							systemURI = templateSystemUri.replace("${DOMAIN}", deviceDriverImpl.getDomain())
 									.replace("${DEVICE_HASH}", hash)
-									.replace("${PATH}", deviceDriverImpl.getPathSystemUri());
+									.replace("${SYSTEM_PATH}", deviceDriverImpl.getPathSystemUri());
 						}
 						
 						containsHandler = DeviceHandler.getInstance().containsHandler(systemURI, sensors.size());
@@ -157,7 +157,7 @@ public class RegisterResource extends CoapResource {
 							for(int i = 0; i<sensors.size(); i++) {
 								desc = desc.replace(sensors.get(i).getURI(), templateSensorUri
 									.replace("${DOMAIN}", deviceDriverImpl.getDomain())
-									.replace("${PATH}", deviceDriverImpl.getPathSystemUri())
+									.replace("${SENSOR_PATH}", deviceDriverImpl.getPathSensorUri())
 									.replace("${DEVICE_HASH}", hash)
 									.replace("${SENSOR_ID}", String.valueOf(i+1)));
 							}
