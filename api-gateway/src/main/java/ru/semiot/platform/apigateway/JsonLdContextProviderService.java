@@ -20,11 +20,15 @@ public class JsonLdContextProviderService {
     
     private static final String API_DOCUMENTATION_PATH = "/ru/semiot/platform/apigateway/ApiDocumentation.jsonld";
     private static final String ENTRYPOINT_PATH = "/ru/semiot/platform/apigateway/EntryPoint.jsonld";
+    private static final String SYSTEM_FRAME_PATH = "/ru/semiot/platform/apigateway/SystemFrame.jsonld";
+    private static final String SENSOR_FRAME_PATH = "/ru/semiot/platform/apigateway/SensorFrame.jsonld";
     
     private final Map<String, Context> contexts = new HashMap<>();
     
     public static final String API_DOCUMENTATION_CONTEXT = "API_DOCUMENTATION_CONTEXT";
     public static final String ENTRYPOINT_CONTEXT = "ENTRYPOINT_CONTEXT";
+    public static final String SYSTEM_FRAME = "SYSTEM_FRAME";
+    public static final String SENSOR_FRAME = "SENSOR_FRAME";
 
     public JsonLdContextProviderService() {
     }
@@ -36,6 +40,10 @@ public class JsonLdContextProviderService {
                     Context.readContextTemplate(API_DOCUMENTATION_PATH));
             contexts.put(ENTRYPOINT_CONTEXT,
                     Context.readContextTemplate(ENTRYPOINT_PATH));
+            contexts.put(SYSTEM_FRAME,
+                    Context.readContextTemplate(SYSTEM_FRAME_PATH));
+            contexts.put(SENSOR_FRAME,
+                    Context.readContextTemplate(SENSOR_FRAME_PATH));
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
         }
