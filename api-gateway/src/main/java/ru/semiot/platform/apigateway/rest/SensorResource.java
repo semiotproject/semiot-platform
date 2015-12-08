@@ -79,7 +79,7 @@ public class SensorResource {
 
                 final QuerySolution qs = r.next();
                 final String uri = ub
-                        .path("systems/{a}")
+                        .path("sensors/{a}")
                         .buildFromEncoded(qs.getLiteral("id").getString()).toASCIIString();
                 final String label;
                 if (qs.contains("label")) {
@@ -121,7 +121,7 @@ public class SensorResource {
     public void getSensor(@Suspended final AsyncResponse response,
             @PathParam("id") String id) throws IOException {
         final Map<String, Object> frame = contextProvider.getContextAsJsonLd(
-                JsonLdContextProviderService.SYSTEM_FRAME, uriInfo.getRequestUri());
+                JsonLdContextProviderService.SENSOR_FRAME, uriInfo.getRequestUri());
 
         query.describe(QUERY_DESCRIBE_SENSOR.replace("${SENSOR_ID}", id)).subscribe((model) -> {
             StringWriter sw = new StringWriter();
