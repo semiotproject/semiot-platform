@@ -2,7 +2,7 @@
 @prefix meter: <http://purl.org/NET/ssnext/meters/core#> .
 @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
+@prefix qudt: <http://qudt.org/schema/qudt#> .
 @prefix : <http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}/machinetool#> .
 @prefix dcterms: <http://purl.org/dc/terms/#> .
 
