@@ -1,6 +1,6 @@
 {
     "@context": {
-        "vocab": "${HOST}/api/doc#",
+        "vocab": "${HOST}/doc#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "sp": "http://spinrdf.org/sp#",
@@ -8,9 +8,9 @@
         "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
         "ssn": "http://purl.oclc.org/NET/ssnx/ssn#"
     },
-    "@id": "${HOST}/api/doc",
+    "@id": "${HOST}/doc",
     "@type": "hydra:ApiDocumentation",
-    "hydra:entrypoint": "${HOST}/api",
+    "hydra:entrypoint": "${HOST}/",
     "supportedClass": [
         {
             "@id": "vocab:EntryPoint",
@@ -57,7 +57,7 @@
                     "hydra:property": {
                         "@id": "vocab:EntryPoint/sparql",
                         "@type": ["hydra:TemplatedLink", "hydra:IriTemplate"],
-                        "hydra:template": "${HOST}/api/sparql?query={q}",
+                        "hydra:template": "${HOST}/sparql?query={q}",
                         "hydra:mapping": [
                             {
                                 "@type": "hydra:IriTemplateMapping",

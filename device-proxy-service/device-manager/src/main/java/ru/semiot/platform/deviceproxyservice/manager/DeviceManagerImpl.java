@@ -45,8 +45,8 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     private String fusekiQueryUrl = "http://localhost:3030/ds/query";
     private String fusekiStoreUrl = "http://localhost:3030/ds/data";
     private String domain = "localhost";
-    private String pathSystemUri = "api/systems";
-    private String pathSensorUri = "api/sensors";
+    private String pathSystemUri = "systems";
+    private String pathSensorUri = "sensors";
 
     private DirectoryService directoryService;
     

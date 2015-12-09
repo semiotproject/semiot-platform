@@ -23,7 +23,7 @@ public class IndexFilter implements Filter {
             throws IOException, ServletException {
         final String apiURL = request.getScheme() + "://" + request.getServerName() 
                 + ":" + request.getServerPort()
-                + request.getServletContext().getContextPath() + "/api/doc";
+                + request.getServletContext().getContextPath() + "/doc";
 
         HttpServletResponse hsr = (HttpServletResponse) response;
 

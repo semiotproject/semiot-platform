@@ -1,6 +1,6 @@
 {
     "@context": {
-        "vocab": "${HOST}/api/doc#",
+        "vocab": "${HOST}/doc#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
