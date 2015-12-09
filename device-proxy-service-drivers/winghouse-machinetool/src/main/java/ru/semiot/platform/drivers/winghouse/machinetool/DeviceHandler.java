@@ -15,7 +15,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
 	private static final String templateTopic = "${DEVICE_HASH}";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> saref:hasState saref:OnState.";
+			+ "<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> saref:hasState saref:OnState.";
 
 	public DeviceHandler(DeviceDriverImpl deviceDriverImpl) {
 		this.deviceDriverImpl = deviceDriverImpl;
@@ -54,7 +54,7 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 				} 
 				if(!deviceDriverImpl.getOldValueMachineTools().get(mvalue.getHash()).getTurnOn()) {
 					deviceDriverImpl.inactiveDevice(templateOnState.replace("${DOMAIN}", deviceDriverImpl.getDomain())
-							.replace("${PATH}", deviceDriverImpl.getPathSystemUri()).replace("${DEVICE_HASH}", mvalue.getHash()));
+							.replace("${SYSTEM_PATH}", deviceDriverImpl.getPathSystemUri()).replace("${DEVICE_HASH}", mvalue.getHash()));
 					// deviceDriverImpl.getOldStateMachineTools().get(mess.getMac()).setTurnOn(true);
 					System.out.println(mvalue.getHash() + " saref:OnState" );
 				}
@@ -77,7 +77,8 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 			String message = deviceDriverImpl
 					.getTemplateObservation()
 					.replace("${DOMAIN}", deviceDriverImpl.getDomain())
-					.replace("${PATH}", deviceDriverImpl.getPathSystemUri())
+					.replace("${SYSTEM_PATH}", deviceDriverImpl.getPathSystemUri())
+					.replace("${SENSOR_PATH}", deviceDriverImpl.getPathSensorUri())
 					.replace("${DEVICE_HASH}", mvalue.getHash())
 					.replace("${SENSOR_ID}", "1")
 					.replace("${TIMESTAMP}", String.valueOf(mvalue.getTimestemp()))
@@ -94,7 +95,8 @@ public class DeviceHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 	private void addDevice(String hashDevice) {
 		// инициализация нового девайса
 		String message = deviceDriverImpl.getTemplateDescription().replace(
-				"${DEVICE_HASH}", hashDevice).replace("${PATH}", deviceDriverImpl.getPathSystemUri())
+				"${DEVICE_HASH}", hashDevice).replace("${SYSTEM_PATH}", deviceDriverImpl.getPathSystemUri())
+				.replace("${SENSOR_PATH}", deviceDriverImpl.getPathSensorUri())
 				.replace("${SENSOR_ID}", "1").replace("${DOMAIN}", deviceDriverImpl.getDomain());
 		// System.out.println("Publish message:\n" + message);
 		deviceDriverImpl.addDevice(new Device(hashDevice, message));

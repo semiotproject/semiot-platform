@@ -12,7 +12,7 @@
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 @prefix dcterms: <http://purl.org/dc/terms/#> .
 
-<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> a ssn:System ;
+<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> a ssn:System ;
     rdfs:label "Temperature Meter #${DEVICE_HASH}"@en ;
     dcterms:identifier "${DEVICE_HASH}"^^xsd:string ;
 	dul:hasLocation [
@@ -21,10 +21,11 @@
 		geo:long "${LONGITUDE}"^^xsd:string
 	] ;
 	saref:hasState saref:OnState ;
-    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> ;
-    ssn:hasSubSystem <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}>.
+    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${SYSTEM_PATH}/topic=${DEVICE_HASH}> ;
+    ssn:hasSubSystem <http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-${SENSOR_ID}>.
     	
-<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/${SENSOR_ID}> a ssn:SensingDevice ;
+<http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-${SENSOR_ID}> a ssn:SensingDevice ;
+	dcterms:identifier "${DEVICE_HASH}-${SENSOR_ID}"^^xsd:string ;
     ssn:observes qudt-quantity:ThermodynamicTemperature ;
     ssn:hasMeasurementCapability [
         a ssn:MeasurementCapability ;
@@ -39,6 +40,6 @@
     ] .
     
     
-<http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
+<http://${DOMAIN}/${SYSTEM_PATH}/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
 	ssncom:topic "${DEVICE_HASH}"^^xsd:string ;
     ssncom:protocol "WAMP" .
