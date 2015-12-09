@@ -27,7 +27,7 @@ opentsdb:
 webui:
   image: docker.semiot.ru/web-ui
   ports:
-    - "80:80"
+    - "8484:80"
   restart: always
 
 deviceproxyservice:
@@ -68,5 +68,16 @@ apigateway:
     - "8383:8080"
   volumes:
     - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
+  restart: always
+
+nginx:
+  image: docker.semiot.ru/nginx
+  links:
+    - wamprouter
+    - deviceproxyservice
+    - webui
+    - apigateway
+  ports:
+    - "80:80"
   restart: always
 

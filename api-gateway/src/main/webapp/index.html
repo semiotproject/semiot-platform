@@ -1,37 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Start Page</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script type="text/javascript">
-            var ws;
-
-            function connect() {
-                ws = new WebSocket("ws://localhost:8282/ws/observations/systems/327956808");
-
-                ws.onopen = function () {
-                    alert("Web Socket is connected!!");
-                };
-                ws.onmessage = function (evt) {
-                    var msg = evt.data;
-                    console.log("Message received:" + msg);
-                };
-                ws.onclose = function () {
-                    alert("Connection is closed...");
-                };
-            }
-
-            function close() {
-                if (ws) {
-                    ws.close();
-                }
-            }
-        </script>
+        <title>SemIoT Platform</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <h1>SemIoT Platform</h1>
 
-        <a href="javascript:connect()">Connect</a>
-        <a href="javascript:close()">Close</a>
+        <b>Navigation:</b>
+        <a href="/explorer">Go to Explorer</a> |
+        <a href="/config">Go to Configuration</a>
     </body>
 </html>
