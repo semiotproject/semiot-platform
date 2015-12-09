@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.deri.cqels.data.Mapping;
 import org.deri.cqels.engine.ConstructListener;
@@ -26,6 +27,7 @@ import org.deri.cqels.engine.OpRouter1;
 import org.deri.cqels.engine.RDFStream;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.ServiceConfig;
+import ru.semiot.services.analyzing.database.QueryDataBase;
 import ru.semiot.services.analyzing.wamp.WAMPClient;
 
 @Named
@@ -40,31 +42,27 @@ public class CQELS implements Engine {
     private ExecContext context = null;
     private final String STREAM_ID = "http://example.org/simpletest/test";
     private DefaultRDFStream stream = null;
-    private Map<String, OpRouter1> queries = null;
+    private Map<Integer, OpRouter1> queries = null;
     //private Map<String, DefaultRDFStream> streams = null;
+    @Inject
+    QueryDataBase db;
 
     public CQELS() {
-            logger.info("Initialize home directory for cqels");
-            File home = new File(CQELS_HOME);
-            if (!home.exists()) {
-                home.mkdir();
-            }
-            context = new ExecContext(home.getAbsolutePath(), true);
-            stream = new DefaultRDFStream(context, STREAM_ID);
-            //streams = new HashMap<>();
-            queries = new HashMap<>();
-
-    }
-
-    public static CQELS getInstance() {
-        if (engine == null) {
-            engine = new CQELS();
+        logger.info("Initialize home directory for cqels");
+        File home = new File(CQELS_HOME);
+        if (!home.exists()) {
+            home.mkdir();
         }
-        return engine;
+        context = new ExecContext(home.getAbsolutePath(), true);
+        stream = new DefaultRDFStream(context, STREAM_ID);
+        //streams = new HashMap<>();
+        queries = new HashMap<>();
+
     }
 
     @Override
-    public boolean registerQuery(String query) {
+    public boolean registerQuery(int query_id) {
+        String query = db.getQuery(query_id).getString("text");
         try {
             if (query.toLowerCase().contains("select") || query.toLowerCase().contains("construct")) {
                 if (query.toLowerCase().contains("construct")) {
@@ -78,7 +76,7 @@ public class CQELS implements Engine {
                             appendData(message);
                         }
                     });
-                    queries.put(query, cc);
+                    queries.put(query_id, cc);
                 } else {
                     ContinuousSelect cs = context.registerSelect(query);
                     cs.register(new ContinuousListener() {
@@ -88,7 +86,7 @@ public class CQELS implements Engine {
                             sendToWAMP(getString(m));
                         }
                     });
-                    queries.put(query, cs);
+                    queries.put(query_id, cs);
                 }
             }
         } catch (com.hp.hpl.jena.query.QueryException e) {
@@ -99,23 +97,23 @@ public class CQELS implements Engine {
     }
 
     public void removeAllQueries() {
-        for (String s : queries.keySet()) {
+        for (Integer s : queries.keySet()) {
             removeQuery(s);
         }
         queries.clear();
     }
 
     @Override
-    public void removeQuery(String query) {
-        if (query != null && !query.isEmpty() && queries.containsKey(query)) {
+    public void removeQuery(int query_id) {
+        if (queries.containsKey(query_id)) {
             logger.debug("Removing query");
-            OpRouter1 op = queries.get(query);
+            OpRouter1 op = queries.get(query_id);
             if (op instanceof ContinuousConstruct) {
                 context.unregisterConstruct((ContinuousConstruct) op);
             } else {
                 context.unregisterSelect((ContinuousSelect) op);
             }
-            queries.remove(query, op);
+            queries.remove(query_id, op);
         } else {
             logger.error("Select not found!");
             logger.debug(queries.keySet().toString());

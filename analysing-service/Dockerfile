@@ -26,7 +26,9 @@ ADD https://github.com/semiotproject/semiot-platform/raw/master/analysing-servic
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get -q -y install mysql-server
 
 #Config MySQL
-RUN service mysql start && mysql --execute="create database analyzis; connect analyzis; create table queries(id int(3), name text, query text, time text, primary key(id));"
+RUN service mysql start && mysql --execute="create database analyzis; connect analyzis; \
+	create table queries(id int(3), name text, query text, time text, primary key(id)); \
+	create table events(id int(3), query_id int(3), events text, time text, primary key(id), foreign key(query_id) references queries(id) on delete cascade);"
 ADD https://github.com/semiotproject/semiot-platform/archive/master.zip /root/
 RUN unzip /root/master.zip && mv semiot-platform-master semiot-platform
 #Deploy to Wildfly

@@ -57,10 +57,15 @@ public class Launcher {
                         break;
                     }
                 } catch (HttpHostConnectException ex) {
-                    logger.info("Try to connect with " + URL);
+                    logger.info("Try to connect with " + URL + "after 2s");
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex1) {
+                        logger.error("Something went wrong with error:\n"+ex1.getMessage());
+                    }
                 } catch (IOException ex) {
                     logger.error("Something went wrong with error:\n"+ex.getMessage());
-                }
+                } 
             }
         } catch (URISyntaxException ex) {
             logger.error("The storeURL is WRONG!!!");

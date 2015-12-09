@@ -17,7 +17,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.cep.Engine;
-import ru.semiot.services.analyzing.database.DataBase;
+import ru.semiot.services.analyzing.database.EventsDataBase;
+import ru.semiot.services.analyzing.database.QueryDataBase;
 
 /**
  *
@@ -31,9 +32,12 @@ public class Queries {
             .getLogger(Queries.class);
 
     @Inject
-    private DataBase db;
-    @Inject Engine engine;
-    
+    private QueryDataBase db;
+    @Inject
+    Engine engine;
+    @Inject
+    EventsDataBase dbe;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQueries() {
@@ -55,14 +59,15 @@ public class Queries {
         }
         try {
             JSONObject object = new JSONObject(request);
-
             if (!object.has("name") || !object.has("text")) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            if (!engine.registerQuery(object.getString("text"))) {
+            JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
+            int query_id = ret.getInt("id");
+            if (!engine.registerQuery(query_id)) {
+                db.removeQuery(query_id);
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
             logger.info("Query " + ret.getString("name") + " appended");
             return Response.ok(ret.toString()).build();
         } catch (JSONException e) {
@@ -86,6 +91,11 @@ public class Queries {
         if (ret == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        JSONObject events = dbe.getEventsFromQuery(id);
+        if (events != null) {
+            ret.append("events",
+                    new JSONObject().append("timestamp", events.getString("created")).append("events", events.getString("events")));
+        }
         return Response.ok(ret.toString()).build();
     }
 
@@ -94,11 +104,11 @@ public class Queries {
     @Produces(MediaType.TEXT_PLAIN)
     public Response remove(@PathParam("id") Integer id) {
         logger.debug("Removing query");
+        engine.removeQuery(id);
         JSONObject ret = db.removeQuery(id);
         if (ret == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        engine.removeQuery(ret.getString("text"));
         logger.info("Query " + ret.getString("name") + " removed");
         return Response.ok().build();
     }

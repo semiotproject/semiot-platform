@@ -3,12 +3,14 @@ package ru.semiot.services.analyzing.database;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -27,6 +29,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Query.count", query = "SELECT COUNT(*) FROM Query"),
     @NamedQuery(name = "Query.getLastID", query = "SELECT MAX(q.id) FROM Query q")})
 public class Query implements Serializable {
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "query")
+    private Events events;
 
     private static final long serialVersionUID = 1L;
     @Lob
@@ -112,6 +117,14 @@ public class Query implements Serializable {
     @Override
     public String toString() {
         return "{\"id\": \"" + id + "\",\n\"created\": \"" + time + "\",\n\"name\": \"" + name + "\",\n\"text\": \"" + query + "\"}";
+    }
+
+    public Events getEvents() {
+        return events;
+    }
+
+    public void setEvents(Events events) {
+        this.events = events;
     }
 
 }

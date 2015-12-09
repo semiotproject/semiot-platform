@@ -3,7 +3,7 @@ package ru.semiot.services.analyzing.database;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public interface DataBase {
+public interface QueryDataBase {
     public JSONObject appendQuery(String request, String name);
     public long getCount();
     public JSONObject getQuery(int id);
