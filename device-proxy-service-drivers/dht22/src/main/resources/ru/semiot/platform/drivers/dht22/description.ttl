@@ -11,8 +11,9 @@
 @prefix qudt-unit: <http://qudt.org/vocab/unit#> .
 @prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 @prefix dcterms: <http://purl.org/dc/terms/#> .
+@prefix ext: <http://w3id.org/qudt/vocab/quantity/ext#> .
 
-<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> a ssn:System ;
+<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> a ssn:System ;
     rdfs:label "Dht22 Meter #${DEVICE_HASH}"@en ;
     dcterms:identifier "${DEVICE_HASH}"^^xsd:string ;
 	dul:hasLocation [
@@ -21,11 +22,11 @@
 		geo:long "${LONGITUDE}"^^xsd:string
 	] ;
 	saref:hasState saref:OnState ;
-    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> ;
-    ssn:hasSubSystem <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/1> ;
-    ssn:hasSubSystem <http://${DOMAIN}/${PATH}/${DEVICE_HASH}/2> .
+    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${SYSTEM_PATH}/topic=${DEVICE_HASH}> ;
+    ssn:hasSubSystem <http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-1> ;
+    ssn:hasSubSystem <http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-2> .
     	
-<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/1> a ssn:SensingDevice ;
+<http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-1> a ssn:SensingDevice ;
     ssn:observes qudt-quantity:ThermodynamicTemperature ;
     ssn:hasMeasurementCapability [
         a ssn:MeasurementCapability ;
@@ -39,21 +40,21 @@
         ] ;
     ] .
     
-<http://${DOMAIN}/${PATH}/${DEVICE_HASH}/2> a ssn:SensingDevice ;
-    ssn:observes qudt-quantity:ThermodynamicTemperature ;
+<http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-2> a ssn:SensingDevice ;
+    ssn:observes ext:RelativeHumidity ;
     ssn:hasMeasurementCapability [
         a ssn:MeasurementCapability ;
-        ssn:forProperty qudt-quantity:ThermodynamicTemperature ;
+        ssn:forProperty ext:RelativeHumidity ;
         ssn:hasMeasurementProperty [
             a qudt:Unit ;
             ssn:hasValue [
                 a qudt:Quantity ;
-                ssn:hasValue qudt-unit:DegreeCelsius ;
+                ssn:hasValue qudt-unit:Percent ;
             ] ;
         ] ;
     ] .
     
     
-<http://${DOMAIN}/${PATH}/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
+<http://${DOMAIN}/${SYSTEM_PATH}/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
 	ssncom:topic "${DEVICE_HASH}"^^xsd:string ;
     ssncom:protocol "WAMP" .

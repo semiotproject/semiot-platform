@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
@@ -28,12 +29,13 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
     
     public static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> saref:hasState saref:OffState.";
+			+ "<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> saref:hasState saref:OffState.";
     
     private ScheduledExecutorService scheduler;
 	private ScheduledDevice scheduledDevice;
 	private ScheduledFuture handle = null;
 	private final String driverName = "dht22";
+	private CoAPInterface coap;
 	
     private volatile DeviceManager deviceManager;
 
@@ -55,23 +57,29 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
         readTemplates();
 
+        coap = new CoAPInterface();
+        
         this.scheduler = Executors.newScheduledThreadPool(1);
 		this.scheduledDevice = new ScheduledDevice(this);
+		this.scheduledDevice.createCoapClients();
 		startSheduled();
     }
 
     public void stop() {
         // перевод всех устройств в статус офф
         stopSheduled();
+        coap.stop();
 
         for (Device device : listDevices)
 		{
-        	System.out.println(templateOffState.replace("${DOMAIN}", getDomain())
-        			.replace("${PATH}", getPathSystemUri())
-        			.replace("${DEVICE_HASH}", device.getID()));
-        	inactiveDevice(templateOffState.replace("${DOMAIN}", getDomain())
-        			.replace("${PATH}", getPathSystemUri())
-        			.replace("${DEVICE_HASH}", device.getID()));
+        	if(device.getTurnOn()) {
+	        	System.out.println(templateOffState.replace("${DOMAIN}", getDomain())
+	        			.replace("${SYSTEM_PATH}", getPathSystemUri())
+	        			.replace("${DEVICE_HASH}", device.getID()));
+	        	inactiveDevice(templateOffState.replace("${DOMAIN}", getDomain())
+	        			.replace("${SYSTEM_PATH}", getPathSystemUri())
+	        			.replace("${DEVICE_HASH}", device.getID()));
+        	}
 		}
         
         System.out.println("Dht22 temperature driver stopped!");
@@ -142,9 +150,17 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     	return deviceManager.getPathSystemUri();
     }
     
+    public String getPathSensorUri() {
+    	return deviceManager.getPathSystemUri();
+    }
+    
     public String getDriverName() {
 		return driverName;
 	}
+    
+    public CoAPInterface getCoap() {
+    	return coap;
+    }
     
     private void readTemplates() {
         try {
@@ -158,6 +174,17 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             System.out.println("Can't read templates");
             throw new IllegalArgumentException(ex);
         }
+    }
+    
+    public void restartSheduller() {
+    	/*stopSheduled();
+    	try {
+			Thread.currentThread().sleep(1000 * 60 * 20);
+		} catch (InterruptedException e) {
+			System.out.println(e.getMessage());
+		}
+    	this.scheduledDevice.createCoapClients();
+    	startSheduled();*/
     }
     
     public void startSheduled() {

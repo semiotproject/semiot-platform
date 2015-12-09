@@ -35,7 +35,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
     
     public static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> saref:hasState saref:OffState.";
+			+ "<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> saref:hasState saref:OffState.";
     
     private ScheduledExecutorService scheduler;
 	private ScheduledDevice scheduledDevice;
@@ -69,10 +69,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         for (Device device : listDevices)
 		{
         	System.out.println(templateOffState.replace("${DOMAIN}", getDomain())
-        			.replace("${PATH}", getPathSystemUri())
+        			.replace("${SYSTEM_PATH}", getPathSystemUri())
         			.replace("${DEVICE_HASH}", device.getID()));
         	inactiveDevice(templateOffState.replace("${DOMAIN}", getDomain())
-        			.replace("${PATH}", getPathSystemUri())
+        			.replace("${SYSTEM_PATH}", getPathSystemUri())
         			.replace("${DEVICE_HASH}", device.getID()));
 		}
         
@@ -123,6 +123,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     
     public String getPathSystemUri() {
     	return deviceManager.getPathSystemUri();
+    }
+    
+    public String getPathSensorUri() {
+    	return deviceManager.getPathSensorUri();
     }
     
     public String getDriverName() {

@@ -29,7 +29,7 @@ public class ScheduledDevice implements Runnable {
 	private static String CMD_SENSOR_NEARBY = "sensorsNearby";
 	private static final String templateTopic = "${DEVICE_HASH}";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> saref:hasState saref:OnState.";
+			+ "<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> saref:hasState saref:OnState.";
 	
 	/* String templateSubsystem = "ssn:hasSubSystem [ a ssn:SensingDevice ; "
 			+ "ssn:observes qudt-quantity:ThermodynamicTemperature ; ssn:hasMeasurementCapability ["
@@ -81,7 +81,7 @@ public class ScheduledDevice implements Runnable {
                         				deviceOld.setTurnOn(true);
                         				ddi.inactiveDevice(templateOnState
                 	            				.replace("${DEVICE_HASH}", deviceOld.getID())
-                	            				.replace("${PATH}", ddi.getPathSystemUri())
+                	            				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
                 	            				.replace("${DOMAIN}", ddi.getDomain()));
                         			}
                         		}
@@ -89,7 +89,8 @@ public class ScheduledDevice implements Runnable {
                         	}
                         	else {
                         		device.setRDFDescription(ddi.getTemplateDescription().replace(
-									"${DEVICE_HASH}", hash).replace("${PATH}", ddi.getPathSystemUri())
+									"${DEVICE_HASH}", hash).replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+									.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
 									.replace("${SENSOR_ID}", "1")
 									.replace("${DOMAIN}", ddi.getDomain())
 									.replace("${LATITUDE}", String.valueOf(jDevice.get("lat")))
@@ -106,7 +107,7 @@ public class ScheduledDevice implements Runnable {
 	            		dev.setTurnOn(false);
 	            		ddi.inactiveDevice(DeviceDriverImpl.templateOffState
 	            				.replace("${DEVICE_HASH}", dev.getID())
-	            				.replace("${PATH}", ddi.getPathSystemUri())
+	            				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
 	            				.replace("${DOMAIN}", ddi.getDomain()));
 	            	}
 	            }
@@ -126,7 +127,8 @@ public class ScheduledDevice implements Runnable {
 			String message = ddi
 					.getTemplateObservation()
 					.replace("${DOMAIN}", ddi.getDomain())
-					.replace("${PATH}", ddi.getPathSystemUri())
+					.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+					.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
 					.replace("${DEVICE_HASH}", hash)
 					.replace("${SENSOR_ID}", "1")
 					.replace("${TIMESTAMP}", String.valueOf(timestamp))
