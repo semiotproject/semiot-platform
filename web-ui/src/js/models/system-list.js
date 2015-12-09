@@ -3,6 +3,10 @@
 import { EventEmitter } from 'events';
 import N3 from 'n3';
 
+function isDeviceOnline(state) {
+    return state === "http://ontology.tno.nl/saref#OnState";
+}
+
 export default function(
     $q,
     rdfUtils,
@@ -82,7 +86,7 @@ export default function(
 
                 systems.forEach((system, index) => {
                     if (system.uri === uri) {
-                        systems[index].isOnline = state === "http://ontology.tno.nl/saref#OnState";
+                        systems[index].isOnline = isDeviceOnline(state);
                         console.info(`changin network state for ${uri}; now is ${systems[index].isOnline ? "online" : "offline"}`);
 
                         this.emit("systemsUpdate", systems);
@@ -100,7 +104,7 @@ export default function(
                         index: index + 1,
                         name: binding.label.value,
                         uri: binding.uri.value,
-                        isOnline: binding.state.value === "saref:OnState"
+                        isOnline: isDeviceOnline(binding.state.value)
                     };
                 });
                 defer.resolve(systems);
