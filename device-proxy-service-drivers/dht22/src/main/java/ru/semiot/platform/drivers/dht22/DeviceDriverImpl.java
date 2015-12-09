@@ -151,7 +151,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     }
     
     public String getPathSensorUri() {
-    	return deviceManager.getPathSystemUri();
+    	return deviceManager.getPathSensorUri();
     }
     
     public String getDriverName() {
