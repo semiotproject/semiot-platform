@@ -2,6 +2,7 @@ package ru.semiot.platform.drivers.dht22;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapResponse;
 
@@ -20,45 +21,67 @@ public class ScheduledDevice implements Runnable {
 	
 	private static final String templateTopic = "${DEVICE_HASH}";
 	private static final String templateOnState = "prefix saref: <http://ontology.tno.nl/saref#> "
-			+ "<http://${DOMAIN}/${PATH}/${DEVICE_HASH}> saref:hasState saref:OnState.";
+			+ "<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> saref:hasState saref:OnState.";
 	
 	public ScheduledDevice(DeviceDriverImpl ddi) {
 		this.ddi = ddi;
-		coapClientTemperature = new CoapClient("coap://" + ddi.getIp() + ":" + ddi.getPort() + "/dht22/temperature");
-        coapClientHumidity = new CoapClient("coap://" + ddi.getIp() + ":" + ddi.getPort() + "/dht22/temperature");
-        hash = getHash(ddi.getDriverName() + ddi.getIp() + String.valueOf(ddi.getPort()));
+		hash = getHash(ddi.getDriverName() + ddi.getIp() + String.valueOf(ddi.getPort()));
         ddi.addDevice(new Device(hash, ddi.getTemplateDescription()
-        		.replace("${DEVICE_HASH}", hash).replace("${PATH}", ddi.getPathSystemUri())
+        		.replace("${DEVICE_HASH}", hash).replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+        		.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
 				.replace("${DOMAIN}", ddi.getDomain())
 				.replace("${LATITUDE}", String.valueOf(ddi.getLat()))
 				.replace("${LONGITUDE}", String.valueOf(ddi.getLng()))));
 	}
 	
+	public void createCoapClients() {
+		coapClientHumidity = new CoapClient("coap://" + ddi.getIp() + ":" + 
+				String.valueOf(ddi.getPort()) + "/dht22/humidity");
+		coapClientTemperature = new CoapClient("coap://" + ddi.getIp() + ":" + 
+				String.valueOf(ddi.getPort()) + "/dht22/temperature");
+        
+        coapClientTemperature.setEndpoint(CoAPInterface.getEndpoint());
+        coapClientHumidity.setEndpoint(CoAPInterface.getEndpoint());
+	}
+	
+	public static void main(String[] args) {
+		DeviceDriverImpl ddi = new DeviceDriverImpl();
+		ScheduledDevice sd = new ScheduledDevice(ddi);
+		sd.createCoapClients();
+		sd.run();
+	}
+	
 	public void run() {
-		long timestamp = System.currentTimeMillis();
-		
-		CoapResponse crTemperature = coapClientTemperature.get();
-		CoapResponse crHumidity = coapClientHumidity.get();
-		
-		if(crTemperature != null && crHumidity != null) {
-			for(Device device : ddi.listDevices()) {
+		if(ddi.listDevices().size() == 1 &&  ddi.listDevices().get(0).getTurnOn()) {
+			long timestamp = System.currentTimeMillis();
+			CoapResponse crHumidity = coapClientHumidity.get();
+			CoapResponse crTemperature = coapClientTemperature.get();
+
+			System.out.println(crTemperature.getResponseText());
+			System.out.println(crHumidity.getResponseText());
+				
+			if(crTemperature != null && crHumidity != null) {
+				Device device = ddi.listDevices().get(0);
 				if(!device.getTurnOn()) {
 					device.setTurnOn(true);
 					ddi.inactiveDevice(templateOnState
 		    				.replace("${DEVICE_HASH}", device.getID())
-		    				.replace("${PATH}", ddi.getPathSystemUri())
+		    				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
 		    				.replace("${DOMAIN}", ddi.getDomain()));
 				}
-			}
-			sendMessage(crTemperature.getResponseText(), crHumidity.getResponseText(),
-					timestamp, hash);
-		} else { // TODO проверить является ли это фактором отключения?
-			for (Device device : ddi.listDevices()) {
+				sendMessage(crTemperature.getResponseText(), crHumidity.getResponseText(),
+						timestamp, hash);
+			} else { // TODO проверить является ли это фактором отключения?
+				Device device = ddi.listDevices().get(0);
 				device.setTurnOn(false);
 	    		ddi.inactiveDevice(DeviceDriverImpl.templateOffState
 	    				.replace("${DEVICE_HASH}", device.getID())
-	    				.replace("${PATH}", ddi.getPathSystemUri())
+	    				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
 	    				.replace("${DOMAIN}", ddi.getDomain()));
+	    		
+	    		coapClientTemperature.shutdown();
+	    		coapClientHumidity.shutdown();
+	    		ddi.restartSheduller();
 			}
 		}
 	}
@@ -74,7 +97,8 @@ public class ScheduledDevice implements Runnable {
 			String messageTemperature = ddi
 					.getTemplateObservationTemperature()
 					.replace("${DOMAIN}", ddi.getDomain())
-					.replace("${PATH}", ddi.getPathSystemUri())
+					.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+					.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
 					.replace("${DEVICE_HASH}", hash)
 					.replace("${TIMESTAMP}", String.valueOf(timestamp))
 					.replace("${DATETIME}", date)
@@ -83,7 +107,8 @@ public class ScheduledDevice implements Runnable {
 			String messageHumidity = ddi
 					.getTemplateObservationHumidity()
 					.replace("${DOMAIN}", ddi.getDomain())
-					.replace("${PATH}", ddi.getPathSystemUri())
+					.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+					.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
 					.replace("${DEVICE_HASH}", hash)
 					.replace("${TIMESTAMP}", String.valueOf(timestamp))
 					.replace("${DATETIME}", date)
