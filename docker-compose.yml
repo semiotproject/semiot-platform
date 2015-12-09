@@ -70,8 +70,8 @@ apigateway:
     - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
   restart: always
 
-nginx:
-  image: docker.semiot.ru/nginx
+frontend:
+  image: docker.semiot.ru/frontend
   links:
     - wamprouter
     - deviceproxyservice
