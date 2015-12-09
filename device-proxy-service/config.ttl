@@ -45,6 +45,8 @@
         #ja:externalContent <http://ontology.tno.nl/saref.ttl> ;
         #ja:externalContent <http://dublincore.org/2012/06/14/dcterms.ttl> ;
         #ja:externalContent <http://www.w3.org/2003/01/geo/wgs84_pos#> ;
+        #ja:externalContent <http://w3id.org/qudt/vocab/quantity/ext#> ;
+        #ja:externalContent <http://www.loa-cnr.it/ontologies/DUL.owl#> ;
     ];
     ja:reasoner [
         ja:reasonerURL <http://jena.hpl.hp.com/2003/RDFSExptRuleReasoner> ;
