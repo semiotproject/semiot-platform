@@ -176,6 +176,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
     }
     
+    // TODO
     public void restartSheduller() {
     	/*stopSheduled();
     	try {
@@ -191,7 +192,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		if (this.handle != null)
 			stopSheduled();
 
-		int nDelay = 10;
+		int nDelay = 60;
 		this.handle = this.scheduler.scheduleAtFixedRate(this.scheduledDevice,
 				1, nDelay, TimeUnit.SECONDS); // Minutes
 		System.out.println("UScheduled started. Repeat will do every "

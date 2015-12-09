@@ -39,26 +39,22 @@ public class ScheduledDevice implements Runnable {
 				String.valueOf(ddi.getPort()) + "/dht22/humidity");
 		coapClientTemperature = new CoapClient("coap://" + ddi.getIp() + ":" + 
 				String.valueOf(ddi.getPort()) + "/dht22/temperature");
-        
-        coapClientTemperature.setEndpoint(CoAPInterface.getEndpoint());
+		coapClientTemperature.setEndpoint(CoAPInterface.getEndpoint());
         coapClientHumidity.setEndpoint(CoAPInterface.getEndpoint());
-	}
-	
-	public static void main(String[] args) {
-		DeviceDriverImpl ddi = new DeviceDriverImpl();
-		ScheduledDevice sd = new ScheduledDevice(ddi);
-		sd.createCoapClients();
-		sd.run();
 	}
 	
 	public void run() {
 		if(ddi.listDevices().size() == 1 &&  ddi.listDevices().get(0).getTurnOn()) {
 			long timestamp = System.currentTimeMillis();
 			CoapResponse crHumidity = coapClientHumidity.get();
-			CoapResponse crTemperature = coapClientTemperature.get();
-
-			System.out.println(crTemperature.getResponseText());
 			System.out.println(crHumidity.getResponseText());
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.err.println(e.getMessage());
+			}
+			CoapResponse crTemperature = coapClientTemperature.get();
+			System.out.println(crTemperature.getResponseText());
 				
 			if(crTemperature != null && crHumidity != null) {
 				Device device = ddi.listDevices().get(0);
@@ -69,7 +65,7 @@ public class ScheduledDevice implements Runnable {
 		    				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
 		    				.replace("${DOMAIN}", ddi.getDomain()));
 				}
-				sendMessage(crTemperature.getResponseText(), crHumidity.getResponseText(),
+				sendMessage(crTemperature.getResponseText().trim(), crHumidity.getResponseText().trim(),
 						timestamp, hash);
 			} else { // TODO проверить является ли это фактором отключения?
 				Device device = ddi.listDevices().get(0);
