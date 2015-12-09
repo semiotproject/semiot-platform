@@ -35,7 +35,8 @@ export default {
             qudt: 'http://www.qudt.org/qudt/owl/1.0.0/qudt/#',
             "qudt-quantity": 'http://qudt.org/vocab/quantity#',
             "qudt-unit": "http://qudt.org/vocab/unit#",
-            om: 'http://purl.org/ifgi/om#'
+            om: 'http://purl.org/ifgi/om#',
+            ext: 'http://w3id.org/qudt/vocab/quantity/ext#'
         },
         types: {
             heatSystem: "http://purl.org/NET/ssnext/heatmeters#HeatMeter",
