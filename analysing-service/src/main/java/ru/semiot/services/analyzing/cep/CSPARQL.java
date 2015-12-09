@@ -192,7 +192,8 @@ public class CSPARQL implements Engine {
     }
     
     private void appendEventsToStore(String events, int query_id) {
-        dbe.appendEvents(query_id, events);
+        if(!events.isEmpty())
+            dbe.appendEvents(query_id, events);
     }
     
     private String asURI(final String string) {
