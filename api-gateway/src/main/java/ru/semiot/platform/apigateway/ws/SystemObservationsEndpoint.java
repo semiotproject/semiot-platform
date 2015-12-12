@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import javax.annotation.Resource;
 import javax.ejb.Stateful;
 import javax.enterprise.concurrent.ManagedExecutorService;
@@ -23,7 +22,7 @@ import ru.semiot.platform.apigateway.SPARQLQueryService;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 
-@ServerEndpoint("/ws/observations/systems/{id}")
+@ServerEndpoint("/ws/systems/{id}/observations")
 @Stateful
 public class SystemObservationsEndpoint {
 

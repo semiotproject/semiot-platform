@@ -1,0 +1,26 @@
+@prefix :      <http://localhost/sensors/327956808-1#> .
+@prefix qudt:  <http://qudt.org/schema/qudt#> .
+@prefix hmtr:  <http://purl.org/NET/ssnext/heatmeters#> .
+@prefix meter: <http://purl.org/NET/ssnext/meters/core#> .
+@prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix ssn:   <http://purl.oclc.org/NET/ssnx/ssn#> .
+
+<http://localhost/sensors/327956808-1>
+        <http://purl.org/dc/terms/#identifier>
+                "327956808-1"^^xsd:string .
+
+:1449936070783-result
+        a                 ssn:SensorOutput ;
+        ssn:hasValue      :1449936070783-resultvalue ;
+        ssn:isProducedBy  <coap://192.169.1.106:60000/meter> .
+
+:1449936070783-resultvalue
+        a                   qudt:QuantityValue ;
+        qudt:quantityValue  "65.0"^^xsd:double .
+
+:1449936070783  a                  ssn:Observation ;
+        ssn:observationResult      :1449936070783-result ;
+        ssn:observationResultTime  "2015-12-12T19:01:10+03:00"^^xsd:dateTime ;
+        ssn:observedBy             <http://localhost/sensors/327956808-1> ;
+        ssn:observedProperty       qudt-quantity:ThermodynamicTemperature .
