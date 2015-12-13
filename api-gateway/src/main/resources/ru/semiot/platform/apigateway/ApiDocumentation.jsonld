@@ -106,8 +106,10 @@
             "@type": "hydra:Link",
             "rdfs:range": "vocab:WebSocketResource",
             "hydra:supportedOperation": [
-                "@type": "vocab:WebSocketSubscribeOperation",
-                "hydra:returns": "ssn:Observation"
+                {
+                    "@type": "vocab:WebSocketSubscribeOperation",
+                    "hydra:returns": "ssn:Observation"
+                }
             ]
         },
         {
@@ -119,6 +121,6 @@
             "@id": "vocab:WebSocketSubscribeOperation",
             "@type": "hydra:Class",
             "rdfs:subClassOf": "hydra:Operation"
-        },
+        }
     ]
 }
