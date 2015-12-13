@@ -11,7 +11,7 @@
     "@id": "${HOST}/doc",
     "@type": "hydra:ApiDocumentation",
     "hydra:entrypoint": "${HOST}/",
-    "supportedClass": [
+    "hydra:supportedClass": [
         {
             "@id": "vocab:EntryPoint",
             "@type": "hydra:Class",
