@@ -1,7 +1,7 @@
 "use strict";
 
 // change it to target hostname when develop
-const DEFAULT_HOSTNAME = "localhost";
+const DEFAULT_HOSTNAME = "demo.semiot.ru";
 const hostname = location.hostname === "localhost" ? DEFAULT_HOSTNAME : location.hostname;
 
 const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
@@ -32,7 +32,7 @@ export default {
             ssncom: 'http://purl.org/NET/ssnext/communication#',
             saref: 'http://ontology.tno.nl/saref#',
             mcht: 'http://purl.org/NET/ssnext/machinetools#',
-            qudt: 'http://www.qudt.org/qudt/owl/1.0.0/qudt/#',
+            qudt: 'http://qudt.org/schema/qudt#',
             "qudt-quantity": 'http://qudt.org/vocab/quantity#',
             "qudt-unit": "http://qudt.org/vocab/unit#",
             om: 'http://purl.org/ifgi/om#',
@@ -55,7 +55,7 @@ export default {
                 "}"
             ].join('\n'),
             getSystemSensors: `
-                SELECT ?type ?observationType ?propLabel ?valueUnitLabel {
+                SELECT ?subsystem ?type ?observationType ?propLabel ?valueUnitLabel {
                   <{0}> ssn:hasSubSystem ?subsystem .
                   ?subsystem ssn:observes ?type .
                   ?subsystem ssn:hasMeasurementCapability ?mc .

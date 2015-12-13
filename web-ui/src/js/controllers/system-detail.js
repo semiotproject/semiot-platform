@@ -84,6 +84,7 @@ export default function(
             // create sensor list
             data.results.bindings.forEach((binding) => {
                 let sensor = $.extend({}, {
+                    uri: binding.subsystem.value,
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
                     sensorType: binding.type.value,
@@ -193,6 +194,11 @@ export default function(
     $scope.isStateSensor = function(sensor) {
         return sensor.observationType === "http://www.qudt.org/qudt/owl/1.0.0/qudt/#Enumeration";
     };
+    $scope.getSensorByURI = function(uri) {
+        return $scope.sensors.find((s) => {
+            return s.uri === uri;
+        });
+    };
 
     // event handlers
 
@@ -203,8 +209,6 @@ export default function(
 
         console.info(`received message: `, data);
 
-        /*
-        // console.info(`received message from ${sensor.endpoint}: `, data);
         rdfUtils.parseTTL(data).then(function(triples) {
 
             let N3Store = N3.Store();
@@ -213,8 +217,11 @@ export default function(
             N3Store.addTriples(triples);
 
             let obs = N3Store.find(null, "rdf:type", "ssn:Observation", "")[0].subject;
+            let sensorURI = N3Store.find(obs, "ssn:observedBy", null, "")[0].object;
             let obsResult = N3Store.find(obs, "ssn:observationResult", null, "")[0].object;
             let obsResultValue = N3Store.find(obsResult, "ssn:hasValue", null, "")[0].object;
+
+            const sensor = $scope.getSensorByURI(sensorURI);
 
             if ($scope.isStateSensor(sensor)) {
 
@@ -236,8 +243,6 @@ export default function(
 
             // updating time window
             sensor.range = getLastHourRange();
-
-        */
     };
     $scope.onSetRangeClick = function(index) {
         let sensor = $scope.sensors[index];
