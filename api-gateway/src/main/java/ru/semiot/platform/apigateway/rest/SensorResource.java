@@ -5,10 +5,14 @@ import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.impl.TurtleRDFParser;
 import com.github.jsonldjava.utils.JsonUtils;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ejb.Stateless;
@@ -28,6 +32,7 @@ import ru.semiot.platform.apigateway.JsonLdContextProviderService;
 import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.JsonLdBuilder;
 import ru.semiot.platform.apigateway.utils.JsonLdKeys;
+import ru.semiot.platform.apigateway.utils.URIUtils;
 
 @Path("/sensors")
 @Stateless
@@ -45,6 +50,11 @@ public class SensorResource {
             = "DESCRIBE ?uri {"
             + "	?uri dcterms:identifier \"${SENSOR_ID}\"^^xsd:string ."
             + "}";
+    private static final String VAR_ID = "id";
+    private static final String VAR_LABEL = "label";
+    private static final Property DCTERMS_IDENTIFIER = 
+            ResourceFactory.createProperty("http://purl.org/dc/terms/#identifier");
+    private static final String VOCAB_OBSERVATIONS = "http://${HOST}/doc#observations";
 
     @Inject
     JsonLdContextProviderService contextProvider;
@@ -78,12 +88,13 @@ public class SensorResource {
                 final UriBuilder ub = uriBuilder.clone();
 
                 final QuerySolution qs = r.next();
+                final String id = qs.getLiteral(VAR_ID).getString();
                 final String uri = ub
                         .path("sensors/{a}")
-                        .buildFromEncoded(qs.getLiteral("id").getString()).toASCIIString();
+                        .buildFromEncoded(id).toASCIIString();
                 final String label;
-                if (qs.contains("label")) {
-                    label = qs.getLiteral("label").getString();
+                if (qs.contains(VAR_LABEL)) {
+                    label = qs.getLiteral(VAR_LABEL).getString();
                 } else {
                     label = null;
                 }
@@ -120,10 +131,25 @@ public class SensorResource {
     @Produces(MediaType.APPLICATION_LD_JSON)
     public void getSensor(@Suspended final AsyncResponse response,
             @PathParam("id") String id) throws IOException {
+        final URI requestUri = uriInfo.getRequestUri();
+        final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
         final Map<String, Object> frame = contextProvider.getContextAsJsonLd(
                 JsonLdContextProviderService.SENSOR_FRAME, uriInfo.getRequestUri());
 
         query.describe(QUERY_DESCRIBE_SENSOR.replace("${SENSOR_ID}", id)).subscribe((model) -> {
+            model.listResourcesWithProperty(
+                    DCTERMS_IDENTIFIER, 
+                    ResourceFactory.createTypedLiteral(id, XSDDatatype.XSDstring))
+                    .forEachRemaining((r) -> {
+                        r.addProperty(
+                                ResourceFactory.createProperty(
+                                        VOCAB_OBSERVATIONS.replace("${HOST}", 
+                                                URIUtils.extractHostName(requestUri))), 
+                                uriBuilder
+                                        .replacePath("/ws/sensors/{id}/observations")
+                                        .build(id).toASCIIString());
+                    });
+            
             StringWriter sw = new StringWriter();
             model.write(sw, "N-TRIPLE");
 
@@ -131,11 +157,11 @@ public class SensorResource {
                 Object b = JsonLdProcessor.fromRDF(
                         sw.toString(), new TurtleRDFParser());
 
-                Map<String, Object> system = JsonLdProcessor.frame(
+                Map<String, Object> sensor = JsonLdProcessor.frame(
                         b, frame, new JsonLdOptions());
-
+                
                 response.resume(JsonUtils.toString(JsonLdProcessor.compact(
-                        system, frame, new JsonLdOptions())));
+                        sensor, frame, new JsonLdOptions())));
             } catch (JsonLdError | IOException ex) {
                 logger.warn(ex.getMessage(), ex);
 

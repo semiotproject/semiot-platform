@@ -12,6 +12,7 @@ import javax.ejb.Singleton;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.semiot.platform.apigateway.utils.URIUtils;
 
 @Singleton
 public class JsonLdContextProviderService {
@@ -52,21 +53,11 @@ public class JsonLdContextProviderService {
     public Map<String, Object> getContextAsJsonLd(
             String contextName, URI requestUri) 
             throws IOException {
-        return contexts.get(contextName).createAsJsonLd(extractHostName(requestUri));
+        return contexts.get(contextName).createAsJsonLd(URIUtils.extractHostName(requestUri));
     }
     
     public String getContextAsString(String contextName, URI requestUri) {
-        return contexts.get(contextName).createAsString(extractHostName(requestUri));
-    }
-    
-    private String extractHostName(URI uri) {
-        final StringBuilder builder = new StringBuilder(uri.getScheme())
-                .append("://").append(uri.getHost());
-        
-        if(uri.getPort() != 80 && uri.getPort() != -1) {
-            builder.append(":").append(uri.getPort());
-        }
-        return builder.toString();
+        return contexts.get(contextName).createAsString(URIUtils.extractHostName(requestUri));
     }
     
     private static class Context {

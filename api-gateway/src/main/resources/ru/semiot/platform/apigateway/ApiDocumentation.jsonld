@@ -106,8 +106,7 @@
             "@type": "hydra:Link",
             "rdfs:range": "vocab:WebSocketResource",
             "hydra:supportedOperation": [
-                "@type": "vocab:WAMPSubscribeOperation",
-                "hydra:expects": "vocab:WAMPTopic",
+                "@type": "vocab:WebSocketSubscribeOperation",
                 "hydra:returns": "ssn:Observation"
             ]
         },
@@ -117,19 +116,9 @@
             "rdfs:subClassOf": "hydra:Resource"
         },
         {
-            "@id": "vocab:WAMPResource",
-            "@type": "hydra:Class",
-            "rdfs:subClassOf": "vocab:WebSocketResource"
-        },
-        {
-            "@id": "vocab:WAMPSubscribeOperation",
+            "@id": "vocab:WebSocketSubscribeOperation",
             "@type": "hydra:Class",
             "rdfs:subClassOf": "hydra:Operation"
         },
-        {
-            "@id": "vocab:WAMPTopic",
-            "@type": "hydra:Class",
-            "rdfs:subClassOf": "rdf:Literal"
-        }
     ]
 }
