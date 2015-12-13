@@ -69,7 +69,7 @@ public class SensorResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_LD_JSON)
+    @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void listSensors(@Suspended final AsyncResponse response)
             throws IOException {
         final Map<String, Object> context = contextProvider.getContextAsJsonLd(
@@ -128,7 +128,7 @@ public class SensorResource {
 
     @GET
     @Path("{id}")
-    @Produces(MediaType.APPLICATION_LD_JSON)
+    @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void getSensor(@Suspended final AsyncResponse response,
             @PathParam("id") String id) throws IOException {
         final URI requestUri = uriInfo.getRequestUri();

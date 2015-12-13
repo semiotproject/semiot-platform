@@ -9,6 +9,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
+import ru.semiot.platform.apigateway.utils.URIUtils;
 
 @WebFilter(urlPatterns = {"/*"}, asyncSupported = true)
 public class IndexFilter implements Filter {
@@ -21,9 +22,7 @@ public class IndexFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        final String apiURL = request.getScheme() + "://" + request.getServerName() 
-                + ":" + request.getServerPort()
-                + request.getServletContext().getContextPath() + "/doc";
+        final String apiURL = URIUtils.rewriteURI(request, "/doc");
 
         HttpServletResponse hsr = (HttpServletResponse) response;
 

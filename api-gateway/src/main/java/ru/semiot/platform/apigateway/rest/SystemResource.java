@@ -61,7 +61,7 @@ public class SystemResource {
     private UriInfo uriInfo;
 
     @GET
-    @Produces(MediaType.APPLICATION_LD_JSON)
+    @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void listSystems(@Suspended final AsyncResponse response)
             throws JsonLdError, IOException {
         final Map<String, Object> context = contextProvider.getContextAsJsonLd(
@@ -111,7 +111,7 @@ public class SystemResource {
 
     @GET
     @Path("{id}")
-    @Produces(MediaType.APPLICATION_LD_JSON)
+    @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void getSystem(
             @Suspended final AsyncResponse response,
             @PathParam("id") String id) throws URISyntaxException, IOException {

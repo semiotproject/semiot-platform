@@ -35,7 +35,7 @@ public class RootResource {
     JsonLdContextProviderService contextProvider;
 
     @GET
-    @Produces(MediaType.APPLICATION_LD_JSON)
+    @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public String entrypoint() throws JsonLdError, IOException, URISyntaxException {
         Map<String, Object> context = contextProvider.getContextAsJsonLd(
                 JsonLdContextProviderService.ENTRYPOINT_CONTEXT, 
@@ -60,7 +60,7 @@ public class RootResource {
 
     @GET
     @Path("/doc")
-    @Produces(MediaType.APPLICATION_LD_JSON)
+    @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public String documentation() throws JsonLdError, IOException {
         return contextProvider.getContextAsString(
                 JsonLdContextProviderService.API_DOCUMENTATION_CONTEXT, 
