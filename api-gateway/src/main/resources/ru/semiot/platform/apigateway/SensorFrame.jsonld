@@ -1,6 +1,6 @@
 {
   "@context": {
-    "vocab": "http://${HOST}/doc#",
+    "vocab": "${HOST}/doc#",
     "hydra": "http://www.w3.org/ns/hydra/core#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
@@ -14,7 +14,8 @@
     "saref:hasState": {"@type": "@id"},
     "ssn:hasValue": {"@type": "@id"},
     "ssn:forProperty": {"@type": "@id"},
-    "ssn:observes": {"@type": "@id"}
+    "ssn:observes": {"@type": "@id"},
+    "vocab:observations": {"@type": "@id"}
   },
   "@type": "ssn:SensingDevice"
 }

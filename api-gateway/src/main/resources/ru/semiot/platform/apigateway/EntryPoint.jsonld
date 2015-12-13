@@ -6,6 +6,15 @@
         "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
         "saref": "http://ontology.tno.nl/saref#",
         "ssncom": "http://purl.org/NET/ssnext/communication#",
-        "dcterms": "http://purl.org/dc/terms/#"
+        "dcterms": "http://purl.org/dc/terms/#",
+
+        "vocab:EntryPoint/systems": {
+            "@id": "vocab:EntryPoint/systems",
+            "@type": "@id"
+        },
+        "vocab:EntryPoint/sensors": {
+            "@id": "vocab:EntryPoint/sensors",
+            "@type": "@id"
+        }
     }
 }

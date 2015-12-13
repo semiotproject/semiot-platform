@@ -53,11 +53,11 @@ public class JsonLdContextProviderService {
     public Map<String, Object> getContextAsJsonLd(
             String contextName, URI requestUri) 
             throws IOException {
-        return contexts.get(contextName).createAsJsonLd(URIUtils.extractHostName(requestUri));
+        return contexts.get(contextName).createAsJsonLd(URIUtils.extractRootURL(requestUri));
     }
     
     public String getContextAsString(String contextName, URI requestUri) {
-        return contexts.get(contextName).createAsString(URIUtils.extractHostName(requestUri));
+        return contexts.get(contextName).createAsString(URIUtils.extractRootURL(requestUri));
     }
     
     private static class Context {

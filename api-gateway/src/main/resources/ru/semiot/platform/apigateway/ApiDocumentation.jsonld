@@ -27,13 +27,13 @@
                    "hydra:property": {
                         "@id": "vocab:EntryPoint/systems",
                         "@type": "hydra:Link",
-                        "domain": "vocab:EntryPoint",
-                        "range": "vocab:SystemCollection",
-                        "supportedOperation": [
+                        "rdfs:domain": "vocab:EntryPoint",
+                        "rdfs:range": "vocab:SystemCollection",
+                        "hydra:supportedOperation": [
                             {
                                 "@type": "hydra:Operation",
-                                "method": "GET",
-                                "returns": "vocab:SystemCollection"
+                                "hydra:method": "GET",
+                                "hydra:returns": "vocab:SystemCollection"
                             }
                         ]
                     }
@@ -42,13 +42,13 @@
                    "hydra:property": {
                         "@id": "vocab:EntryPoint/sensors",
                         "@type": "hydra:Link",
-                        "domain": "vocab:EntryPoint",
-                        "range": "vocab:SensorCollection",
-                        "supportedOperation": [
+                        "rdfs:domain": "vocab:EntryPoint",
+                        "rdfs:range": "vocab:SensorCollection",
+                        "hydra:supportedOperation": [
                             {
                                 "@type": "hydra:Operation",
-                                "method": "GET",
-                                "returns": "vocab:SensorCollection"
+                                "hydra:method": "GET",
+                                "hydra:returns": "vocab:SensorCollection"
                             }
                         ]
                     }
@@ -90,6 +90,26 @@
             ]
         },
         {
+            "@id": "ssn:System",
+            "@type": "hydra:Class",
+            "hydra:supportedOperation": [
+                {
+                    "@type": "hydra:Operation",
+                    "hydra:method": "GET",
+                    "hydra:returns": "ssn:System"
+                }
+            ],
+            "hydra:supportedProperty": [
+                {
+                    "hydra:property" : {
+                        "@id": "ssn:hasSubSystem",
+                        "rdfs:domain": "ssn:System",
+                        "rdfs:range": "ssn:SensingDevice" 
+                    }
+                }
+            ]
+        },
+        {
             "@id": "vocab:SensorCollection",
             "@type": "hydra:Class",
             "rdfs:subClassOf": "hydra:Collection",
@@ -98,6 +118,17 @@
                     "@type": "hydra:Operation",
                     "hydra:method": "GET",
                     "hydra:returns": "vocab:SensorCollection"
+                }
+            ]
+        },
+        {
+            "@id": "ssn:SensingDevice",
+            "@type": "hydra:Class",
+            "hydra:supportedOperation": [
+                {
+                    "@type": "hydra:Operation",
+                    "hydra:method": "GET",
+                    "hydra:returns": "ssn:SensingDevice"
                 }
             ]
         },
