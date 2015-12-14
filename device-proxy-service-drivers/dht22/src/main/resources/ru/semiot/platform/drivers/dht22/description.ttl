@@ -4,12 +4,11 @@
 @prefix ssncom: <http://purl.org/NET/ssnext/communication#> .
 @prefix saref: <http://ontology.tno.nl/saref#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
 @prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
 @prefix qudt-unit: <http://qudt.org/vocab/unit#> .
-@prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> .
+@prefix qudt: <http://qudt.org/schema/qudt> .
 @prefix dcterms: <http://purl.org/dc/terms/#> .
 @prefix ext: <http://w3id.org/qudt/vocab/quantity/ext#> .
 

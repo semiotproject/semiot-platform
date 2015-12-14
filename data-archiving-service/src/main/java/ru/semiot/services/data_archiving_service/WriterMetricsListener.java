@@ -36,7 +36,7 @@ public class WriterMetricsListener implements Observer<String> {
 	
 	private static final String QUDT_ENUMERATION = "http://qudt.org/schema/qudt#Enumeration";
 	private static final Query METRICS_QUERY = QueryFactory
-			.create("prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> "
+			.create("prefix qudt: <http://qudt.org/schema/qudt#> "
 					+ "prefix dcterms: <http://purl.org/dc/terms/#> "
 					+ "prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> "
 					+ "SELECT ?timestamp ?property ?value_type ?value ?feature_of_interest ?source "
