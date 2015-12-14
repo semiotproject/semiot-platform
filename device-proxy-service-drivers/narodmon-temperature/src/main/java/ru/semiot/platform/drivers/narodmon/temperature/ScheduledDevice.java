@@ -49,7 +49,8 @@ public class ScheduledDevice implements Runnable {
 			CloseableHttpClient client = HttpClients.createDefault();
 			HttpPost post = new HttpPost(uri);
 			JSONObject json = new JSONObject();
-			json.put("cmd", CMD_SENSOR_NEARBY).put("uuid", UUID).put("api_key", API_KEY);
+			json.put("cmd", CMD_SENSOR_NEARBY).put("lat", "55.75").put("lng", "37.62")
+				.put("radius", "20").put("types", "1").put("uuid", UUID).put("api_key", API_KEY);
 			post.setEntity(new StringEntity(json.toString(), ContentType.APPLICATION_JSON));
 			HttpResponse response = client.execute(post);
 			json = new JSONObject(EntityUtils.toString(response.getEntity()));
@@ -65,40 +66,38 @@ public class ScheduledDevice implements Runnable {
                     for(int j = 0; j< a.length(); j++){
                     	// one sensor
                     	JSONObject jSensor = a.getJSONObject(j);
-                        if((String.valueOf(jSensor.get("type"))).equals("1")) { // проверка удовлетворению типа
-                        	String hash = getHash(String.valueOf(jDevice.get("id")));
-                        	
-                        	String value = String.valueOf(jSensor.get("value"));
-                        	Device device = new Device(hash, "");
-                        	list.add(device);
-                        	System.out.println(hash + " " + value);
-                        	if(ddi.contains(device)) {
-                        		int index = ddi.listDevices().indexOf(device);
-                        		if(index > 0)
-                        		{
-                        			Device deviceOld = ddi.listDevices().get(index);
-                        			if(deviceOld != null && !deviceOld.getTurnOn()) {
-                        				deviceOld.setTurnOn(true);
-                        				ddi.inactiveDevice(templateOnState
-                	            				.replace("${DEVICE_HASH}", deviceOld.getID())
-                	            				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
-                	            				.replace("${DOMAIN}", ddi.getDomain()));
-                        			}
-                        		}
-                        		sendMessage(value, currentTimestamp, hash);
-                        	}
-                        	else {
-                        		device.setRDFDescription(ddi.getTemplateDescription().replace(
-									"${DEVICE_HASH}", hash).replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
-									.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
-									.replace("${SENSOR_ID}", "1")
-									.replace("${DOMAIN}", ddi.getDomain())
-									.replace("${LATITUDE}", String.valueOf(jDevice.get("lat")))
-									.replace("${LONGITUDE}", String.valueOf(jDevice.get("lng"))));
-                        		ddi.addDevice(device);
-                        		sendMessage(value, currentTimestamp, hash);
-                        	}
-                        }    
+                    	String hash = getHash(String.valueOf(jDevice.get("id")));
+                    	
+                    	String value = String.valueOf(jSensor.get("value"));
+                    	Device device = new Device(hash, "");
+                    	list.add(device);
+                    	System.out.println(hash + " " + value);
+                    	if(ddi.contains(device)) {
+                    		int index = ddi.listDevices().indexOf(device);
+                    		if(index > 0)
+                    		{
+                    			Device deviceOld = ddi.listDevices().get(index);
+                    			if(deviceOld != null && !deviceOld.getTurnOn()) {
+                    				deviceOld.setTurnOn(true);
+                    				ddi.inactiveDevice(templateOnState
+            	            				.replace("${DEVICE_HASH}", deviceOld.getID())
+            	            				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+            	            				.replace("${DOMAIN}", ddi.getDomain()));
+                    			}
+                    		}
+                    		sendMessage(value, currentTimestamp, hash);
+                    	}
+                    	else {
+                    		device.setRDFDescription(ddi.getTemplateDescription().replace(
+								"${DEVICE_HASH}", hash).replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+								.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
+								.replace("${SENSOR_ID}", "1")
+								.replace("${DOMAIN}", ddi.getDomain())
+								.replace("${LATITUDE}", String.valueOf(jDevice.get("lat")))
+								.replace("${LONGITUDE}", String.valueOf(jDevice.get("lng"))));
+                    		ddi.addDevice(device);
+                    		sendMessage(value, currentTimestamp, hash);
+                    	}   
                         break;
                     }
 	            }
