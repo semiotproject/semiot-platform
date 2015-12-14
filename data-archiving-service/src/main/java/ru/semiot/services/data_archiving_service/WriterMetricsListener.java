@@ -34,7 +34,7 @@ public class WriterMetricsListener implements Observer<String> {
 	private static final String FEATURE_OF_INTEREST = "feature_of_interest";
 	private static final String SOURCE = "source";
 	
-	private static final String QUDT_ENUMERATION = "http://www.qudt.org/qudt/owl/1.0.0/qudt/#Enumeration";
+	private static final String QUDT_ENUMERATION = "http://qudt.org/schema/qudt#Enumeration";
 	private static final Query METRICS_QUERY = QueryFactory
 			.create("prefix qudt: <http://www.qudt.org/qudt/owl/1.0.0/qudt/#> "
 					+ "prefix dcterms: <http://purl.org/dc/terms/#> "
