@@ -4,11 +4,13 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.JSONArray;
@@ -91,12 +93,29 @@ public class Queries {
         if (ret == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        JSONObject events = dbe.getEventsFromQuery(id);
+        JSONArray events = dbe.getEventsByQueryId(id);
         if (events != null) {
-            ret.append("events",
-                    new JSONObject().append("timestamp", events.getString("created")).append("events", events.getString("events")));
+            ret.append("events", events);
         }
         return Response.ok(ret.toString()).build();
+    }
+        
+    @GET
+    @Path("{id}/events")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEventsByTime(@PathParam("id") Integer id, 
+            @DefaultValue("-1") @QueryParam("from") long start_timestamp, 
+            @DefaultValue("-1") @QueryParam("to") long end_timestamp) {
+        logger.debug("Return events");
+        JSONArray events;
+        if(start_timestamp!=-1 && end_timestamp!=-1)
+            events = dbe.getEventsByTime(start_timestamp, end_timestamp);
+        else
+            events = dbe.getEventsByQueryId(id);
+        if (events == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(events.toString()).build();
     }
 
     @DELETE

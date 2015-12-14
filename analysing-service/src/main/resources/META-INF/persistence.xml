@@ -3,6 +3,7 @@
   <persistence-unit name="DataSource" transaction-type="JTA">
     <jta-data-source>java:/jboss/datasources/SemiotDS</jta-data-source>
     <class>ru.semiot.services.analyzing.database.Query</class>
+    <class>ru.semiot.services.analyzing.database.Events</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties/>
   </persistence-unit>

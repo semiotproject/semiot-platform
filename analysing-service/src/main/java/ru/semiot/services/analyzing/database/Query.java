@@ -1,20 +1,23 @@
 package ru.semiot.services.analyzing.database;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -26,12 +29,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Query.findAll", query = "SELECT q FROM Query q"),
     @NamedQuery(name = "Query.findById", query = "SELECT q FROM Query q WHERE q.id = :id"),
-    @NamedQuery(name = "Query.count", query = "SELECT COUNT(*) FROM Query"),
+    @NamedQuery(name = "Query.count", query = "SELECT COUNT(q.id) FROM Query q"),
     @NamedQuery(name = "Query.getLastID", query = "SELECT MAX(q.id) FROM Query q")})
 public class Query implements Serializable {
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "query")
-    private Events events;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date time;
+    @OneToMany(mappedBy = "queryId")
+    private Collection<Events> eventsCollection;
 
     private static final long serialVersionUID = 1L;
     @Lob
@@ -42,10 +50,6 @@ public class Query implements Serializable {
     @Size(max = 65535)
     @Column(name = "query")
     private String query;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "time")
-    private String time;
     @Id
     @Basic(optional = false)
     @NotNull
@@ -58,7 +62,7 @@ public class Query implements Serializable {
 
     public Query(String text, String name, int id) {
         this.id = id;
-        this.time = Long.toString(new Date().getTime());
+        this.time = new Date();
         this.name = name;
         this.query = text;
     }
@@ -77,14 +81,6 @@ public class Query implements Serializable {
 
     public void setQuery(String query) {
         this.query = query;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
     }
 
     public Integer getId() {
@@ -116,15 +112,24 @@ public class Query implements Serializable {
 
     @Override
     public String toString() {
-        return "{\"id\": \"" + id + "\",\n\"created\": \"" + time + "\",\n\"name\": \"" + name + "\",\n\"text\": \"" + query + "\"}";
+        return "{\"id\": \"" + id + "\",\n\"created\": \"" + time.getTime() + "\",\n\"name\": \"" + name + "\",\n\"text\": \"" + query + "\"}";
     }
 
-    public Events getEvents() {
-        return events;
+    public Date getTime() {
+        return time;
     }
 
-    public void setEvents(Events events) {
-        this.events = events;
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    @XmlTransient
+    public Collection<Events> getEventsCollection() {
+        return eventsCollection;
+    }
+
+    public void setEventsCollection(Collection<Events> eventsCollection) {
+        this.eventsCollection = eventsCollection;
     }
 
 }

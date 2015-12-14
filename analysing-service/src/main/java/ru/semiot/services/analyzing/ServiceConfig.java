@@ -15,7 +15,7 @@ public interface ServiceConfig extends Config {
     public static final ServiceConfig config = ConfigFactory
             .create(ServiceConfig.class);
 
-    @DefaultValue("ws://wamprouter:8080/ws")
+    @DefaultValue("ws://demo.semiot.ru:8080/ws")
     @Key("services.wamp.uri")
     String wampUri();
 
@@ -32,7 +32,7 @@ public interface ServiceConfig extends Config {
     @Key("services.topics.subscriber")
     String topicsSubscriber();
 
-    @DefaultValue("http://deviceproxyservice:3030/ds/query")
+    @DefaultValue("http://demo.semiot.ru:3030/ds/query")
     @Key("services.devicedirectory.store.url")
     String storeUrl();
 

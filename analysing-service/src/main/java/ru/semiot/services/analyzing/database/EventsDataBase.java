@@ -1,11 +1,14 @@
 package ru.semiot.services.analyzing.database;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public interface EventsDataBase {
     public void appendEvents(int query_id, String events);
-    public JSONObject getEventsFromQuery(int query_id);
-    public JSONObject getEventsFromID(int id);
-    public JSONObject removeEvents(int id);
+    public JSONArray getEventsByQueryId(int query_id);
+    public JSONObject getEventsById(int id);
+    public JSONObject removeEventsById(int id);
+    public JSONArray removeEventsByQueryId(int query_id);
+    public JSONArray getEventsByTime(long start, long end);
     public long getCount();
 }

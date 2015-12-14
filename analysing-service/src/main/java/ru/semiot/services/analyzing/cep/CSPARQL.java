@@ -42,14 +42,14 @@ import ru.semiot.services.analyzing.wamp.WAMPClient;
 @Default
 @ApplicationScoped
 public class CSPARQL implements Engine {
-    
+
     private final org.slf4j.Logger logger = LoggerFactory
             .getLogger(CSPARQL.class);
     private final String STREAM_URI = "http://ex.org/streams/test";
     private final CsparqlEngine engine;
     private final RdfStream stream;
     private final Map<Integer, CsparqlQueryResultProxy> queries;
-    
+
     public CSPARQL() {
         engine = new CsparqlEngineImpl();
         stream = new RdfStream(STREAM_URI);
@@ -77,7 +77,7 @@ public class CSPARQL implements Engine {
             stream.put(new RdfQuadruple(stmt.getSubject().getURI(), stmt.getPredicate().getURI(), stmt.getObject().toString(), calendar.getTimeInMillis()));
         }
     }
-    
+
     @Override
     public boolean registerQuery(int query_id) {
         String query = db.getQuery(query_id).getString("text");
@@ -88,7 +88,7 @@ public class CSPARQL implements Engine {
                 queries.put(query_id, proxy);
                 logger.debug("Query is appended. Try to append Observer");
                 proxy.addObserver(new Observer() {
-                    
+
                     @Override
                     public void update(Observable o, Object arg) {
                         final RDFTable rdfTable = (RDFTable) arg;
@@ -105,13 +105,13 @@ public class CSPARQL implements Engine {
             } else {
                 return false;
             }
-            
+
         } catch (ParseException | QueryParseException | NullPointerException ex) {
             logger.debug("Bad exception with message: " + ex.getMessage());
             return false;
         }
     }
-    
+
     @Override
     public void removeQuery(int query_id) {
         if (queries.containsKey(query_id)) {
@@ -122,14 +122,14 @@ public class CSPARQL implements Engine {
             logger.error("Query not found!");
             logger.debug(queries.keySet().toString());
         }
-        
+
     }
-    
+
     public void sendToWAMP(String message) {
-        logger.info("Get alert! " + message);
+        logger.info("Get alert!\n " + message);
         WAMPClient.getInstance().publish(ServiceConfig.config.topicsAlert(), message);
     }
-    
+
     private String getString(String[] vars, List<Binding> bindings) {
         StringBuilder message = new StringBuilder();
         for (Binding binding : bindings) {
@@ -141,11 +141,11 @@ public class CSPARQL implements Engine {
         }
         return message.toString();
     }
-    
+
     private final String QUOTE = "\"";
     private final String GT = ">";
     private final String LT = "<";
-    
+
     private Binding toBinding(String[] vars, String string, String separator) {
         String[] values = string.split(separator);
         final BindingMap binding = BindingFactory.create();
@@ -154,7 +154,7 @@ public class CSPARQL implements Engine {
         }
         return binding;
     }
-    
+
     private Node toNode(String value) {
         if (value.startsWith("http://")) {
             return NodeFactory.createURI(value);
@@ -168,7 +168,7 @@ public class CSPARQL implements Engine {
             }
         }
     }
-    
+
     private String unquoting(final String string) {
         final StringBuilder builder = new StringBuilder(string);
         if (builder.indexOf(QUOTE) == 0) {
@@ -179,7 +179,7 @@ public class CSPARQL implements Engine {
         }
         return builder.toString();
     }
-    
+
     private String toUri(final String string) {
         final StringBuilder builder = new StringBuilder(string);
         if (builder.indexOf(LT) == 0) {
@@ -190,12 +190,13 @@ public class CSPARQL implements Engine {
         }
         return builder.toString();
     }
-    
+
     private void appendEventsToStore(String events, int query_id) {
-        if(!events.isEmpty())
+        if (events != null && !events.isEmpty()) {
             dbe.appendEvents(query_id, events);
+        }
     }
-    
+
     private String asURI(final String string) {
         final StringBuilder builder = new StringBuilder();
         if (string.startsWith("http://")) {

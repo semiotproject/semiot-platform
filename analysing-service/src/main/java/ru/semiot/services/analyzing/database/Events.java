@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ru.semiot.services.analyzing.database;
 
 import java.io.Serializable;
@@ -13,10 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -31,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Events.findAll", query = "SELECT e FROM Events e"),
     @NamedQuery(name = "Events.findById", query = "SELECT e FROM Events e WHERE e.id = :id"),
-    @NamedQuery(name = "Events.findByQueryId", query = "SELECT e FROM Events e WHERE e.queryId = :queryId")})
+    @NamedQuery(name = "Events.findByTime", query = "SELECT e FROM Events e WHERE e.time BETWEEN :st_time AND :end_time")})
 public class Events implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,29 +37,28 @@ public class Events implements Serializable {
     @NotNull
     @Column(name = "id")
     private Integer id;
-    @Column(name = "query_id")
-    private Integer queryId;
     @Lob
     @Size(max = 65535)
     @Column(name = "events")
     private String events;
-    @Lob
-    @Size(max = 65535)
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "time")
-    private String time;
-    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
-    @OneToOne(optional = false)
-    private Query query;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date time;
+    @JoinColumn(name = "query_id", referencedColumnName = "id")
+    @ManyToOne
+    private Query queryId;
 
     public Events() {
 
     }
 
-    public Events(int id, int query_id, String events) {
+    public Events(int id, Query query, String events) {
         this.id = id;
-        this.queryId = query_id;
+        this.queryId = query;
         this.events = events;
-        this.time = Long.toString(new Date().getTime());
+        this.time = new Date();
     }
 
     public Integer getId() {
@@ -73,37 +69,29 @@ public class Events implements Serializable {
         this.id = id;
     }
 
-    public Integer getQueryId() {
-        return queryId;
-    }
-
-    public void setQueryId(Integer queryId) {
-        this.queryId = queryId;
-    }
-
     public String getEvents() {
         return events;
     }
 
     public void setEvents(String events) {
         this.events = events;
-        this.time = Long.toString(new Date().getTime());
+        this.time = new Date();        
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
-    public Query getQuery() {
-        return query;
+    public Query getQueryId() {
+        return queryId;
     }
 
-    public void setQuery(Query query) {
-        this.query = query;
+    public void setQueryId(Query query) {
+        this.queryId = query;
     }
 
     @Override
@@ -115,7 +103,6 @@ public class Events implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Events)) {
             return false;
         }
@@ -128,7 +115,7 @@ public class Events implements Serializable {
 
     @Override
     public String toString() {
-        return "{\"id\": \"" + id + "\",\n\"created\": \"" + time + "\",\n\"events\": \"" + events.replace("\"", "\\\"").replace("\n", "\\n") + "\",\n\"query_id\": \"" + queryId + "\"}";
+        return "{\"created\": \"" + time.getTime() + "\",\n\"events\": \"" + events.replace("\"", "\\\"").replace("\n", "\\n") + "\"}";
     }
 
 }
