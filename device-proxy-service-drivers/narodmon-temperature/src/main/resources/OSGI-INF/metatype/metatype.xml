@@ -4,6 +4,8 @@
          id="ru.semiot.platform.drivers.narodmon.temperature">
         <AD name="URL" id="ru.semiot.platform.drivers.narodmon.temperature.url"
             required="true" type="String" default="http://narodmon.ru"/>
+        <AD name="Scheduled Delay" id="ru.semiot.platform.drivers.narodmon.temperature.scheduled_delay"
+            required="true" type="Integer" default="10"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.drivers.narodmon.temperature">

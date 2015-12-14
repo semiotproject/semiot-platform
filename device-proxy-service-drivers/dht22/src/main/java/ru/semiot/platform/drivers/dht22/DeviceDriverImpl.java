@@ -11,7 +11,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
@@ -21,10 +20,11 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
-    private static final String IP_KEY = Activator.PID + ".ip";
-    private static final String PORT_KEY = Activator.PID + ".port";
-    private static final String LAT_KEY = Activator.PID + ".lat";
-    private static final String LNG_KEY = Activator.PID + ".lng";
+    private static final String IP = Activator.PID + ".ip";
+    private static final String PORT = Activator.PID + ".port";
+    private static final String LAT = Activator.PID + ".lat";
+    private static final String LNG = Activator.PID + ".lng";
+    private static final String SCHEDULED_DELAY = Activator.PID + ".scheduled_delay";
             
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
     
@@ -47,6 +47,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private String ip = "94.19.230.213";
     private String lat = "60.01352";
     private String lng = "30.287799";
+    private int scheduledDelay = 10;
 
     public List<Device> listDevices() {
         return listDevices;
@@ -89,10 +90,16 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         synchronized(this) {
             System.out.println(properties == null);
             if(properties != null) {
-            	ip = (String) properties.get(IP_KEY);
-            	port = (Integer) properties.get(PORT_KEY);
-            	lat = (String) properties.get(LAT_KEY);
-            	lng = (String) properties.get(LNG_KEY);
+            	ip = (String) properties.get(IP);
+            	port = (Integer) properties.get(PORT);
+            	lat = (String) properties.get(LAT);
+            	lng = (String) properties.get(LNG);
+            	int newDelay = (Integer) properties.get(SCHEDULED_DELAY);
+            	if(newDelay != scheduledDelay) {
+            		scheduledDelay = newDelay;
+            		stopSheduled();
+            		startSheduled();
+            	}
             }
         }
     }
@@ -192,11 +199,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		if (this.handle != null)
 			stopSheduled();
 
-		int nDelay = 60;
 		this.handle = this.scheduler.scheduleAtFixedRate(this.scheduledDevice,
-				1, nDelay, TimeUnit.SECONDS); // Minutes
+				1, scheduledDelay, TimeUnit.MINUTES); // Minutes
 		System.out.println("UScheduled started. Repeat will do every "
-				+ String.valueOf(nDelay) + " seconds");
+				+ String.valueOf(scheduledDelay) + " seconds");
 	}
 
 	public void stopSheduled() {

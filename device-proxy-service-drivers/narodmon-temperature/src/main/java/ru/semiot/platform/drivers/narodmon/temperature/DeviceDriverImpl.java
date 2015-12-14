@@ -20,6 +20,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import javax.print.attribute.standard.SheetCollate;
+
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -30,8 +32,8 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
-    private static final String URL_KEY = Activator.PID + ".url";
-            
+    private static final String URL = Activator.PID + ".url";
+    private static final String SCHEDULED_DELAY = Activator.PID + ".scheduled_delay";
     private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
     
     public static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
@@ -48,6 +50,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private String templateObservation;
 
     private String url = "http://narodmon.ru";
+    private int scheduledDelay = 10;
 
     public List<Device> listDevices() {
         return listDevices;
@@ -83,7 +86,13 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         synchronized(this) {
             System.out.println(properties == null);
             if(properties != null) {
-            	url = (String) properties.get(URL_KEY);
+            	url = (String) properties.get(URL);
+            	int newDelay = (Integer) properties.get(SCHEDULED_DELAY);
+            	if(newDelay != scheduledDelay) {
+            		scheduledDelay = newDelay;
+            		stopSheduled();
+            		startSheduled();
+            	}
             }
         }
     }
@@ -149,11 +158,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 		if (this.handle != null)
 			stopSheduled();
 
-		int nDelay = 10;
 		this.handle = this.scheduler.scheduleAtFixedRate(this.scheduledDevice,
-				1, nDelay, MINUTES);
+				1, scheduledDelay, MINUTES);
 		System.out.println("UScheduled started. Repeat will do every "
-				+ String.valueOf(nDelay) + " minutes");
+				+ String.valueOf(scheduledDelay) + " minutes");
 	}
 
 	public void stopSheduled() {
