@@ -8,7 +8,7 @@
 @prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
 @prefix qudt-unit: <http://qudt.org/vocab/unit#> .
-@prefix qudt: <http://qudt.org/schema/qudt> .
+@prefix qudt: <http://qudt.org/schema/qudt#> .
 @prefix dcterms: <http://purl.org/dc/terms/#> .
 
 <http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> a ssn:System ;
