@@ -23,6 +23,8 @@ public class ScheduledDevice implements Runnable {
 	
 	private static final int FNV_32_INIT = 0x811c9dc5;
     private static final int FNV_32_PRIME = 0x01000193;
+    private static final double maxTemperature = 50;
+    
 	
 	private static String API_KEY = "21a2qYKfbqzyU";
 	private static String UUID = "41e99f715d97f740cf34cdf146882fa9";
@@ -69,35 +71,41 @@ public class ScheduledDevice implements Runnable {
                     	String hash = getHash(String.valueOf(jDevice.get("id")));
                     	
                     	String value = String.valueOf(jSensor.get("value"));
-                    	Device device = new Device(hash, "");
-                    	list.add(device);
-                    	System.out.println(hash + " " + value);
-                    	if(ddi.contains(device)) {
-                    		int index = ddi.listDevices().indexOf(device);
-                    		if(index > 0)
-                    		{
-                    			Device deviceOld = ddi.listDevices().get(index);
-                    			if(deviceOld != null && !deviceOld.getTurnOn()) {
-                    				deviceOld.setTurnOn(true);
-                    				ddi.inactiveDevice(templateOnState
-            	            				.replace("${DEVICE_HASH}", deviceOld.getID())
-            	            				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
-            	            				.replace("${DOMAIN}", ddi.getDomain()));
-                    			}
-                    		}
-                    		sendMessage(value, currentTimestamp, hash);
+                    	Double val = Double.valueOf(value);
+                    	if(maxTemperature > val) {
+	                    	Device device = new Device(hash, "");
+	                    	list.add(device);
+	                    	System.out.println(hash + " " + value);
+	                    	if(ddi.contains(device)) {
+	                    		int index = ddi.listDevices().indexOf(device);
+	                    		if(index > 0)
+	                    		{
+	                    			Device deviceOld = ddi.listDevices().get(index);
+	                    			if(deviceOld != null && !deviceOld.getTurnOn()) {
+	                    				deviceOld.setTurnOn(true);
+	                    				ddi.inactiveDevice(templateOnState
+	            	            				.replace("${DEVICE_HASH}", deviceOld.getID())
+	            	            				.replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+	            	            				.replace("${DOMAIN}", ddi.getDomain()));
+	                    			}
+	                    		}
+	                    		sendMessage(value, currentTimestamp, hash);
+	                    	}
+	                    	else {
+	                    		device.setRDFDescription(ddi.getTemplateDescription().replace(
+									"${DEVICE_HASH}", hash).replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
+									.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
+									.replace("${SENSOR_ID}", "1")
+									.replace("${DOMAIN}", ddi.getDomain())
+									.replace("${LATITUDE}", String.valueOf(jDevice.get("lat")))
+									.replace("${LONGITUDE}", String.valueOf(jDevice.get("lng"))));
+	                    		ddi.addDevice(device);
+	                    		sendMessage(value, currentTimestamp, hash);
+	                    	}   
+                    	} else {
+                    		System.out.println("Sensor has invalid value.");
+                    		System.out.println(jSensor.toString());
                     	}
-                    	else {
-                    		device.setRDFDescription(ddi.getTemplateDescription().replace(
-								"${DEVICE_HASH}", hash).replace("${SYSTEM_PATH}", ddi.getPathSystemUri())
-								.replace("${SENSOR_PATH}", ddi.getPathSensorUri())
-								.replace("${SENSOR_ID}", "1")
-								.replace("${DOMAIN}", ddi.getDomain())
-								.replace("${LATITUDE}", String.valueOf(jDevice.get("lat")))
-								.replace("${LONGITUDE}", String.valueOf(jDevice.get("lng"))));
-                    		ddi.addDevice(device);
-                    		sendMessage(value, currentTimestamp, hash);
-                    	}   
                         break;
                     }
 	            }
