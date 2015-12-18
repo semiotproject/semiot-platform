@@ -1,0 +1,44 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix mcht: <http://purl.org/NET/ssnext/machinetools#> .
+@prefix ssncom: <http://purl.org/NET/ssnext/communication#> .
+@prefix saref: <http://ontology.tno.nl/saref#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
+@prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
+@prefix qudt-unit: <http://qudt.org/vocab/unit#> .
+@prefix qudt: <http://qudt.org/schema/qudt#> .
+@prefix dcterms: <http://purl.org/dc/terms/#> .
+
+<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> a ssn:System ;
+    rdfs:label "Temperature Meter #${DEVICE_HASH}"@en ;
+    dcterms:identifier "${DEVICE_HASH}"^^xsd:string ;
+	dul:hasLocation [
+		a geo:Point ;
+		geo:lat "${LATITUDE}"^^xsd:string ;
+		geo:long "${LONGITUDE}"^^xsd:string
+	] ;
+	saref:hasState saref:OnState ;
+    ssncom:hasCommunicationEndpoint <http://${DOMAIN}/${SYSTEM_PATH}/topic=${DEVICE_HASH}> ;
+    ssn:hasSubSystem <http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-${SENSOR_ID}>.
+    	
+<http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-${SENSOR_ID}> a ssn:SensingDevice ;
+	dcterms:identifier "${DEVICE_HASH}-${SENSOR_ID}"^^xsd:string ;
+    ssn:observes qudt-quantity:ThermodynamicTemperature ;
+    ssn:hasMeasurementCapability [
+        a ssn:MeasurementCapability ;
+        ssn:forProperty qudt-quantity:ThermodynamicTemperature ;
+        ssn:hasMeasurementProperty [
+            a qudt:Unit ;
+            ssn:hasValue [
+                a qudt:Quantity ;
+                ssn:hasValue qudt-unit:DegreeCelsius ;
+            ] ;
+        ] ;
+    ] .
+    
+    
+<http://${DOMAIN}/${SYSTEM_PATH}/topic=${DEVICE_HASH}> a ssncom:CommunicationEndpoint ;
+	ssncom:topic "${DEVICE_HASH}"^^xsd:string ;
+    ssncom:protocol "WAMP" .

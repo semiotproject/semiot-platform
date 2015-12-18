@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+    <OCD description="Netatmo Temperature Driver" name="Netatmo Temperature Driver"
+         id="ru.semiot.platform.drivers.netatmo.temperature">
+        <AD name="North East Longitude" id="ru.semiot.platform.drivers.netatmo.temperature.longitude_ne"
+            required="true" type="Double" default="30.677734"/>
+        <AD name="North East Lattitude" id="ru.semiot.platform.drivers.netatmo.temperature.lattitude_ne"
+            required="true" type="Double" default="60.138258"/>
+        <AD name="South West Longitude" id="ru.semiot.platform.drivers.netatmo.temperature.longitude_sw"
+            required="true" type="Double" default="29.750763"/>
+        <AD name="South West Lattitude" id="ru.semiot.platform.drivers.netatmo.temperature.lattitude_sw"
+            required="true" type="Double" default="59.71779"/>
+        <AD name="Scheduled Delay" id="ru.semiot.platform.drivers.netatmo.temperature.scheduled_delay"
+            required="true" type="Integer" default="10"/>
+    </OCD>
+    
+    <Designate pid="ru.semiot.platform.drivers.netatmo.temperature">
+        <Object ocdref="ru.semiot.platform.drivers.netatmo.temperature"/>
+    </Designate>
+</metatype:MetaData>

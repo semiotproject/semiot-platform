@@ -1,0 +1,23 @@
+@prefix hmtr: <http://purl.org/NET/ssnext/heatmeters#> .
+@prefix meter: <http://purl.org/NET/ssnext/meters/core#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/schema/qudt#> .
+@prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
+@prefix : <http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}/temperature#> .
+@prefix dcterms: <http://purl.org/dc/terms/#> .
+
+:${TIMESTAMP} a ssn:Observation ;
+    ssn:observedProperty qudt-quantity:ThermodynamicTemperature ;
+    ssn:observedBy <http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-${SENSOR_ID}> ;
+    ssn:observationResultTime "${DATETIME}"^^xsd:dateTime ;
+    ssn:observationResult :${TIMESTAMP}-result .
+
+:${TIMESTAMP}-result a ssn:SensorOutput ;
+    ssn:isProducedBy <http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> ;
+    ssn:hasValue :${TIMESTAMP}-resultvalue .
+
+:${TIMESTAMP}-resultvalue a qudt:QuantityValue ;
+    qudt:quantityValue "${VALUE}"^^xsd:double .
+    
+<http://${DOMAIN}/${SENSOR_PATH}/${DEVICE_HASH}-${SENSOR_ID}> dcterms:identifier "${DEVICE_HASH}-${SENSOR_ID}"^^xsd:string .
