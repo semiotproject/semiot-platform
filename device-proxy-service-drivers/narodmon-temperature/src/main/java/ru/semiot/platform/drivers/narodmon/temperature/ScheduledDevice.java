@@ -78,7 +78,7 @@ public class ScheduledDevice implements Runnable {
 	                    	System.out.println(hash + " " + value);
 	                    	if(ddi.contains(device)) {
 	                    		int index = ddi.listDevices().indexOf(device);
-	                    		if(index > 0)
+	                    		if(index >= 0)
 	                    		{
 	                    			Device deviceOld = ddi.listDevices().get(index);
 	                    			if(deviceOld != null && !deviceOld.getTurnOn()) {
