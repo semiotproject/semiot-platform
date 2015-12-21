@@ -46,7 +46,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private double lon_ne = 30.677734;
     private double lat_sw = 59.71779;
     private double lon_sw = 29.750763;
-    
+
     public List<Device> listDevices() {
         return listDevices;
     }
@@ -75,11 +75,11 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
         logger.info("Netatmo temperature driver stopped!");
     }
-
+    
     public void updated(Dictionary properties) throws ConfigurationException {
         logger.info("Netatmo temperature driver updated");
         synchronized (this) {
-            logger.debug("properties is " + (properties == null?"null":"not null"));
+            logger.debug("properties is " + (properties == null ? "null" : "not null"));
             if (properties != null) {
                 lat_ne = (Double) properties.get(LAT_NE);
                 lon_ne = (Double) properties.get(LON_NE);
@@ -168,7 +168,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     public void startSheduled() {
         logger.debug("Hello from startScheduled!");
-        
+
         if (this.handle != null) {
             logger.debug("Try to stop scheduler");
             stopSheduled();

@@ -3,27 +3,22 @@ package ru.semiot.platform.drivers.netatmo.temperature;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -36,7 +31,7 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 public class ScheduledDevice implements Runnable {
 
     private final static Logger logger = Logger.getLogger(ScheduledDevice.class);
-    private DeviceDriverImpl ddi;
+    private final DeviceDriverImpl ddi;
 
     private static final int FNV_32_INIT = 0x811c9dc5;
     private static final int FNV_32_PRIME = 0x01000193;
@@ -72,7 +67,7 @@ public class ScheduledDevice implements Runnable {
      + " a ssn:MeasurementCapability ; ssn:forProperty qudt-quantity:ThermodynamicTemperature ; "
      + "ssn:hasMeasurementProperty [ a qudt:Unit ; ssn:hasValue [ a qudt:Quantity ; "
      + "ssn:hasValue qudt-unit:DegreeCelsius ; ] ; ] ; ] ; ]"; */
-    public ScheduledDevice(DeviceDriverImpl ddi) {        
+    public ScheduledDevice(DeviceDriverImpl ddi) {
         this.ddi = ddi;
     }
 
@@ -187,30 +182,9 @@ public class ScheduledDevice implements Runnable {
 
     private static SSLConnectionSocketFactory initSSL() {
         logger.debug("SSL is initializing");
-        //Trust anybody
-        try {
-            SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-                @Override
-                public void checkClientTrusted(X509Certificate[] certs,
-                        String authType) {
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] certs,
-                        String authType) {
-                }
-            }}, new SecureRandom());
-            return new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
-            logger.error("Something went wrong! " + ex.getMessage());
-        }
-        return null;
+        //Trust everyone
+        return new SSLConnectionSocketFactory(SSLContexts.createDefault(), 
+                NoopHostnameVerifier.INSTANCE);
     }
 
     private void initCredential() {
@@ -229,7 +203,7 @@ public class ScheduledDevice implements Runnable {
                     ContentType.APPLICATION_FORM_URLENCODED));
             logger.debug("Init Client");
             CloseableHttpClient client = HttpClients.custom().setSSLSocketFactory(sslf).build();
-            CloseableHttpClient cl = HttpClients.createDefault();
+//            CloseableHttpClient cl = HttpClients.createDefault();
             HttpGet q = new HttpGet("http://www.google.com");
             logger.debug("Client is initialized! client=" + client.toString() + " SSLSocketFactory is " + sslf.toString());
             logger.debug(post.toString() + ". Body is " + EntityUtils.toString(post.getEntity()) + ". URI is " + post.getURI().toString());
@@ -249,7 +223,7 @@ public class ScheduledDevice implements Runnable {
 
     private void initGeo() {
         setGeoPosition(ddi.getLat_sw(), ddi.getLon_sw(), ddi.getLat_ne(), ddi.getLon_ne());
-        logger.debug("GEO is (lat,lon): sw("+lat_sw+","+lon_sw+"); ne("+lat_ne+","+lon_ne+")");
+        logger.debug("GEO is (lat,lon): sw(" + lat_sw + "," + lon_sw + "); ne(" + lat_ne + "," + lon_ne + ")");
     }
 
     private JSONArray getData() {

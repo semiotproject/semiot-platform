@@ -15,7 +15,7 @@ public class Activator extends DependencyActivatorBase {
 
     public static final String PID = "ru.semiot.platform.drivers.netatmo.temperature";
 
-    //@Override
+    @Override
     public void init(BundleContext bc, DependencyManager manager) throws Exception {
         BasicConfigurator.configure();
         org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
