@@ -29,7 +29,7 @@ public class DirectoryService {
 			+ "SELECT ?uri_system ?state where{ ?uri_system saref:hasState ?state }");
 	protected static final String QUERY_UPDATE_STATE_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
 			+ "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
-			+ "INSERT { <${URI_SYSTEM}> saref:hasState <${STATE}> } "
+			+ "INSERT { <${URI_SYSTEM}> saref:hasState ${STATE} } "
 			+ "WHERE { <${URI_SYSTEM}> saref:hasState ?x }";
 	
 	DeviceManagerImpl dmi;
