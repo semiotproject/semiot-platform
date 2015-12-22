@@ -20,8 +20,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,7 +69,7 @@ public class ScheduledDevice implements Runnable {
         this.ddi = ddi;
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         BasicConfigurator.configure();
         org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
         rootLogger.setLevel(Level.ALL);
@@ -79,7 +77,7 @@ public class ScheduledDevice implements Runnable {
 
         sd.run();
 
-    }
+    }*/
 
     public void run() {
         logger.debug("Run method started");
@@ -204,7 +202,7 @@ public class ScheduledDevice implements Runnable {
             logger.debug("Init Client");
             CloseableHttpClient client = HttpClients.custom().setSSLSocketFactory(sslf).build();
 //            CloseableHttpClient cl = HttpClients.createDefault();
-            HttpGet q = new HttpGet("http://www.google.com");
+            //HttpGet q = new HttpGet("http://www.google.com");
             logger.debug("Client is initialized! client=" + client.toString() + " SSLSocketFactory is " + sslf.toString());
             logger.debug(post.toString() + ". Body is " + EntityUtils.toString(post.getEntity()) + ". URI is " + post.getURI().toString());
             HttpResponse response = client.execute(post);
@@ -228,8 +226,8 @@ public class ScheduledDevice implements Runnable {
 
     private JSONArray getData() {
         logger.debug("Try to get data");
-        //initGeo();//Метод необходим для запуска через felix
-        setGeoPosition(59.71779, 29.750763, 60.138258, 30.677734);//Метод нужен для локальной проверки класса
+        initGeo();//Метод необходим для запуска через felix
+        //setGeoPosition(59.71779, 29.750763, 60.138258, 30.677734);//Метод нужен для локальной проверки класса
         try {
             initCredential();
             logger.debug("Building URI");

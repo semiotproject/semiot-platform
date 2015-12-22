@@ -3,15 +3,15 @@
     <OCD description="Netatmo Temperature Driver" name="Netatmo Temperature Driver"
          id="ru.semiot.platform.drivers.netatmo.temperature">
         <AD name="North East Longitude" id="ru.semiot.platform.drivers.netatmo.temperature.longitude_ne"
-            required="true" type="Double" default="30.677734"/>
+            required="true" type="Double" default="37.842851"/>
         <AD name="North East Lattitude" id="ru.semiot.platform.drivers.netatmo.temperature.lattitude_ne"
-            required="true" type="Double" default="60.138258"/>
+            required="true" type="Double" default="55.907042"/>
         <AD name="South West Longitude" id="ru.semiot.platform.drivers.netatmo.temperature.longitude_sw"
-            required="true" type="Double" default="29.750763"/>
+            required="true" type="Double" default="37.412678"/>
         <AD name="South West Lattitude" id="ru.semiot.platform.drivers.netatmo.temperature.lattitude_sw"
-            required="true" type="Double" default="59.71779"/>
+            required="true" type="Double" default="55.593313"/>
         <AD name="Scheduled Delay" id="ru.semiot.platform.drivers.netatmo.temperature.scheduled_delay"
-            required="true" type="Integer" default="10"/>
+            required="true" type="Integer" default="30"/>
     </OCD>
     
     <Designate pid="ru.semiot.platform.drivers.netatmo.temperature">

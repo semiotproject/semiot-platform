@@ -19,7 +19,7 @@ public class Activator extends DependencyActivatorBase {
     public void init(BundleContext bc, DependencyManager manager) throws Exception {
         BasicConfigurator.configure();
         org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
-        rootLogger.setLevel(Level.ALL);
+        rootLogger.setLevel(Level.INFO);
 
         rootLogger.debug("Hello from init!");
         Properties properties = new Properties();
