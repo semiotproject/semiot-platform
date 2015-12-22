@@ -38,7 +38,7 @@ public class Events implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Lob
-    @Size(max = 65535)
+    @Size(max = 2147483647)
     @Column(name = "events")
     private String events;
     @Basic(optional = false)
