@@ -41,11 +41,11 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private String templateDescription;
     private String templateObservation;
 
-    private int scheduledDelay = 10;
-    private double lat_ne = 60.138258;
-    private double lon_ne = 30.677734;
-    private double lat_sw = 59.71779;
-    private double lon_sw = 29.750763;
+    private int scheduledDelay = 30;
+    private double lat_ne = 55.907042;
+    private double lon_ne = 37.842851;
+    private double lat_sw = 55.593313;
+    private double lon_sw = 37.412678;
 
     public List<Device> listDevices() {
         return listDevices;
