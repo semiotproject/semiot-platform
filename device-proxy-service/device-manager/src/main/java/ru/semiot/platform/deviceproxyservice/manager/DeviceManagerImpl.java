@@ -52,6 +52,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     
     public void start() {
     	directoryService = new DirectoryService(this);
+    	logger.info(wampUri);
         try {
             WAMPClient
                     .getInstance()
@@ -91,23 +92,44 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     public void updated(Dictionary properties) throws ConfigurationException {
         synchronized (this) {
             if (properties != null) {
-                wampUri = (String) properties.get(WAMP_URI_KEY);
-                wampRealm = (String) properties.get(WAMP_REALM_KEY);
+            	if (properties.get(WAMP_URI_KEY) != null) {
+            		wampUri = (String) properties.get(WAMP_URI_KEY);
+            	}
+            	if (properties.get(WAMP_REALM_KEY) != null) {
+            		wampRealm = (String) properties.get(WAMP_REALM_KEY);
+            	}
                 if (properties.get(WAMP_RECONNECT_KEY) != null) {
                     wampReconnect = (int) properties.get(WAMP_RECONNECT_KEY);
                 }
-                topicNewAndObserving = (String) properties.get(TOPIC_NEWANDOBSERVING_KEY);
-                topicInactive = (String) properties.get(TOPIC_INACTIVE);
+                if (properties.get(TOPIC_NEWANDOBSERVING_KEY) != null) {
+                	topicNewAndObserving = (String) properties.get(TOPIC_NEWANDOBSERVING_KEY);
+                }
+                if (properties.get(TOPIC_INACTIVE) != null) {
+                	topicInactive = (String) properties.get(TOPIC_INACTIVE);
+                }
                 if(properties.get(FUSEKI_PASSWORD) != null) {
                 	fusekiPassword = (String) properties.get(FUSEKI_PASSWORD);
                 }
-                fusekiUsername = (String) properties.get(FUSEKI_USERNAME);
-                fusekiUpdateUrl = (String) properties.get(FUSEKI_UPDATE_URL);
-                fusekiQueryUrl = (String) properties.get(FUSEKI_QUERY_URL);
-                fusekiStoreUrl = (String) properties.get(FUSEKI_STORE_URL);
+                if (properties.get(FUSEKI_USERNAME) != null) {
+                	fusekiUsername = (String) properties.get(FUSEKI_USERNAME);
+                }
+                if (properties.get(FUSEKI_UPDATE_URL) != null) {
+                	fusekiUpdateUrl = (String) properties.get(FUSEKI_UPDATE_URL);
+                }
+                if (properties.get(FUSEKI_QUERY_URL) != null) {
+                	fusekiQueryUrl = (String) properties.get(FUSEKI_QUERY_URL);
+                }
+                if (properties.get(FUSEKI_STORE_URL) != null) {
+                	fusekiStoreUrl = (String) properties.get(FUSEKI_STORE_URL);
+                }
+                if (properties.get(PATH_SYSTEM_URI) != null) {
+                	pathSystemUri = (String) properties.get(PATH_SYSTEM_URI);
+                }
+                if (properties.get(PATH_SENSOR_URI) != null) {
+                	pathSensorUri = (String) properties.get(PATH_SENSOR_URI);
+                }
+                
                 domain = (String) properties.get(DOMAIN);
-                pathSystemUri = (String) properties.get(PATH_SYSTEM_URI);
-                pathSensorUri = (String) properties.get(PATH_SENSOR_URI);
             }
         }
     }
