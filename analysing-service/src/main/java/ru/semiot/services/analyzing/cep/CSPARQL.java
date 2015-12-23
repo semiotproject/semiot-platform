@@ -126,7 +126,7 @@ public class CSPARQL implements Engine {
     }
 
     public void sendToWAMP(String message) {
-        logger.info("Get alert!\n " + message);
+        logger.debug("Get alert!\n " + message);
         WAMPClient.getInstance().publish(ServiceConfig.config.topicsAlert(), message);
     }
 
