@@ -1,11 +1,5 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import java.io.StringReader;
-
-import org.apache.jena.riot.RiotException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -14,6 +8,10 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import java.io.StringReader;
+import org.apache.jena.riot.RiotException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DirectoryService {
 	
@@ -41,6 +39,7 @@ public class DirectoryService {
 	}
 	
 	public void inactiveDevice(String message) {
+		String request = null;
 		try {
 			Model description = ModelFactory.createDefaultModel().read(
 					new StringReader(message), null, LANG);
@@ -55,9 +54,10 @@ public class DirectoryService {
 					QuerySolution qs = systems.next();
 					String uriSystem = qs.getResource("uri_system").getURI();
 					String state = qs.getResource("state").getURI();
+					request = QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
+							.replace("${STATE}", state);
 					if(uriSystem != null && state != null) {
-						rdfStore.update(QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
-							.replace("${STATE}", state)); 
+						rdfStore.update(request); 
 					}
 				}
 			} else {
@@ -66,6 +66,7 @@ public class DirectoryService {
 		} catch (RiotException ex) {
 			logger.warn(ex.getMessage(), ex);
 		} catch (Exception ex) {
+			logger.info("Exception with string: " + ((request!=null && !request.isEmpty())?request:"request message is empty"));
 			logger.error(ex.getMessage(), ex);
 		}
 	}
