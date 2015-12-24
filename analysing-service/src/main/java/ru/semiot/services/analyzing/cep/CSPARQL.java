@@ -218,7 +218,7 @@ public class CSPARQL implements Engine {
                     .next().getObject().getLiteral().getValue().toString();
             String absTemp = description.getGraph().find(t.getSubject(), NodeFactory.createURI("http://example.com/#hasAbsTemp"), Node.ANY)
                     .next().getObject().getLiteral().getValue().toString();
-            String absAvg = description.getGraph().find(t.getSubject(), NodeFactory.createURI("http://example.com/#hasAbsAvg"), Node.ANY)
+            String absAvg = description.getGraph().find(t.getSubject(), NodeFactory.createURI("http://example.com/#hasAvg"), Node.ANY)
                     .next().getObject().getLiteral().getValue().toString();
             String group = description.getGraph().find(t.getSubject(), NodeFactory.createURI("http://example.com/#InGroup"), Node.ANY)
                     .next().getObject().getLiteral().getValue().toString();
