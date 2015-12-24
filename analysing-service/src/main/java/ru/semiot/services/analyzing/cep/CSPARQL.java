@@ -3,6 +3,7 @@ package ru.semiot.services.analyzing.cep;
 import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -32,6 +33,8 @@ import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.bind.DatatypeConverter;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.ServiceConfig;
 import ru.semiot.services.analyzing.database.EventsDataBase;
@@ -193,8 +196,40 @@ public class CSPARQL implements Engine {
 
     private void appendEventsToStore(String events, int query_id) {
         if (events != null && !events.isEmpty()) {
-            dbe.appendEvents(query_id, events);
+            JSONArray array = toJSONfromRDF(events);
+            dbe.appendEvents(query_id, array.toString());
         }
+    }
+
+    private JSONArray toJSONfromRDF(String message) {
+        Model description = ModelFactory.createDefaultModel().read(
+                new StringReader(message.replaceAll("\t\n", ".\n")), null, "TURTLE");
+
+        JSONArray array = new JSONArray();
+        JSONObject sensor;
+        List<Triple> sensorsList = description.getGraph()
+                .find(Node.ANY, NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), NodeFactory.createURI("http://example.com/#Diff"))
+                .toList();
+        
+        for (Triple t : sensorsList) {
+            sensor = new JSONObject();
+            String sensorURI = t.getSubject().getURI();
+            String diff = description.getGraph().find(t.getSubject(), NodeFactory.createURI("http://example.com/#hasDiff"), Node.ANY)
+                    .next().getObject().getLiteral().getValue().toString();
+            String absTemp = description.getGraph().find(t.getSubject(), NodeFactory.createURI("http://example.com/#hasAbsTemp"), Node.ANY)
+                    .next().getObject().getLiteral().getValue().toString();
+            String absAvg = description.getGraph().find(t.getSubject(), NodeFactory.createURI("http://example.com/#hasAbsAvg"), Node.ANY)
+                    .next().getObject().getLiteral().getValue().toString();
+            String group = description.getGraph().find(t.getSubject(), NodeFactory.createURI("http://example.com/#InGroup"), Node.ANY)
+                    .next().getObject().getLiteral().getValue().toString();
+            sensor.put("sensor", sensorURI);
+            sensor.put("group", Integer.parseInt(group));
+            sensor.put("avg", Double.parseDouble(absAvg));
+            sensor.put("diff", Double.parseDouble(diff));
+            sensor.put("temp", Double.parseDouble(absTemp));
+            array.put(sensor);
+        }
+        return array;
     }
 
     private String asURI(final String string) {
