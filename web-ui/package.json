@@ -37,13 +37,14 @@
   "dependencies": {
     "angular": "~1.4.7",
     "angular-route": "~1.4.7",
-    "autobahn": "~0.9.6",
+    "autobahn": "0.9.6",
     "highcharts": "0.0.9",
     "highcharts-ng": "0.0.11",
     "jquery": "~2.1.4",
     "moment": "~2.10.6",
     "n3": "0.4.5",
     "bootstrap": "~3.3.5",
-    "angular-ui-bootstrap": "~0.13.4"
+    "angular-ui-bootstrap": "~0.13.4",
+    "when": "3.7.5"
   }
 }
