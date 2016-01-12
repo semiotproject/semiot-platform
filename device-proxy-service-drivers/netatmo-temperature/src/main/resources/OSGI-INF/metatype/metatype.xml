@@ -3,15 +3,27 @@
     <OCD description="Netatmo Temperature Driver" name="Netatmo Temperature Driver"
          id="ru.semiot.platform.drivers.netatmo.temperature">
         <AD name="North East Longitude" id="ru.semiot.platform.drivers.netatmo.temperature.longitude_ne"
-            required="true" type="Double" default="37.842851"/>
+            required="true" type="Double" default="30.297721"/>
         <AD name="North East Lattitude" id="ru.semiot.platform.drivers.netatmo.temperature.lattitude_ne"
-            required="true" type="Double" default="55.907042"/>
+            required="true" type="Double" default="60.015601"/>
         <AD name="South West Longitude" id="ru.semiot.platform.drivers.netatmo.temperature.longitude_sw"
-            required="true" type="Double" default="37.412678"/>
+            required="true" type="Double" default="30.260427"/>
         <AD name="South West Lattitude" id="ru.semiot.platform.drivers.netatmo.temperature.lattitude_sw"
-            required="true" type="Double" default="55.593313"/>
-        <AD name="Scheduled Delay" id="ru.semiot.platform.drivers.netatmo.temperature.scheduled_delay"
-            required="true" type="Integer" default="30"/>
+            required="true" type="Double" default="60.008394"/>
+        <AD name="Polling interval" id="ru.semiot.platform.drivers.netatmo.temperature.scheduled_delay"
+            required="true" type="Integer" default="5"/>
+        <AD name="Polling delay" id="ru.semiot.platform.drivers.netatmo.temperature.start_pause"
+            required="true" type="Integer" default="1"/>
+        
+        <AD name="Netatmo Username" id="ru.semiot.platform.drivers.netatmo.temperature.username"
+            required="true" type="String" default="garayzuev@gmail.com"/>
+        <AD name="Netatmo Password" id="ru.semiot.platform.drivers.netatmo.temperature.pass"
+            required="true" type="String" default="Ny7!Ze#o"/>
+        <AD name="Client App ID" id="ru.semiot.platform.drivers.netatmo.temperature.client_app_id"
+            required="true" type="String" default="566ffb00e8ede139a1529208"/>
+        <AD name="Client Secret" id="ru.semiot.platform.drivers.netatmo.temperature.client_secret"
+            required="true" type="String" default="C5hws3Fo0fG0wiZpdd1AKi64OTZK7G3Ic0eu5R"/>
+        
     </OCD>
     
     <Designate pid="ru.semiot.platform.drivers.netatmo.temperature">

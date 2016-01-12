@@ -1,13 +1,9 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import java.util.Hashtable;
 import java.util.Properties;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ManagedService;
@@ -19,11 +15,7 @@ public class Activator extends DependencyActivatorBase {
     private static final String PID = "ru.semiot.platform.deviceproxyservice.manager";
 
     @Override
-    public void init(BundleContext bc, DependencyManager manager) throws Exception {
-    	BasicConfigurator.configure();
-    	Logger rootLogger = Logger.getRootLogger();
-        rootLogger.setLevel(Level.INFO);
-    	
+    public void init(BundleContext bc, DependencyManager manager) throws Exception {   	   	
         Properties properties = new Properties();
         properties.setProperty(Constants.SERVICE_PID, PID);
         

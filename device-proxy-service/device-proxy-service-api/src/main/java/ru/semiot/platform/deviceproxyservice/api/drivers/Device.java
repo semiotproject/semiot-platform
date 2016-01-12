@@ -1,49 +1,57 @@
 package ru.semiot.platform.deviceproxyservice.api.drivers;
 
-public class Device {
-    
-    private String id;
-    private String rdfDescription;
-    private boolean turnOn = true;
-    
-    public Device(String id, String rdfDescription) {
-        this.id = id;
-        this.rdfDescription = rdfDescription;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+public abstract class Device {
+
+    private final Map<String, String> properties = new HashMap<>();
+
+    public Device(String id) {
+        properties.put(DeviceProperties.DEVICE_ID, id);
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public String getProperty(String name) {
+        return properties.get(name);
     }
     
-    public String getID() {
-        return id;
+    public void setProperty(String key, String value) {
+        properties.put(key, value);
     }
-    
-    public String getRDFDescription() {
-        return rdfDescription;
+
+    public String getId() {
+        return properties.get(DeviceProperties.DEVICE_ID);
     }
-    
-    public boolean getTurnOn() {
-    	return turnOn;
+
+    public abstract String getRDFTemplate();
+
+    public String toTurtleString() {
+        return TemplateUtils.resolve(getRDFTemplate(), properties);
     }
-    
-    public void setID(String id) {
-    	this.id = id;
-    }
-    
-    public void setRDFDescription(String rdfDescription) {
-    	this.rdfDescription = rdfDescription;
-    }
-    
-    public void setTurnOn(boolean turnOn) {
-    	this.turnOn = turnOn;
-    }
-    
 
     @Override
-    public boolean equals(Object object)
-    {
-        if (this.id!=null && object != null && object instanceof Device)
-        {
-            return this.id.equals(((Device) object).getID());
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
 
+        if (obj instanceof Device) {
+            Device that = (Device) obj;
+
+            return this.properties.equals(that.properties);
+        }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + Objects.hashCode(this.properties);
+        return hash;
     }
 }

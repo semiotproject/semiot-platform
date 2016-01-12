@@ -1,0 +1,30 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix mcht: <http://purl.org/NET/ssnext/machinetools#> .
+@prefix ssncom: <http://purl.org/NET/ssnext/communication#> .
+@prefix saref: <http://ontology.tno.nl/saref#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
+@prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
+@prefix qudt-unit: <http://qudt.org/vocab/unit#> .
+@prefix qudt: <http://qudt.org/schema/qudt#> .
+@prefix dcterms: <http://purl.org/dc/terms/#> .
+@prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
+@prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/temperature/prototype.ttl#> .
+
+<${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}> a proto:SystemIndividual ;
+    proto:hasPrototype ws:WeatherStation ;
+    dcterms:identifier "${ru.semiot.platform.device.id}"^^xsd:string ;
+    dul:hasLocation [
+	a geo:Point ;
+	geo:lat "${ru.semiot.drivers.netatmo.latitude}"^^xsd:string ;
+        geo:long "${ru.semiot.drivers.netatmo.langitude}"^^xsd:string ;
+    ] ;
+    ssncom:hasCommunicationEndpoint <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/wamp> ;
+    .
+
+<${ru.semiot.platform.resource_uri_prefix}${ru.semiot.platform.device.id}/wamp> a ssncom:CommunicationEndpoint ;
+    ssncom:topic "${common.device.id}"^^xsd:string ;
+    ssncom:protocol "WAMP" ;
+    .

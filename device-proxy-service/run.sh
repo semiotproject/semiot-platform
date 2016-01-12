@@ -5,7 +5,7 @@ rm -f /fuseki/fuseki-db/tdb.lock
 
 pushd $FUSEKI_HOME
 
-./fuseki-server --config=base/config.ttl &> fuseki.log &
+./fuseki-server --config=base/config.ttl &> /root/semiot-platform/$SERVICE_NAME/proxy-logs/fuseki.log &
 
 popd
 
@@ -16,4 +16,4 @@ do
 done
 echo "$(date) - Connected to Fuseki successfully"
 
-exec java -jar $SERVICE_JAR_NAME.jar >> /root/semiot-platform/$SERVICE_NAME/proxy-logs/deviceproxy.log 2>&1
+exec java -jar -Dlogback.configurationFile=/root/semiot-platform/$SERVICE_NAME/logback.xml $SERVICE_JAR_NAME.jar >> /root/semiot-platform/$SERVICE_NAME/proxy-logs/deviceproxy.log 2>&1

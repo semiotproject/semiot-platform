@@ -1,182 +1,121 @@
 package ru.semiot.platform.drivers.netatmo.temperature;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import java.util.concurrent.TimeUnit;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
-    private static final Logger logger = Logger.getLogger(DeviceDriverImpl.class);
-    private static final String SCHEDULED_DELAY = Activator.PID + ".scheduled_delay";
-    private static final String LAT_NE = Activator.PID + ".lattitude_ne";
-    private static final String LON_NE = Activator.PID + ".longitude_ne";
-    private static final String LAT_SW = Activator.PID + ".lattitude_sw";
-    private static final String LON_SW = Activator.PID + ".longitude_sw";
+    private static final Logger logger = LoggerFactory.getLogger(DeviceDriverImpl.class);
 
-    private final List<Device> listDevices = Collections.synchronizedList(new ArrayList<Device>());
-
-    public static final String templateOffState = "prefix saref: <http://ontology.tno.nl/saref#> "
-            + "<http://${DOMAIN}/${SYSTEM_PATH}/${DEVICE_HASH}> saref:hasState saref:OffState.";
-
-    private ScheduledExecutorService scheduler;
-    private ScheduledDevice scheduledDevice;
-    private ScheduledFuture handle = null;
+    private final Map<String, Device> devicesMap
+            = Collections.synchronizedMap(new HashMap<>());
     private final String driverName = "Netatmo temperature";
+    private final Configuration configuration = new Configuration();
 
     private volatile DeviceManager deviceManager;
 
-    private String templateDescription;
-    private String templateObservation;
-
-    private int scheduledDelay = 30;
-    private double lat_ne = 55.907042;
-    private double lon_ne = 37.842851;
-    private double lat_sw = 55.593313;
-    private double lon_sw = 37.412678;
-
-    public List<Device> listDevices() {
-        return listDevices;
-    }
+    private ScheduledExecutorService scheduler;
+    private ScheduledFuture handle = null;
 
     public void start() {
-        logger.info("Netatmo temperature driver started!");
+        logger.info("{} started!", driverName);
 
-        readTemplates();
         this.scheduler = Executors.newScheduledThreadPool(1);
-        this.scheduledDevice = new ScheduledDevice(this);
         startSheduled();
     }
 
     public void stop() {
-        // перевод всех устройств в статус офф
         stopSheduled();
 
-        for (Device device : listDevices) {
-            System.out.println(templateOffState.replace("${DOMAIN}", getDomain())
-                    .replace("${SYSTEM_PATH}", getPathSystemUri())
-                    .replace("${DEVICE_HASH}", device.getID()));
-            inactiveDevice(templateOffState.replace("${DOMAIN}", getDomain())
-                    .replace("${SYSTEM_PATH}", getPathSystemUri())
-                    .replace("${DEVICE_HASH}", device.getID()));
-        }
-
-        logger.info("Netatmo temperature driver stopped!");
+        logger.info("{} stopped!", driverName);
     }
-    
-    public void updated(Dictionary properties) throws ConfigurationException {
-        logger.info("Netatmo temperature driver updated");
+
+    @Override
+    public void updated(Dictionary dictionary) throws ConfigurationException {
         synchronized (this) {
-            logger.debug("properties is " + (properties == null ? "null" : "not null"));
-            if (properties != null) {
-                lat_ne = (Double) properties.get(LAT_NE);
-                lon_ne = (Double) properties.get(LON_NE);
-                lat_sw = (Double) properties.get(LAT_SW);
-                lon_sw = (Double) properties.get(LON_SW);
-                int newDelay = (Integer) properties.get(SCHEDULED_DELAY);
-                logger.debug("Get all parameters! Lat_ne=" + lat_ne + ", lat_sw=" + lat_sw + ", lon_ne=" + lon_ne + ", lon_sw=" + lon_sw + ", delay=" + newDelay);
-                logger.debug("Try to start (" + (newDelay != scheduledDelay) + ")");
-                if (newDelay != scheduledDelay) {
-                    scheduledDelay = newDelay;
-                    stopSheduled();
-                    startSheduled();
+            if (dictionary != null) {
+                if (!configuration.isConfigured()) {
+                    configuration.putAll(dictionary);
+
+                    configuration.setConfigured();
+                } else {
+                    logger.warn("Driver is already configured! Ignoring it");
                 }
+            } else {
+                logger.debug("Configuration is empty. Skipping it");
             }
         }
     }
 
-    public void inactiveDevice(String message) {
-        deviceManager.inactiveDevice(message);
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
-    public void publish(String topic, String message) {
-        deviceManager.publish(topic, message);
-    }
+    public void registerDevice(Device device) {
+        devicesMap.put(device.getId(), device);
 
-    public void addDevice(Device device) {
-        listDevices.add(device);
         deviceManager.register(device);
     }
 
-    public boolean contains(Device device) {
-        return listDevices.contains(device);
+    public boolean isRegistered(String id) {
+        return devicesMap.containsKey(id);
     }
 
-    public String getTemplateDescription() {
-        return templateDescription;
+    public Device getDeviceById(String id) {
+        return devicesMap.get(id);
     }
 
-    public String getTemplateObservation() {
-        return templateObservation;
+    public void updateDevice(Device newDevice) {
+        devicesMap.put(newDevice.getId(), newDevice);
+
+        //TODO: Trigger update in the database
     }
 
-    public String getDomain() {
-        return deviceManager.getDomain();
+    public int getNumberOfRegisteredDevices() {
+        return devicesMap.size();
     }
 
-    public String getPathSystemUri() {
-        return deviceManager.getPathSystemUri();
+    public Set<String> getIDsOfRegisteredDevices() {
+        return devicesMap.keySet();
     }
 
-    public String getPathSensorUri() {
-        return deviceManager.getPathSensorUri();
-    }
-
+    @Override
     public String getDriverName() {
         return driverName;
     }
 
-    public double getLat_ne() {
-        return lat_ne;
-    }
-
-    public double getLon_ne() {
-        return lon_ne;
-    }
-
-    public double getLat_sw() {
-        return lat_sw;
-    }
-
-    public double getLon_sw() {
-        return lon_sw;
-    }
-
-    private void readTemplates() {
-        try {
-            this.templateDescription = IOUtils.toString(DeviceDriverImpl.class
-                    .getResourceAsStream("/ru/semiot/platform/drivers/netatmo/temperature/descriptionNetatmoTemperature.ttl"));
-            this.templateObservation = IOUtils.toString(DeviceDriverImpl.class
-                    .getResourceAsStream("/ru/semiot/platform/drivers/netatmo/temperature/observation.ttl"));
-        } catch (IOException ex) {
-            logger.error("Can't read templates");
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
     public void startSheduled() {
-        logger.debug("Hello from startScheduled!");
-
         if (this.handle != null) {
             logger.debug("Try to stop scheduler");
             stopSheduled();
         }
-        this.handle = this.scheduler.scheduleAtFixedRate(this.scheduledDevice,
-                1, scheduledDelay, MINUTES);
-        logger.debug("UScheduled started. Repeat will do every "
-                + String.valueOf(scheduledDelay) + " minutes");
+
+        ScheduledPuller puller = new ScheduledPuller(this);
+        puller.init();
+
+        this.handle = this.scheduler.scheduleAtFixedRate(
+                puller,
+                configuration.getAsLong(Keys.POLLING_START_PAUSE),
+                configuration.getAsLong(Keys.POLLING_INTERVAL),
+                TimeUnit.MINUTES);
+
+        logger.debug("Polling scheduled. Interval {} minutes",
+                configuration.get(Keys.POLLING_INTERVAL));
     }
 
     public void stopSheduled() {
@@ -187,7 +126,38 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
         handle.cancel(true);
         handle = null;
+
+        scheduler.shutdown();
+        try {
+            scheduler.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            logger.warn(ex.getMessage(), ex);
+        }
+        scheduler.shutdownNow();
         logger.debug("UScheduled stoped");
     }
 
+//    private void sendMessage(String value, long timestamp, String hash) {
+//        if (value != null) {
+//            String topic = templateTopic.replace("${DEVICE_HASH}", hash);
+//
+//            final String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+//                    .format(new Date(timestamp));
+//
+//            String message = driver
+//                    .getTemplateObservation()
+//                    .replace("${DOMAIN}", driver.getDomain())
+//                    .replace("${SYSTEM_PATH}", driver.getPathSystemUri())
+//                    .replace("${SENSOR_PATH}", driver.getPathSensorUri())
+//                    .replace("${DEVICE_HASH}", hash)
+//                    .replace("${SENSOR_ID}", "1")
+//                    .replace("${TIMESTAMP}", String.valueOf(timestamp))
+//                    .replace("${DATETIME}", date)
+//                    .replace("${VALUE}", value);
+//
+//            driver.publish(topic, message);
+//        } else {
+//            logger.warn(hash + " has unknown value (null)");
+//        }
+//    }
 }

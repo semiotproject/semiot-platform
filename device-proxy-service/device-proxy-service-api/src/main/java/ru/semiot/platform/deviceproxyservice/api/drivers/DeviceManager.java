@@ -6,18 +6,10 @@ public interface DeviceManager {
 
     public void register(Device device);
     
-    public void inactiveDevice(String message);
-    
-    public void updateStatus(Device device, DeviceStatus status);
+    public void update(Device device);
     
     public void publish(String topic, String message);
     
     public Observable<String> subscribe(String topic);
-    
-    public String getDomain();
-    
-    public String getPathSystemUri();
-    
-    public String getPathSensorUri();
     
 }
