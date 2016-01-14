@@ -11,7 +11,7 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceStatus;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
 import ru.semiot.platform.deviceproxyservice.api.drivers.TemplateUtils;
 import rx.Observable;
 import ws.wamp.jawampa.ApplicationError;
@@ -28,11 +28,11 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
 
     public void start() {
         logger.info("Device Manager is starting...");
-        
-        directoryService = new DirectoryService(this);
-        
+
+        directoryService = new DirectoryService(new RDFStore(configuration));
+
         logger.debug("Directory service is ready");
-        
+
         try {
             WAMPClient
                     .getInstance()
@@ -79,13 +79,11 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
                     configuration.putAll(dictionary);
 
                     configuration.put(Keys.PLATFORM_RESOURCE_URI_PREFIX,
-                            configuration.get(Keys.PLATFORM_DOMAIN)
+                            configuration.get(Keys.PLATFORM_DOMAIN) + "/"
                             + configuration.get(Keys.PLATFORM_RESOURCE_PATH));
-                    
-                    logger.debug("Configuration: {}", configuration.toString());
 
                     configuration.setConfigured();
-                    
+
                     logger.debug("Manager was configured");
                 } else {
                     logger.warn("Manager is already configured! Ignoring it");
@@ -115,14 +113,38 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     public void register(Device device) {
         if (directoryService != null) {
             logger.info("Device [ID={}] is being registered", device.getId());
-            
+
             /**
              * Resolve common variables, e.g. platform's domain name.
              */
             final String description = TemplateUtils.resolve(
                     device.toTurtleString(), configuration);
 
-            directoryService.addNewDevice(device, description);
+            boolean isAdded = directoryService.addNewDevice(device, description);
+
+            if (isAdded) {
+                WAMPClient.getInstance().publish(
+                        getConfiguration().get(Keys.TOPIC_NEWANDOBSERVING),
+                        description);
+            }
+        } else {
+            logger.error("DirectoryService hasn't been initialized!");
+        }
+    }
+
+    @Override
+    public void registerObservation(Device device, Observation observation) {
+        //TODO: Can we get rid of this null check?
+        if (directoryService != null) {
+            logger.info("Observation [ID={}] is being registered", device.getId());
+
+            String description = TemplateUtils.resolve(
+                    observation.toTurtleString(),
+                    device.getProperties(),
+                    configuration);
+
+            //TODO: There's no garantee that WAMPClient is connected.
+            WAMPClient.getInstance().publish(device.getId(), description);
         } else {
             logger.error("DirectoryService hasn't been initialized!");
         }

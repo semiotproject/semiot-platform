@@ -41,7 +41,30 @@ public class WeatherStationFactory {
         return String.valueOf(longHash);
     }
 
-    private WeatherStation.Observation findObservation(JSONObject device, String name)
+    private boolean isMeasures(JSONObject device, String name)
+            throws JSONException {
+        JSONObject obj = device.getJSONObject(MEASURES_KEY);
+
+        Iterator keys = obj.keys();
+
+        while (keys.hasNext()) {
+            String sensorId = (String) keys.next();
+            JSONArray types = obj.getJSONObject(sensorId).optJSONArray(TYPE_KEY);
+            if (types != null) {
+                int index = JSONUtils.find(types, name);
+
+                if(index > -1) {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    private TemperatureObservation findObservation(JSONObject device, String deviceId, String name)
             throws JSONException {
         JSONObject obj = device.getJSONObject(MEASURES_KEY);
 
@@ -55,11 +78,11 @@ public class WeatherStationFactory {
                 if (index > -1) {
                     String timestamp = (String) obj.getJSONObject(sensorId)
                             .getJSONObject(RES_KEY).keys().next();
-                    double value = obj.getJSONObject(sensorId)
+                    String value = String.valueOf(obj.getJSONObject(sensorId)
                             .getJSONObject(RES_KEY).getJSONArray(timestamp)
-                            .getDouble(index);
+                            .getDouble(index));
 
-                    return new WeatherStation.Observation(timestamp, value);
+                    return new TemperatureObservation(deviceId, timestamp, value);
                 }
             } else {
                 return null;
@@ -69,7 +92,7 @@ public class WeatherStationFactory {
         return null;
     }
 
-    public List<WeatherStation> parse(JSONArray devices) {
+    public List<WeatherStation> parseStations(JSONArray devices) {
         List<WeatherStation> stations = new ArrayList<>();
 
         for (int i = 0; i < devices.length(); i++) {
@@ -83,15 +106,10 @@ public class WeatherStationFactory {
                 double longitude = location.getDouble(0);
                 double latitude = location.getDouble(1);
 
-                WeatherStation.Observation temperature = findObservation(
-                        device, TEMPERATURE_KEY);
-
-                if (temperature != null) {
+                if (isMeasures(device, TEMPERATURE_KEY)) {
                     //We want stations measuring temperature
                     WeatherStation station = new WeatherStation(
                             id, latitude, longitude);
-
-                    station.setTemperature(temperature);
 
                     stations.add(station);
                 }
@@ -101,6 +119,28 @@ public class WeatherStationFactory {
         }
 
         return stations;
+    }
+
+    public List<TemperatureObservation> parseObservations(JSONArray devices) {
+        List<TemperatureObservation> observations = new ArrayList<>();
+
+        for (int i = 0; i < devices.length(); i++) {
+            try {
+                JSONObject device = devices.getJSONObject(i);
+
+                String id = hash(driverName, device.getString(ID_KEY));
+
+                TemperatureObservation temperature = findObservation(
+                        device, id, TEMPERATURE_KEY);
+
+                observations.add(temperature);
+
+            } catch (JSONException ex) {
+                logger.warn(ex.getMessage(), ex);
+            }
+        }
+
+        return observations;
     }
 
 }

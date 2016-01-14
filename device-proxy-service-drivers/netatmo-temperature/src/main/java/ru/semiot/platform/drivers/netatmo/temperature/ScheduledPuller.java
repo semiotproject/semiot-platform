@@ -2,10 +2,10 @@ package ru.semiot.platform.drivers.netatmo.temperature;
 
 import java.util.List;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceProperties;
 
 public class ScheduledPuller implements Runnable {
 
@@ -40,19 +40,21 @@ public class ScheduledPuller implements Runnable {
         try {
             logger.info("Starting to pull...");
 
-            JSONArray devices = netAtmoAPI.getPublicData(
+            JSONArray data = netAtmoAPI.getPublicData(
                     driver.getConfiguration().get(Keys.LATITUDE_NORTH_EAST), 
                     driver.getConfiguration().get(Keys.LONGITUDE_NORTH_EAST),
                     driver.getConfiguration().get(Keys.LATITUDE_SOUTH_WEST),
                     driver.getConfiguration().get(Keys.LONGITUDE_SOUTH_WEST));
 
-            if (devices != null) {
-                logger.info("Loaded [{}] stations", devices.length());
+            if (data != null) {
+                logger.info("Loaded [{}] stations", data.length());
 
                 WeatherStationFactory wsFactory = new WeatherStationFactory(
                         Keys.DRIVER_PID);
 
-                List<WeatherStation> stations = wsFactory.parse(devices);
+                List<WeatherStation> stations = wsFactory.parseStations(data);
+                
+                logger.info("Found [{}] stations", stations.size());
 
                 //Register and update already registered devices
                 for (WeatherStation newDevice : stations) {
@@ -78,12 +80,31 @@ public class ScheduledPuller implements Runnable {
                                 newDevice.getId());
                     }
                 }
+                
+                //Send new observations
+                List<TemperatureObservation> observations = wsFactory
+                        .parseObservations(data);
+                
+                logger.info("Found [{}] observations", observations.size());
+                
+                for(TemperatureObservation newObs : observations) {
+                    String deviceId = newObs.getProperty(
+                            DeviceProperties.DEVICE_ID);
+                    
+                    TemperatureObservation oldObs = driver.
+                            getObservationByDeviceId(deviceId);
+                    
+                    if(!newObs.equalsIgnoreTimestamp(oldObs)) {                      
+                        driver.publishNewObservation(newObs);
+                    } else {
+                        logger.debug("Observation [device={}] isn't new. Skipping", 
+                                deviceId);
+                    }
+                }
             } else {
                 logger.warn("Pulling failed!");
             }
-
-            //TODO: Publish observations
-        } catch (JSONException ex) {
+        } catch (Throwable ex) {
             logger.error(ex.getMessage(), ex);
         }
     }

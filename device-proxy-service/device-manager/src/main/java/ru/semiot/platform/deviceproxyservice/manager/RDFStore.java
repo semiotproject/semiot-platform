@@ -15,6 +15,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.update.UpdateExecutionFactory;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 
 public class RDFStore {
 
@@ -22,19 +23,19 @@ public class RDFStore {
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
     private final HttpAuthenticator httpAuthenticator;
-    private DeviceManagerImpl dmi;
+    private final Configuration config;
 
-    public RDFStore(DeviceManagerImpl dmi) {
-        this.dmi = dmi;
+    public RDFStore(Configuration config) {
+        this.config = config;
         httpAuthenticator = new SimpleAuthenticator(
-                dmi.getConfiguration().get(Keys.FUSEKI_USERNAME),
-                dmi.getConfiguration().get(Keys.FUSEKI_PASSWORD).toCharArray());
+                config.get(Keys.FUSEKI_USERNAME),
+                config.get(Keys.FUSEKI_PASSWORD).toCharArray());
     }
 
     public void save(Model model) {
         DatasetAccessorFactory
                 .createHTTP(
-                        dmi.getConfiguration().get(Keys.FUSEKI_STORE_URL),
+                        config.get(Keys.FUSEKI_STORE_URL),
                         httpAuthenticator)
                 .add(model);
     }
@@ -47,7 +48,7 @@ public class RDFStore {
         Query select = QueryFactory.create(query);
         ResultSet rs = QueryExecutionFactory
                 .createServiceRequest(
-                        dmi.getConfiguration().get(Keys.FUSEKI_QUERY_URL),
+                        config.get(Keys.FUSEKI_QUERY_URL),
                         select,
                         httpAuthenticator)
                 .execSelect();
@@ -59,7 +60,7 @@ public class RDFStore {
 
         UpdateExecutionFactory.createRemote(
                 updateRequest,
-                dmi.getConfiguration().get(Keys.FUSEKI_UPDATE_URL),
+                config.get(Keys.FUSEKI_UPDATE_URL),
                 httpAuthenticator)
                 .execute();
     }

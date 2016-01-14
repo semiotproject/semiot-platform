@@ -27,28 +27,45 @@ public class WeatherStationFactoryTest {
     public void testParseJSONArray() throws JSONException {
         WeatherStationFactory wsFactory = new WeatherStationFactory(DRIVER_PID);
 
-        List<WeatherStation> actual = wsFactory.parse(new JSONArray(JSON_DEVICES));
+        List<WeatherStation> actual = wsFactory.parseStations(new JSONArray(JSON_DEVICES));
 
         List<WeatherStation> expected = new ArrayList<>();
         WeatherStation one = new WeatherStation(wsFactory.hash(DRIVER_PID, "70:ee:50:06:0f:12"),
                 60.021748, 30.298187);
-        one.setTemperature(new WeatherStation.Observation("1452115809", -18.4));
         WeatherStation two = new WeatherStation(wsFactory.hash(DRIVER_PID, "70:ee:50:03:df:36"),
                 60.0255383, 30.29713856);
-        two.setTemperature(new WeatherStation.Observation("1452115790", -18.9));
         expected.add(one);
         expected.add(two);
 
         assertArrayEquals(actual.toArray(), expected.toArray());
     }
-    
+
     @Test
     public void testConvertEmptyDeviceArray() throws JSONException {
         WeatherStationFactory wsFactory = new WeatherStationFactory(DRIVER_PID);
 
-        List<WeatherStation> actual = wsFactory.parse(new JSONArray(JSON_DEVICES_EMPTY));
+        List<WeatherStation> actual = wsFactory.parseStations(new JSONArray(JSON_DEVICES_EMPTY));
 
         List<WeatherStation> expected = new ArrayList<>();
+
+        assertArrayEquals(actual.toArray(), expected.toArray());
+    }
+
+    @Test
+    public void testParseObservations() throws JSONException {
+        WeatherStationFactory wsFactory = new WeatherStationFactory(DRIVER_PID);
+
+        List<TemperatureObservation> actual = wsFactory.parseObservations(new JSONArray(JSON_DEVICES));
+
+        List<TemperatureObservation> expected = new ArrayList<>();
+        TemperatureObservation one = new TemperatureObservation(
+                wsFactory.hash(DRIVER_PID, "70:ee:50:06:0f:12"),
+                "1452115809", "-18.4");
+        TemperatureObservation two = new TemperatureObservation(
+                wsFactory.hash(DRIVER_PID, "70:ee:50:03:df:36"),
+                "1452115790", "-18.9");
+        expected.add(one);
+        expected.add(two);
 
         assertArrayEquals(actual.toArray(), expected.toArray());
     }

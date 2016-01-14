@@ -24,7 +24,7 @@
                     required="false" type="String" default="http://localhost:3030/ds/data"/>
         
         <AD name="Domain" id="ru.semiot.platform.domain"
-            required="true" type="String" default="localhost"/>
+            required="true" type="String" default="http://localhost"/>
         <AD name="Path in System Uri" id="ru.semiot.platform.resource_path"
             required="false" type="String" default="resources"/>
     </OCD>

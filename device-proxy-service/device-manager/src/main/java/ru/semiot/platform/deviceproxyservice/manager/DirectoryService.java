@@ -23,15 +23,13 @@ public class DirectoryService {
             + "INSERT { <${URI_SYSTEM}> saref:hasState <${STATE}> } "
             + "WHERE { <${URI_SYSTEM}> saref:hasState ?x }";
     private static final String GET_SYSTEM_URI = ""
-            + "PREFIX proto: <http://w3id.org/semiot/ontologies/proto#> \n"
-            + "SELECT ?uri {?uri a proto:SystemIndividual} LIMIT 1";
+            + "PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#> \n"
+            + "SELECT ?uri {?uri a ssn:System} LIMIT 1";
 
-    DeviceManagerImpl dmi;
-    RDFStore rdfStore;
+    private final RDFStore store;
 
-    public DirectoryService(DeviceManagerImpl dmi) {
-        this.dmi = dmi;
-        rdfStore = new RDFStore(dmi);
+    public DirectoryService(RDFStore store) {
+        this.store = store;
     }
 
     public void inactiveDevice(String message) {
@@ -54,7 +52,7 @@ public class DirectoryService {
                     request = QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
                             .replace("${STATE}", state);
                     if (uriSystem != null && state != null) {
-                        rdfStore.update(request);
+                        store.update(request);
                     }
                 }
             } else {
@@ -72,8 +70,9 @@ public class DirectoryService {
      * Doesn't check whether device already exists.
      *
      * @param deviceDescription
+     * @return true if the given device successfully added.
      */
-    public void addNewDevice(Device device, String deviceDescription) {
+    public boolean addNewDevice(Device device, String deviceDescription) {
         try {
             Model description = ModelFactory.createDefaultModel()
                     .read(new StringReader(deviceDescription), null, RDF_FORMAT);
@@ -88,16 +87,15 @@ public class DirectoryService {
 
                     if (uri != null) {
                         //Given uri is not a blank node
-                        rdfStore.save(description);
+                        store.save(description);
 
-                        WAMPClient.getInstance().publish(
-                                dmi.getConfiguration().get(Keys.TOPIC_NEWANDOBSERVING),
-                                deviceDescription);
-
+                        return true;
                     } else {
                         logger.error("Device [{}] doesn't have URI!",
                                 device.getId());
                     }
+                } else {
+                    logger.error("Can't find a system!");
                 }
             } else {
                 logger.warn("Received an empty message or in a wrong format!");
@@ -107,6 +105,8 @@ public class DirectoryService {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
+
+        return false;
     }
 
     private static abstract class Vars {

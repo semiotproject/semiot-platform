@@ -10,6 +10,8 @@ public interface DeviceManager {
     
     public void publish(String topic, String message);
     
+    public void registerObservation(Device device, Observation observation);
+    
     public Observable<String> subscribe(String topic);
     
 }

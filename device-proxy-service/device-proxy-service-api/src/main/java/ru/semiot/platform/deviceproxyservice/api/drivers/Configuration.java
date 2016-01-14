@@ -17,9 +17,7 @@ public class Configuration extends HashMap<String, String> {
 
         while (dictKeys.hasMoreElements()) {
             Object key = dictKeys.nextElement();
-            
-            System.out.format("Configuration: [%s : %s]\n", key, dictionary.get(key));
-            
+           
             put(String.valueOf(key), String.valueOf(dictionary.get(key)));
         }
     }

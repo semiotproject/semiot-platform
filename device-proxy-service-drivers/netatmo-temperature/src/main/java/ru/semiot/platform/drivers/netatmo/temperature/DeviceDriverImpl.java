@@ -17,12 +17,15 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceProperties;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceDriverImpl.class);
 
     private final Map<String, Device> devicesMap
+            = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, TemperatureObservation> observationsMap
             = Collections.synchronizedMap(new HashMap<>());
     private final String driverName = "Netatmo temperature";
     private final Configuration configuration = new Configuration();
@@ -66,24 +69,12 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         return configuration;
     }
 
-    public void registerDevice(Device device) {
-        devicesMap.put(device.getId(), device);
-
-        deviceManager.register(device);
-    }
-
     public boolean isRegistered(String id) {
         return devicesMap.containsKey(id);
     }
 
     public Device getDeviceById(String id) {
         return devicesMap.get(id);
-    }
-
-    public void updateDevice(Device newDevice) {
-        devicesMap.put(newDevice.getId(), newDevice);
-
-        //TODO: Trigger update in the database
     }
 
     public int getNumberOfRegisteredDevices() {
@@ -94,9 +85,33 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         return devicesMap.keySet();
     }
 
+    public TemperatureObservation getObservationByDeviceId(String deviceId) {
+        return observationsMap.get(deviceId);
+    }
+
     @Override
     public String getDriverName() {
         return driverName;
+    }
+
+    public void updateDevice(Device newDevice) {
+        devicesMap.put(newDevice.getId(), newDevice);
+
+        //TODO: Trigger update in the database
+    }
+
+    public void registerDevice(Device device) {
+        devicesMap.put(device.getId(), device);
+
+        deviceManager.register(device);
+    }
+
+    public void publishNewObservation(TemperatureObservation observation) {
+        //Replace previous observation
+        String deviceId = observation.getProperty(DeviceProperties.DEVICE_ID);
+        observationsMap.put(deviceId, observation);
+
+        deviceManager.registerObservation(devicesMap.get(deviceId), observation);
     }
 
     public void startSheduled() {

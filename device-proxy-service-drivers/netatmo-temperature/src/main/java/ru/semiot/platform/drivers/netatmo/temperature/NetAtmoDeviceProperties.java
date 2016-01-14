@@ -6,5 +6,6 @@ public class NetAtmoDeviceProperties extends DeviceProperties {
     
     public static final String LATITUDE = "ru.semiot.drivers.netatmo.latitude";
     public static final String LONGITUDE = "ru.semiot.drivers.netatmo.langitude";
+    public static final String OBSERVATION_VALUE = "ru.semiot.drivers.netatmo.observation.value";
     
 }
