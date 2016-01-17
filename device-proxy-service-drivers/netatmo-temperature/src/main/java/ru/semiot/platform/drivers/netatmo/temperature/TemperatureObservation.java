@@ -24,7 +24,7 @@ public class TemperatureObservation extends Observation {
     public TemperatureObservation(String deviceId, String timestamp, String value) {
         super(deviceId, timestamp);
         
-        getProperties().put(NetAtmoDeviceProperties.OBSERVATION_VALUE, value);
+        getProperties().put(NetatmoDeviceProperties.OBSERVATION_VALUE, value);
     }
 
     @Override

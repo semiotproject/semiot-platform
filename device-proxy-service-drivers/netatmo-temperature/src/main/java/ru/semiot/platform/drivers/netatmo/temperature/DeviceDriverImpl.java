@@ -1,5 +1,6 @@
 package ru.semiot.platform.drivers.netatmo.temperature;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceProperties;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
@@ -27,7 +29,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, TemperatureObservation> observationsMap
             = Collections.synchronizedMap(new HashMap<>());
-    private final String driverName = "Netatmo temperature";
+    private final String driverName = "Netatmo.com (only temperature)";
     private final Configuration configuration = new Configuration();
 
     private volatile DeviceManager deviceManager;
@@ -37,13 +39,19 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     public void start() {
         logger.info("{} started!", driverName);
+        
+        DriverInformation info = new DriverInformation(
+                Keys.DRIVER_PID, 
+                URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/temperature/prototype.ttl#WeatherStation"));
+        
+        deviceManager.registerDriver(info);
 
         this.scheduler = Executors.newScheduledThreadPool(1);
-        startSheduled();
+        startScheduled();
     }
 
     public void stop() {
-        stopSheduled();
+        stopScheduled();
 
         logger.info("{} stopped!", driverName);
     }
@@ -103,7 +111,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     public void registerDevice(Device device) {
         devicesMap.put(device.getId(), device);
 
-        deviceManager.register(device);
+        deviceManager.registerDevice(device);
     }
 
     public void publishNewObservation(TemperatureObservation observation) {
@@ -114,10 +122,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         deviceManager.registerObservation(devicesMap.get(deviceId), observation);
     }
 
-    public void startSheduled() {
+    public void startScheduled() {
         if (this.handle != null) {
             logger.debug("Try to stop scheduler");
-            stopSheduled();
+            stopScheduled();
         }
 
         ScheduledPuller puller = new ScheduledPuller(this);
@@ -129,11 +137,12 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
                 configuration.getAsLong(Keys.POLLING_INTERVAL),
                 TimeUnit.MINUTES);
 
-        logger.debug("Polling scheduled. Interval {} minutes",
+        logger.debug("Polling scheduled. Starts in {}min with interval {}min",
+                configuration.get(Keys.POLLING_START_PAUSE),
                 configuration.get(Keys.POLLING_INTERVAL));
     }
 
-    public void stopSheduled() {
+    public void stopScheduled() {
         logger.debug("Hello from stopScheduled!");
         if (handle == null) {
             return;
@@ -151,28 +160,4 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         scheduler.shutdownNow();
         logger.debug("UScheduled stoped");
     }
-
-//    private void sendMessage(String value, long timestamp, String hash) {
-//        if (value != null) {
-//            String topic = templateTopic.replace("${DEVICE_HASH}", hash);
-//
-//            final String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-//                    .format(new Date(timestamp));
-//
-//            String message = driver
-//                    .getTemplateObservation()
-//                    .replace("${DOMAIN}", driver.getDomain())
-//                    .replace("${SYSTEM_PATH}", driver.getPathSystemUri())
-//                    .replace("${SENSOR_PATH}", driver.getPathSensorUri())
-//                    .replace("${DEVICE_HASH}", hash)
-//                    .replace("${SENSOR_ID}", "1")
-//                    .replace("${TIMESTAMP}", String.valueOf(timestamp))
-//                    .replace("${DATETIME}", date)
-//                    .replace("${VALUE}", value);
-//
-//            driver.publish(topic, message);
-//        } else {
-//            logger.warn(hash + " has unknown value (null)");
-//        }
-//    }
 }

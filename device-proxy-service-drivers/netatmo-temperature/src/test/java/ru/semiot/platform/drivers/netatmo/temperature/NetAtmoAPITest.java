@@ -19,7 +19,7 @@ public class NetAtmoAPITest {
     
     @Test
     public void testAuthenticate() {
-        NetAtmoAPI api = new NetAtmoAPI(CLIENT_APP_ID, CLIENT_SECRET);
+        NetatmoAPI api = new NetatmoAPI(CLIENT_APP_ID, CLIENT_SECRET);
         
         assertFalse(api.authenticate("balhbala", "bahad"));
         
@@ -28,7 +28,7 @@ public class NetAtmoAPITest {
     
     @Test
     public void testGetDevices() throws JSONException {
-        NetAtmoAPI api = new NetAtmoAPI(CLIENT_APP_ID, CLIENT_SECRET);        
+        NetatmoAPI api = new NetatmoAPI(CLIENT_APP_ID, CLIENT_SECRET);        
         api.authenticate(USERNAME, PASSWORD);
         
         JSONArray devices = api.getPublicData(LAT_NE, LON_NE, LAT_SW, LON_SW);

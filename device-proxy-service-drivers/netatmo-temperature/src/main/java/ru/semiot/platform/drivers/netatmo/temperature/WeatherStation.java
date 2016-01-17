@@ -23,9 +23,9 @@ public class WeatherStation extends Device {
 
     public WeatherStation(String id, double latitude, double longitude) {
         super(id);
-        setProperty(NetAtmoDeviceProperties.DEVICE_ID, id);
-        setProperty(NetAtmoDeviceProperties.LATITUDE, String.valueOf(latitude));
-        setProperty(NetAtmoDeviceProperties.LONGITUDE, String.valueOf(longitude));
+        setProperty(NetatmoDeviceProperties.DEVICE_ID, id);
+        setProperty(NetatmoDeviceProperties.LATITUDE, String.valueOf(latitude));
+        setProperty(NetatmoDeviceProperties.LONGITUDE, String.valueOf(longitude));
     }
 
     @Override

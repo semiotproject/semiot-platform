@@ -1,7 +1,13 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import java.io.IOException;
 import java.util.Dictionary;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.util.EntityUtils;
+import org.apache.jena.riot.RDFDataMgr;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -11,9 +17,9 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
 import ru.semiot.platform.deviceproxyservice.api.drivers.TemplateUtils;
-import rx.Observable;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 
@@ -95,22 +101,21 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     }
 
     @Override
-    public void publish(String topic, String message) {
-        WAMPClient.getInstance().publish(topic, message);
+    public void registerDriver(DriverInformation info) {
+        if (directoryService != null) {
+            directoryService.addDevicePrototype(info.getPrototypeUri());
+        } else {
+            logger.error("DirectoryService hasn't been initialized!");
+        }
     }
 
     @Override
-    public Observable<String> subscribe(String topic) {
-        return WAMPClient.getInstance().subscribe(topic);
-    }
-
-    @Override
-    public void update(Device device) {
+    public void updateDevice(Device device) {
         //TODO: Here we should update device's states.
     }
 
     @Override
-    public void register(Device device) {
+    public void registerDevice(Device device) {
         if (directoryService != null) {
             logger.info("Device [ID={}] is being registered", device.getId());
 

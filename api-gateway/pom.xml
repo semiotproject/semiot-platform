@@ -14,7 +14,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
-    <dependencies>       
+    <dependencies>     
+        
+        <!-- Test dependencies -->
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -51,12 +54,18 @@
             <version>1.7.13</version>
             <scope>test</scope>
         </dependency>
+        
+        <!-- Provided dependencies -->
+        
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
+        
+        <!-- Compile dependencies -->
+        
         <dependency>
             <groupId>com.github.jsonld-java</groupId>
             <artifactId>jsonld-java</artifactId>

@@ -18,9 +18,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetAtmoAPI {
+public class NetatmoAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(NetAtmoAPI.class);
+    private static final Logger logger = LoggerFactory.getLogger(NetatmoAPI.class);
     private static final String AUTH_API_URI = "https://api.netatmo.net/oauth2/token";
     private static final String PUBLIC_DATA_API_URI = "https://api.netatmo.com/api/getpublicdata";
     private static final String GRANT_TYPE_KEY = "grant_type";
@@ -48,7 +48,7 @@ public class NetAtmoAPI {
     private String access_token;
     private String refresh_token;
 
-    public NetAtmoAPI(String client_app_id, String client_secret) {
+    public NetatmoAPI(String client_app_id, String client_secret) {
         this.client_app_id = client_app_id;
         this.client_secret = client_secret;
     }

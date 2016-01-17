@@ -13,12 +13,12 @@ public class ScheduledPuller implements Runnable {
             ScheduledPuller.class);
 
     private final DeviceDriverImpl driver;
-    private final NetAtmoAPI netAtmoAPI;
+    private final NetatmoAPI netAtmoAPI;
 
     public ScheduledPuller(DeviceDriverImpl driver) {
         this.driver = driver;
 
-        this.netAtmoAPI = new NetAtmoAPI(
+        this.netAtmoAPI = new NetatmoAPI(
                 driver.getConfiguration().get(Keys.CLIENT_APP_ID), 
                 driver.getConfiguration().get(Keys.CLIENT_SECRET));
     }

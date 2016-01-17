@@ -7,6 +7,9 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import java.io.StringReader;
+import java.net.URI;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +69,16 @@ public class DirectoryService {
         }
     }
 
+    public void addDevicePrototype(URI uri) {
+        try {
+            Model model = RDFDataMgr.loadModel(uri.toASCIIString(), RDFLanguages.TURTLE);
+
+            store.save(model);
+        } catch (Throwable ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+    }
+
     /**
      * Doesn't check whether device already exists.
      *
@@ -102,7 +115,7 @@ public class DirectoryService {
             }
         } catch (RiotException ex) {
             logger.warn(ex.getMessage(), ex);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             logger.error(ex.getMessage(), ex);
         }
 

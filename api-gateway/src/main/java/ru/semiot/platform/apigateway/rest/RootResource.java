@@ -16,6 +16,7 @@ import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.apigateway.JsonLdContextProviderService;
+import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.JsonLdBuilder;
 import ru.semiot.platform.apigateway.utils.JsonLdKeys;
 
@@ -27,6 +28,9 @@ public class RootResource {
 
     public RootResource() {
     }
+    
+    @Inject
+    SPARQLQueryService query;
 
     @Context
     UriInfo uriInfo;
@@ -62,6 +66,8 @@ public class RootResource {
     @Path("/doc")
     @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public String documentation() throws JsonLdError, IOException {
+        //TODO: Add declaration of prototypes from TS
+        
         return contextProvider.getContextAsString(
                 JsonLdContextProviderService.API_DOCUMENTATION_CONTEXT, 
                 uriInfo.getRequestUri());
