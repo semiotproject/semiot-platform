@@ -4,7 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public interface QueryDataBase {
-    public JSONObject appendQuery(String request, String name);
+    public JSONObject appendQuery(String request, String name, String sparql);
     public long getCount();
     public JSONObject getQuery(int id);
     public JSONArray getQueries();

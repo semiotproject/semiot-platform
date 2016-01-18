@@ -32,6 +32,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Query.count", query = "SELECT COUNT(q.id) FROM Query q"),
     @NamedQuery(name = "Query.getLastID", query = "SELECT MAX(q.id) FROM Query q")})
 public class Query implements Serializable {
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "sparql")
+    private String sparql;
 
     @Basic(optional = false)
     @NotNull
@@ -60,11 +64,12 @@ public class Query implements Serializable {
 
     }
 
-    public Query(String text, String name, int id) {
+    public Query(String text, String name, String sparql, int id) {
         this.id = id;
         this.time = new Date();
         this.name = name;
         this.query = text;
+        this.sparql = sparql;
     }
 
     public String getName() {
@@ -112,7 +117,7 @@ public class Query implements Serializable {
 
     @Override
     public String toString() {
-        return "{\"id\": \"" + id + "\",\n\"created\": \"" + time.getTime() + "\",\n\"name\": \"" + name + "\",\n\"text\": \"" + query + "\"}";
+        return "{\"id\": \"" + id + "\",\n\"created\": \"" + time.getTime() + "\",\n\"name\": \"" + name.replace("\"", "\\\"") + "\",\n\"text\": \"" + query.replace("\"", "\\\"") + "\",\n\"sparql\": \"" + sparql.replace("\"", "\\\"")+ "\"}";
     }
 
     public Date getTime() {
@@ -132,4 +137,11 @@ public class Query implements Serializable {
         this.eventsCollection = eventsCollection;
     }
 
+    public String getSparql() {
+        return sparql;
+    }
+
+    public void setSparql(String sparql) {
+        this.sparql = sparql;
+    }
 }

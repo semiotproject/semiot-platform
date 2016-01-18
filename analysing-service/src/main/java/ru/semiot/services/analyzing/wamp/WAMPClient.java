@@ -44,8 +44,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
     public Observable<String> subscribe(String topic) {
         logger.info("Made subscription to " + topic);
 
-        return client.makeSubscription(topic, String.class
-        );
+        return client.makeSubscription(topic, String.class);
     }
 
     @Override
