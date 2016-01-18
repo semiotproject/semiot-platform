@@ -14,13 +14,13 @@ public class DefaultQueryDataBase implements QueryDataBase {
     private EntityManager em;
 
     @Override
-    public JSONObject appendQuery(String request, String name) {
+    public JSONObject appendQuery(String request, String name, String sparql) {
         //Bad, bad function
         int id = 0;
         if (getCount() > 0) {
             id = (Integer) em.createQuery("SELECT MAX(q.id) FROM Query q").getSingleResult();
         }
-        Query r = new Query(request, name, ++id);
+        Query r = new Query(request, name, sparql, ++id);
         em.merge(r);
         return new JSONObject(r.toString());
     }

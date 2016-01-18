@@ -61,10 +61,10 @@ public class Queries {
         }
         try {
             JSONObject object = new JSONObject(request);
-            if (!object.has("name") || !object.has("text")) {
+            if (!object.has("name") || !object.has("sparql") || !object.has("text")) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"));
+            JSONObject ret = db.appendQuery(object.getString("text"), object.getString("name"), object.getString("sparql"));
             int query_id = ret.getInt("id");
             if (!engine.registerQuery(query_id)) {
                 db.removeQuery(query_id);

@@ -10,14 +10,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.cep.Engine;
 import rx.Observer;
+
 @ApplicationScoped
 @Named
 public class TopicListener implements Observer<String> {
 
     private static final Logger logger = LoggerFactory
-            .getLogger(TopicListener.class);    
-    @Inject Engine engine;
-    
+            .getLogger(TopicListener.class);
+    @Inject
+    Engine engine;
+
     public TopicListener() {
         logger.info("Created Listener");
     }
@@ -31,12 +33,12 @@ public class TopicListener implements Observer<String> {
     public void onError(Throwable e) {
         logger.warn(e.getMessage(), e);
     }
-    
+
     @Override
     public void onNext(String message) {
         Model description = ModelFactory.createDefaultModel().read(
                 new StringReader(message), null, "TURTLE");
-        if (!description.isEmpty()) {            
+        if (!description.isEmpty()) {
             engine.appendData(message);
         }
     }
