@@ -4,7 +4,7 @@ MAINTAINER Shilin Ivan <proniment@gmail.com>
 
 ENV SERVICE_NAME device-proxy-service
 ENV SERVICE_JAR_NAME device-proxy-service-launcher-1.0-SNAPSHOT-jar-with-dependencies
-ENV FUSEKI_ARCHIVE_NAME apache-jena-fuseki-2.0.0
+ENV FUSEKI_ARCHIVE_NAME apache-jena-fuseki-2.3.0
 ENV FUSEKI_HOME /fuseki
 ENV FUSEKI_BASE /fuseki/base
 
