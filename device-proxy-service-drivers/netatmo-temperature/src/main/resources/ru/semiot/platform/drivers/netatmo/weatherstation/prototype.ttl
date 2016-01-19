@@ -5,12 +5,12 @@
 @prefix qudt-unit: <http://qudt.org/vocab/unit#> .
 @prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
 @prefix qudt-quantity-ext: <http://w3id.org/qudt/vocab/quantity/ext#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 :NetatmoWeatherStationOutdoorModule a ssn:System, proto:Prototype ;
-
     rdfs:label "Netatmo Weather Station (Outdoor module)"@en ;
     rdfs:seeAlso "http://shop.netatmo.com/eur_en/netatmo-weather-station-400.html"^^xsd:anyURI ;
-
     ssn:hasSubSystem :NetatmoWeatherStationOutdoorModule-TemperatureSensor ;
     ssn:hasSubSystem :NetatmoWeatherStationOutdoorModule-HumiditySensor ;
     .

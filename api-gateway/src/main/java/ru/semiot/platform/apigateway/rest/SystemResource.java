@@ -36,9 +36,8 @@ public class SystemResource {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
     private static final String QUERY_GET_ALL_SYSTEMS
-            = "SELECT DISTINCT ?uri ?label ?id {"
-            + "?uri a ssn:System ;"
-            + "rdfs:label ?label ;"
+            = "SELECT DISTINCT ?uri ?id {"
+            + "?uri a ssn:System, proto:Individual ;"
             + "dcterms:identifier ?id ."
             + "}";
 
@@ -84,14 +83,12 @@ public class SystemResource {
                 final String uri = ub
                         .path("systems/{a}")
                         .buildFromEncoded(qs.getLiteral("id").getString()).toASCIIString();
-                final String label = qs.getLiteral("label").getString();
 
                 builder.append("hydra:member", new HashMap<String, Object>() {
                     {
                         {
                             put(JsonLdKeys.ID, uri);
                             put(JsonLdKeys.TYPE, "ssn:System");
-                            put("rdfs:label", label);
                         }
                     }
                 });

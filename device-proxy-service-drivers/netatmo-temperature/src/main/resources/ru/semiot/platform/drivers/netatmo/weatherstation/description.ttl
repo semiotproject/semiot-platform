@@ -27,12 +27,12 @@
     ssncom:hasCommunicationEndpoint <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/wamp> ;
     .
 
-<${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/temperature> 
+<${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/temperature>
     a ssn:SensingDevice, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-TemperatureSensor ;
     .
 
-<${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/humidity> 
+<${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/humidity>
     a ssn:SensingDevice, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-HumiditySensor ;
     .
