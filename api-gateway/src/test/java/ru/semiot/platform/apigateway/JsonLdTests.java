@@ -23,10 +23,11 @@ public class JsonLdTests {
                 new AbstractMap.SimpleEntry<>("hydra", "http://www.w3.org/ns/hydra/core#")
         ).collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
 
-        JsonLdBuilder builder = new JsonLdBuilder(CONTEXT)
-                .add("@id", "http://example.com/a#")
-                .add("@type", "hydra:ApiDocumentation")
-                .add("hydra:entrypoint", "http://example.com/api");
+        JsonLdBuilder builder = new JsonLdBuilder()
+                .context(CONTEXT)
+                .append("@id", "http://example.com/a#")
+                .append("@type", "hydra:ApiDocumentation")
+                .append("hydra:entrypoint", "http://example.com/api");
 
         System.out.println(builder.toCompactedString());
     }
@@ -52,11 +53,12 @@ public class JsonLdTests {
                 new AbstractMap.SimpleEntry<>("hydra", "http://www.w3.org/ns/hydra/core#")
         ).collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
 
-        JsonLdBuilder builder = new JsonLdBuilder(CONTEXT)
-                .add("@id", "http://example.com/a#")
-                .add("@type", "hydra:ApiDocumentation")
-                .add("hydra:entrypoint", "http://example.com/api")
-                .add("hydra:member", new HashMap<>());
+        JsonLdBuilder builder = new JsonLdBuilder()
+                .context(CONTEXT)
+                .append("@id", "http://example.com/a#")
+                .append("@type", "hydra:ApiDocumentation")
+                .append("hydra:entrypoint", "http://example.com/api")
+                .append("hydra:member", new HashMap<>());
 
         System.out.println(builder.toCompactedString());
     }

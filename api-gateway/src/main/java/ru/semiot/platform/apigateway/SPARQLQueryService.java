@@ -16,7 +16,7 @@ import rx.schedulers.Schedulers;
 
 @Singleton
 public class SPARQLQueryService {
-    
+
     @Resource
     ManagedExecutorService mes;
 
@@ -28,7 +28,8 @@ public class SPARQLQueryService {
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "PREFIX ssncom: <http://purl.org/NET/ssnext/communication#>\n"
             + "PREFIX dcterms: <http://purl.org/dc/terms/#>\n"
-            + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
+            + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
+            + "PREFIX proto: <http://w3id.org/semiot/ontologies/proto#>\n";
 
     private final HttpAuthenticator httpAuthenticator;
 
@@ -39,20 +40,25 @@ public class SPARQLQueryService {
 
     public Observable<ResultSet> select(String query) {
         return Observable.create(o -> {
-            Query select = QueryFactory.create(PREFIXES + query);
-            ResultSet rs = QueryExecutionFactory.createServiceRequest(
-                    config.sparqlEndpoint(), select, httpAuthenticator).execSelect();
-            o.onNext(rs);
+            try {
+                Query select = QueryFactory.create(PREFIXES + query);
+                ResultSet rs = QueryExecutionFactory.createServiceRequest(
+                        config.sparqlEndpoint(), select, httpAuthenticator).execSelect();
+                o.onNext(rs);
+            } catch (Throwable ex) {
+                o.onError(ex);
+            }
+
             o.onCompleted();
         }).subscribeOn(Schedulers.from(mes)).cast(ResultSet.class);
     }
-    
+
     public Observable<Model> describe(String query) {
         return Observable.create(o -> {
             Query describe = QueryFactory.create(PREFIXES + query);
             Model model = QueryExecutionFactory.createServiceRequest(
                     config.sparqlEndpoint(), describe, httpAuthenticator).execDescribe();
-            
+
             o.onNext(model);
             o.onCompleted();
         }).subscribeOn(Schedulers.from(mes)).cast(Model.class);

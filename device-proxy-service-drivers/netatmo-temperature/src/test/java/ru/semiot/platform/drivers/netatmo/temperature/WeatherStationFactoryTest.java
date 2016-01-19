@@ -1,5 +1,8 @@
 package ru.semiot.platform.drivers.netatmo.temperature;
 
+import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStationObservation;
+import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStation;
+import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStationFactory;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONArray;
@@ -31,13 +34,13 @@ public class WeatherStationFactoryTest {
 
         List<WeatherStation> expected = new ArrayList<>();
         WeatherStation one = new WeatherStation(wsFactory.hash(DRIVER_PID, "70:ee:50:06:0f:12"),
-                60.021748, 30.298187);
+                "60.021748", "30.298187", "15.0");
         WeatherStation two = new WeatherStation(wsFactory.hash(DRIVER_PID, "70:ee:50:03:df:36"),
-                60.0255383, 30.29713856);
+                "60.0255383", "30.29713856", "24.0");
         expected.add(one);
         expected.add(two);
 
-        assertArrayEquals(actual.toArray(), expected.toArray());
+        assertArrayEquals(expected.toArray(), actual.toArray());
     }
 
     @Test
@@ -53,19 +56,30 @@ public class WeatherStationFactoryTest {
 
     @Test
     public void testParseObservations() throws JSONException {
+
         WeatherStationFactory wsFactory = new WeatherStationFactory(DRIVER_PID);
 
-        List<TemperatureObservation> actual = wsFactory.parseObservations(new JSONArray(JSON_DEVICES));
+        List<WeatherStationObservation> actual = wsFactory.parseObservations(
+                new JSONArray(JSON_DEVICES));
 
-        List<TemperatureObservation> expected = new ArrayList<>();
-        TemperatureObservation one = new TemperatureObservation(
+        List<WeatherStationObservation> expected = new ArrayList<>();
+        WeatherStationObservation one = new WeatherStationObservation(
                 wsFactory.hash(DRIVER_PID, "70:ee:50:06:0f:12"),
-                "1452115809", "-18.4");
-        TemperatureObservation two = new TemperatureObservation(
+                "1452115809", "-18.4", WeatherStationObservation.TEMPERATURE_TYPE);
+        WeatherStationObservation two = new WeatherStationObservation(
+                wsFactory.hash(DRIVER_PID, "70:ee:50:06:0f:12"),
+                "1452115809", "71.0", WeatherStationObservation.HUMIDITY_TYPE);
+        WeatherStationObservation three = new WeatherStationObservation(
                 wsFactory.hash(DRIVER_PID, "70:ee:50:03:df:36"),
-                "1452115790", "-18.9");
+                "1452115790", "-18.9", WeatherStationObservation.TEMPERATURE_TYPE);
+        WeatherStationObservation four = new WeatherStationObservation(
+                wsFactory.hash(DRIVER_PID, "70:ee:50:03:df:36"),
+                "1452115790", "68.0", WeatherStationObservation.HUMIDITY_TYPE);
+        
         expected.add(one);
         expected.add(two);
+        expected.add(three);
+        expected.add(four);
 
         assertArrayEquals(actual.toArray(), expected.toArray());
     }

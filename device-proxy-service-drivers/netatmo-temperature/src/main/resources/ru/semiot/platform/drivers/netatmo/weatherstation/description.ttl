@@ -14,20 +14,27 @@
 @prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/temperature/prototype.ttl#> .
 
 <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}> a ssn:System, proto:Individual ;
-    proto:hasPrototype ws:WeatherStation ;
+    proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule ;
     ssn:hasSubSystem <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/temperature> ;
+    ssn:hasSubSystem <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/humidity> ;
     dcterms:identifier "${ru.semiot.platform.device.id}"^^xsd:string ;
     dul:hasLocation [
 	a geo:Point ;
 	geo:lat "${ru.semiot.drivers.netatmo.latitude}"^^xsd:string ;
         geo:long "${ru.semiot.drivers.netatmo.langitude}"^^xsd:string ;
+        geo:alt "${ru.semiot.drivers.netatmo.altitude}"^^xsd:string ;
     ] ;
     ssncom:hasCommunicationEndpoint <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/wamp> ;
     .
 
 <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/temperature> 
     a ssn:SensingDevice, proto:Individual ;
-    proto:hasPrototype ws:WeatherStation-TemperatureSensor ;
+    proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-TemperatureSensor ;
+    .
+
+<${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/humidity> 
+    a ssn:SensingDevice, proto:Individual ;
+    proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-HumiditySensor ;
     .
 
 <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/wamp> a ssncom:CommunicationEndpoint ;

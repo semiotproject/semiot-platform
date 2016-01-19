@@ -1,0 +1,133 @@
+{
+    "@context": {
+        "vocab": "http://localhost/doc#",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "sp": "http://spinrdf.org/sp#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
+        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#"
+    },
+    "@id": "http://localhost/doc",
+    "@type": "hydra:ApiDocumentation",
+    "hydra:entrypoint": "http://localhost/",
+    "hydra:supportedClass": [
+        {
+            "@id": "vocab:EntryPoint",
+            "@type": "hydra:Class",
+            "hydra:supportedOperation": [
+                {
+                    "@type": "hydra:Operation",
+                    "hydra:method": "GET",
+                    "hydra:returns": "vocab:EntryPoint"
+                }
+            ],
+            "hydra:supportedProperty": [
+                {
+                   "hydra:property": {
+                        "@id": "vocab:EntryPoint/systems",
+                        "@type": "hydra:Link",
+                        "rdfs:domain": "vocab:EntryPoint",
+                        "rdfs:range": "hydra:Collection",
+                        "hydra:supportedOperation": [
+                            {
+                                "@type": "hydra:Operation",
+                                "hydra:method": "GET",
+                                "hydra:returns": "hydra:Collection"
+                            }
+                        ]
+                    }
+                },
+                {
+                   "hydra:property": {
+                        "@id": "vocab:EntryPoint/sensors",
+                        "@type": "hydra:Link",
+                        "rdfs:domain": "vocab:EntryPoint",
+                        "rdfs:range": "hydra:Collection",
+                        "hydra:supportedOperation": [
+                            {
+                                "@type": "hydra:Operation",
+                                "hydra:method": "GET",
+                                "hydra:returns": "hydra:Collection"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "hydra:property": {
+                        "@id": "vocab:EntryPoint/sparql",
+                        "@type": ["hydra:TemplatedLink", "hydra:IriTemplate"],
+                        "hydra:template": "http://localhost/sparql?query={q}",
+                        "hydra:mapping": [
+                            {
+                                "@type": "hydra:IriTemplateMapping",
+                                "hydra:variable": "q",
+                                "hydra:property": "sp:Select",
+                                "hydra:required": true
+                            }
+                        ],
+                        "hydra:supportedOperation": [
+                            {
+                                "@type": "hydra:Operation",
+                                "hydra:method": "GET",
+                                "hydra:returns": "rdf:List"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "@id": "ssn:System",
+            "@type": "hydra:Class",
+            "hydra:supportedOperation": [
+                {
+                    "@type": "hydra:Operation",
+                    "hydra:method": "GET",
+                    "hydra:returns": "ssn:System"
+                }
+            ],
+            "hydra:supportedProperty": [
+                {
+                    "hydra:property" : {
+                        "@id": "ssn:hasSubSystem",
+                        "rdfs:domain": "ssn:System",
+                        "rdfs:range": "ssn:SensingDevice" 
+                    }
+                }
+            ]
+        },
+        {
+            "@id": "ssn:SensingDevice",
+            "@type": "hydra:Class",
+            "hydra:supportedOperation": [
+                {
+                    "@type": "hydra:Operation",
+                    "hydra:method": "GET",
+                    "hydra:returns": "ssn:SensingDevice"
+                }
+            ]
+        },
+        {
+            "@id": "vocab:observations",
+            "@type": "hydra:Link",
+            "rdfs:range": "vocab:WebSocketResource",
+            "hydra:supportedOperation": [
+                {
+                    "@type": "vocab:WebSocketSubscribeOperation",
+                    "hydra:returns": "ssn:Observation"
+                }
+            ]
+        },
+        {
+            "@id": "vocab:WebSocketResource",
+            "@type": "hydra:Class",
+            "rdfs:subClassOf": "hydra:Resource"
+        },
+        {
+            "@id": "vocab:WebSocketSubscribeOperation",
+            "@type": "hydra:Class",
+            "rdfs:subClassOf": "hydra:Operation"
+        }
+    ]
+}

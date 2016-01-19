@@ -80,9 +80,10 @@ public class SensorResource {
         final String requstUri = uriInfo.getRequestUri().toASCIIString();
 
         query.select(QUERY_GET_ALL_SENSORS).subscribe((ResultSet r) -> {
-            JsonLdBuilder builder = new JsonLdBuilder(context)
-                    .add(JsonLdKeys.ID, requstUri)
-                    .add(JsonLdKeys.TYPE, "vocab:SensorCollection");
+            JsonLdBuilder builder = new JsonLdBuilder()
+                    .context(context)
+                    .append(JsonLdKeys.ID, requstUri)
+                    .append(JsonLdKeys.TYPE, "vocab:SensorCollection");
 
             while (r.hasNext()) {
                 final UriBuilder ub = uriBuilder.clone();
@@ -99,7 +100,7 @@ public class SensorResource {
                     label = null;
                 }
 
-                builder.add("hydra:member", new HashMap<String, Object>() {
+                builder.append("hydra:member", new HashMap<String, Object>() {
                     {
                         {
                             put(JsonLdKeys.ID, uri);

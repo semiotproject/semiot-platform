@@ -1,4 +1,4 @@
-package ru.semiot.platform.drivers.netatmo.temperature;
+package ru.semiot.platform.drivers.netatmo.weatherstation;
 
 import java.net.URI;
 import java.util.Collections;
@@ -27,7 +27,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     private final Map<String, Device> devicesMap
             = Collections.synchronizedMap(new HashMap<>());
-    private final Map<String, TemperatureObservation> observationsMap
+    private final Map<String, WeatherStationObservation> observationsMap
             = Collections.synchronizedMap(new HashMap<>());
     private final String driverName = "Netatmo.com (only temperature)";
     private final Configuration configuration = new Configuration();
@@ -39,11 +39,11 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     public void start() {
         logger.info("{} started!", driverName);
-        
+
         DriverInformation info = new DriverInformation(
-                Keys.DRIVER_PID, 
+                Keys.DRIVER_PID,
                 URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/temperature/prototype.ttl#WeatherStation"));
-        
+
         deviceManager.registerDriver(info);
 
         this.scheduler = Executors.newScheduledThreadPool(1);
@@ -93,8 +93,8 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         return devicesMap.keySet();
     }
 
-    public TemperatureObservation getObservationByDeviceId(String deviceId) {
-        return observationsMap.get(deviceId);
+    public WeatherStationObservation getObservation(String deviceId, String type) {
+        return observationsMap.get(toObsKey(deviceId, type));
     }
 
     @Override
@@ -114,10 +114,11 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         deviceManager.registerDevice(device);
     }
 
-    public void publishNewObservation(TemperatureObservation observation) {
+    public void publishNewObservation(WeatherStationObservation observation) {
         //Replace previous observation
-        String deviceId = observation.getProperty(DeviceProperties.DEVICE_ID);
-        observationsMap.put(deviceId, observation);
+        String deviceId = observation.getProperty(NetatmoDeviceProperties.DEVICE_ID);
+        String type = observation.getProperty(NetatmoDeviceProperties.OBSERVATION_TYPE);
+        observationsMap.put(toObsKey(deviceId, type), observation);
 
         deviceManager.registerObservation(devicesMap.get(deviceId), observation);
     }
@@ -159,5 +160,9 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
         scheduler.shutdownNow();
         logger.debug("UScheduled stoped");
+    }
+    
+    private String toObsKey(String deviceId, String type) {
+        return deviceId + "-" + type;
     }
 }

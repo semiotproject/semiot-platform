@@ -1,4 +1,4 @@
-package ru.semiot.platform.drivers.netatmo.temperature;
+package ru.semiot.platform.drivers.netatmo.weatherstation;
 
 import java.util.List;
 import org.json.JSONArray;
@@ -82,23 +82,26 @@ public class ScheduledPuller implements Runnable {
                 }
                 
                 //Send new observations
-                List<TemperatureObservation> observations = wsFactory
+                List<WeatherStationObservation> observations = wsFactory
                         .parseObservations(data);
                 
                 logger.info("Found [{}] observations", observations.size());
                 
-                for(TemperatureObservation newObs : observations) {
+                for(WeatherStationObservation newObs : observations) {
                     String deviceId = newObs.getProperty(
                             DeviceProperties.DEVICE_ID);
+                    String type = newObs.getProperty(
+                            NetatmoDeviceProperties.OBSERVATION_TYPE);
                     
-                    TemperatureObservation oldObs = driver.
-                            getObservationByDeviceId(deviceId);
+                    WeatherStationObservation oldObs = driver.getObservation(
+                            deviceId, type);
                     
-                    if(!newObs.equalsIgnoreTimestamp(oldObs)) {                      
+                    if(oldObs == null || !newObs.getProperty(DeviceProperties.OBSERVATION_TIMESTAMP)
+                            .equalsIgnoreCase(oldObs.getProperty(DeviceProperties.OBSERVATION_TIMESTAMP))) {
                         driver.publishNewObservation(newObs);
                     } else {
-                        logger.debug("Observation [device={}] isn't new. Skipping", 
-                                deviceId);
+                        logger.debug("Observation [device={}, type={}] isn't new. Skipping", 
+                                deviceId, type);
                     }
                 }
             } else {

@@ -1,5 +1,6 @@
 package ru.semiot.platform.drivers.netatmo.temperature;
 
+import ru.semiot.platform.drivers.netatmo.weatherstation.NetatmoAPI;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Test;

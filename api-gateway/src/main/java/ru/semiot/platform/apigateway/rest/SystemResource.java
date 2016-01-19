@@ -72,9 +72,10 @@ public class SystemResource {
         final String requstUri = uriInfo.getRequestUri().toASCIIString();
 
         query.select(QUERY_GET_ALL_SYSTEMS).subscribe((ResultSet r) -> {
-            JsonLdBuilder builder = new JsonLdBuilder(context)
-                    .add(JsonLdKeys.ID, requstUri)
-                    .add(JsonLdKeys.TYPE, "vocab:SystemCollection");
+            JsonLdBuilder builder = new JsonLdBuilder()
+                    .context(context)
+                    .append(JsonLdKeys.ID, requstUri)
+                    .append(JsonLdKeys.TYPE, "vocab:SystemCollection");
 
             while (r.hasNext()) {
                 final UriBuilder ub = uriBuilder.clone();
@@ -85,7 +86,7 @@ public class SystemResource {
                         .buildFromEncoded(qs.getLiteral("id").getString()).toASCIIString();
                 final String label = qs.getLiteral("label").getString();
 
-                builder.add("hydra:member", new HashMap<String, Object>() {
+                builder.append("hydra:member", new HashMap<String, Object>() {
                     {
                         {
                             put(JsonLdKeys.ID, uri);

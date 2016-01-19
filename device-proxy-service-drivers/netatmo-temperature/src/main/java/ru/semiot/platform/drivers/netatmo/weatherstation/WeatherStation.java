@@ -1,4 +1,4 @@
-package ru.semiot.platform.drivers.netatmo.temperature;
+package ru.semiot.platform.drivers.netatmo.weatherstation;
 
 import java.io.IOException;
 import org.apache.commons.io.IOUtils;
@@ -8,7 +8,7 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 public class WeatherStation extends Device {
 
     private static final String TEMPLATE_PATH
-            = "/ru/semiot/platform/drivers/netatmo/temperature/description.ttl";
+            = "/ru/semiot/platform/drivers/netatmo/weatherstation/description.ttl";
     private static String DESCRIPTION_TEMPLATE;
 
     static {
@@ -21,11 +21,13 @@ public class WeatherStation extends Device {
         }
     }
 
-    public WeatherStation(String id, double latitude, double longitude) {
+    public WeatherStation(String id, String latitude, String longitude, 
+            String altitude) {
         super(id);
         setProperty(NetatmoDeviceProperties.DEVICE_ID, id);
-        setProperty(NetatmoDeviceProperties.LATITUDE, String.valueOf(latitude));
-        setProperty(NetatmoDeviceProperties.LONGITUDE, String.valueOf(longitude));
+        setProperty(NetatmoDeviceProperties.LATITUDE, latitude);
+        setProperty(NetatmoDeviceProperties.LONGITUDE, longitude);
+        setProperty(NetatmoDeviceProperties.ALTITUDE, altitude);
     }
 
     @Override

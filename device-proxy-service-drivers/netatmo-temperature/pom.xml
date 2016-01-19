@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.semiot.platform.drivers</groupId>
-    <artifactId>netatmo-temperature</artifactId>
+    <artifactId>netatmo-weatherstation</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>Netatmo Temperature Driver</name>
+    <name>Netatmo Weather Station (Outdoor Module) Driver</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -87,7 +87,7 @@
                         </Import-Package>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
-                        <Bundle-Activator>ru.semiot.platform.drivers.netatmo.temperature.Activator</Bundle-Activator>
+                        <Bundle-Activator>ru.semiot.platform.drivers.netatmo.weatherstation.Activator</Bundle-Activator>
                         <Export-Package/>
                     </instructions>
                 </configuration>

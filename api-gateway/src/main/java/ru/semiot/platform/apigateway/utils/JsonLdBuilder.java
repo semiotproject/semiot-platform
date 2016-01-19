@@ -11,30 +11,40 @@ import java.util.List;
 import java.util.Map;
 
 public class JsonLdBuilder {
-    
-    private final Map<String, Object> context;
-    private final Map<String, Object> content;
-    
+
+    private Map<String, Object> context = new HashMap<>();
+    private Map<String, Object> content = new HashMap<>();
+
     public JsonLdBuilder() {
-        this(new HashMap<>(), new HashMap<>());
-    }
-    
-    public JsonLdBuilder(Map<String, Object> context) {
-        this(context, new HashMap<>());
     }
 
-    public JsonLdBuilder(
-            Map<String, Object> context, Map<String, Object> content) {
-        this.context = context;
-        this.content = content;
+    public JsonLdBuilder context(Map<String, Object> context) {
+        if (context.containsKey(JsonLdKeys.CONTEXT)) {
+            Object c = context.get(JsonLdKeys.CONTEXT);
+            if(c instanceof Map) {
+                this.context = (Map<String, Object>) c;
+            } else {
+                throw new IllegalArgumentException("Context should be a map!");
+            }
+        } else {
+            this.context = context;
+        }
+
+        return this;
     }
-    
-    public JsonLdBuilder add(String key, Object value) {
-        if(content.containsKey(key)) {
+
+    public JsonLdBuilder append(Map<String, Object> content) {
+        this.content.putAll(content);
+
+        return this;
+    }
+
+    public JsonLdBuilder append(String key, Object value) {
+        if (content.containsKey(key)) {
             List<Object> lo;
             Object o = content.get(key);
-            
-            if(o instanceof List) {
+
+            if (o instanceof List) {
                 lo = (List<Object>) o;
                 lo.add(value);
             } else {
@@ -42,31 +52,31 @@ public class JsonLdBuilder {
                 lo.add(content.get(key));
                 lo.add(value);
             }
-            
+
             content.put(key, lo);
         } else {
             content.put(key, value);
         }
-        
+
         return this;
     }
-    
+
     public Map<String, Object> toJsonLdObject() throws JsonLdError {
         return JsonLdProcessor.compact(content, context, new JsonLdOptions());
     }
-    
+
     public String toCompactedString() throws JsonLdError, IOException {
         return JsonUtils.toString(
                 JsonLdProcessor.compact(content, context, new JsonLdOptions()));
     }
-    
+
     public String toFlattenString() throws JsonLdError, IOException {
         return JsonUtils.toString(JsonLdProcessor.flatten(content, context, new JsonLdOptions()));
     }
-    
+
     public String toExpandedString() throws IOException, JsonLdError {
         return JsonUtils.toString(
                 JsonLdProcessor.expand(content));
     }
-    
+
 }

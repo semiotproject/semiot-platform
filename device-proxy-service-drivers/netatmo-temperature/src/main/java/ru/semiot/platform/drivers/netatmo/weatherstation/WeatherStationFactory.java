@@ -1,4 +1,4 @@
-package ru.semiot.platform.drivers.netatmo.temperature;
+package ru.semiot.platform.drivers.netatmo.weatherstation;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,13 +15,13 @@ public class WeatherStationFactory {
 
     private static final int FNV_32_INIT = 0x811c9dc5;
     private static final int FNV_32_PRIME = 0x01000193;
-    private static final String TEMPERATURE_KEY = "temperature";
     private static final String LOCATION_KEY = "location";
     private static final String PLACE_KEY = "place";
     private static final String ID_KEY = "_id";
     private static final String MEASURES_KEY = "measures";
     private static final String TYPE_KEY = "type";
     private static final String RES_KEY = "res";
+    private static final String ALTITUDE_KEY = "altitude";
 
     private final String driverName;
 
@@ -41,7 +41,7 @@ public class WeatherStationFactory {
         return String.valueOf(longHash);
     }
 
-    private boolean isMeasures(JSONObject device, String name)
+    private boolean isMeasuresTemperatureAndHumidity(JSONObject device)
             throws JSONException {
         JSONObject obj = device.getJSONObject(MEASURES_KEY);
 
@@ -50,21 +50,18 @@ public class WeatherStationFactory {
         while (keys.hasNext()) {
             String sensorId = (String) keys.next();
             JSONArray types = obj.getJSONObject(sensorId).optJSONArray(TYPE_KEY);
-            if (types != null) {
-                int index = JSONUtils.find(types, name);
-
-                if(index > -1) {
+            if (types.length() == 2) {
+                if (JSONUtils.contains(types, WeatherStationObservation.TEMPERATURE_TYPE)
+                        && JSONUtils.contains(types, WeatherStationObservation.HUMIDITY_TYPE)) {
                     return true;
                 }
-            } else {
-                return false;
             }
         }
 
         return false;
     }
 
-    private TemperatureObservation findObservation(JSONObject device, String deviceId, String name)
+    private WeatherStationObservation findObservation(JSONObject device, String deviceId, String type)
             throws JSONException {
         JSONObject obj = device.getJSONObject(MEASURES_KEY);
 
@@ -74,7 +71,7 @@ public class WeatherStationFactory {
             String sensorId = (String) keys.next();
             JSONArray types = obj.getJSONObject(sensorId).optJSONArray(TYPE_KEY);
             if (types != null) {
-                int index = JSONUtils.find(types, name);
+                int index = JSONUtils.find(types, type);
                 if (index > -1) {
                     String timestamp = (String) obj.getJSONObject(sensorId)
                             .getJSONObject(RES_KEY).keys().next();
@@ -82,7 +79,8 @@ public class WeatherStationFactory {
                             .getJSONObject(RES_KEY).getJSONArray(timestamp)
                             .getDouble(index));
 
-                    return new TemperatureObservation(deviceId, timestamp, value);
+                    return new WeatherStationObservation(
+                            deviceId, timestamp, value, type);
                 }
             } else {
                 return null;
@@ -100,16 +98,18 @@ public class WeatherStationFactory {
                 JSONObject device = devices.getJSONObject(i);
 
                 String id = hash(driverName, device.getString(ID_KEY));
-                JSONArray location = device.getJSONObject(PLACE_KEY)
+                JSONObject place = device.getJSONObject(PLACE_KEY);
+                JSONArray location = place
                         .getJSONArray(LOCATION_KEY);
 
-                double longitude = location.getDouble(0);
-                double latitude = location.getDouble(1);
+                String longitude = String.valueOf(location.getDouble(0));
+                String latitude = String.valueOf(location.getDouble(1));
+                String altitude = String.valueOf(place.getDouble(ALTITUDE_KEY));
 
-                if (isMeasures(device, TEMPERATURE_KEY)) {
+                if (isMeasuresTemperatureAndHumidity(device)) {
                     //We want stations measuring temperature
                     WeatherStation station = new WeatherStation(
-                            id, latitude, longitude);
+                            id, latitude, longitude, altitude);
 
                     stations.add(station);
                 }
@@ -121,8 +121,8 @@ public class WeatherStationFactory {
         return stations;
     }
 
-    public List<TemperatureObservation> parseObservations(JSONArray devices) {
-        List<TemperatureObservation> observations = new ArrayList<>();
+    public List<WeatherStationObservation> parseObservations(JSONArray devices) {
+        List<WeatherStationObservation> observations = new ArrayList<>();
 
         for (int i = 0; i < devices.length(); i++) {
             try {
@@ -130,10 +130,16 @@ public class WeatherStationFactory {
 
                 String id = hash(driverName, device.getString(ID_KEY));
 
-                TemperatureObservation temperature = findObservation(
-                        device, id, TEMPERATURE_KEY);
+                WeatherStationObservation temperature = findObservation(
+                        device, id, WeatherStationObservation.TEMPERATURE_TYPE);
 
-                observations.add(temperature);
+                WeatherStationObservation humidity = findObservation(
+                        device, id, WeatherStationObservation.HUMIDITY_TYPE);
+
+                if (temperature != null && humidity != null) {
+                    observations.add(temperature);
+                    observations.add(humidity);
+                }
 
             } catch (JSONException ex) {
                 logger.warn(ex.getMessage(), ex);

@@ -1,4 +1,4 @@
-package ru.semiot.platform.drivers.netatmo.temperature;
+package ru.semiot.platform.drivers.netatmo.weatherstation;
 
 import java.util.Properties;
 import org.apache.felix.dm.DependencyActivatorBase;

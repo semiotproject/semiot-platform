@@ -1,4 +1,4 @@
-package ru.semiot.platform.drivers.netatmo.temperature;
+package ru.semiot.platform.drivers.netatmo.weatherstation;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +14,16 @@ public class JSONUtils {
         }
 
         return -1;
+    }
+    
+    public static boolean contains(JSONArray array, String element) throws JSONException {
+        for (int i = 0; i < array.length(); i++) {
+            if (array.getString(i).equals(element)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
