@@ -17,7 +17,6 @@
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule ;
     ssn:hasSubSystem <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/temperature> ;
     ssn:hasSubSystem <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/humidity> ;
-    dcterms:identifier "${ru.semiot.platform.device.id}"^^xsd:string ;
     dul:hasLocation [
 	a geo:Point ;
 	geo:lat "${ru.semiot.drivers.netatmo.latitude}"^^xsd:string ;

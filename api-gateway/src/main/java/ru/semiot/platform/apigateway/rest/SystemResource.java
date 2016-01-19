@@ -7,10 +7,10 @@ import com.github.jsonldjava.impl.TurtleRDFParser;
 import com.github.jsonldjava.utils.JsonUtils;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Resource;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Map;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -23,12 +23,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.UriBuilder;
+import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.apigateway.JsonLdContextProviderService;
 import ru.semiot.platform.apigateway.SPARQLQueryService;
+import ru.semiot.platform.apigateway.utils.Hydra;
 import ru.semiot.platform.apigateway.utils.JsonLdBuilder;
 import ru.semiot.platform.apigateway.utils.JsonLdKeys;
+import ru.semiot.platform.apigateway.utils.MapBuilder;
+import ru.semiot.platform.apigateway.utils.Proto;
 
 @Path("/systems")
 @Stateless
@@ -36,9 +40,10 @@ public class SystemResource {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
     private static final String QUERY_GET_ALL_SYSTEMS
-            = "SELECT DISTINCT ?uri ?id {"
+            = "SELECT DISTINCT ?uri ?id ?prototype {"
             + "?uri a ssn:System, proto:Individual ;"
-            + "dcterms:identifier ?id ."
+            + "dcterms:identifier ?id ;"
+            + "proto:hasPrototype ?prototype ."
             + "}";
 
     private static final String QUERY_DESCRIBE_SYSTEM
@@ -74,7 +79,7 @@ public class SystemResource {
             JsonLdBuilder builder = new JsonLdBuilder()
                     .context(context)
                     .append(JsonLdKeys.ID, requstUri)
-                    .append(JsonLdKeys.TYPE, "vocab:SystemCollection");
+                    .append(JsonLdKeys.TYPE, "hydra:Collection");
 
             while (r.hasNext()) {
                 final UriBuilder ub = uriBuilder.clone();
@@ -83,15 +88,15 @@ public class SystemResource {
                 final String uri = ub
                         .path("systems/{a}")
                         .buildFromEncoded(qs.getLiteral("id").getString()).toASCIIString();
+                final Resource prototype = qs.getResource("prototype");
 
-                builder.append("hydra:member", new HashMap<String, Object>() {
-                    {
-                        {
-                            put(JsonLdKeys.ID, uri);
-                            put(JsonLdKeys.TYPE, "ssn:System");
-                        }
-                    }
-                });
+                builder.append(Hydra.member,
+                        MapBuilder.newMap()
+                        .put(JsonLdKeys.ID, uri)
+                        .put(JsonLdKeys.TYPE, "ssn:System", Proto.Individual, 
+                                "vocab:" + prototype.getLocalName() + "Resource")
+                        .put(Proto.hasPrototype, prototype.getURI())
+                        .build());
             }
 
             try {
@@ -118,7 +123,7 @@ public class SystemResource {
 
         query.describe(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id)).subscribe((model) -> {
             StringWriter sw = new StringWriter();
-            model.write(sw, "N-TRIPLE");
+            model.write(sw, RDFLanguages.N3.getName());
 
             try {
                 Object b = JsonLdProcessor.fromRDF(

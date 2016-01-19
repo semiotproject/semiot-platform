@@ -1,11 +1,14 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import java.io.StringReader;
 import java.net.URI;
 import org.apache.jena.riot.RDFDataMgr;
@@ -19,7 +22,7 @@ public class DirectoryService {
 
     private static final Logger logger = LoggerFactory
             .getLogger(DirectoryService.class);
-    private static final String RDF_FORMAT = "TURTLE";
+    private static final String DCTERMS_IDENTIFIER = "http://purl.org/dc/terms/#identifier";
 
     protected static final String QUERY_UPDATE_STATE_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
             + "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
@@ -39,7 +42,7 @@ public class DirectoryService {
         String request = null;
         try {
             Model description = ModelFactory.createDefaultModel().read(
-                    new StringReader(message), null, RDF_FORMAT);
+                    new StringReader(message), null, RDFLanguages.TURTLE.getName());
             if (!description.isEmpty()) {
                 logger.info("Update " + message);
 
@@ -87,8 +90,9 @@ public class DirectoryService {
      */
     public boolean addNewDevice(Device device, String deviceDescription) {
         try {
-            Model description = ModelFactory.createDefaultModel()
-                    .read(new StringReader(deviceDescription), null, RDF_FORMAT);
+            Model description = ModelFactory.createDefaultModel().read(
+                    new StringReader(deviceDescription), null, 
+                            RDFLanguages.TURTLE.getName());
 
             if (!description.isEmpty()) {
                 ResultSet qr = QueryExecutionFactory.create(
@@ -96,10 +100,17 @@ public class DirectoryService {
                         description).execSelect();
 
                 if (qr.hasNext()) {
-                    String uri = qr.next().getResource(Vars.URI).getURI();
+                    Resource system = qr.next().getResource(Vars.URI);
 
-                    if (uri != null) {
-                        //Given uri is not a blank node
+                    //Given uri is not a blank node
+                    if (system.isURIResource()) {
+                        //Add dcterms:identifier
+                        description.add(system, 
+                                ResourceFactory.createProperty(DCTERMS_IDENTIFIER), 
+                                ResourceFactory.createTypedLiteral(device.getId(), XSDDatatype.XSDstring));
+                        
+                        //TODO: Add ssncom:hasCommunicationEndpoint to a private graph
+                        
                         store.save(description);
 
                         return true;

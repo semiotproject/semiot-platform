@@ -3,13 +3,10 @@ package ru.semiot.platform.apigateway.rest;
 import com.github.jsonldjava.core.JsonLdError;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDFS;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Produces;
@@ -98,7 +95,7 @@ public class RootResource {
                     final Resource prototype = r.next().getResource(VAR_PROTOTYPE);
                     builder.append(Hydra.supportedClass,
                             MapBuilder.newMap()
-                            .put(JsonLdKeys.ID, prototype.getLocalName() + "Resource")
+                            .put(JsonLdKeys.ID, "vocab:" + prototype.getLocalName() + "Resource")
                             .put(JsonLdKeys.TYPE, Hydra.Class, "proto:Individual")
                             .put("proto:hasPrototype", prototype.getURI())
                             .build());

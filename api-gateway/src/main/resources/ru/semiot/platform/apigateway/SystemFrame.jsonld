@@ -10,6 +10,7 @@
     "qudt-quantity" : "http://qudt.org/vocab/quantity#",
     "qudt-unit" : "http://qudt.org/vocab/unit#",
     "qudt" : "http://qudt.org/schema/qudt#",
+    "proto": "http://w3id.org/semiot/ontologies/proto#",
 
     "saref:hasState": {"@type": "@id"},
     "ssn:hasValue": {"@type": "@id"},
