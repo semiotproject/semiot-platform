@@ -11,12 +11,15 @@
     "qudt-unit" : "http://qudt.org/vocab/unit#",
     "qudt" : "http://qudt.org/schema/qudt#",
     "proto": "http://w3id.org/semiot/ontologies/proto#",
+    "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
+    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
 
     "saref:hasState": {"@type": "@id"},
     "ssn:hasValue": {"@type": "@id"},
     "ssn:forProperty": {"@type": "@id"},
     "ssn:observes": {"@type": "@id"},
-    "ssn:hasSubSystem": {"@type": "@id"}
+    "ssn:hasSubSystem": {"@type": "@id"},
+    "proto:hasPrototype": {"@type": "@id"}
   },
   "@type": "ssn:System"
 }

@@ -5,10 +5,13 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.RDF;
 import java.io.StringReader;
 import java.net.URI;
 import org.apache.jena.riot.RDFDataMgr;
@@ -23,6 +26,16 @@ public class DirectoryService {
     private static final Logger logger = LoggerFactory
             .getLogger(DirectoryService.class);
     private static final String DCTERMS_IDENTIFIER = "http://purl.org/dc/terms/#identifier";
+    private static final Property SSNCOM_HASCOMMUNICATIONENDPOINT = ResourceFactory
+            .createProperty("http://purl.org/NET/ssnext/communication#hasCommunicationEndpoint");
+    private static final Resource SSNCOM_COMMUNICATIONENDPOINT = ResourceFactory
+            .createResource("http://purl.org/NET/ssnext/communication#CommunicationEndpoint");
+    private static final Property SSNCOM_TOPIC = ResourceFactory
+            .createProperty("http://purl.org/NET/ssnext/communication#topic");
+    private static final Property SSNCOM_PROTOCOL = ResourceFactory
+            .createProperty("http://purl.org/NET/ssnext/communication#protocol");
+    private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
+    private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
 
     protected static final String QUERY_UPDATE_STATE_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
             + "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
@@ -103,16 +116,21 @@ public class DirectoryService {
                     Resource system = qr.next().getResource(Vars.URI);
 
                     //Given uri is not a blank node
-                    if (system.isURIResource()) {
-                        //Add dcterms:identifier
-                        description.add(system, 
-                                ResourceFactory.createProperty(DCTERMS_IDENTIFIER), 
-                                ResourceFactory.createTypedLiteral(device.getId(), XSDDatatype.XSDstring));
-                        
-                        //TODO: Add ssncom:hasCommunicationEndpoint to a private graph
-                        
+                    if (system.isURIResource()) {                       
                         store.save(description);
+                        
+                        //Add ssncom:hasCommunicationEndpoint to a private graph
+                        Resource wampResource = ResourceFactory.createResource(system.getURI() + "/wamp");
+                        Model privateDeviceInfo = ModelFactory
+                                .createDefaultModel()
+                                .add(system, SSNCOM_HASCOMMUNICATIONENDPOINT, wampResource)
+                                .add(wampResource, RDF.type, SSNCOM_COMMUNICATIONENDPOINT)
+                                .add(wampResource, SSNCOM_TOPIC, 
+                                        ResourceFactory.createPlainLiteral(device.getId()))
+                                .add(wampResource, SSNCOM_PROTOCOL, WAMP);
 
+                        store.save(GRAPH_PRIVATE, privateDeviceInfo);
+                        
                         return true;
                     } else {
                         logger.error("Device [{}] doesn't have URI!",

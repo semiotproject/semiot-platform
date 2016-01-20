@@ -1,13 +1,7 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import java.io.IOException;
 import java.util.Dictionary;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.util.EntityUtils;
-import org.apache.jena.riot.RDFDataMgr;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -84,9 +78,12 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
 
                     configuration.putAll(dictionary);
 
-                    configuration.put(Keys.PLATFORM_RESOURCE_URI_PREFIX,
+                    configuration.put(Keys.PLATFORM_SYSTEMS_URI_PREFIX,
                             configuration.get(Keys.PLATFORM_DOMAIN) + "/"
-                            + configuration.get(Keys.PLATFORM_RESOURCE_PATH));
+                            + configuration.get(Keys.PLATFORM_SYSTEMS_PATH));
+                    configuration.put(Keys.PLATFORM_SENSORS_URI_PREFIX,
+                            configuration.get(Keys.PLATFORM_DOMAIN) + "/"
+                            + configuration.get(Keys.PLATFORM_SENSORS_PATH));
 
                     configuration.setConfigured();
 

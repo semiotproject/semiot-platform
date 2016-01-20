@@ -20,9 +20,13 @@ public class Keys {
      */
     public static final String PLATFORM_DOMAIN = 
             "ru.semiot.platform.domain";
-    public static final String PLATFORM_RESOURCE_PATH = 
-            "ru.semiot.platform.resource_path";
-    public static final String PLATFORM_RESOURCE_URI_PREFIX = 
-            "ru.semiot.platform.resource_uri_prefix";
+    public static final String PLATFORM_SYSTEMS_PATH = 
+            "ru.semiot.platform.systems_path";
+    public static final String PLATFORM_SYSTEMS_URI_PREFIX = 
+            "ru.semiot.platform.systems_uri_prefix";
+    public static final String PLATFORM_SENSORS_PATH = 
+            "ru.semiot.platform.sensors_path";
+    public static final String PLATFORM_SENSORS_URI_PREFIX = 
+            "ru.semiot.platform.sensors_uri_prefix";
 
 }

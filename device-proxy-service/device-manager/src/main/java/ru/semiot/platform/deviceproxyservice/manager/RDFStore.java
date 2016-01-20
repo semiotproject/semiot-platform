@@ -15,6 +15,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.update.UpdateExecutionFactory;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
+import org.apache.jena.riot.RDFLanguages;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 
 public class RDFStore {
@@ -38,6 +39,13 @@ public class RDFStore {
                         config.get(Keys.FUSEKI_STORE_URL),
                         httpAuthenticator)
                 .add(model);
+    }
+    
+    public void save(String graphUri, Model model) {
+        DatasetAccessorFactory.createHTTP(
+                config.get(Keys.FUSEKI_STORE_URL), 
+                httpAuthenticator)
+                .add(graphUri, model);
     }
     
     public ResultSet select(String query) {
@@ -68,7 +76,7 @@ public class RDFStore {
     private String modelToQuery(Model model) throws IOException {
         String query = PREFIXES + "INSERT DATA {\n";
         try (StringWriter writer = new StringWriter()) {
-            model.write(writer, "N3");
+            model.write(writer, RDFLanguages.N3.getName());
             query += writer.toString();
         }
         query += "\n}";

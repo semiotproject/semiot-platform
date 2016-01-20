@@ -47,9 +47,16 @@ public class SystemResource {
             + "}";
 
     private static final String QUERY_DESCRIBE_SYSTEM
-            = "DESCRIBE ?system_uri ?subsystem_uri {"
-            + "	?system_uri dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ;"
-            + "    ssn:hasSubSystem ?subsystem_uri ."
+            = "CONSTRUCT {"
+            + "  ?system ?p ?o ."
+            + "  ?o ?o_p ?o_o ."
+            + "} WHERE {"
+            + "  ?system ?p ?o ;"
+            + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
+            + "  OPTIONAL {"
+            + "    ?o ?o_p ?o_o ."
+            + "    FILTER isBlank(?o)"
+            + "  }"
             + "}";
 
     public SystemResource() {
@@ -79,7 +86,7 @@ public class SystemResource {
             JsonLdBuilder builder = new JsonLdBuilder()
                     .context(context)
                     .append(JsonLdKeys.ID, requstUri)
-                    .append(JsonLdKeys.TYPE, "hydra:Collection");
+                    .append(JsonLdKeys.TYPE, Hydra.Collection);
 
             while (r.hasNext()) {
                 final UriBuilder ub = uriBuilder.clone();
@@ -89,13 +96,15 @@ public class SystemResource {
                         .path("systems/{a}")
                         .buildFromEncoded(qs.getLiteral("id").getString()).toASCIIString();
                 final Resource prototype = qs.getResource("prototype");
+                final String id = qs.getLiteral("id").getLexicalForm();
 
                 builder.append(Hydra.member,
                         MapBuilder.newMap()
                         .put(JsonLdKeys.ID, uri)
-                        .put(JsonLdKeys.TYPE, "ssn:System", Proto.Individual, 
+                        .put(JsonLdKeys.TYPE, "ssn:System", Proto.Individual,
                                 "vocab:" + prototype.getLocalName() + "Resource")
                         .put(Proto.hasPrototype, prototype.getURI())
+                        .put("dcterms:identifier", id)
                         .build());
             }
 

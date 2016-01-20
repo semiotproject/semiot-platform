@@ -4,17 +4,17 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix qudt: <http://qudt.org/schema/qudt#> .
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
-@prefix : <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/observations/temperature#> .
 @prefix dcterms: <http://purl.org/dc/terms/#> .
+@prefix : <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/observations/temperature#> .
 
 :${ru.semiot.platform.observation.timestamp} a ssn:Observation ;
     ssn:observedProperty qudt-quantity:ThermodynamicTemperature ;
-    ssn:observedBy <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/temperature> ;
+    ssn:observedBy <${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-temperature> ;
     ssn:observationResultTime "${ru.semiot.platform.observation.datetime}"^^xsd:dateTime ;
     ssn:observationResult :${ru.semiot.platform.observation.timestamp}-result .
 
 :${ru.semiot.platform.observation.timestamp}-result a ssn:SensorOutput ;
-    ssn:isProducedBy <${ru.semiot.platform.resource_uri_prefix}/${ru.semiot.platform.device.id}/sensors/temperature> ;
+    ssn:isProducedBy <${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-temperature> ;
     ssn:hasValue :${ru.semiot.platform.observation.timestamp}-resultvalue .
 
 :${ru.semiot.platform.observation.timestamp}-resultvalue a qudt:QuantityValue ;
