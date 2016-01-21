@@ -64,7 +64,7 @@ public class DefaultQueryDataBase implements QueryDataBase {
         }
         JSONArray array = new JSONArray();
         for (Object q : l) {
-            array.put(new JSONObject((Query) q).toString());
+            array.put(new JSONObject(((Query) q).toString()));
         }
         return array;
     }

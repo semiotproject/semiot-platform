@@ -93,10 +93,10 @@ public class Queries {
         if (ret == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        JSONArray events = dbe.getEventsByQueryId(id);
+        /*JSONArray events = dbe.getEventsByQueryId(id);
         if (events != null) {
             ret.append("events", events);
-        }
+        }*/
         return Response.ok(ret.toString()).build();
     }
         

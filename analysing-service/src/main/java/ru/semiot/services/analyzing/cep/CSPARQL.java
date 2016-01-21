@@ -5,7 +5,6 @@ import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -22,7 +21,6 @@ import eu.larkc.csparql.core.engine.CsparqlEngine;
 import eu.larkc.csparql.core.engine.CsparqlEngineImpl;
 import eu.larkc.csparql.core.engine.CsparqlQueryResultProxy;
 import java.io.StringReader;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -123,8 +121,9 @@ public class CSPARQL implements Engine {
                 return false;
             }
 
-        } catch (ParseException | QueryParseException | NullPointerException ex) {
+        } catch (Exception ex) {
             logger.debug("Error in C-SPARQL query! Message: " + ex.getMessage());
+            subscribeTopics(query_id, false);
             return false;
         }
     }
@@ -153,8 +152,7 @@ public class CSPARQL implements Engine {
                 subscriber.unsubscribeTopics(topics, query_id);
             }
             return true;
-        }
-        catch(QueryParseException | NullPointerException ex){
+        } catch (Exception ex) {
             logger.debug("Error in sparql query! Message: " + ex.getMessage());
             return false;
         }
@@ -165,7 +163,7 @@ public class CSPARQL implements Engine {
         if (queries.containsKey(query_id)) {
             logger.info("Removing query");
             engine.unregisterQuery(queries.get(query_id).getId());
-            subscribeTopics(query_id, false);            
+            subscribeTopics(query_id, false);
             queries.remove(query_id);
         } else {
             logger.error("Query not found!");
