@@ -45,9 +45,9 @@ public class DefaultEventsDataBase implements EventsDataBase {
         try {
             Query q = em.createNamedQuery("Query.findById", Query.class).setParameter("id", query_id).getSingleResult();
             Collection<Events> list = q.getEventsCollection();
-            if(list == null || list.isEmpty())
-                return null;
-            JSONArray arr = new JSONArray();
+            if(list == null)
+                return null;            
+            JSONArray arr = new JSONArray();            
             for (Events e : list) {
                 arr.put(new JSONObject(e.toString()));
             }
