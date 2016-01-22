@@ -34,5 +34,5 @@ RUN chmod 777 run.sh
 #Install Supervisord
 RUN mkdir -p /var/log/supervisor
 ADD supervisor-proxyservice.conf /etc/supervisor/conf.d/proxyservice.conf
-
+RUN echo "10.0.0.10 demo-1.semiot.ru" >> /etc/hosts
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/proxyservice.conf"]
