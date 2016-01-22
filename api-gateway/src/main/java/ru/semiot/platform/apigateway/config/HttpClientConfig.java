@@ -38,30 +38,6 @@ import com.sun.mail.iap.Response;
 
 
 public class HttpClientConfig {
-
-	public static void main(String[] args) throws Exception {
-		HashMap<String, Object> parameters = new HashMap<String, Object>();
-		HttpClientConfig http = new HttpClientConfig();
-
-		http.sendUploadAvalaibleFile(//"http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_netatmo_temperature_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/netatmo-temperature/target/netatmo-temperature-1.0-SNAPSHOT.jar",
-				
-				"http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_simulator_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/simulator/target/simulator-1.0-SNAPSHOT.jar",
-				"http://localhost:8181/system/console/bundles");
-		
-		/*String url = "http://localhost:8181/system/console/bundles/18";
-		String url = "http://localhost:8181/system/console/configMgr/ru.semiot.platform.deviceproxyservice.manager?"
-				+ "ru.semiot.platform.deviceproxyservice.manager.domain=localhost&"
-				+ "propertylist=ru.semiot.platform.deviceproxyservice.manager.domain&apply=true&post=true";
-		parameters.put("action", "uninstall");
-		// parameters.put("post", "true");
-		// parameters.put("apply", "true");
-		// parameters.put("propertylist", "ru.semiot.platform.deviceproxyservice.manager.domain");
-		
-
-		//http.sendPost(url, null, "{\"action\":\"uninstall\"}");
-		http.sendPost(url, null, parameters);*/
-		
-	}
 	
 	// TODO Authorization костыль
 	public String sendGetUrl(String url, HashMap<String, String> urlpParam, boolean autorizationWebConsole) throws Exception {

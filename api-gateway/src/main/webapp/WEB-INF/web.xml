@@ -21,13 +21,13 @@
   <servlet-name>ConfigurationDriver</servlet-name>
   <jsp-file>/config/ConfigurationDriver.jsp</jsp-file>
  </servlet>
+  <servlet>
+  <servlet-name>index</servlet-name>
+  <jsp-file>/config/index.jsp</jsp-file>
+ </servlet>
  <servlet-mapping>
-  <servlet-name>default</servlet-name>
-  <url-pattern>/index.html</url-pattern>
- </servlet-mapping>
- <servlet-mapping>
-  <servlet-name>default</servlet-name>
-  <url-pattern>/resources/roundbar-blue.gif</url-pattern>
+  <servlet-name>index</servlet-name>
+  <url-pattern>/config/index</url-pattern>
  </servlet-mapping>
  <servlet-mapping>
   <servlet-name>SystemSettings</servlet-name>

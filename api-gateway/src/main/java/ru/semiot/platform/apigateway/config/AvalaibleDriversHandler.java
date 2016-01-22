@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 
 @WebServlet("/AvalaibleDriversHandler")
 public class AvalaibleDriversHandler extends HttpServlet {
-	private static String urlBundles = "http://localhost:8181/system/console/bundles";
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -28,7 +27,7 @@ public class AvalaibleDriversHandler extends HttpServlet {
     	
     	if (request.getParameter("install") != null) {
     		HttpClientConfig hcc = new HttpClientConfig();
-    		String symbolicName = hcc.sendUploadAvalaibleFile(parameters.get("url"), urlBundles);
+    		String symbolicName = hcc.sendUploadAvalaibleFile(parameters.get("url"), BundleConstants.urlBundles);
     		if(StringUtils.isNotBlank(symbolicName)) {
         		request.setAttribute("symbolicName", symbolicName);
         	}

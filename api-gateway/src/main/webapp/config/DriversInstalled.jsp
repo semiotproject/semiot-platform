@@ -1,17 +1,11 @@
-<%@page import="java.util.HashMap"%>
 <%@page import="org.json.JSONArray"%>
 <%@page import="org.json.JSONObject"%>
-<%@page import="ru.semiot.platform.apigateway.config.HttpClientConfig"%>
 <%@page import="java.util.Iterator"%>
+<%@page import="ru.semiot.platform.apigateway.config.QueryUtils"%>
+<%@page import="ru.semiot.platform.apigateway.config.BundleConstants"%>
 
 <%
-	int countDefaultBundles = 14;
-	String urlBundles = "http://localhost:8181/system/console/bundles.json";
-	HashMap<String, String> hmap = new HashMap<String, String>(); 
-	hmap.put("post", "true");
-	HttpClientConfig clientConfig = new HttpClientConfig();
-	JSONObject jsonObject = new JSONObject(clientConfig.sendGetUrl(urlBundles, hmap, true));
-	JSONArray jsonBundles = jsonObject.getJSONArray("data");
+	JSONArray jsonBundles = QueryUtils.getBundlesJsonArray();
 %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -53,7 +47,7 @@
 		            </tr>
 		            
 		            <%
-					if(jsonBundles.length() <= countDefaultBundles) {
+					if(jsonBundles.length() <= BundleConstants.countDefaultBundles) {
 					%>
 					<tr>
 						<td>Драйвера отсутствуют</td>
@@ -63,8 +57,7 @@
 						for( int i = 0; i < jsonBundles.length(); i++ ) {
 							JSONObject jObj = jsonBundles.getJSONObject(i);
 							int id = jObj.getInt("id");
-							// System.out.println(id);
-							if(id >= countDefaultBundles) {
+							if(id >= BundleConstants.countDefaultBundles) {
 			           		%>
 				           	<tr>	
 				           		<td><%=j++%>

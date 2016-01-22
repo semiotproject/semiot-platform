@@ -21,14 +21,13 @@ import org.apache.commons.lang3.StringUtils;
 @WebServlet("/UploadDriverHandler")
 @MultipartConfig
 public class UploadDriverHandler extends HttpServlet {
-	private static String urlBundles = "http://localhost:8181/system/console/bundles";
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     	
     	Part part = request.getPart("bundlefile");
     	HttpClientConfig hcc = new HttpClientConfig();
-    	String symbolicName = hcc.sendPostUploadFile(urlBundles, part.getInputStream(), part.getSubmittedFileName());
+    	String symbolicName = hcc.sendPostUploadFile(BundleConstants.urlBundles, part.getInputStream(), part.getSubmittedFileName());
 		if(StringUtils.isNotBlank(symbolicName)) {
     		request.setAttribute("symbolicName", symbolicName);
     	}

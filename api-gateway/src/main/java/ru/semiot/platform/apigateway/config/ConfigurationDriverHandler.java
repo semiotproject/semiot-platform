@@ -20,32 +20,36 @@ public class ConfigurationDriverHandler extends HttpServlet {
 	            throws ServletException, IOException {
     	HashMap<String, String> parameters = getRequestParameters(request);
     	
-    	String url = parameters.get("url");
-    	parameters.remove("url");
-    	
-		HttpClientConfig hcc = new HttpClientConfig();
-		try {
-			//parameters
-			StringBuilder propertyList = new StringBuilder();
-			if (parameters.size() < 1) {
-				return;
-			}
-			for(Entry<String, String> entry : parameters.entrySet()) {
-				if(propertyList.length() > 0) {
-					propertyList.append(",");
+    	if (request.getParameter("save") != null) {
+	    	String pid = parameters.get("pid");
+	    	parameters.remove("url");
+	    	parameters.remove("save");
+	    	
+			HttpClientConfig hcc = new HttpClientConfig();
+			try {
+				//parameters
+				StringBuilder propertyList = new StringBuilder();
+				if (parameters.size() < 1) {
+					return;
 				}
-				propertyList.append(entry.getKey());
+				for(Entry<String, String> entry : parameters.entrySet()) {
+					if(propertyList.length() > 0) {
+						propertyList.append(",");
+					}
+					propertyList.append(entry.getKey());
+				}
+				System.out.println(propertyList.toString());
+				parameters.put("post", "true");
+				parameters.put("apply", "true");
+				parameters.put("propertylist", propertyList.toString());
+				
+				hcc.sendGetUrl(BundleConstants.urlConfigMgr + pid, parameters, true);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
 			}
-			System.out.println(propertyList.toString());
-			parameters.put("post", "true");
-			parameters.put("apply", "true");
-			parameters.put("propertylist", propertyList.toString());
-			
-			hcc.sendGetUrl(url, parameters, true);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-    	
+    	} else if(request.getParameter("cancel") != null) {
+    		
+    	}
     	
     	request.getRequestDispatcher("/config/DriversInstalled").forward(request, response);
     }

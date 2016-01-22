@@ -1,18 +1,11 @@
-<%@page import="java.util.HashMap"%>
 <%@page import="org.json.JSONArray"%>
 <%@page import="org.json.JSONObject"%>
-<%@page import="ru.semiot.platform.apigateway.config.HttpClientConfig"%>
+<%@page import="ru.semiot.platform.apigateway.config.QueryUtils"%>
 <%@page import="java.util.Iterator"%>
 
 <%
 	String pid = String.valueOf(request.getAttribute("symbolicName"));
-	String url = "http://localhost:8181/system/console/configMgr/" + pid;
-	HashMap<String, String> hmap = new HashMap<String, String>(); 
-	// hmap.put("post", "true");
-	HttpClientConfig clientConfig = new HttpClientConfig();
-	JSONObject jsonObject = new JSONObject(clientConfig.sendPost(url, null, null));
-	JSONObject jsonProperties = jsonObject.getJSONObject("properties");
-	
+	JSONObject jsonProperties = QueryUtils.getConfiguration(pid);
 %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -61,9 +54,9 @@
 					</table>
 				</div>
 				<div class="text-right">
-		            <button class="btn btn-primary btn-sm" name="save" type="submit">Save</button>
+		            <input class="btn btn-primary btn-sm" type="submit" name="save" value="Save" />
 		        </div>
-		        <input type="hidden" name="url" id="url" value=<%=url%> />
+		        <input type="hidden" name="pid" id="pid" value=<%=pid%> />
 			</form>
 		
 		<script>

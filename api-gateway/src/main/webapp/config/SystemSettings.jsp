@@ -1,20 +1,15 @@
-
 <%@page import="java.util.HashMap"%>
 <%@page import="org.json.JSONArray"%>
 <%@page import="org.json.JSONObject"%>
 <%@page import="ru.semiot.platform.apigateway.config.HttpClientConfig"%>
 <%@page import="java.util.Iterator"%>
+<%@page import="ru.semiot.platform.apigateway.config.QueryUtils"%>
+<%@page import="ru.semiot.platform.apigateway.config.BundleConstants"%>
 
 <%
-	String url = "http://localhost:8181/system/console/configMgr/ru.semiot.platform.deviceproxyservice.manager";
-	HashMap<String, String> hmap = new HashMap<String, String>(); 
-	hmap.put("post", "true");
-	HttpClientConfig clientConfig = new HttpClientConfig(); 
-	// Добавить проверку что сервак не лежит!
-	JSONObject jsonObject = new JSONObject(clientConfig.sendPost(url, hmap, null));
-	JSONObject jsonProperties = jsonObject.getJSONObject("properties");
-	String key = "ru.semiot.platform.deviceproxyservice.manager.domain";
-	JSONObject jsonDomain = jsonProperties.getJSONObject(key);
+	String pid = "ru.semiot.platform.deviceproxyservice.manager";
+	JSONObject jsonProperties = QueryUtils.getConfiguration(pid);
+	JSONObject jsonDomain = jsonProperties.getJSONObject(BundleConstants.managerDomain);
 %>
 
 
@@ -53,15 +48,15 @@
 			                <td><%=1%>
 			                <td><%=jsonDomain.get("name")%>
 			                <td><input type="text" id="txtfld1" onClick="SelectAll('txtfld1');" 
-			                	name=<%=key%> style="width:200px" 
+			                	name=<%=BundleConstants.managerDomain%> style="width:200px" 
 			                	value = <%=jsonDomain.get("value")%> />
 			            </tr>
 			        </table>
 			    </div>
 		        <div class="text-right">
-		            <button class="btn btn-primary btn-sm" name="save" type="submit">Save</button>
+		            <input class="btn btn-primary btn-sm" type="submit" name="save" value="Save" />
 		        </div>
-		         <input type="hidden" name="url" id="url" value=<%=url%> />
+		         <input type="hidden" name="pid" id="pid" value=<%=pid%> />
 		    </form>
 		</div>  
 		

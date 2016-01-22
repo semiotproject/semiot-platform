@@ -1,16 +1,13 @@
-<%@page import="java.util.HashMap"%>
+<%@page import="java.util.List"%>
 <%@page import="org.json.JSONArray"%>
 <%@page import="org.json.JSONObject"%>
 <%@page import="ru.semiot.platform.apigateway.config.HttpClientConfig"%>
 <%@page import="java.util.Iterator"%>
+<%@page import="ru.semiot.platform.apigateway.config.QueryUtils"%>
 
 <%
-	String urlDrivers = "https://raw.githubusercontent.com/semiotproject/semiot-platform/bundles/drivers.json";
-	HashMap<String, String> hmap = new HashMap<String, String>(); 
-	// hmap.put("post", "true");
-	HttpClientConfig clientConfig = new HttpClientConfig();
-	JSONObject jsonObject = new JSONObject(clientConfig.sendGetUrl(urlDrivers, null, false));
-	JSONArray jsonBundles = jsonObject.getJSONObject("drivers").getJSONArray("driver");
+	JSONArray jsonBundles = QueryUtils.getDriversJsonArray();
+	List<String> listInstalledBundles = QueryUtils.getPidListBundles();
 %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -51,17 +48,20 @@
 		                <th>Command</th>
 		            </tr>
 					<%
+					int j = 1;
 					for( int i = 0; i < jsonBundles.length(); i++ ) {
 						JSONObject jObj = jsonBundles.getJSONObject(i);
-						String url = jObj.getString("url");
-		           		%>
-			           	<tr>	
-			           		<td><%=i+1%>
-			                <td><%=jObj.get("name")%>
-			                <td><input type="submit" class="btn btn-primary btn-sm" name="install" value="install" class="form-control"
-			                		onClick="ChangeValue('url', '<%=url%>');" />
-			            </tr>
-			           	<%
+						if(!listInstalledBundles.contains(jObj.getString("pid"))) {
+							String url = jObj.getString("url");
+			           		%>
+				           	<tr>	
+				           		<td><%=j++%>
+				                <td><%=jObj.get("name")%>
+				                <td><input type="submit" class="btn btn-primary btn-sm" name="install" value="install" class="form-control"
+				                		onClick="ChangeValue('url', '<%=url%>');" />
+				            </tr>
+				           	<%
+						}
 					}
 		            %> 
 		        </table>

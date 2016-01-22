@@ -55,7 +55,7 @@ public class RootResource {
     @GET
     @Produces({MediaType.TEXT_HTML, MediaType.TEXT_PLAIN})
     public Response index() {
-        return Response.seeOther(URI.create("/index.html")).build();
+        return Response.seeOther(URI.create("/config/index")).build();
     }
 
     @GET

@@ -1,8 +1,3 @@
-<%@page import="java.util.HashMap"%>
-<%@page import="org.json.JSONArray"%>
-<%@page import="org.json.JSONObject"%>
-<%@page import="ru.semiot.platform.apigateway.config.HttpClientConfig"%>
-<%@page import="java.util.Iterator"%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
