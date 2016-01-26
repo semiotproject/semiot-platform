@@ -22,13 +22,8 @@ public class DriversInstalledHandler extends HttpServlet {
     	HashMap<String, String> parameters = getRequestParameters(request);
     	
     	if (request.getParameter("uninstall") != null) {
-    		HttpClientConfig hcc = new HttpClientConfig();
     		try {
-    			HashMap<String, Object> payload = new HashMap<String, Object>();
-    			payload.put("action", "uninstall");
-    			
-    			String url = BundleConstants.urlBundles + "/" + parameters.get("id_bundle");
-				hcc.sendPost(url, null, payload);
+    			QueryUtils.uninstall(parameters.get("id_bundle"));
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}

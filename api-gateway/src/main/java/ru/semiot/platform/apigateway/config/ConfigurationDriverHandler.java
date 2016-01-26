@@ -19,10 +19,11 @@ public class ConfigurationDriverHandler extends HttpServlet {
 	 protected void doPost(HttpServletRequest request, HttpServletResponse response)
 	            throws ServletException, IOException {
     	HashMap<String, String> parameters = getRequestParameters(request);
+    	String pid = parameters.get("pid");
     	
     	if (request.getParameter("save") != null) {
-	    	String pid = parameters.get("pid");
-	    	parameters.remove("url");
+	    	
+	    	parameters.remove("pid");
 	    	parameters.remove("save");
 	    	
 			HttpClientConfig hcc = new HttpClientConfig();
@@ -48,8 +49,12 @@ public class ConfigurationDriverHandler extends HttpServlet {
 				System.out.println(e.getMessage());
 			}
     	} else if(request.getParameter("cancel") != null) {
-    		
-    	}
+        		try {
+        			QueryUtils.uninstall(pid);
+    			} catch (Exception e) {
+    				System.out.println(e.getMessage());
+    			}
+            }
     	
     	request.getRequestDispatcher("/config/DriversInstalled").forward(request, response);
     }

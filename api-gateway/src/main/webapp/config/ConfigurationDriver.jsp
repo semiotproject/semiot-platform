@@ -4,6 +4,7 @@
 <%@page import="java.util.Iterator"%>
 
 <%
+	// pid = symbolicName
 	String pid = String.valueOf(request.getAttribute("symbolicName"));
 	JSONObject jsonProperties = QueryUtils.getConfiguration(pid);
 %>
@@ -55,6 +56,7 @@
 				</div>
 				<div class="text-right">
 		            <input class="btn btn-primary btn-sm" type="submit" name="save" value="Save" />
+		            <input class="btn btn-primary btn-sm" type="submit" name="cancel" value="Cancel" />
 		        </div>
 		        <input type="hidden" name="pid" id="pid" value=<%=pid%> />
 			</form>

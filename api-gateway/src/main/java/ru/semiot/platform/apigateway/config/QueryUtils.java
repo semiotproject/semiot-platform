@@ -1,6 +1,7 @@
 package ru.semiot.platform.apigateway.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -46,6 +47,14 @@ public class QueryUtils {
 		// TODO костыльное решение
 		String services = clientConfig.sendGetUrl(BundleConstants.urlServicesJson, null, true);
 		return services.indexOf(BundleConstants.managerApi) == -1 ? false : true;
+	}
+	
+	public static void uninstall(String id_bundle) throws Exception {
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("action", "uninstall");
+		
+		String url = BundleConstants.urlBundles + "/" + id_bundle;
+		clientConfig.sendPost(url, null, payload);
 	}
 	
 }
