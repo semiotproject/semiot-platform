@@ -6,7 +6,12 @@
 <%
 	// pid = symbolicName
 	String pid = String.valueOf(request.getAttribute("symbolicName"));
+	
 	JSONObject jsonProperties = QueryUtils.getConfiguration(pid);
+	
+	while (jsonProperties.length() < 1) {
+		jsonProperties = QueryUtils.getConfiguration(pid);
+	}
 %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -55,7 +60,7 @@
 					</table>
 				</div>
 				<div class="text-right">
-		            <input class="btn btn-primary btn-sm" type="submit" name="save" value="Save" />
+		            <input class="btn btn-primary btn-sm" type="submit" name="save" value="Save and start" />
 		            <input class="btn btn-primary btn-sm" type="submit" name="cancel" value="Cancel" />
 		        </div>
 		        <input type="hidden" name="pid" id="pid" value=<%=pid%> />

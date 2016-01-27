@@ -27,7 +27,7 @@
  </servlet>
  <servlet-mapping>
   <servlet-name>index</servlet-name>
-  <url-pattern>/config/index</url-pattern>
+  <url-pattern>/index</url-pattern>
  </servlet-mapping>
  <servlet-mapping>
   <servlet-name>SystemSettings</servlet-name>

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,6 +14,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -24,7 +26,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
@@ -38,6 +43,8 @@ import com.sun.mail.iap.Response;
 
 
 public class HttpClientConfig {
+	
+	private HttpClient client = new DefaultHttpClient();
 	
 	// TODO Authorization костыль
 	public String sendGetUrl(String url, HashMap<String, String> urlpParam, boolean autorizationWebConsole) throws Exception {
@@ -87,7 +94,45 @@ public class HttpClientConfig {
 		return con.getInputStream();
 	}
 	
-	
+	public String sendPost(String url, List<NameValuePair> postParams) throws ClientProtocolException, IOException {
+		HttpPost post = new HttpPost(url);
+		
+		// add headers
+		post.setHeader("Authorization", "Basic YWRtaW46YWRtaW4=");
+		post.setHeader("Accept", "application/json");
+		post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+		
+		post.setHeader("Origin", "chrome-extension://hgmloofddffdnphfgcellkdfbfbjeloo");
+		post.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36");
+		post.setHeader("Accept-Encoding", "gzip, deflate");
+		post.setHeader("Accept-Language", "ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4");
+		//post.setHeader("Cookie", "felix-webconsole-locale=ru_RU; JSESSIONID=0JSBKIuu1OEJMi4JKyydX5mS.ivan-pc");
+		
+		// post.setHeader("", "");
+		
+		if(postParams != null) {
+			post.setEntity(new UrlEncodedFormEntity(postParams));
+		}
+		
+		HttpResponse response = client.execute(post);
+
+		int responseCode = response.getStatusLine().getStatusCode();
+		
+		System.out.println("\nSending 'POST' request to URL : " + url);
+		System.out.println("Post parameters : " + postParams);
+		System.out.println("Response Code : " + responseCode);
+		
+		BufferedReader rd = new BufferedReader(
+                new InputStreamReader(response.getEntity().getContent()));
+
+		StringBuffer result = new StringBuffer();
+		String line = "";
+		while ((line = rd.readLine()) != null) {
+			result.append(line);
+		}
+		
+		return result.toString();
+	}
 	
 	// HTTP POST request
 	// example payload="{\"jsonrpc\":\"2.0\",\"method\":\"changeDetail\",\"params\":[{\"id\":11376}],\"id\":2}";

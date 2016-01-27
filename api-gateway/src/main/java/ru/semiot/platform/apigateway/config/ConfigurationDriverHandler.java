@@ -25,8 +25,7 @@ public class ConfigurationDriverHandler extends HttpServlet {
 	    	
 	    	parameters.remove("pid");
 	    	parameters.remove("save");
-	    	
-			HttpClientConfig hcc = new HttpClientConfig();
+
 			try {
 				//parameters
 				StringBuilder propertyList = new StringBuilder();
@@ -44,7 +43,9 @@ public class ConfigurationDriverHandler extends HttpServlet {
 				parameters.put("apply", "true");
 				parameters.put("propertylist", propertyList.toString());
 				
-				hcc.sendGetUrl(BundleConstants.urlConfigMgr + pid, parameters, true);
+				QueryUtils.sendGetUrl(BundleConstants.urlConfigMgr + pid, parameters, true);
+				
+				QueryUtils.start(pid);
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}

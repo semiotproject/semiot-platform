@@ -64,7 +64,7 @@
 				                <td><%=jObj.get("name")%>
 				                <td><input type="submit" class="btn btn-primary btn-sm" name="conf" value="configuration" class="form-control" disabled/>
 									<input type="submit" class="btn btn-primary btn-sm" name="uninstall" value="uninstall" class="form-control"
-										onClick="ChangeValue('id_bundle', '<%=id%>');" /></td>
+										onClick="ChangeValue('id_bundle', '<%=jObj.getString("symbolicName")%>');" /></td>
 				            </tr>
 				           	<%
 				           	}

@@ -1,7 +1,13 @@
 <%@page import="ru.semiot.platform.apigateway.config.QueryUtils"%>
 
 <%
-	boolean managerIsConfigurated = QueryUtils.managerIsConfigurated();
+	boolean managerIsConfigurated = true;
+	boolean isConnect = true;
+	try {
+		managerIsConfigurated = QueryUtils.managerIsConfigurated();
+	} catch (Exception ex) {
+		isConnect = false;
+	}
 %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -19,7 +25,9 @@
     <body>
     	<div class="container">
 	        <h1>SemIoT Platform</h1>
-			
+			<%
+			if (isConnect) {
+			%>
 	        <b>Navigation:</b>
 		    <ul class="nav nav-pills nav-justified">
 		        <a href="/explorer">Go to Explorer</a> |
@@ -29,6 +37,13 @@
 		        <a href="/config/DriversInstalled">Go to Configuration</a>
 		        <% } %>
 	        </ul>
+	        <%
+			} else {
+			%>	
+			<b>Can`t connect to webconsole. Please reload the page after a few seconds.</b>
+			<%
+			}
+			%>
 	    </div>
     </body>
 </html>

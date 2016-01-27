@@ -39,7 +39,15 @@ public class QueryUtils {
 	}
 	
 	public static JSONObject getConfiguration(String pid) throws JSONException, Exception {
-		JSONObject jsonObject = new JSONObject(clientConfig.sendPost(BundleConstants.urlConfigMgr + pid, null, null));
+		// когда использую пост, через раз вместо имени приходит pid
+		JSONObject jsonObject = new JSONObject(clientConfig.sendPost(BundleConstants.urlConfigMgr + pid, null));
+		/*String res = clientConfig.sendGetUrl(BundleConstants.urlConfigMgr + pid + ".json", null, true);
+		JSONObject jsonObject;
+		if( res.indexOf("[") == 0 && res.lastIndexOf("]") == res.length() - 1 ) {
+			jsonObject = new JSONObject(res.substring(1, res.length() - 1));
+		} else {
+			jsonObject = new JSONObject(res);
+		}*/
 		return jsonObject.getJSONObject("properties");
 	}
 	
@@ -55,6 +63,27 @@ public class QueryUtils {
 		
 		String url = BundleConstants.urlBundles + "/" + id_bundle;
 		clientConfig.sendPost(url, null, payload);
+		
+		deleteConfig(id_bundle);
 	}
 	
+	private static void deleteConfig(String id_bundle) throws Exception {
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("delete", "true");
+		payload.put("apply", "true");
+		
+		clientConfig.sendPost(BundleConstants.urlConfigMgr + id_bundle, null, payload);
+	}
+	
+	public static void start(String id_bundle) throws Exception {
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("action", "start");
+		
+		String url = BundleConstants.urlBundles + "/" + id_bundle;
+		clientConfig.sendPost(url, null, payload);
+	}
+	
+	public static void sendGetUrl(String url, HashMap<String, String> parameters, boolean autoriz) throws Exception {
+		clientConfig.sendGetUrl(url, parameters, autoriz);
+	}
 }
