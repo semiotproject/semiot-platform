@@ -2,7 +2,8 @@ package ru.semiot.platform.apigateway.config;
 
 public class BundleConstants {
 	
-	private static String urlWebConsole = "http://deviceproxyservice:8181";
+	// private static String urlWebConsole = "http://deviceproxyservice:8181";
+	private static String urlWebConsole = "http://localhost:8181";
 	
 	public static String urlBundles = urlWebConsole + "/system/console/bundles";
 	public static String urlBundlesJson = urlWebConsole + "/system/console/bundles.json";
