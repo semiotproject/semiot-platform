@@ -34,9 +34,9 @@
 		<div class="text-center">
 			<br />
 			<div class="btn-group">
-				<a href="/config/DriversInstalled" class="btn btn-primary"
-					role="button">Installed</a> <a href="/config/AvalaibleDrivers"
-					class="btn btn-primary" role="button">Avalaible</a> <a
+				<a href="/config/DriversInstalled" class="btn btn-primary active"
+					role="button">Installed</a> <a href="/config/AvailableDrivers"
+					class="btn btn-primary" role="button">Available</a> <a
 					href="/config/UploadDriver" class="btn btn-primary" role="button">Upload</a>
 			</div>
 		</div>
@@ -44,7 +44,7 @@
 			action="${pageContext.request.contextPath}/DriverInstalledHandler"
 			method="post">
 			<table class="table table-hover">
-				<CAPTION>Список драйверов</CAPTION>
+				<CAPTION>List of drivers</CAPTION>
 				<tr>
 				<tr>
 					<th>№</th>
@@ -56,7 +56,7 @@
 					if(jsonBundles.length() <= BundleConstants.countDefaultBundles) {
 					%>
 				<tr>
-					<td>Драйвера отсутствуют</td>
+					<td>Drivers are missing.</td>
 				</tr>
 				<%} else {
 						int j = 1;

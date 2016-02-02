@@ -14,8 +14,8 @@
   <jsp-file>/config/UploadDriver.jsp</jsp-file>
  </servlet>
  <servlet>
-  <servlet-name>AvalaibleDrivers</servlet-name>
-  <jsp-file>/config/AvalaibleDrivers.jsp</jsp-file>
+  <servlet-name>AvailableDrivers</servlet-name>
+  <jsp-file>/config/AvailableDrivers.jsp</jsp-file>
  </servlet>
  <servlet>
   <servlet-name>ConfigurationDriver</servlet-name>
@@ -42,8 +42,8 @@
   <url-pattern>/config/UploadDriver</url-pattern>
  </servlet-mapping>
  <servlet-mapping>
-  <servlet-name>AvalaibleDrivers</servlet-name>
-  <url-pattern>/config/AvalaibleDrivers</url-pattern>
+  <servlet-name>AvailableDrivers</servlet-name>
+  <url-pattern>/config/AvailableDrivers</url-pattern>
  </servlet-mapping>
  <servlet-mapping>
   <servlet-name>ConfigurationDriver</servlet-name>

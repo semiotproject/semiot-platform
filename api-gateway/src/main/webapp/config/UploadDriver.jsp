@@ -26,14 +26,14 @@
 			<br />
 			<div class="btn-group">
 				<a href="/config/DriversInstalled" class="btn btn-primary"
-					role="button">Installed</a> <a href="/config/AvalaibleDrivers"
-					class="btn btn-primary" role="button">Avalaible</a> <a
-					href="/config/UploadDriver" class="btn btn-primary" role="button">Upload</a>
+					role="button">Installed</a> <a href="/config/AvailableDrivers"
+					class="btn btn-primary" role="button">Available</a> <a
+					href="/config/UploadDriver" class="btn btn-primary active" role="button">Upload</a>
 			</div>
 		</div>
 		<form action="${pageContext.request.contextPath}/UploadDriverHandler"
 			method="post" enctype="multipart/form-data">
-			<br class="form-control">Загрузите bundle в виде .jar файла</br> <input
+			<br class="form-control">Download the bundle as a .jar file</br> <input
 				type="file" name="bundlefile" accept="jar|war" /> <input
 				type="submit" class="btn btn-primary" />
 		</form>

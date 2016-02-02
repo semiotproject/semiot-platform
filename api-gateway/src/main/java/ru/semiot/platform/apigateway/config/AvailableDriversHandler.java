@@ -18,8 +18,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 
-@WebServlet("/AvalaibleDriversHandler")
-public class AvalaibleDriversHandler extends HttpServlet {
+@WebServlet("/AvailableDriversHandler")
+public class AvailableDriversHandler extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -27,7 +27,7 @@ public class AvalaibleDriversHandler extends HttpServlet {
 
 		if (request.getParameter("install") != null) {
 			HttpClientConfig hcc = new HttpClientConfig();
-			String symbolicName = hcc.sendUploadAvalaibleFile(
+			String symbolicName = hcc.sendUploadAvailableFile(
 					parameters.get("url"), BundleConstants.urlBundles);
 			if (StringUtils.isNotBlank(symbolicName)) {
 				HttpSession session = request.getSession(false);

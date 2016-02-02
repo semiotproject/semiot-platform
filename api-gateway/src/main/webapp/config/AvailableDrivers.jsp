@@ -16,7 +16,7 @@
 <html>
 
 <head>
-<title>Avalaible Drivers</title>
+<title>Available Drivers</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet"
@@ -28,7 +28,7 @@
 </head>
 <body>
 	<div class="container">
-		<h3>Avalaible Drivers</h3>
+		<h3>Available Drivers</h3>
 		<ul class="nav nav-pills nav-justified">
 			<li><a href="/config/SystemSettings">System Settings</a></li>
 			<li class="active"><a href="/config/UploadDriver">Drivers</a></li>
@@ -37,16 +37,16 @@
 			<br />
 			<div class="btn-group">
 				<a href="/config/DriversInstalled" class="btn btn-primary"
-					role="button">Installed</a> <a href="/config/AvalaibleDrivers"
-					class="btn btn-primary" role="button">Avalaible</a> <a
+					role="button">Installed</a> <a href="/config/AvailableDrivers"
+					class="btn btn-primary active" role="button">Available</a> <a
 					href="/config/UploadDriver" class="btn btn-primary" role="button">Upload</a>
 			</div>
 		</div>
 		<form
-			action="${pageContext.request.contextPath}/AvalaibleDriversHandler"
+			action="${pageContext.request.contextPath}/AvailableDriversHandler"
 			method="post">
 			<table class="table table-hover">
-				<CAPTION>Список доступных драйверов</CAPTION>
+				<CAPTION>List of available drivers</CAPTION>
 				<tr>
 				<tr>
 					<th>№</th>

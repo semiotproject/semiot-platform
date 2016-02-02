@@ -5,13 +5,17 @@
 <%@page import="java.util.Iterator"%>
 
 <%
-	String pid = String.valueOf(session.getAttribute("symbolicName"));
+	String pid = null;
+	if(session.getAttribute("symbolicName") != null) {
+		pid = String.valueOf(session.getAttribute("symbolicName"));
+	}
 	session.removeAttribute("symbolicName");
 
 	JSONObject jsonProperties = QueryUtils.getConfiguration(pid);
 	
-	while (StringUtils.isNotBlank(pid) && jsonProperties.length() < 1) {
+	for (int i = 0; StringUtils.isNotBlank(pid) && jsonProperties.length() < 1 && i<10; i++) {
 		jsonProperties = QueryUtils.getConfiguration(pid);
+		Thread.sleep(300);
 	}
 %>
 

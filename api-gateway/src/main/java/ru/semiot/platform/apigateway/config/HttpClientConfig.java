@@ -190,7 +190,7 @@ public class HttpClientConfig {
 		return response.toString();
 	}
 
-	public String sendUploadAvalaibleFile(String urlFrom, String urlTo) {
+	public String sendUploadAvailableFile(String urlFrom, String urlTo) {
 		try {
 			return sendPostUploadFile(urlTo, sendGet(urlFrom, false), urlFrom);
 		} catch (Exception e) {
