@@ -7,6 +7,10 @@
 <%@page import="ru.semiot.platform.apigateway.config.BundleConstants"%>
 
 <%
+	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+	response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+	response.setHeader("Expires", "0");
+
 	String pid = "ru.semiot.platform.deviceproxyservice.manager";
 	JSONObject jsonProperties = QueryUtils.getConfiguration(pid);
 	JSONObject jsonDomain = jsonProperties.getJSONObject(BundleConstants.managerDomain);
