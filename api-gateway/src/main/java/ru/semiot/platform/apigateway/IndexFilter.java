@@ -27,6 +27,8 @@ public class IndexFilter implements Filter {
         HttpServletResponse hsr = (HttpServletResponse) response;
 
         hsr.addHeader("Link", "<" + apiURL + ">; rel=\"http://www.w3.org/ns/hydra/core#apiDocumentation\"");
+        hsr.addHeader("Access-Control-Allow-Origin", "*");
+        hsr.addHeader("Access-Control-Expose-Headers", "Link");
 
         chain.doFilter(request, hsr);
     }

@@ -6,7 +6,8 @@
         "sp": "http://spinrdf.org/sp#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
-        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#"
+        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+        "proto": "http://w3id.org/semiot/ontologies/proto#"
     },
     "@id": "${HOST}/doc",
     "@type": "hydra:ApiDocumentation",

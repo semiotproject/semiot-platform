@@ -79,8 +79,6 @@ public class RootResource {
     @Path("/doc")
     @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void documentation(@Suspended final AsyncResponse response) throws JsonLdError, IOException {
-        //TODO: Add declaration of prototypes from TS
-
         Map<String, Object> apiDoc = contextProvider.getContextAsJsonLd(
                 JsonLdContextProviderService.API_DOCUMENTATION_CONTEXT,
                 uriInfo.getRequestUri());
@@ -96,7 +94,7 @@ public class RootResource {
                     builder.append(Hydra.supportedClass,
                             MapBuilder.newMap()
                             .put(JsonLdKeys.ID, "vocab:" + prototype.getLocalName() + "Resource")
-                            .put(JsonLdKeys.TYPE, Hydra.Class, "proto:Individual")
+                            .put(JsonLdKeys.TYPE, Hydra.Class, "proto:Individual", "ssn:System")
                             .put("proto:hasPrototype", prototype.getURI())
                             .build());
                 }
