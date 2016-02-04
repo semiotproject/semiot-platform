@@ -19,31 +19,34 @@ public class ConfigurationDriverHandler extends HttpServlet {
 		String pid = parameters.get("pid");
 
 		if (request.getParameter("save") != null) {
-
-			parameters.remove("pid");
-			parameters.remove("save");
-
 			try {
-				// parameters
-				StringBuilder propertyList = new StringBuilder();
-				if (parameters.size() < 1) {
-					return;
-				}
-				for (Entry<String, String> entry : parameters.entrySet()) {
-					if (propertyList.length() > 0) {
-						propertyList.append(",");
+				String statusConf = QueryUtils.getStatusConfigurations();
+				if (statusConf.indexOf("\"PID = " + pid + "\"") == -1) {
+
+					parameters.remove("pid");
+					parameters.remove("save");
+
+					// parameters
+					StringBuilder propertyList = new StringBuilder();
+					if (parameters.size() < 1) {
+						return;
 					}
-					propertyList.append(entry.getKey());
+					for (Entry<String, String> entry : parameters.entrySet()) {
+						if (propertyList.length() > 0) {
+							propertyList.append(",");
+						}
+						propertyList.append(entry.getKey());
+					}
+					System.out.println(propertyList.toString());
+					parameters.put("post", "true");
+					parameters.put("apply", "true");
+					parameters.put("propertylist", propertyList.toString());
+
+					QueryUtils.sendGetUrl(BundleConstants.urlConfigMgr + pid,
+							parameters, true);
+
+					QueryUtils.start(pid);
 				}
-				System.out.println(propertyList.toString());
-				parameters.put("post", "true");
-				parameters.put("apply", "true");
-				parameters.put("propertylist", propertyList.toString());
-
-				QueryUtils.sendGetUrl(BundleConstants.urlConfigMgr + pid,
-						parameters, true);
-
-				QueryUtils.start(pid);
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
