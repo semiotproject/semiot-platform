@@ -9,6 +9,7 @@ public class BundleConstants {
 	public static String urlDriversJson = "https://raw.githubusercontent.com/semiotproject/semiot-platform/bundles/drivers.json";
 	public static String urlServicesJson = urlWebConsole + "/system/console/services.json";
 	public static String urlConfigMgr = urlWebConsole + "/system/console/configMgr/";
+	public static String urlStatusConfigurationsJson = urlWebConsole + "/system/console/status-Configurations.json";
 	public static int countDefaultBundles = 14;
 	
 	public static String managerDomain = "ru.semiot.platform.deviceproxyservice.manager.domain";

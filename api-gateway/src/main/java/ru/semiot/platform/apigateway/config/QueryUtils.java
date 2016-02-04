@@ -56,12 +56,18 @@ public class QueryUtils {
 	}
 
 	public static boolean managerIsConfigurated() throws Exception {
-		// TODO костыльное решение
+		// TODO правильное решение через сервисы? его можно было бы заменить на
+		// конфигурации
 		String services = clientConfig.sendGetUrl(
 				BundleConstants.urlServicesJson, null, true);
 		return services.indexOf(BundleConstants.managerApi) == -1
 				? false
 				: true;
+	}
+
+	public static String getStatusConfigurations() throws Exception {
+		return clientConfig.sendGetUrl(
+				BundleConstants.urlStatusConfigurationsJson, null, true);
 	}
 
 	public static void uninstall(String id_bundle) throws Exception {

@@ -51,11 +51,18 @@
 						<th>Optional</th>
 					</tr>
 					<%
-						Iterator<String> it = jsonProperties.keys();
-							                	int i = 0;
-							                	while(it.hasNext()) {
-							                		String key = it.next();
-							                		JSONObject jsonProperty = jsonProperties.getJSONObject(key);
+						if(jsonProperties.length() < 1) {
+					%>
+					<tr>
+						<td>Configuration is not found.</td>
+					</tr>
+					<%
+						} else {
+							Iterator<String> it = jsonProperties.keys();
+				                	int i = 0;
+				                	while(it.hasNext()) {
+				                		String key = it.next();
+				                		JSONObject jsonProperty = jsonProperties.getJSONObject(key);
 					%>
 					<td><%=++i%>
 					<td><%=jsonProperty.get("name")%>
@@ -66,13 +73,22 @@
 					</tr>
 					<%
 						}
+									}
 					%>
 				</table>
 			</div>
 			<div class="text-right">
+				<%
+					if(jsonProperties.length() > 0) {
+				%>
 				<input class="btn btn-primary btn-sm" type="submit" name="save"
 					value="Save and start" /> <input class="btn btn-primary btn-sm"
-					type="submit" name="cancel" value="Cancel" />
+					type="submit" name="uninstall" value="Uninstall" />
+				<%
+					}
+				%>
+				<input class="btn btn-primary btn-sm" type="submit" name="back"
+					value="Back" />
 			</div>
 			<input type="hidden" name="pid" id="pid" value=<%=pid%> />
 		</form>

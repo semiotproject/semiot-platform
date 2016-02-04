@@ -57,13 +57,16 @@
 					<th>Name</th>
 					<th>Command</th>
 				</tr>
+
 				<%
+					boolean isMissing = true;
 					int j = 1;
 					for( int i = 0; i < jsonBundles.length(); i++ ) {
 						JSONObject jObj = jsonBundles.getJSONObject(i);
 						if(!listInstalledBundles.contains(jObj.getString("pid"))) {
+							isMissing = false;
 							String url = jObj.getString("url");
-			           		%>
+				%>
 				<tr>
 					<td><%=j++%>
 					<td><%=jObj.get("name")%>
@@ -74,16 +77,22 @@
 				<%
 						}
 					}
-		            %>
+					if(isMissing) {
+				%>
+				<tr>
+					<td>Available drivers are missing.</td>
+				</tr>
+				<%
+					}
+				%>
 			</table>
 			<input type="hidden" name="url" id="url" />
 		</form>
 
 		<script>
-		function ChangeValue(id, url)
-		{
-		    document.getElementById(id).value=url;
-		}
+			function ChangeValue(id, url) {
+				document.getElementById(id).value = url;
+			}
 		</script>
 </body>
 </html>

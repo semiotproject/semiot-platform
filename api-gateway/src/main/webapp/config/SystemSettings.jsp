@@ -14,6 +14,8 @@
 	String pid = "ru.semiot.platform.deviceproxyservice.manager";
 	JSONObject jsonProperties = QueryUtils.getConfiguration(pid);
 	JSONObject jsonDomain = jsonProperties.getJSONObject(BundleConstants.managerDomain);
+	
+	boolean managerIsConfigurated = QueryUtils.managerIsConfigurated();
 %>
 
 
@@ -66,7 +68,7 @@
 			</div>
 			<div class="text-right">
 				<input class="btn btn-primary btn-sm" type="submit" name="save"
-					value="Save" />
+					value="Save" <% if(managerIsConfigurated) { %> disabled <% } %> />
 			</div>
 			<input type="hidden" name="pid" id="pid" value=<%=pid%> />
 		</form>

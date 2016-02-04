@@ -9,6 +9,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.StringUtils;
 
 @WebServlet("/DriverInstalledHandler")
 public class DriversInstalledHandler extends HttpServlet {
@@ -17,15 +20,24 @@ public class DriversInstalledHandler extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		HashMap<String, String> parameters = getRequestParameters(request);
 
-		if (request.getParameter("uninstall") != null) {
-			try {
-				QueryUtils.uninstall(parameters.get("id_bundle"));
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
+		String symbolicName = parameters.get("id_bundle");
+		String redirect = "/config/DriversInstalled";
+		if (StringUtils.isNotBlank(symbolicName)) {
+			if (request.getParameter("uninstall") != null) {
+				try {
+					QueryUtils.uninstall(symbolicName);
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
+			} else if(request.getParameter("conf") != null) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("symbolicName", symbolicName);
+	
+				redirect = "/config/ConfigurationDriver";
 			}
 		}
 
-		response.sendRedirect("/config/DriversInstalled");
+		response.sendRedirect(redirect);
 		// request.getRequestDispatcher("/config/DriversInstalled").forward(request,
 		// response);
 	}

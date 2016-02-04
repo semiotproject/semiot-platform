@@ -47,7 +47,7 @@ public class ConfigurationDriverHandler extends HttpServlet {
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
-		} else if (request.getParameter("cancel") != null) {
+		} else if (request.getParameter("uninstall") != null) {
 			try {
 				QueryUtils.uninstall(pid);
 			} catch (Exception e) {

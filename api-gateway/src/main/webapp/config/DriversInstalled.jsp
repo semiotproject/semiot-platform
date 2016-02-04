@@ -5,11 +5,13 @@
 <%@page import="ru.semiot.platform.apigateway.config.BundleConstants"%>
 
 <%
-	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+	response.setHeader("Cache-Control",
+			"no-cache, no-store, must-revalidate"); // HTTP 1.1.
 	response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
 	response.setHeader("Expires", "0");
 
 	JSONArray jsonBundles = QueryUtils.getBundlesJsonArray();
+	String statusConfigurations = QueryUtils.getStatusConfigurations();
 %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -57,41 +59,46 @@
 				</tr>
 
 				<%
-					if(jsonBundles.length() <= BundleConstants.countDefaultBundles) {
-					%>
+					if (jsonBundles.length() <= BundleConstants.countDefaultBundles) {
+				%>
 				<tr>
-					<td>Drivers are missing.</td>
+					<td>Installed drivers are missing.</td>
 				</tr>
-				<%} else {
+				<%
+					} else {
 						int j = 1;
-						for( int i = 0; i < jsonBundles.length(); i++ ) {
+						for (int i = 0; i < jsonBundles.length(); i++) {
 							JSONObject jObj = jsonBundles.getJSONObject(i);
 							int id = jObj.getInt("id");
-							if(id >= BundleConstants.countDefaultBundles) {
-			           		%>
+							if (id >= BundleConstants.countDefaultBundles) {
+								String symbName = jObj.getString("symbolicName");
+				%>
 				<tr>
 					<td><%=j++%>
 					<td><%=jObj.get("name")%>
 					<td><input type="submit" class="btn btn-primary btn-sm"
-						name="conf" value="configuration" class="form-control" disabled />
-						<input type="submit" class="btn btn-primary btn-sm"
-						name="uninstall" value="uninstall" class="form-control"
-						onClick="ChangeValue('id_bundle', '<%=jObj.getString("symbolicName")%>');" /></td>
+						name="conf" value="configuration" class="form-control"
+						onClick="ChangeValue('id_bundle', '<%=symbName%>');"
+						<%if (statusConfigurations.indexOf("\"PID = " + symbName
+								+ "\"") != -1) {%>
+						disabled <%}%> /> <input type="submit"
+						class="btn btn-primary btn-sm" name="uninstall" value="uninstall"
+						class="form-control"
+						onClick="ChangeValue('id_bundle', '<%=symbName%>');" /></td>
 				</tr>
 				<%
-				           	}
+							}
 						}
 					}
-		            %>
+				%>
 			</table>
 			<input type="hidden" name="id_bundle" id="id_bundle" />
 		</form>
 	</div>
 	<script>
-		function ChangeValue(id, val)
-		{
-		    document.getElementById(id).value=val;
+		function ChangeValue(id, val) {
+			document.getElementById(id).value = val;
 		}
-		</script>
+	</script>
 </body>
 </html>
