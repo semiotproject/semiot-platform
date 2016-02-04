@@ -29,11 +29,8 @@ public class DriversInstalledHandler extends HttpServlet {
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 				}
-			} else if(request.getParameter("conf") != null) {
-				HttpSession session = request.getSession(false);
-				session.setAttribute("symbolicName", symbolicName);
-	
-				redirect = "/config/ConfigurationDriver";
+			} else if(request.getParameter("conf") != null) {	
+				redirect = "/config/ConfigurationDriver?symbolicName="+symbolicName;
 			}
 		}
 

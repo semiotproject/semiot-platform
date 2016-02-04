@@ -25,12 +25,8 @@ public class UploadDriverHandler extends HttpServlet {
 		String symbolicName = hcc.sendPostUploadFile(
 				BundleConstants.urlBundles, part.getInputStream(),
 				part.getSubmittedFileName());
-		if (StringUtils.isNotBlank(symbolicName)) {
-			HttpSession session = request.getSession(false);
-			session.setAttribute("symbolicName", symbolicName);
-		}
 
-		response.sendRedirect("/config/ConfigurationDriver");
+		response.sendRedirect("/config/ConfigurationDriver?symbolicName="+symbolicName);
 
 		// request.getRequestDispatcher("/config/ConfigurationDriver").forward(request,
 		// response);

@@ -24,18 +24,15 @@ public class AvailableDriversHandler extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		HashMap<String, String> parameters = getRequestParameters(request);
-
+		
+		String symbolicName = null;
 		if (request.getParameter("install") != null) {
 			HttpClientConfig hcc = new HttpClientConfig();
-			String symbolicName = hcc.sendUploadAvailableFile(
+			symbolicName = hcc.sendUploadAvailableFile(
 					parameters.get("url"), BundleConstants.urlBundles);
-			if (StringUtils.isNotBlank(symbolicName)) {
-				HttpSession session = request.getSession(false);
-				session.setAttribute("symbolicName", symbolicName);
-			}
 		}
 
-		response.sendRedirect("/config/ConfigurationDriver");
+		response.sendRedirect("/config/ConfigurationDriver?symbolicName="+symbolicName);
 
 		// request.getRequestDispatcher("/config/ConfigurationDriver").forward(request,
 		// response);

@@ -6,10 +6,9 @@
 
 <%
 	String pid = null;
-	if(session.getAttribute("symbolicName") != null) {
-		pid = String.valueOf(session.getAttribute("symbolicName"));
+	if(request.getParameter("symbolicName") != null) {
+		pid = String.valueOf(request.getParameter("symbolicName"));
 	}
-	session.removeAttribute("symbolicName");
 
 	JSONObject jsonProperties = QueryUtils.getConfiguration(pid);
 	
