@@ -1,11 +1,11 @@
 wamprouter:
-  image: semiot/wamp-router:v1.0.4
+  image: docker.semiot.ru/wamp-router
   ports:
     - "8080:8080"
   restart: always
 
 dataarchivingservice:
-  image: semiot/data-archiving-service:v1.0.4
+  image: docker.semiot.ru/data-archiving-service
   links:
     - opentsdb
     - wamprouter
@@ -15,7 +15,7 @@ dataarchivingservice:
   restart: always
   
 opentsdb:
-  image: semiot/opentsdb:v1.0.4
+  image: docker.semiot.ru/opentsdb
   links:
     - hbase
   ports:
@@ -25,13 +25,13 @@ opentsdb:
   restart: always
 
 webui:
-  image: semiot/web-ui:v1.0.4
+  image: docker.semiot.ru/web-ui
   ports:
     - "8484:80"
   restart: always
 
 deviceproxyservice:
-  image: semiot/device-proxy-service:v1.0.4
+  image: docker.semiot.ru/device-proxy-service
   links:
     - wamprouter
   ports:
@@ -46,7 +46,7 @@ deviceproxyservice:
   restart: always
   
 hbase:
-  image: semiot/hbase:v1.0.4
+  image: docker.semiot.ru/hbase
   ports:
     - "60000:60000"
     - "60010:60010"
@@ -59,7 +59,7 @@ hbase:
   restart: always
 
 apigateway:
-  image: semiot/api-gateway:v1.0.4
+  image: docker.semiot.ru/api-gateway
   links:
     - wamprouter
     - opentsdb
@@ -71,7 +71,7 @@ apigateway:
   restart: always
 
 frontend:
-  image: semiot/frontend:v1.0.4
+  image: docker.semiot.ru/frontend
   links:
     - wamprouter
     - deviceproxyservice
