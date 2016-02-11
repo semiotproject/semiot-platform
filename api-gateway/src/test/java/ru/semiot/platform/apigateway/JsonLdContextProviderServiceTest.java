@@ -11,26 +11,25 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
 public class JsonLdContextProviderServiceTest {
 
     @Inject
-    JsonLdContextProviderService service;
+    ContextProvider service;
 
     @Deployment
     public static JavaArchive createDeployment() {
         return ShrinkWrap.create(JavaArchive.class)
-                .addClasses(JsonLdContextProviderService.class)
+                .addClasses(ContextProvider.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     @Test
     public void test() throws IOException, URISyntaxException {
-        System.out.println(JsonUtils.toPrettyString(service.getContextAsJsonLd(
-                JsonLdContextProviderService.API_DOCUMENTATION_CONTEXT, 
+        System.out.println(JsonUtils.toPrettyString(service.getRDFModel(
+                ContextProvider.API_DOCUMENTATION, 
                 new URI("http://demo.semiot.ru"))));
     }
 

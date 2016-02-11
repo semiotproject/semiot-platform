@@ -18,7 +18,7 @@
     ssn:hasSubSystem <${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-temperature> ;
     ssn:hasSubSystem <${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-humidity> ;
     dcterms:identifier "${ru.semiot.platform.device.id}"^^xsd:string ;
-    dul:hasLocation [
+    geo:location [
 	a geo:Point ;
 	geo:lat "${ru.semiot.drivers.netatmo.latitude}"^^xsd:string ;
         geo:long "${ru.semiot.drivers.netatmo.langitude}"^^xsd:string ;

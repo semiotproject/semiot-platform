@@ -5,15 +5,22 @@ import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.impl.TurtleRDFParser;
 import com.github.jsonldjava.utils.JsonUtils;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import ru.semiot.platform.apigateway.utils.JsonLdBuilder;
+import ru.semiot.platform.apigateway.utils.RDFUtils;
 
 public class JsonLdTests {
 
@@ -101,5 +108,27 @@ public class JsonLdTests {
                 .fromRDF(INPUT_RDF, new TurtleRDFParser());
         
         System.out.println(JsonUtils.toString(object));
+    }
+    
+    @Test
+    public void testFraming1() throws IOException, JsonLdError {
+        InputStream input = this.getClass().getResourceAsStream("/JsonLDTests/frame-1-in.ttl");
+        assertNotNull(input);
+        
+        Model model = ModelFactory.createDefaultModel();
+        RDFDataMgr.read(model, input, Lang.TTL);
+        
+        Object inputObj = RDFUtils.toJsonLd(model);
+        
+        final Object frame = JsonUtils.fromInputStream(
+                this.getClass().getResourceAsStream("/JsonLDTests/frame-1-frame.jsonld"));
+        assertNotNull(frame);
+        
+        JsonLdOptions options = new JsonLdOptions();
+        options.setBase("http://localhost/doc");
+        
+        final Object result = JsonLdProcessor.frame(inputObj, frame, options);
+        
+        System.out.println(JsonUtils.toPrettyString(result));
     }
 }

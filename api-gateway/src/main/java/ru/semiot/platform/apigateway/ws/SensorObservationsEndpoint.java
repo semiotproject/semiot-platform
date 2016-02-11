@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.apigateway.MessageBusService;
 import ru.semiot.platform.apigateway.SPARQLQueryService;
-import ru.semiot.platform.apigateway.utils.RDFMatcher;
+import ru.semiot.platform.apigateway.utils.RDFUtils;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 
@@ -115,7 +115,7 @@ public class SensorObservationsEndpoint {
         this.subscription = message.subscribe(topic)
                 .observeOn(Schedulers.from(executor))
                 .subscribe((m) -> {
-                    if (RDFMatcher.match(m,
+                    if (RDFUtils.match(m,
                             Node.ANY,
                             ResourceFactory.createProperty(SSN_OBSERVEDBY).asNode(),
                             ResourceFactory.createResource(uri).asNode())) {

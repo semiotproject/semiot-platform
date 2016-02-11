@@ -1,0 +1,77 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix hydra: <http://www.w3.org/ns/hydra/core#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+
+<#EntryPoint-Sensors> a void:Dataset, hydra:Link ;
+    rdfs:domain <#EntryPoint> ;
+    rdfs:range hydra:Collection ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns hydra:Collection
+    ] .
+
+<#EntryPoint-Sparql> a hydra:IriTemplate, hydra:TemplatedLink ;
+    hydra:mapping [
+        a hydra:IriTemplateMapping ;
+        hydra:property sp:Select ;
+        hydra:required "true"^^xsd:boolean ;
+        hydra:variable "q"
+    ] ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns rdf:List
+    ] ;
+    hydra:template "../sparql?query={q}" .
+
+<#EntryPoint-Systems> a void:Dataset, hydra:Link ;
+    rdfs:domain <#EntryPoint> ;
+    rdfs:range hydra:Collection ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns hydra:Collection
+    ] .
+
+<#EntryPoint> a hydra:Class ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns <#EntryPoint>
+    ] ;
+    hydra:supportedProperty [
+        hydra:property <#EntryPoint-Systems>
+    ] , [
+        hydra:property <#EntryPoint-Sensors>
+    ] , [
+        hydra:property <#EntryPoint-Sparql>
+    ] .
+
+<> a hydra:ApiDocumentation ;
+    hydra:supportedClass <#EntryPoint>, <#WebSocketResource>, 
+        ssn:SensingDevice, ssn:System .
+
+ssn:SensingDevice a hydra:Class ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns ssn:SensingDevice
+    ] .
+
+ssn:System a hydra:Class ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns ssn:System
+    ] ;
+    hydra:supportedProperty [
+        hydra:property ssn:hasSubSystem
+    ] .
+
+ssn:hasSubSystem rdfs:domain ssn:System ;
+    rdfs:range ssn:SensingDevice .

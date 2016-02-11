@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import ru.semiot.platform.apigateway.utils.RDFMatcher;
+import ru.semiot.platform.apigateway.utils.RDFUtils;
 
 public class RDFMatcherTest {
     
@@ -19,17 +19,17 @@ public class RDFMatcherTest {
     
     @Test
     public void matchAny() throws IOException {
-        assertTrue(RDFMatcher.match(message, Node.ANY, Node.ANY, Node.ANY));
+        assertTrue(RDFUtils.match(message, Node.ANY, Node.ANY, Node.ANY));
     }
     
     @Test
     public void matchPredicateAndObject() throws IOException {
-        assertTrue(RDFMatcher.match(message, 
+        assertTrue(RDFUtils.match(message, 
                 Node.ANY, 
                 ResourceFactory.createProperty("http://purl.oclc.org/NET/ssnx/ssn#observedBy").asNode(), 
                 ResourceFactory.createResource("http://localhost/sensors/327956808-1").asNode()));
         
-        assertFalse(RDFMatcher.match(message, 
+        assertFalse(RDFUtils.match(message, 
                 Node.ANY, 
                 ResourceFactory.createProperty("http://purl.oclc.org/NET/ssnx/ssn#observedBy").asNode(), 
                 ResourceFactory.createResource("http://localhost/sensors/327956808-2").asNode()));

@@ -1,0 +1,27 @@
+{
+  "@context": {
+    "@base": "http://localhost/doc",
+    "hydra": "http://www.w3.org/ns/hydra/core#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sp": "http://spinrdf.org/sp#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
+    "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+    "proto": "http://w3id.org/semiot/ontologies/proto#",
+    "void": "http://rdfs.org/ns/void#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    
+    "hydra:entrypoint": {"@type": "@id"},
+    "hydra:property": {"@type": "@id"},
+    "hydra:returns": {"@type": "@id"},
+    "rdfs:domain": {"@type": "@id"},
+    "rdfs:range": {"@type": "@id"},
+    "rdfs:subClassOf": {"@type": "@id"},
+    "hydra:required": {"@type": "xsd:boolean"}
+  },
+  "@type": "hydra:ApiDocumentation",
+  "hydra:supportedClass": {
+    "@type": "hydra:Class",
+    "hydra:supportedOperation": {}
+  }
+}

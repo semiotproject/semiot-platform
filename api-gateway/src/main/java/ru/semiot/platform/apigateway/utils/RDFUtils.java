@@ -1,13 +1,17 @@
 package ru.semiot.platform.apigateway.utils;
 
+import com.github.jsonldjava.utils.JsonUtils;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.rdf.model.Model;
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.system.StreamRDFBase;
 
-public class RDFMatcher {
+public class RDFUtils {
 
     public static boolean match(String turtle, Node subject, Node predicate, Node object) {
         MatchSinkRDF matcher = new MatchSinkRDF(subject, predicate, object);
@@ -15,6 +19,13 @@ public class RDFMatcher {
                 new StringReader(turtle), Lang.TURTLE);
 
         return matcher.match;
+    }
+    
+    public static Object toJsonLd(Model model) throws IOException {
+        StringWriter writer = new StringWriter();
+        model.write(writer, Lang.JSONLD.getName());
+        
+        return JsonUtils.fromString(writer.toString());
     }
 
     private static class MatchSinkRDF extends StreamRDFBase {

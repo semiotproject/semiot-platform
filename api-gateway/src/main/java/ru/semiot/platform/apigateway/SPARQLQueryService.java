@@ -29,7 +29,9 @@ public class SPARQLQueryService {
             + "PREFIX ssncom: <http://purl.org/NET/ssnext/communication#>\n"
             + "PREFIX dcterms: <http://purl.org/dc/terms/#>\n"
             + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-            + "PREFIX proto: <http://w3id.org/semiot/ontologies/proto#>\n";
+            + "PREFIX proto: <http://w3id.org/semiot/ontologies/proto#>\n"
+            + "PREFIX hydra: <http://www.w3.org/ns/hydra/core#>\n"
+            + "PREFIX sh: <http://www.w3.org/ns/shacl#>\n";
 
     private final HttpAuthenticator httpAuthenticator;
 
@@ -51,6 +53,13 @@ public class SPARQLQueryService {
 
             o.onCompleted();
         }).subscribeOn(Schedulers.from(mes)).cast(ResultSet.class);
+    }
+    
+    public ResultSet select(Model model, String query) {
+        Query select = QueryFactory.create(PREFIXES + query);
+        ResultSet rs = QueryExecutionFactory.create(select, model).execSelect();
+        
+        return rs;
     }
 
     public Observable<Model> describe(String query) {
