@@ -26,6 +26,7 @@ ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
 WORKDIR /root/semiot-platform/$SERVICE_NAME
 
 ADD device-proxy-service-launcher/target/$SERVICE_JAR_NAME.jar $SERVICE_JAR_NAME.jar
+ADD logback.xml ./
 
 ADD run.sh ./
 RUN chmod 777 run.sh
