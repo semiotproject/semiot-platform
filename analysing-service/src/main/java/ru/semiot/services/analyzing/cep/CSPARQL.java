@@ -111,7 +111,7 @@ public class CSPARQL implements Engine {
                         rdfTable.stream().forEach((t) -> {
                             bindings.add(toBinding(vars, t.toString(), "\t"));
                         });
-                        sendToWAMP(getString(vars, bindings));
+                        sendToWAMP(getString(vars, bindings), query_id);
                         appendEventsToStore(getString(vars, bindings), query_id);
                         subscribeTopics(query_id, true);
                     }
@@ -172,9 +172,9 @@ public class CSPARQL implements Engine {
 
     }
 
-    public void sendToWAMP(String message) {
+    public void sendToWAMP(String message, int query_id) {
         logger.debug("Get alert!\n " + message);
-        WAMPClient.getInstance().publish(config.topicsAlert(), message);
+        WAMPClient.getInstance().publish(config.topicsAlert() + "." + query_id, message);
     }
 
     private String getString(String[] vars, List<Binding> bindings) {
