@@ -6,6 +6,9 @@
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix ja:      <http://jena.hpl.hp.com/2005/11/Assembler#> .
 @prefix tdb:     <http://jena.hpl.hp.com/2008/tdb#> .
+@prefix spatial: <http://jena.apache.org/spatial#> .
+
+spatial:SpatialIndexLucene  rdfs:subClassOf  spatial:SpatialIndex .
 
 [] a fuseki:Server ;
     fuseki:services ( <#service1> ) ;
@@ -19,7 +22,7 @@
     fuseki:serviceUpload                "upload" ;
     fuseki:serviceReadWriteGraphStore   "data" ;
     fuseki:serviceReadGraphStore        "get" ;
-    fuseki:dataset                      <#dataset> ;
+    fuseki:dataset                      <#spatial_dataset> ;
     .
 
 <#dataset> a ja:RDFDataset ;
@@ -28,6 +31,21 @@
     
 <#tdbDataset> a tdb:DatasetTDB ;
     tdb:location "/fuseki/fuseki-db" .
+    
+<#spatial_dataset> a spatial:SpatialDataset ;
+    spatial:dataset <#dataset> ;
+    spatial:index <#index> ;
+    .
+    
+<#index> a spatial:SpatialIndexLucene ;
+    spatial:directory <file:/fuseki/Lucene> ;
+    spatial:definition <#definition> ;
+    .
+    
+<#definition> a spatial:EntityDefinition ;
+    spatial:entityField  "uri" ;
+    spatial:geoField     "geo" ;
+    .
 
 <#model_inf> a ja:InfModel ;
     ja:baseModel [
