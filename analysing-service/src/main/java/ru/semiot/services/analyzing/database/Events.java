@@ -115,7 +115,7 @@ public class Events implements Serializable {
 
     @Override
     public String toString() {
-        return "{\"created\": \"" + time.getTime() + "\",\n\"events\": \"" + events.replace("\"", "\\\"").replace("\n", "\\n") + "\"}";
+        return "{\"created\": \"" + time.getTime() + "\",\n\"events\": " + events.replace("\"", "\\\"").replace("\n", "\\n") + "}";
     }
 
 }
