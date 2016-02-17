@@ -109,7 +109,7 @@ public class Queries {
         logger.debug("Return events");
         JSONArray events;
         if(start_timestamp!=-1 && end_timestamp!=-1)
-            events = dbe.getEventsByTime(start_timestamp, end_timestamp);
+            events = dbe.getEventsByTime(start_timestamp, end_timestamp, id);
         else
             events = dbe.getEventsByQueryId(id);
         if (events == null) {

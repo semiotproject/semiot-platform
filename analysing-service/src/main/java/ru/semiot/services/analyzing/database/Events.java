@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Events.findAll", query = "SELECT e FROM Events e"),
     @NamedQuery(name = "Events.findById", query = "SELECT e FROM Events e WHERE e.id = :id"),
-    @NamedQuery(name = "Events.findByTime", query = "SELECT e FROM Events e WHERE e.time BETWEEN :st_time AND :end_time ORDER BY e.time")})
+    @NamedQuery(name = "Events.findByTime", query = "SELECT e FROM Events e WHERE e.time BETWEEN :st_time AND :end_time AND e.queryId = :id ORDER BY e.time")})
 public class Events implements Serializable {
 
     private static final long serialVersionUID = 1L;
