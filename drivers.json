@@ -14,11 +14,11 @@
       {
         "name": "Narodmon temperature",
         "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_narodmon_temperature_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/narodmon-temperature/target/narodmon.temperature-1.0-SNAPSHOT.jar",
-        "pid": "ru.semiot.platform.drivers.narodmon.temperature"
+        "pid": "ru.semiot.platform.drivers.narodmon-weatherstation"
       },
       {
-        "name": "Netatmo temperature",
-        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_netatmo_temperature_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/netatmo-temperature/target/netatmo.temperature-1.0-SNAPSHOT.jar",
+        "name": "Netatmo Weather Station (Outdoor module)",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_netatmo_weatherstation_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/netatmo-weatherstation/target/netatmo-weatherstation-1.0-SNAPSHOT.jar",
         "pid": "ru.semiot.platform.drivers.netatmo.temperature"
       },
       {
