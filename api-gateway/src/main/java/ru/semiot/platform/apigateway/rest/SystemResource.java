@@ -11,7 +11,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -25,7 +24,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.apigateway.ContextProvider;
@@ -54,7 +52,6 @@ public class SystemResource {
             + " ?uri a ssn:System, proto:Individual ;"
             + "     proto:hasPrototype ?prototype ."
             + "}";
-
     private static final String QUERY_DESCRIBE_SYSTEM
             = "CONSTRUCT {"
             + "  ?system ?p ?o ."
@@ -64,9 +61,10 @@ public class SystemResource {
             + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
             + "  OPTIONAL {"
             + "    ?o ?o_p ?o_o ."
-            + "    FILTER isBlank(?o)"
+            + "    FILTER(?p != rdf:type)"
             + "  }"
             + "}";
+    
     private static final String VAR_URI = "uri";
     private static final String VAR_PROTOTYPE = "prototype";
 
@@ -131,7 +129,7 @@ public class SystemResource {
                     }
                 });
 
-        Observable.zip(systems, prototypes, (a, b) -> {
+        Observable.zip(systems, prototypes, (a, __) -> {
             return a;
         }).subscribe((o) -> {
             response.resume(o);
@@ -171,10 +169,8 @@ public class SystemResource {
                     }
                 }).subscribe((o) -> {
                     response.resume(o);
-                },
-                (e) -> {
+                }, (e) -> {
                     logger.warn(e.getMessage(), e);
-
                     response.resume(e);
                 });
     }
