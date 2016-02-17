@@ -1,37 +1,29 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.vocabulary.RDF;
 import java.io.StringReader;
 import java.net.URI;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RiotException;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.semiot.commons.namespaces.SSNCOM;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 
 public class DirectoryService {
 
     private static final Logger logger = LoggerFactory
             .getLogger(DirectoryService.class);
-    private static final Property SSNCOM_HASCOMMUNICATIONENDPOINT = ResourceFactory
-            .createProperty("http://purl.org/NET/ssnext/communication#hasCommunicationEndpoint");
-    private static final Resource SSNCOM_COMMUNICATIONENDPOINT = ResourceFactory
-            .createResource("http://purl.org/NET/ssnext/communication#CommunicationEndpoint");
-    private static final Property SSNCOM_TOPIC = ResourceFactory
-            .createProperty("http://purl.org/NET/ssnext/communication#topic");
-    private static final Property SSNCOM_PROTOCOL = ResourceFactory
-            .createProperty("http://purl.org/NET/ssnext/communication#protocol");
     private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
     private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
 
@@ -122,11 +114,11 @@ public class DirectoryService {
                         Resource wampResource = ResourceFactory.createResource(system.getURI() + "/wamp");
                         Model privateDeviceInfo = ModelFactory
                                 .createDefaultModel()
-                                .add(system, SSNCOM_HASCOMMUNICATIONENDPOINT, wampResource)
-                                .add(wampResource, RDF.type, SSNCOM_COMMUNICATIONENDPOINT)
-                                .add(wampResource, SSNCOM_TOPIC, 
+                                .add(system, SSNCOM.hasCommunicationEndpoint, wampResource)
+                                .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
+                                .add(wampResource, SSNCOM.topic, 
                                         ResourceFactory.createPlainLiteral(device.getId()))
-                                .add(wampResource, SSNCOM_PROTOCOL, WAMP);
+                                .add(wampResource, SSNCOM.protocol, WAMP);
 
                         store.save(GRAPH_PRIVATE, privateDeviceInfo);
                         

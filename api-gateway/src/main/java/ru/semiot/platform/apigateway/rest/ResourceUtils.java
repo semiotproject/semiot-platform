@@ -1,8 +1,8 @@
 package ru.semiot.platform.apigateway.rest;
 
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import java.net.URI;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 
 public class ResourceUtils {

@@ -1,12 +1,12 @@
 package ru.semiot.platform.apigateway.utils;
 
 import com.github.jsonldjava.utils.JsonUtils;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.rdf.model.Model;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.system.StreamRDFBase;

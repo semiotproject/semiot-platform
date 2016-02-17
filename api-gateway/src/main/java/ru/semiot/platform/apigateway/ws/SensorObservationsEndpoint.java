@@ -1,8 +1,5 @@
 package ru.semiot.platform.apigateway.ws;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import java.io.IOException;
 import javax.annotation.Resource;
 import javax.ejb.Stateful;
@@ -14,6 +11,9 @@ import javax.websocket.OnError;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.apigateway.MessageBusService;

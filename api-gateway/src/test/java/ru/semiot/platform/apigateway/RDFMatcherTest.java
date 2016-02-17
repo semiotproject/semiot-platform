@@ -1,9 +1,9 @@
 package ru.semiot.platform.apigateway;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import java.io.IOException;
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
