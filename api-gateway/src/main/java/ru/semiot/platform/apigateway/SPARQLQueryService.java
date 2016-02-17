@@ -11,6 +11,17 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
+import ru.semiot.commons.namespaces.DCTERMS;
+import ru.semiot.commons.namespaces.Hydra;
+import ru.semiot.commons.namespaces.NamespaceUtils;
+import ru.semiot.commons.namespaces.Proto;
+import ru.semiot.commons.namespaces.SHACL;
+import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.commons.namespaces.SSNCOM;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -21,17 +32,9 @@ public class SPARQLQueryService {
     ManagedExecutorService mes;
 
     private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
-    private static final String PREFIXES
-            = "PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#>\n"
-            + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-            + "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n"
-            + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-            + "PREFIX ssncom: <http://purl.org/NET/ssnext/communication#>\n"
-            + "PREFIX dcterms: <http://purl.org/dc/terms/#>\n"
-            + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
-            + "PREFIX proto: <http://w3id.org/semiot/ontologies/proto#>\n"
-            + "PREFIX hydra: <http://www.w3.org/ns/hydra/core#>\n"
-            + "PREFIX sh: <http://www.w3.org/ns/shacl#>\n";
+    private static final String PREFIXES = NamespaceUtils.toSPARQLPrologue(
+            SSN.class, RDF.class, OWL.class, RDFS.class, SSNCOM.class, 
+            DCTERMS.class, XSD.class, Proto.class, Hydra.class, SHACL.class);
 
     private final HttpAuthenticator httpAuthenticator;
 

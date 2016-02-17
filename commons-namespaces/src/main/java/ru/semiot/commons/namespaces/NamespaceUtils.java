@@ -3,6 +3,7 @@ package ru.semiot.commons.namespaces;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class NamespaceUtils {
     
@@ -12,6 +13,7 @@ public class NamespaceUtils {
     private static final String LT = "<";
     private static final String GT = ">";
     private static final String NEWLINE = "\n";
+    private static final String FIELD_PREFIX = "PREFIX";
     private static final String FIELD_URI = "URI";
 
     /**
@@ -33,10 +35,22 @@ public class NamespaceUtils {
                     return f.getName().equalsIgnoreCase(FIELD_URI);
                 }).findFirst().get();
                 
+                Optional<Field> f_prefix_opt = fields.stream().filter((f) -> {
+                    return f.getName().equalsIgnoreCase(FIELD_PREFIX);
+                }).findFirst();
+                
+                String prefix;
+                if(f_prefix_opt.isPresent()) {
+                    Field f_prefix = f_prefix_opt.get();
+                    f_prefix.setAccessible(true);
+                    prefix = (String) f_prefix.get(null);
+                } else {
+                    prefix = clazz.getSimpleName().toLowerCase();
+                }
+                
                 f_uri.setAccessible(true);
                 if (f_uri.isAccessible() && !clazz.isAnonymousClass()) {
                     Object uri = f_uri.get(null);
-                    String prefix = clazz.getSimpleName().toLowerCase();
                     
                     if (uri instanceof String) {
                         builder.append(PREFIX).append(BLANK).append(prefix)
