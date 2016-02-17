@@ -50,8 +50,8 @@ public class HttpClientConfig {
 				} else {
 					allUrl.append("&");
 				}
-				allUrl.append(entry.getKey()).append("=")
-						.append(entry.getValue());
+				allUrl.append(URLEncoder.encode(entry.getKey(), "UTF-8")).append("=")
+						.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
 			}
 		}
 
