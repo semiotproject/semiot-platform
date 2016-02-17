@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import ru.semiot.platform.apigateway.ns.Hydra;
+import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.platform.apigateway.utils.JsonLdBuilder;
 import ru.semiot.platform.apigateway.utils.JsonLdKeys;
 

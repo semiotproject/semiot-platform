@@ -1,6 +1,6 @@
-package ru.semiot.semiot.commons.namespaces;
+package ru.semiot.commons.namespaces;
 
-import com.hp.hpl.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Property;
 
 public class RDFS extends Namespace {
     

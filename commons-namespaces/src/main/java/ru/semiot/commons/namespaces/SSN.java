@@ -1,7 +1,7 @@
-package ru.semiot.semiot.commons.namespaces;
+package ru.semiot.commons.namespaces;
 
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 
 public class SSN extends Namespace {
 

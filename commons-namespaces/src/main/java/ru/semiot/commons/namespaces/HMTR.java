@@ -1,4 +1,4 @@
-package ru.semiot.semiot.commons.namespaces;
+package ru.semiot.commons.namespaces;
 
 public class HMTR extends Namespace {
     
