@@ -42,6 +42,7 @@ deviceproxyservice:
   volumes:
     - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
     - /semiot-platform/fuseki/fuseki-db:/fuseki/fuseki-db
+    - /semiot-platform/fuseki/app:/fuseki/app
     - /semiot-platform/device-proxy-service/proxy-logs:/root/semiot-platform/device-proxy-service/proxy-logs
   restart: always
   

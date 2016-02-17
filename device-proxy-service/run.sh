@@ -3,6 +3,12 @@
 # Delete .lock files
 rm -f /fuseki/fuseki-db/tdb.lock
 
+if [ -e $FUSEKI_HOME/app/shiro.ini ]
+then
+        rm $FUSEKI_BASE/shiro.ini
+        cp /fuseki/app/shiro.ini $FUSEKI_BASE/shiro.ini
+fi
+
 pushd $FUSEKI_HOME
 
 ./fuseki-server --config=base/config.ttl &> fuseki.log &
