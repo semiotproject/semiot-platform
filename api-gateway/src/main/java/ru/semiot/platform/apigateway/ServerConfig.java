@@ -27,4 +27,10 @@ public interface ServerConfig extends Config {
     @DefaultValue("http://opentsdb:4242/api/query")
     String tsdbEndpoint();
     
+    @DefaultValue("http://localhost:8181")
+    String consoleEndpoint();
+    
+    @DefaultValue("https://raw.githubusercontent.com/semiotproject/semiot-platform/bundles/drivers.json")
+    String repositoryEndpoint();
+    
 }

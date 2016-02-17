@@ -18,7 +18,6 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceProperties;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {

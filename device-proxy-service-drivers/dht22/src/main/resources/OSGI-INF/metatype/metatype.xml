@@ -6,9 +6,9 @@
             required="true" type="String" default="94.19.230.213"/>
         <AD name="Port" id="ru.semiot.platform.drivers.dht22.port"
             required="true" type="Integer" default="5683"/>
-        <AD name="IP" id="ru.semiot.platform.drivers.dht22.lat"
+        <AD name="Latitude" id="ru.semiot.platform.drivers.dht22.lat"
             required="true" type="String" default="60.01352"/>
-        <AD name="IP" id="ru.semiot.platform.drivers.dht22.lng"
+        <AD name="Longitude" id="ru.semiot.platform.drivers.dht22.lng"
             required="true" type="String" default="30.287799"/>
         <AD name="Scheduled Delay" id="ru.semiot.platform.drivers.dht22.scheduled_delay"
             required="true" type="Integer" default="10"/>

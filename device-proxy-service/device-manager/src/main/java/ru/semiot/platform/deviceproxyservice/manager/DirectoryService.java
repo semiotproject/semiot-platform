@@ -1,6 +1,5 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
@@ -25,7 +24,6 @@ public class DirectoryService {
 
     private static final Logger logger = LoggerFactory
             .getLogger(DirectoryService.class);
-    private static final String DCTERMS_IDENTIFIER = "http://purl.org/dc/terms/#identifier";
     private static final Property SSNCOM_HASCOMMUNICATIONENDPOINT = ResourceFactory
             .createProperty("http://purl.org/NET/ssnext/communication#hasCommunicationEndpoint");
     private static final Resource SSNCOM_COMMUNICATIONENDPOINT = ResourceFactory
@@ -56,6 +54,7 @@ public class DirectoryService {
         try {
             Model description = ModelFactory.createDefaultModel().read(
                     new StringReader(message), null, RDFLanguages.TURTLE.getName());
+
             if (!description.isEmpty()) {
                 logger.info("Update " + message);
 

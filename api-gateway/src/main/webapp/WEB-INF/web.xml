@@ -1,11 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-	 version="3.1">
-    <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>/index.html</url-pattern>
-    </servlet-mapping>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+ <servlet>
+  <servlet-name>SystemSettings</servlet-name>
+  <jsp-file>/config/SystemSettings.jsp</jsp-file>
+ </servlet>
+ <servlet>
+  <servlet-name>DriversInstalled</servlet-name>
+  <jsp-file>/config/DriversInstalled.jsp</jsp-file>
+ </servlet>
+ <servlet>
+  <servlet-name>UploadDriver</servlet-name>
+  <jsp-file>/config/UploadDriver.jsp</jsp-file>
+ </servlet>
+ <servlet>
+  <servlet-name>AvailableDrivers</servlet-name>
+  <jsp-file>/config/AvailableDrivers.jsp</jsp-file>
+ </servlet>
+ <servlet>
+  <servlet-name>ConfigurationDriver</servlet-name>
+  <jsp-file>/config/ConfigurationDriver.jsp</jsp-file>
+ </servlet>
+  <servlet>
+  <servlet-name>index</servlet-name>
+  <jsp-file>/config/index.jsp</jsp-file>
+ </servlet>
+ <servlet-mapping>
+  <servlet-name>index</servlet-name>
+  <url-pattern>/index</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>SystemSettings</servlet-name>
+  <url-pattern>/config/SystemSettings</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>DriversInstalled</servlet-name>
+  <url-pattern>/config/DriversInstalled</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>UploadDriver</servlet-name>
+  <url-pattern>/config/UploadDriver</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>AvailableDrivers</servlet-name>
+  <url-pattern>/config/AvailableDrivers</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>ConfigurationDriver</servlet-name>
+  <url-pattern>/config/ConfigurationDriver</url-pattern>
+ </servlet-mapping>
 </web-app>

@@ -4,7 +4,8 @@ import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.QueryParseException;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -20,7 +21,6 @@ import eu.larkc.csparql.core.engine.CsparqlEngine;
 import eu.larkc.csparql.core.engine.CsparqlEngineImpl;
 import eu.larkc.csparql.core.engine.CsparqlQueryResultProxy;
 import java.io.StringReader;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -33,12 +33,15 @@ import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.bind.DatatypeConverter;
+import org.apache.jena.atlas.web.auth.HttpAuthenticator;
+import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
-import ru.semiot.services.analyzing.ServiceConfig;
+import static ru.semiot.services.analyzing.ServiceConfig.config;
 import ru.semiot.services.analyzing.database.EventsDataBase;
 import ru.semiot.services.analyzing.database.QueryDataBase;
+import ru.semiot.services.analyzing.wamp.Subsciber;
 import ru.semiot.services.analyzing.wamp.WAMPClient;
 
 @Named
@@ -52,6 +55,7 @@ public class CSPARQL implements Engine {
     private final CsparqlEngine engine;
     private final RdfStream stream;
     private final Map<Integer, CsparqlQueryResultProxy> queries;
+    private final HttpAuthenticator httpAuthenticator;
 
     public CSPARQL() {
         engine = new CsparqlEngineImpl();
@@ -59,12 +63,16 @@ public class CSPARQL implements Engine {
         engine.initialize();
         engine.registerStream(stream);
         queries = new HashMap<>();
+        httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
+                config.storePassword().toCharArray());
         logger.info("C-SPARQL is initialized");
     }
     @Inject
     QueryDataBase db;
     @Inject
     EventsDataBase dbe;
+    @Inject
+    Subsciber subscriber;
 
     @Override
     public void appendData(String message) {
@@ -84,6 +92,9 @@ public class CSPARQL implements Engine {
     @Override
     public boolean registerQuery(int query_id) {
         String query = db.getQuery(query_id).getString("text");
+        if (!subscribeTopics(query_id, true)) {
+            return false;
+        }
         try {
             logger.debug("Try to register query:\n" + query);
             CsparqlQueryResultProxy proxy = engine.registerQuery(query, false);
@@ -100,8 +111,9 @@ public class CSPARQL implements Engine {
                         rdfTable.stream().forEach((t) -> {
                             bindings.add(toBinding(vars, t.toString(), "\t"));
                         });
-                        sendToWAMP(getString(vars, bindings));
+                        sendToWAMP(getString(vars, bindings), query_id);
                         appendEventsToStore(getString(vars, bindings), query_id);
+                        subscribeTopics(query_id, true);
                     }
                 });
                 return true;
@@ -109,8 +121,39 @@ public class CSPARQL implements Engine {
                 return false;
             }
 
-        } catch (ParseException | QueryParseException | NullPointerException ex) {
-            logger.debug("Bad exception with message: " + ex.getMessage());
+        } catch (Exception ex) {
+            logger.debug("Error in C-SPARQL query! Message: " + ex.getMessage());
+            subscribeTopics(query_id, false);
+            return false;
+        }
+    }
+
+    private boolean subscribeTopics(int query_id, boolean subsc) {
+        try {
+            String sparql = db.getQuery(query_id).getString("sparql");
+            ResultSet execution = QueryExecutionFactory.sparqlService(config.storeUrl(),
+                    sparql, httpAuthenticator).execSelect();
+            List<String> lst = execution.getResultVars();
+            if (lst.isEmpty() || lst.size() > 1) {
+                logger.debug("Sparql query is bad!");
+                return false;
+            }
+            String var = lst.get(0);
+            List<String> topics = new ArrayList<>();
+            while (execution.hasNext()) {
+                topics.add(execution.next().get(var).asLiteral().getString());
+            }
+            if (topics.isEmpty()) {
+                return false;
+            }
+            if (subsc) {
+                subscriber.subscribeTopics(topics, query_id);
+            } else {
+                subscriber.unsubscribeTopics(topics, query_id);
+            }
+            return true;
+        } catch (Exception ex) {
+            logger.debug("Error in sparql query! Message: " + ex.getMessage());
             return false;
         }
     }
@@ -120,6 +163,7 @@ public class CSPARQL implements Engine {
         if (queries.containsKey(query_id)) {
             logger.info("Removing query");
             engine.unregisterQuery(queries.get(query_id).getId());
+            subscribeTopics(query_id, false);
             queries.remove(query_id);
         } else {
             logger.error("Query not found!");
@@ -128,9 +172,9 @@ public class CSPARQL implements Engine {
 
     }
 
-    public void sendToWAMP(String message) {
+    public void sendToWAMP(String message, int query_id) {
         logger.debug("Get alert!\n " + message);
-        WAMPClient.getInstance().publish(ServiceConfig.config.topicsAlert(), message);
+        WAMPClient.getInstance().publish(config.topicsAlert() + "." + query_id, message);
     }
 
     private String getString(String[] vars, List<Binding> bindings) {
@@ -210,7 +254,7 @@ public class CSPARQL implements Engine {
         List<Triple> sensorsList = description.getGraph()
                 .find(Node.ANY, NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), NodeFactory.createURI("http://example.com/#Diff"))
                 .toList();
-        
+
         for (Triple t : sensorsList) {
             sensor = new JSONObject();
             String sensorURI = t.getSubject().getURI();

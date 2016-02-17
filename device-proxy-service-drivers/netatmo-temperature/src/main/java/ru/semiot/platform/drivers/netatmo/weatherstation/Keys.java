@@ -3,7 +3,7 @@ package ru.semiot.platform.drivers.netatmo.weatherstation;
 public abstract class Keys {
 
     public static final String DRIVER_PID
-            = "ru.semiot.platform.drivers.netatmo.weatherstation";
+            = "ru.semiot.platform.drivers.netatmo-weatherstation";
     public static final String LONGITUDE_NORTH_EAST = DRIVER_PID + ".longitude_ne";
     public static final String LATITUDE_NORTH_EAST = DRIVER_PID + ".lattitude_ne";
     public static final String LONGITUDE_SOUTH_WEST = DRIVER_PID + ".longitude_sw";
