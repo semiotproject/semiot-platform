@@ -89,10 +89,10 @@ public class DefaultEventsDataBase implements EventsDataBase {
     }
 
     @Override
-    public JSONArray getEventsByTime(long start, long end) {
+    public JSONArray getEventsByTime(long start, long end, int query_id) {
         try {
             JSONArray arr = new JSONArray();
-            List<Events> list = em.createNamedQuery("Events.findByTime", Events.class).setParameter("st_time", new Date(start)).setParameter("end_time", new Date (end)).getResultList();
+            List<Events> list = em.createNamedQuery("Events.findByTime", Events.class).setParameter("st_time", new Date(start)).setParameter("end_time", new Date (end)).setParameter("id", query_id).getResultList();
             if(list == null || list.isEmpty())
                 return null;
             for (Events e : list) {

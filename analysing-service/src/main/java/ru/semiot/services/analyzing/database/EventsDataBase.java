@@ -9,6 +9,6 @@ public interface EventsDataBase {
     public JSONObject getEventsById(int id);
     public JSONObject removeEventsById(int id);
     public JSONArray removeEventsByQueryId(int query_id);
-    public JSONArray getEventsByTime(long start, long end);
+    public JSONArray getEventsByTime(long start, long end, int query_id);
     public long getCount();
 }
