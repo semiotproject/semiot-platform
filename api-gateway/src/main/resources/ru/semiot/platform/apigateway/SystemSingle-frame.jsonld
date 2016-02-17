@@ -4,7 +4,7 @@
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
         "void": "http://rdfs.org/ns/void#",
-        "dcterms": "http://purl.org/dc/terms/#",
+        "dcterms": "http://purl.org/dc/terms/",
         "qudt-quantity" : "http://qudt.org/vocab/quantity#",
         "qudt-unit" : "http://qudt.org/vocab/unit#",
         "qudt" : "http://qudt.org/schema/qudt#",

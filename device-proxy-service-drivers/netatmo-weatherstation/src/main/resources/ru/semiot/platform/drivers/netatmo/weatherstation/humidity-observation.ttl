@@ -6,7 +6,6 @@
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
 @prefix qudt-quantity-ext: <http://w3id.org/qudt/vocab/quantity/ext#> .
 @prefix : <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/observations/humidity#> .
-@prefix dcterms: <http://purl.org/dc/terms/#> .
 
 :${ru.semiot.platform.observation.timestamp} a ssn:Observation ;
     ssn:observedProperty qudt-quantity-ext:RelativeHumidity ;

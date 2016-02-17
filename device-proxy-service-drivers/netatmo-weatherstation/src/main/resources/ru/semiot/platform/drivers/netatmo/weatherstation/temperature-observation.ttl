@@ -4,7 +4,6 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix qudt: <http://qudt.org/schema/qudt#> .
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
-@prefix dcterms: <http://purl.org/dc/terms/#> .
 @prefix : <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/observations/temperature#> .
 
 :${ru.semiot.platform.observation.timestamp} a ssn:Observation ;

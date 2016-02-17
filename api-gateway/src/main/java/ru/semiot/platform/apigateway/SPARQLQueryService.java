@@ -11,11 +11,11 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import ru.semiot.commons.namespaces.DCTERMS;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.Proto;
@@ -34,7 +34,7 @@ public class SPARQLQueryService {
     private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
     private static final String PREFIXES = NamespaceUtils.toSPARQLPrologue(
             SSN.class, RDF.class, OWL.class, RDFS.class, SSNCOM.class, 
-            DCTERMS.class, XSD.class, Proto.class, Hydra.class, SHACL.class);
+            DCTerms.class, XSD.class, Proto.class, Hydra.class, SHACL.class);
 
     private final HttpAuthenticator httpAuthenticator;
 

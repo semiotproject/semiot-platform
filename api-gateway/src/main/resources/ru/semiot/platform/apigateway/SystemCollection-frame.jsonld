@@ -5,7 +5,7 @@
         "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
         "saref": "http://ontology.tno.nl/saref#",
         "void": "http://rdfs.org/ns/void#",
-        "dcterms": "http://purl.org/dc/terms/#",
+        "dcterms": "http://purl.org/dc/terms/",
         "qudt-quantity" : "http://qudt.org/vocab/quantity#",
         "qudt-unit" : "http://qudt.org/vocab/unit#",
         "qudt" : "http://qudt.org/schema/qudt#",
