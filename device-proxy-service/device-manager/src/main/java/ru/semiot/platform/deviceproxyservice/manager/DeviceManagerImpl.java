@@ -152,6 +152,11 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
         }
     }
 
+    @Override
+    public int removeDataOfDriverFromFuseki(String pid) {
+    	return directoryService.removeDataOfDriver(pid);
+    }
+    
     public Configuration getConfiguration() {
         return configuration;
     }

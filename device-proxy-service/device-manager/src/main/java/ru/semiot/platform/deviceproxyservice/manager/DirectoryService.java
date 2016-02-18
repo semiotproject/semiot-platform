@@ -144,6 +144,20 @@ public class DirectoryService {
 
         return false;
     }
+    
+    protected static final String QUERY_DELETE_DEVICE = "PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#> "
+			+ "PREFIX ssncom: <http://purl.org/NET/ssnext/communication#> "
+			+ "DELETE {?comm ?ppp ?sss. ?sensor ?pp ?ss. <${URI_SYSTEM}> ?p ?s.} "
+			+ "WHERE{{<${URI_SYSTEM}> ssn:hasSubsystem ?sensor. "
+			+ "?sensor ssncom:hasCommunicationEndpoint ?comm. ?comm ?ppp ?sss. } "
+			+ "union {<${URI_SYSTEM}> ssn:hasSubsystem ?sensor. ?sensor ?pp ?ss.} "
+			+ "union {<${URI_SYSTEM}> ?p ?s.}}";
+    
+    public int removeDataOfDriver(String pid) {
+    	
+    	
+    	return -1;
+    }
 
     private static abstract class Vars {
 

@@ -10,4 +10,6 @@ public interface DeviceManager {
     
     public void registerObservation(Device device, Observation observation);
     
+    public int removeDataOfDriverFromFuseki(String pid);
+    
 }
