@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class NamespaceUtils {
-    
+
     private static final String PREFIX = "PREFIX";
     private static final String BLANK = " ";
     private static final String COLON = ":";
@@ -15,59 +15,71 @@ public class NamespaceUtils {
     private static final String NEWLINE = "\n";
     private static final String FIELD_PREFIX = "PREFIX";
     private static final String FIELD_URI = "URI";
+    private static final String FIELD_NS = "NS";
 
-    /**
-     * Generates prologue for SPARQL queries.
-     * 
-     * {@code namespaces} must have a public static field named {@code uri} 
-     * (ignoring case) which is {@code String} containing the uri of the namespace.
-     * 
-     * @param namespaces
-     * @return 
-     */
-    public static String toSPARQLPrologue(Class... namespaces) {
+    private static StringBuilder _toSPARQLPrologue(Class... namespaces) {
         StringBuilder builder = new StringBuilder();
-        
+
         for (Class<? extends Namespace> clazz : namespaces) {
             try {
                 List<Field> fields = Arrays.asList(clazz.getDeclaredFields());
                 Field f_uri = fields.stream().filter((f) -> {
-                    return f.getName().equalsIgnoreCase(FIELD_URI);
+                    return f.getName().equalsIgnoreCase(FIELD_URI)
+                            || f.getName().equalsIgnoreCase(FIELD_NS);
                 }).findFirst().get();
-                
+
                 Optional<Field> f_prefix_opt = fields.stream().filter((f) -> {
                     return f.getName().equalsIgnoreCase(FIELD_PREFIX);
                 }).findFirst();
-                
+
                 String prefix;
-                if(f_prefix_opt.isPresent()) {
+                if (f_prefix_opt.isPresent()) {
                     Field f_prefix = f_prefix_opt.get();
                     f_prefix.setAccessible(true);
                     prefix = (String) f_prefix.get(null);
                 } else {
                     prefix = clazz.getSimpleName().toLowerCase();
                 }
-                
+
                 f_uri.setAccessible(true);
                 if (f_uri.isAccessible() && !clazz.isAnonymousClass()) {
                     Object uri = f_uri.get(null);
-                    
+
                     if (uri instanceof String) {
                         builder.append(PREFIX).append(BLANK).append(prefix)
                                 .append(COLON).append(BLANK).append(LT)
                                 .append(uri).append(GT).append(NEWLINE);
-                        
+
                         continue;
                     }
                 }
-                
+
                 throw new IllegalStateException();
             } catch (Throwable ex) {
-                throw new IllegalStateException(ex);
+                throw new IllegalStateException(
+                        clazz.getName() + " : " + ex.getMessage(), ex);
             }
         }
 
-        return builder.toString();
+        return builder;
+    }
+
+    /**
+     * Generates prologue for SPARQL queries.
+     *
+     * {@code namespaces} must have a public static field named {@code uri} or
+     * {@code ns} (ignoring case) which is {@code String} containing the uri of
+     * the namespace.
+     *
+     * @param namespaces
+     * @return
+     */
+    public static String toSPARQLPrologue(Class... namespaces) {
+        return _toSPARQLPrologue(namespaces).toString();
+    }
+
+    public static String newSPARQLQuery(String query, Class... namespaces) {
+        return _toSPARQLPrologue(namespaces).append(query).toString();
     }
 
 }

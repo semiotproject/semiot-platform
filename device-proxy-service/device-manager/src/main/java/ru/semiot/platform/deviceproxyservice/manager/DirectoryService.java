@@ -17,6 +17,9 @@ import org.apache.jena.riot.RiotException;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.semiot.commons.namespaces.NamespaceUtils;
+import ru.semiot.commons.namespaces.SAREF;
+import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.SSNCOM;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 
@@ -27,13 +30,13 @@ public class DirectoryService {
     private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
     private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
 
-    protected static final String QUERY_UPDATE_STATE_SYSTEM = "prefix saref: <http://ontology.tno.nl/saref#> "
-            + "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
+    protected static final String QUERY_UPDATE_STATE_SYSTEM = NamespaceUtils.newSPARQLQuery(
+            "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
             + "INSERT { <${URI_SYSTEM}> saref:hasState <${STATE}> } "
-            + "WHERE { <${URI_SYSTEM}> saref:hasState ?x }";
-    private static final String GET_SYSTEM_URI = ""
-            + "PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#> \n"
-            + "SELECT ?uri {?uri a ssn:System} LIMIT 1";
+            + "WHERE { <${URI_SYSTEM}> saref:hasState ?x }",
+            SAREF.class);
+    private static final String GET_SYSTEM_URI = NamespaceUtils.newSPARQLQuery(
+            "SELECT ?uri {?uri a ssn:System} LIMIT 1", SSN.class);
 
     private final RDFStore store;
 
@@ -95,8 +98,8 @@ public class DirectoryService {
     public boolean addNewDevice(Device device, String deviceDescription) {
         try {
             Model description = ModelFactory.createDefaultModel().read(
-                    new StringReader(deviceDescription), null, 
-                            RDFLanguages.TURTLE.getName());
+                    new StringReader(deviceDescription), null,
+                    RDFLanguages.TURTLE.getName());
 
             if (!description.isEmpty()) {
                 ResultSet qr = QueryExecutionFactory.create(
@@ -107,21 +110,21 @@ public class DirectoryService {
                     Resource system = qr.next().getResource(Vars.URI);
 
                     //Given uri is not a blank node
-                    if (system.isURIResource()) {                       
+                    if (system.isURIResource()) {
                         store.save(description);
-                        
+
                         //Add ssncom:hasCommunicationEndpoint to a private graph
                         Resource wampResource = ResourceFactory.createResource(system.getURI() + "/wamp");
                         Model privateDeviceInfo = ModelFactory
                                 .createDefaultModel()
                                 .add(system, SSNCOM.hasCommunicationEndpoint, wampResource)
                                 .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
-                                .add(wampResource, SSNCOM.topic, 
+                                .add(wampResource, SSNCOM.topic,
                                         ResourceFactory.createPlainLiteral(device.getId()))
                                 .add(wampResource, SSNCOM.protocol, WAMP);
 
                         store.save(GRAPH_PRIVATE, privateDeviceInfo);
-                        
+
                         return true;
                     } else {
                         logger.error("Device [{}] doesn't have URI!",
