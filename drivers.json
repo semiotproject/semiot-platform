@@ -1,0 +1,31 @@
+{
+  "drivers": {
+    "driver": [
+      {
+        "name": "DHT-22",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_DHT-22-based_weather_station/lastSuccessfulBuild/artifact/device-proxy-service-drivers/dht22/target/dht22-1.0-SNAPSHOT.jar",
+        "pid": "ru.semiot.platform.drivers.dht22"
+      },
+      {
+        "name": "Winghouse machine-tool",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_machinetool_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/winghouse-machinetool/target/winghouse.machinetool-1.0-SNAPSHOT.jar",
+        "pid": "ru.semiot.platform.drivers.winghouse.machinetool"
+      },
+      {
+        "name": "Narodmon temperature",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_narodmon_temperature_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/narodmon-temperature/target/narodmon.temperature-1.0-SNAPSHOT.jar",
+        "pid": "ru.semiot.platform.drivers.narodmon-weatherstation"
+      },
+      {
+        "name": "Netatmo Weather Station (Outdoor module)",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_netatmo_weatherstation_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/netatmo-weatherstation/target/netatmo-weatherstation-1.0-SNAPSHOT.jar",
+        "pid": "ru.semiot.platform.drivers.netatmo.temperature"
+      },
+      {
+        "name": "Simulator",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_simulator_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/simulator/target/simulator-1.0-SNAPSHOT.jar",
+        "pid": "ru.semiot.platform.drivers.simulator"
+      }
+    ]
+  }
+}
