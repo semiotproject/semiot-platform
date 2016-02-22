@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+        <groupId>ru.semiot.platform</groupId>
+        <artifactId>device-proxy-service-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+  </parent>
+  
+  <groupId>ru.semiot.platform</groupId>
+  <artifactId>rs-proxy-service</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
+  
+  <name>Rest Service Semiot Platform</name>
+  
+  <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+  
+  <dependencies>
+    <!--+======================+-->
+    <!--+ REST Dependencies    +-->
+    <!--+======================+-->
+    <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet-core</artifactId>
+        <version>2.22.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.http.bundle</artifactId>
+        <version>2.2.0</version>
+    </dependency>
+   <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.framework</artifactId>
+        <version>4.6.0</version>
+    </dependency>
+    <dependency>
+		<groupId>org.apache.felix</groupId>
+		<artifactId>org.apache.felix.eventadmin</artifactId>
+		<version>1.4.6</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.felix</groupId>
+		<artifactId>org.apache.felix.dependencymanager</artifactId>
+		<version>4.1.0</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-core</artifactId>
+		<version>2.4.1</version>
+	</dependency>
+	<dependency>
+		<groupId>ru.semiot.platform</groupId>
+		<artifactId>device-proxy-service-api</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<scope>provided</scope>
+	</dependency>
+  </dependencies>
+  
+  <build>
+        <plugins>
+           <plugin>
+	            <groupId>org.apache.felix</groupId>
+	            <artifactId>maven-bundle-plugin</artifactId>
+	            <version>2.3.7</version>
+	            <extensions>true</extensions>
+	            <configuration>
+	                <instructions>
+	                    <Import-Package>javax.servlet.*;version="[2.4,4.0)",*</Import-Package>
+	                    <Bundle-Activator>rs.proxy.service.Activator</Bundle-Activator>
+	                    <Implementation-Title>jersey-osgi-http-service-bundle</Implementation-Title>
+	                    <Implementation-Version>${project.version}</Implementation-Version>
+	                </instructions>
+	                <unpackBundle>true</unpackBundle>
+	            </configuration>
+	        </plugin>
+        </plugins>
+    </build>
+</project>

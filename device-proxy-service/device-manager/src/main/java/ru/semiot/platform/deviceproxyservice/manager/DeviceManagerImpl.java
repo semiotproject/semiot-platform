@@ -112,7 +112,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     }
 
     @Override
-    public void registerDevice(Device device) {
+    public void registerDevice(DriverInformation info, Device device) {
         if (directoryService != null) {
             logger.info("Device [ID={}] is being registered", device.getId());
 
@@ -122,7 +122,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
             final String description = TemplateUtils.resolve(
                     device.toTurtleString(), configuration);
 
-            boolean isAdded = directoryService.addNewDevice(device, description);
+            boolean isAdded = directoryService.addNewDevice(info, device, description);
 
             if (isAdded) {
                 WAMPClient.getInstance().publish(
@@ -152,6 +152,11 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
         }
     }
 
+    @Override
+    public void removeDataOfDriverFromFuseki(String pid) {
+    	directoryService.removeDataOfDriver(pid);
+    }
+    
     public Configuration getConfiguration() {
         return configuration;
     }
