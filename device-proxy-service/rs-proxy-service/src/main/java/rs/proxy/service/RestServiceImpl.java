@@ -42,8 +42,8 @@ public class RestServiceImpl implements ManagedService {
 		return RestServiceImpl.instanceRS;
 	}
 	
-	public static int removeDataOfDriverFromFuseki(String pid) {
-		return instanceRS.getDeviceManager().removeDataOfDriverFromFuseki(pid);
+	public static void removeDataOfDriverFromFuseki(String pid) {
+		instanceRS.getDeviceManager().removeDataOfDriverFromFuseki(pid);
 	}
 	
 	public DeviceManager getDeviceManager() {

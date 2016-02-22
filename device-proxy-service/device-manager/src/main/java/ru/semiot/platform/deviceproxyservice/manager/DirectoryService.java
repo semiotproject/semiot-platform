@@ -2,6 +2,7 @@ package ru.semiot.platform.deviceproxyservice.manager;
 
 import java.io.StringReader;
 import java.net.URI;
+
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
@@ -17,11 +18,14 @@ import org.apache.jena.riot.RiotException;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SAREF;
+import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.SSNCOM;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
 public class DirectoryService {
 
@@ -29,7 +33,28 @@ public class DirectoryService {
             .getLogger(DirectoryService.class);
     private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
     private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
+    private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
 
+    protected static final String QUERY_DELETE_ALL_DATA_DRIVER = NamespaceUtils.newSPARQLQuery(
+    		"PREFIX  semiot: <http://w3id.org/semiot/ontologies/semiot#> "
+    		+ "PREFIX  ssncom: <http://purl.org/NET/ssnext/communication#> "
+    		+ "PREFIX  ssn:  <http://purl.oclc.org/NET/ssnx/ssn#> "
+    		+ "DELETE { "
+    			+ "?system ?x1 ?y1. "
+    			+ "?sensor ?x2 ?y2. "
+    			+ "GRAPH <urn:semiot:graphs:private>{?system ?x3 ?y3} "
+    			+ "GRAPH <urn:semiot:graphs:private>{?wamp ?x4 ?y4} } "
+    			+ "WHERE { "
+    				+ "GRAPH <urn:semiot:graphs:private> {"
+    					+ "?system semiot:hasDriver <urn:semiot:drivers:${PID}>} . "
+    				+ "{ ?system  ssn:hasSubSystem  ?sensor . "
+    					+ "?system ?x1 ?y1. ?sensor ?x2 ?y2 } "
+    				+ "UNION { "
+    					+ "GRAPH <urn:semiot:graphs:private> { "
+    						+ "?system ssncom:hasCommunicationEndpoint  ?wamp . "
+    						+ "?system ?x3 ?y3. ?wamp ?x4 ?y4} } }", 
+    		SSN.class, SSNCOM.class, SEMIOT.class);
+    
     protected static final String QUERY_UPDATE_STATE_SYSTEM = NamespaceUtils.newSPARQLQuery(
             "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
             + "INSERT { <${URI_SYSTEM}> saref:hasState <${STATE}> } "
@@ -95,7 +120,7 @@ public class DirectoryService {
      * @param deviceDescription
      * @return true if the given device successfully added.
      */
-    public boolean addNewDevice(Device device, String deviceDescription) {
+    public boolean addNewDevice(DriverInformation info, Device device, String deviceDescription) {
         try {
             Model description = ModelFactory.createDefaultModel().read(
                     new StringReader(deviceDescription), null,
@@ -121,7 +146,10 @@ public class DirectoryService {
                                 .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
                                 .add(wampResource, SSNCOM.topic,
                                         ResourceFactory.createPlainLiteral(device.getId()))
-                                .add(wampResource, SSNCOM.protocol, WAMP);
+                                .add(wampResource, SSNCOM.protocol, WAMP)
+                                .add(system, SEMIOT.hasDriver, 
+                                		ResourceFactory.createResource(
+                                				TEMPLATE_DRIVER_URN.replace("${PID}", info.getId())));
 
                         store.save(GRAPH_PRIVATE, privateDeviceInfo);
 
@@ -145,18 +173,8 @@ public class DirectoryService {
         return false;
     }
     
-    protected static final String QUERY_DELETE_DEVICE = "PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#> "
-			+ "PREFIX ssncom: <http://purl.org/NET/ssnext/communication#> "
-			+ "DELETE {?comm ?ppp ?sss. ?sensor ?pp ?ss. <${URI_SYSTEM}> ?p ?s.} "
-			+ "WHERE{{<${URI_SYSTEM}> ssn:hasSubsystem ?sensor. "
-			+ "?sensor ssncom:hasCommunicationEndpoint ?comm. ?comm ?ppp ?sss. } "
-			+ "union {<${URI_SYSTEM}> ssn:hasSubsystem ?sensor. ?sensor ?pp ?ss.} "
-			+ "union {<${URI_SYSTEM}> ?p ?s.}}";
-    
-    public int removeDataOfDriver(String pid) {
-    	
-    	
-    	return -1;
+    public void removeDataOfDriver(String pid) {
+    	store.update(QUERY_DELETE_ALL_DATA_DRIVER.replace("${PID}", pid));
     }
 
     private static abstract class Vars {

@@ -13,5 +13,5 @@ public interface IRemoveService {
   @GET
   @Path("fuseki/{pid}")
   @Produces(MediaType.TEXT_PLAIN)
-  int fuseki(@PathParam("pid") String name);
+  String fuseki(@PathParam("pid") String name);
 }

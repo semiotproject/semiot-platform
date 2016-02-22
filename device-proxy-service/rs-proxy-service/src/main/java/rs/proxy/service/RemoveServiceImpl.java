@@ -2,7 +2,8 @@ package rs.proxy.service;
 
 public class RemoveServiceImpl implements IRemoveService {
 
-	public int fuseki(String pid) {
-		return RestServiceImpl.removeDataOfDriverFromFuseki(pid);
+	public String fuseki(String pid) {
+		RestServiceImpl.removeDataOfDriverFromFuseki(pid);
+		return "Deleted data from fuseki. Driver pid = " + pid;
 	}
 }

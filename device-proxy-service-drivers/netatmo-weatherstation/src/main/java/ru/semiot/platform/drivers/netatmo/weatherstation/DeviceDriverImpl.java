@@ -30,18 +30,18 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             = Collections.synchronizedMap(new HashMap<>());
     private final String driverName = "Netatmo.com (only temperature)";
     private final Configuration configuration = new Configuration();
+    private final DriverInformation info = new DriverInformation(
+            Keys.DRIVER_PID,
+            URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule"));; 
 
     private volatile DeviceManager deviceManager;
 
     private ScheduledExecutorService scheduler;
     private ScheduledFuture handle = null;
-
+    
+    
     public void start() {
         logger.info("{} started!", driverName);
-
-        DriverInformation info = new DriverInformation(
-                Keys.DRIVER_PID,
-                URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule"));
 
         deviceManager.registerDriver(info);
 
@@ -110,7 +110,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     public void registerDevice(Device device) {
         devicesMap.put(device.getId(), device);
 
-        deviceManager.registerDevice(device);
+        deviceManager.registerDevice(info, device);
     }
 
     public void publishNewObservation(WeatherStationObservation observation) {
