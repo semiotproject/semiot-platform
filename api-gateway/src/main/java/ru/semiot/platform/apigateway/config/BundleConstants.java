@@ -14,7 +14,7 @@ public class BundleConstants {
     public static final String urlConfigMgr = CONFIG.consoleEndpoint() + "/system/console/configMgr/";
     public static final String urlStatusConfigurationsJson = 
             CONFIG.consoleEndpoint() + "/system/console/status-Configurations.json";
-    public static final int countDefaultBundles = 14;
+    public static final int countDefaultBundles = 16;
 
     public static final String managerDomain = "ru.semiot.platform.domain";
     public static final String managerApi = "ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager";

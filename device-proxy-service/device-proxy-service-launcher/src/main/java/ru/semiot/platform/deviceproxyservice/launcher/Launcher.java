@@ -74,7 +74,10 @@ public class Launcher {
                     "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.eventadmin-1.4.4.jar?raw=true"));
             bundles.add(context.installBundle(
                     "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.dependencymanager-4.1.0.jar?raw=true"));
-            bundles.add(context.installBundle("http://central.maven.org/maven2/com/github/livesense/org.liveSense.fragment.sun.misc/1.0.5/org.liveSense.fragment.sun.misc-1.0.5.jar"));
+            bundles.add(context.installBundle(
+            		"http://central.maven.org/maven2/com/github/livesense/org.liveSense.fragment.sun.misc/1.0.5/org.liveSense.fragment.sun.misc-1.0.5.jar"));
+            bundles.add(context.installBundle(
+            		"https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/jersey-all-2.22.1.jar?raw=true"));
 
             //Device Proxy Service bundles
             bundles.add(context.installBundle(
@@ -83,6 +86,9 @@ public class Launcher {
             bundles.add(context.installBundle(
                     "device-proxy-service-manager-1.0-SNAPSHOT.jar",
                     Launcher.class.getResourceAsStream("/bundles/device-proxy-service-manager-1.0-SNAPSHOT.jar")));
+            bundles.add(context.installBundle(
+                    "rs-proxy-service-1.0.0-SNAPSHOT.jar",
+                    Launcher.class.getResourceAsStream("/bundles/rs-proxy-service-1.0.0-SNAPSHOT.jar")));
 
             logger.info("Installed all bundles!");
 
