@@ -81,15 +81,38 @@
                         if (jsonProperties.size() > 0) {
                     %>
                     <input class="btn btn-primary btn-sm" type="submit" name="save"
-                           value="Save and start" /> <input class="btn btn-primary btn-sm"
-                           type="submit" name="uninstall" value="Uninstall" />
+                           value="Save and start" /> <a href="#myModal"
+						class="btn btn-primary btn-sm" data-toggle="modal">uninstall</a>
                     <%
                         }
                     %>
                     <input class="btn btn-primary btn-sm" type="submit" name="back"
                            value="Back" />
                 </div>
+                
                 <input type="hidden" name="pid" id="pid" value=<%=pid%> />
+                
+                <div id="myModal" class="modal fade">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									aria-hidden="true">×</button>
+								<h4 class="modal-title">Optional feature</h4>
+							</div>
+							<!-- Основное содержимое модального окна -->
+							<div class="modal-body">Do you want to remove all data
+								connected with the driver?</div>
+							<!-- Футер модального окна -->
+							<div class="modal-footer">
+								<input type="submit" class="btn btn-primary btn-sm"
+									name="uninstall" value="no" class="form-control" /> <input
+									type="submit" class="btn btn-primary btn-sm"
+									name="uninstallWithDeleteData" value="yes" class="form-control" />
+							</div>
+						</div>
+					</div>
+				</div>
             </form>
 
             <script>

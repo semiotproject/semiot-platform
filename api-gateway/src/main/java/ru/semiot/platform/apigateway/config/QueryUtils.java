@@ -92,6 +92,12 @@ public class QueryUtils {
 
         deleteConfig(id_bundle);
     }
+    
+    public static void uninstallWithData(String id_bundle) throws Exception {
+    	uninstall(id_bundle);
+    	clientConfig.sendGetUrl(
+                BundleConstants.urlRsRemoveFromFuseki + id_bundle, null, false);
+    }
 
     private static void deleteConfig(String id_bundle) throws Exception {
         HashMap<String, Object> payload = new HashMap<>();
