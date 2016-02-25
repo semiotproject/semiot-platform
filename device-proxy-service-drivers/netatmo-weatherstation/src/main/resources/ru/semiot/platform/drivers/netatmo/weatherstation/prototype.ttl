@@ -1,4 +1,4 @@
-@prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#> .
+@prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#> .
 @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
 @prefix qudt: <http://qudt.org/schema/qudt#> .
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .

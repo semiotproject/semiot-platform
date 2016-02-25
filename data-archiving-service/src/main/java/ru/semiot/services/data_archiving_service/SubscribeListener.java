@@ -41,7 +41,7 @@ public class SubscribeListener implements Observer<String> {
 
     private static final Query GET_TOPICS_QUERY = QueryFactory.create(
             NamespaceUtils.newSPARQLQuery(
-                    "SELECT ?q { "
+                    "SELECT ?topic { "
                     + "GRAPH <urn:semiot:graphs:private> {"
                     + " ?x ssncom:hasCommunicationEndpoint ?e ."
                     + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
@@ -49,7 +49,7 @@ public class SubscribeListener implements Observer<String> {
                     + "}", SSN.class, SSNCOM.class));
     private static final String GET_TOPIC_BY_URI_QUERY
             = NamespaceUtils.newSPARQLQuery(
-                    "SELECT ?q { "
+                    "SELECT ?topic { "
                     + "GRAPH <urn:semiot:graphs:private> {"
                     + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
                     + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
