@@ -36,14 +36,11 @@ public class DirectoryService {
     private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
 
     protected static final String QUERY_DELETE_ALL_DATA_DRIVER = NamespaceUtils.newSPARQLQuery(
-    		"PREFIX  semiot: <http://w3id.org/semiot/ontologies/semiot#> "
-    		+ "PREFIX  ssncom: <http://purl.org/NET/ssnext/communication#> "
-    		+ "PREFIX  ssn:  <http://purl.oclc.org/NET/ssnx/ssn#> "
-    		+ "DELETE { "
+    		"DELETE { "
     			+ "?system ?x1 ?y1. "
     			+ "?sensor ?x2 ?y2. "
-    			+ "GRAPH <urn:semiot:graphs:private>{?system ?x3 ?y3} "
-    			+ "GRAPH <urn:semiot:graphs:private>{?wamp ?x4 ?y4} } "
+    			+ "GRAPH <urn:semiot:graphs:private>{?system ?x3 ?y3. "
+    				+ "?wamp ?x4 ?y4} } "
     			+ "WHERE { "
     				+ "GRAPH <urn:semiot:graphs:private> {"
     					+ "?system semiot:hasDriver <urn:semiot:drivers:${PID}>} . "

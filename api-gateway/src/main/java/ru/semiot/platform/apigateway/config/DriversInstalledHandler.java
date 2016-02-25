@@ -29,6 +29,12 @@ public class DriversInstalledHandler extends HttpServlet {
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 				}
+			} else if(request.getParameter("uninstallWithDeleteData") != null) {
+				try {
+					QueryUtils.uninstallWithData(symbolicName);
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 			} else if(request.getParameter("conf") != null) {	
 				redirect = "/config/ConfigurationDriver?symbolicName="+symbolicName;
 			}
