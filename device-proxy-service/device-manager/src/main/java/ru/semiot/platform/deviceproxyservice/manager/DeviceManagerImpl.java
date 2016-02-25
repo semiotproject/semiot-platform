@@ -75,7 +75,26 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
         synchronized (this) {
             if (dictionary != null) {
                 if (!configuration.isConfigured()) {
-
+                	// default values
+					configuration.put(Keys.WAMP_URI, "ws://wamprouter:8080/ws");
+					configuration.put(Keys.WAMP_REALM, "realm1");
+					configuration.put(Keys.WAMP_RECONNECT, "15");
+					configuration.put(Keys.TOPIC_NEWANDOBSERVING,
+							"ru.semiot.devices.newandobserving");
+					configuration.put(Keys.TOPIC_INACTIVE,
+							"ru.semiot.devices.turnoff");
+					configuration.put(Keys.FUSEKI_PASSWORD, "pw");
+					configuration.put(Keys.FUSEKI_USERNAME, "admin");
+					configuration.put(Keys.FUSEKI_UPDATE_URL,
+							"http://localhost:3030/ds/update");
+					configuration.put(Keys.FUSEKI_QUERY_URL,
+							"http://localhost:3030/ds/query");
+					configuration.put(Keys.FUSEKI_STORE_URL,
+							"http://localhost:3030/ds/data");
+					configuration.put(Keys.PLATFORM_DOMAIN, "http://localhost");
+					configuration.put(Keys.PLATFORM_SYSTEMS_PATH, "systems");
+					configuration.put(Keys.PLATFORM_SENSORS_PATH, "sensors");
+                	
                     configuration.putAll(dictionary);
 
                     configuration.put(Keys.PLATFORM_SYSTEMS_URI_PREFIX,
