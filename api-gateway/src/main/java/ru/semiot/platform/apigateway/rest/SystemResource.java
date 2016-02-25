@@ -1,8 +1,6 @@
 package ru.semiot.platform.apigateway.rest;
 
 import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.core.JsonLdOptions;
-import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
 import java.io.IOException;
 import java.net.URI;
@@ -32,11 +30,14 @@ import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.VOID;
+import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
+import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
 
 @Path("/systems")
+@Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
 @Stateless
 public class SystemResource {
 
@@ -61,12 +62,13 @@ public class SystemResource {
             + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
             + "  OPTIONAL {"
             + "    ?o ?o_p ?o_o ."
-            + "    FILTER(?p != rdf:type)"
+            + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"
             + "  }"
             + "}";
-    
+
     private static final String VAR_URI = "uri";
     private static final String VAR_PROTOTYPE = "prototype";
+    private static final int FIRST = 0;
 
     public SystemResource() {
     }
@@ -81,12 +83,13 @@ public class SystemResource {
     private UriInfo uriInfo;
 
     @GET
-    @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void listSystems(@Suspended final AsyncResponse response)
             throws JsonLdError, IOException {
         URI root = uriInfo.getRequestUri();
-        final Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_COLLECTION, root);
-        final Map<String, Object> frame = contextProvider.getFrame(ContextProvider.SYSTEM_COLLECTION, root);
+        final Model model = contextProvider.getRDFModel(
+                ContextProvider.SYSTEM_COLLECTION, root);
+        final Map<String, Object> frame = contextProvider.getFrame(
+                ContextProvider.SYSTEM_COLLECTION, root);
 
         Observable<Void> prototypes = query.select(QUERY_GET_SYSTEM_PROTOTYPES)
                 .map((ResultSet rs) -> {
@@ -120,10 +123,7 @@ public class SystemResource {
                     }
 
                     try {
-                        Object result = JsonLdProcessor.frame(
-                                RDFUtils.toJsonLd(model), frame, new JsonLdOptions());
-
-                        return JsonUtils.toString(result);
+                        return JsonUtils.toString(RDFUtils.toJsonLdCompact(model, frame));
                     } catch (IOException | JsonLdError e) {
                         throw Exceptions.propagate(e);
                     }
@@ -142,28 +142,27 @@ public class SystemResource {
 
     @GET
     @Path("{id}")
-    @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void getSystem(
             @Suspended final AsyncResponse response,
             @PathParam("id") String id) throws URISyntaxException, IOException {
         URI root = uriInfo.getRequestUri();
-        final Map<String, Object> frame = contextProvider.getFrame(ContextProvider.SYSTEM_SINGLE, root);
+        final Map<String, Object> frame = contextProvider.getFrame(
+                ContextProvider.SYSTEM_SINGLE, root);
 
         query.describe(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id))
                 .map((Model model) -> {
                     try {
-                        Resource system = model.listResourcesWithProperty(
-                                RDF.type, SSN.System).next();
+                        Resource system = RDFUtils.listResourcesWithProperty(
+                                model, RDF.type, SSN.System, Proto.Individual)
+                        .get(FIRST);
+                        System.out.println(system);
                         Resource prototype = model.listObjectsOfProperty(
                                 system, Proto.hasPrototype).next().asResource();
                         Resource prototypeResource = ResourceUtils
-                                .createResourceFromClass(root, prototype.getLocalName());
+                        .createResourceFromClass(root, prototype.getLocalName());
                         model.add(system, RDF.type, prototypeResource);
-                        
-                        Object result = JsonLdProcessor.frame(
-                                RDFUtils.toJsonLd(model), frame, new JsonLdOptions());
 
-                        return JsonUtils.toString(result);
+                        return JsonUtils.toString(RDFUtils.toJsonLdCompact(model, frame));
                     } catch (JsonLdError | IOException ex) {
                         throw Exceptions.propagate(ex);
                     }
@@ -173,6 +172,21 @@ public class SystemResource {
                     logger.warn(e.getMessage(), e);
                     response.resume(e);
                 });
+    }
+    
+    @GET
+    @Path("{id}/observations")
+    public void observations(@Suspended final AsyncResponse response, 
+            @PathParam("id") String id) throws IOException {
+        URI root = uriInfo.getRequestUri();
+        Model model = contextProvider.getRDFModel(
+                ContextProvider.OBSERVATIONS_COLLECTION, MapBuilder.newMap()
+                        .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
+                        .put(ContextProvider.VAR_SYSTEM_ID, id)
+                        .build());
+        Map<String, Object> frame = contextProvider.getFrame(
+                ContextProvider.OBSERVATIONS_COLLECTION, root);
+        //TODO: Implement
     }
 
 }

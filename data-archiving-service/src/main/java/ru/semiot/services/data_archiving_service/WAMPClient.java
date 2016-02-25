@@ -22,8 +22,8 @@ public class WAMPClient implements Closeable, AutoCloseable {
 	private static final ServiceConfig config = ConfigFactory
 			.create(ServiceConfig.class);
 	private static final WAMPClient INSTANCE = new WAMPClient();
+        private final HashMap<String, Subscription> sensorSubscriptions = new HashMap<>();
 	private WampClient client;
-	private HashMap<String, Subscription> sensorSubscriptions = new HashMap<>();
 
 	private WAMPClient() {
 	}
@@ -49,7 +49,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
 	}
 
 	public Observable<String> subscribe(String topic) {
-		logger.info("Made subscription to " + topic);
+		logger.info("Subscribed to {} topic", topic);
 		return client.makeSubscription(topic, String.class);
 	}
 
