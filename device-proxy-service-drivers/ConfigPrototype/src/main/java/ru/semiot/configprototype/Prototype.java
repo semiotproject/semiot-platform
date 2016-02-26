@@ -15,9 +15,9 @@ public class Prototype implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         Dictionary properties = new Properties();
         properties.put("felix.webconsole.label", "hello");
-        properties.put("felix.webconsole.category", "OSGI");
+        //properties.put("felix.webconsole.category", "OSGI");
 
-        pluginRegistration = context.registerService(Servlet.class.getName(), new SimpleServlet(), properties);
+        pluginRegistration = context.registerService(Servlet.class.getName(), new SimpleServlet(context), properties);
     }
 
     @Override
