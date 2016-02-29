@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ru.semiot</groupId>
-    <artifactId>ru.semiot.configprototype</artifactId>
+    <groupId>ru.semiot.platform</groupId>
+    <artifactId>configurator</artifactId>
     <version>1.0.0</version>
     <packaging>bundle</packaging>
     
-    <name>ConfigPrototype</name>
+    <name>Configurator</name>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,6 +38,12 @@
             <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20140107</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>      
         <plugins>  
@@ -64,11 +70,17 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>
-                            ${artifactId}
-                        </Bundle-SymbolicName>
+                        <Import-Package>
+                            org.apache.felix.dm;version="[4.1,5)",
+                            org.osgi.framework;version="[1.8,2)",
+                            org.osgi.service.cm;version="[1.5,2)",
+                            org.apache.felix.webconsole;version="[3.0,4.2.12]",
+                            javax.servlet,
+                            javax.servlet.http,
+                            org.json
+                        </Import-Package>
                         <Bundle-Activator>
-                            ru.semiot.configprototype.Prototype
+                            ru.semiot.platform.configurator.Activator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>
