@@ -34,6 +34,7 @@ import ru.semiot.commons.namespaces.VOID;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
+import static ru.semiot.platform.apigateway.rest.ResourceHelper.*;
 
 @Path("/sensors")
 @Stateless
@@ -130,13 +131,7 @@ public class SensorResource {
 
         Observable.zip(sensors, prototypes, (a, b) -> {
             return a;
-        }).subscribe((o) -> {
-            response.resume(o);
-        }, (e) -> {
-            logger.warn(e.getMessage(), e);
-
-            response.resume(e);
-        });
+        }).subscribe(resume(response));
     }
 
     @GET
@@ -165,13 +160,7 @@ public class SensorResource {
                     } catch (JsonLdError | IOException ex) {
                         throw Exceptions.propagate(ex);
                     }
-                }).subscribe((o) -> {
-                    response.resume(o);
-                }, (e) -> {
-                    logger.warn(e.getMessage(), e);
-
-                    response.resume(e);
-                });
+                }).subscribe(resume(response));
     }
 
 }

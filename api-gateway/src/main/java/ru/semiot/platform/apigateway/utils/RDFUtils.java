@@ -11,12 +11,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.system.StreamRDFBase;
@@ -47,6 +50,19 @@ public class RDFUtils {
                 frame, DEFAULT_OPTIONS);
     }
 
+    public static Literal toLiteral(Object value) {
+
+        if (value instanceof String) {
+            return ResourceFactory.createPlainLiteral(value.toString());
+        }
+        if (value instanceof Double) {
+            return ResourceFactory.createTypedLiteral(value.toString(),
+                    XSDDatatype.XSDdouble);
+        }
+
+        throw new IllegalArgumentException();
+    }
+
     public static List<Resource> listResourcesWithProperty(Model model, Property p,
             RDFNode... objects) {
         Map<Resource, Integer> counts = new HashMap<>();
@@ -64,6 +80,11 @@ public class RDFUtils {
 
         return Arrays.asList(counts.keySet().stream().filter(
                 (resource) -> (counts.get(resource) == objects.length)).toArray(Resource[]::new));
+    }
+    
+    public static Resource subjectWithProperty(Model model, Property property, 
+            RDFNode object) {
+        return model.listSubjectsWithProperty(property, object).next();
     }
 
     private static class MatchSinkRDF extends StreamRDFBase {

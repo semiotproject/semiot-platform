@@ -54,7 +54,7 @@ apidoc:observations a hydra:Link ;
     rdfs:range [
         a hydra:Collection, sh:Shape ;
         sh:property [
-            sh:property hydra:member ;
+            sh:predicate hydra:member ;
             sh:class ssn:Observation
         ]
     ] ;
@@ -65,7 +65,7 @@ apidoc:observations a hydra:Link ;
     ] .
 
 apidoc:ApiDocumentation a hydra:ApiDocumentation ;
-    hydra:supportedClass apidoc:EntryPoint, ssn:SensingDevice, ssn:System .
+    hydra:supportedClass apidoc:observations, apidoc:EntryPoint, ssn:SensingDevice, ssn:System .
 
 ssn:SensingDevice a hydra:Class ;
     hydra:supportedOperation [

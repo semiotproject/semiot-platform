@@ -38,7 +38,7 @@ public class ContextProvider {
     public static final String SENSOR_COLLECTION = "SensorCollection";
     public static final String SENSOR_SINGLE = "SensorSingle";
     public static final String OBSERVATIONS_COLLECTION = "ObservationsCollection";
-    
+
     public static final String VAR_ROOT_URL = "${ROOT_URL}";
     public static final String VAR_SYSTEM_ID = "${SYSTEM_ID}";
 
@@ -51,9 +51,10 @@ public class ContextProvider {
             loadContext(API_DOCUMENTATION);
             loadContext(ENTRYPOINT);
             loadContext(SYSTEM_COLLECTION);
+            loadContext(SYSTEM_SINGLE);
             loadContext(SENSOR_COLLECTION);
-
-            loadFrame(SYSTEM_SINGLE);
+            loadContext(OBSERVATIONS_COLLECTION);
+            
             loadFrame(SENSOR_SINGLE);
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
@@ -103,7 +104,7 @@ public class ContextProvider {
         return StringUtils.replaceEach(template,
                 vars.keySet().toArray(new String[0]),
                 vars.values().stream().map((value) -> {
-                    return value.toString();
+                    return String.valueOf(value);
                 }).toArray(String[]::new));
     }
 

@@ -19,6 +19,7 @@ import javax.ws.rs.container.Suspended;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
@@ -30,11 +31,13 @@ import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.VOID;
+import ru.semiot.platform.apigateway.TSDBQueryService;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
+import static ru.semiot.platform.apigateway.rest.ResourceHelper.*;
 
 @Path("/systems")
 @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
@@ -74,7 +77,10 @@ public class SystemResource {
     }
 
     @Inject
-    SPARQLQueryService query;
+    SPARQLQueryService sparqlQuery;
+
+    @Inject
+    TSDBQueryService tsdbQuery;
 
     @Inject
     ContextProvider contextProvider;
@@ -91,7 +97,7 @@ public class SystemResource {
         final Map<String, Object> frame = contextProvider.getFrame(
                 ContextProvider.SYSTEM_COLLECTION, root);
 
-        Observable<Void> prototypes = query.select(QUERY_GET_SYSTEM_PROTOTYPES)
+        Observable<Void> prototypes = sparqlQuery.select(QUERY_GET_SYSTEM_PROTOTYPES)
                 .map((ResultSet rs) -> {
                     while (rs.hasNext()) {
                         Resource prototype = rs.next().getResource(VAR_PROTOTYPE);
@@ -108,7 +114,7 @@ public class SystemResource {
 
                     return null;
                 });
-        Observable<String> systems = query.select(QUERY_GET_ALL_SYSTEMS)
+        Observable<String> systems = sparqlQuery.select(QUERY_GET_ALL_SYSTEMS)
                 .map((ResultSet rs) -> {
                     while (rs.hasNext()) {
                         QuerySolution qs = rs.next();
@@ -131,13 +137,7 @@ public class SystemResource {
 
         Observable.zip(systems, prototypes, (a, __) -> {
             return a;
-        }).subscribe((o) -> {
-            response.resume(o);
-        }, (e) -> {
-            logger.warn(e.getMessage(), e);
-
-            response.resume(e);
-        });
+        }).subscribe(resume(response));
     }
 
     @GET
@@ -146,16 +146,21 @@ public class SystemResource {
             @Suspended final AsyncResponse response,
             @PathParam("id") String id) throws URISyntaxException, IOException {
         URI root = uriInfo.getRequestUri();
-        final Map<String, Object> frame = contextProvider.getFrame(
+        Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_SINGLE, 
+                MapBuilder.newMap()
+                        .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
+                        .put(ContextProvider.VAR_SYSTEM_ID, id)
+                        .build());
+        Map<String, Object> frame = contextProvider.getFrame(
                 ContextProvider.SYSTEM_SINGLE, root);
 
-        query.describe(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id))
-                .map((Model model) -> {
+        sparqlQuery.describe(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id))
+                .map((Model result) -> {
+                    model.add(result);
                     try {
                         Resource system = RDFUtils.listResourcesWithProperty(
                                 model, RDF.type, SSN.System, Proto.Individual)
                         .get(FIRST);
-                        System.out.println(system);
                         Resource prototype = model.listObjectsOfProperty(
                                 system, Proto.hasPrototype).next().asResource();
                         Resource prototypeResource = ResourceUtils
@@ -166,27 +171,37 @@ public class SystemResource {
                     } catch (JsonLdError | IOException ex) {
                         throw Exceptions.propagate(ex);
                     }
-                }).subscribe((o) -> {
-                    response.resume(o);
-                }, (e) -> {
-                    logger.warn(e.getMessage(), e);
-                    response.resume(e);
-                });
+                }).subscribe(resume(response));
     }
-    
+
     @GET
     @Path("{id}/observations")
-    public void observations(@Suspended final AsyncResponse response, 
-            @PathParam("id") String id) throws IOException {
+    public void observations(@Suspended final AsyncResponse response,
+            @PathParam("id") String systemId) throws IOException {
         URI root = uriInfo.getRequestUri();
         Model model = contextProvider.getRDFModel(
                 ContextProvider.OBSERVATIONS_COLLECTION, MapBuilder.newMap()
-                        .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
-                        .put(ContextProvider.VAR_SYSTEM_ID, id)
-                        .build());
+                .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
+                .put(ContextProvider.VAR_SYSTEM_ID, systemId)
+                .build());
         Map<String, Object> frame = contextProvider.getFrame(
                 ContextProvider.OBSERVATIONS_COLLECTION, root);
-        //TODO: Implement
+
+        tsdbQuery.query(systemId).map((result) -> {
+            model.add(result);
+            Resource collection = model.listSubjectsWithProperty(
+                    RDF.type, Hydra.Collection).next();
+            ResIterator iter = model.listSubjectsWithProperty(RDF.type, SSN.Observaton);
+            while (iter.hasNext()) {
+                Resource obs = iter.next();
+                model.add(collection, Hydra.member, obs);
+            }
+            try {
+                return RDFUtils.toJsonLdCompact(model, frame);
+            } catch (JsonLdError | IOException ex) {
+                throw Exceptions.propagate(ex);
+            }
+        }).subscribe(resume(response));
     }
 
 }
