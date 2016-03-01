@@ -75,7 +75,26 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
         synchronized (this) {
             if (dictionary != null) {
                 if (!configuration.isConfigured()) {
-
+                	// default values
+					configuration.put(Keys.WAMP_URI, "ws://wamprouter:8080/ws");
+					configuration.put(Keys.WAMP_REALM, "realm1");
+					configuration.put(Keys.WAMP_RECONNECT, "15");
+					configuration.put(Keys.TOPIC_NEWANDOBSERVING,
+							"ru.semiot.devices.newandobserving");
+					configuration.put(Keys.TOPIC_INACTIVE,
+							"ru.semiot.devices.turnoff");
+					configuration.put(Keys.FUSEKI_PASSWORD, "pw");
+					configuration.put(Keys.FUSEKI_USERNAME, "admin");
+					configuration.put(Keys.FUSEKI_UPDATE_URL,
+							"http://localhost:3030/ds/update");
+					configuration.put(Keys.FUSEKI_QUERY_URL,
+							"http://localhost:3030/ds/query");
+					configuration.put(Keys.FUSEKI_STORE_URL,
+							"http://localhost:3030/ds/data");
+					configuration.put(Keys.PLATFORM_DOMAIN, "http://localhost");
+					configuration.put(Keys.PLATFORM_SYSTEMS_PATH, "systems");
+					configuration.put(Keys.PLATFORM_SENSORS_PATH, "sensors");
+                	
                     configuration.putAll(dictionary);
 
                     configuration.put(Keys.PLATFORM_SYSTEMS_URI_PREFIX,
@@ -112,7 +131,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     }
 
     @Override
-    public void registerDevice(Device device) {
+    public void registerDevice(DriverInformation info, Device device) {
         if (directoryService != null) {
             logger.info("Device [ID={}] is being registered", device.getId());
 
@@ -122,7 +141,7 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
             final String description = TemplateUtils.resolve(
                     device.toTurtleString(), configuration);
 
-            boolean isAdded = directoryService.addNewDevice(device, description);
+            boolean isAdded = directoryService.addNewDevice(info, device, description);
 
             if (isAdded) {
                 WAMPClient.getInstance().publish(
@@ -152,6 +171,11 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
         }
     }
 
+    @Override
+    public void removeDataOfDriverFromFuseki(String pid) {
+    	directoryService.removeDataOfDriver(pid);
+    }
+    
     public Configuration getConfiguration() {
         return configuration;
     }

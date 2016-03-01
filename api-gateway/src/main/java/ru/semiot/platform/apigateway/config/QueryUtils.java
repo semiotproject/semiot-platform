@@ -1,16 +1,38 @@
 package ru.semiot.platform.apigateway.config;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import rx.Observable;
+
+import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-public class QueryUtils {
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.utils.JsonUtils;
+
+import ru.semiot.commons.namespaces.Hydra;
+import ru.semiot.platform.apigateway.SPARQLQueryService;
+import ru.semiot.platform.apigateway.rest.ResourceUtils;
+import ru.semiot.platform.apigateway.utils.RDFUtils;
+import rx.exceptions.Exceptions;
+
+public class QueryUtils {
+	@Inject
+    static SPARQLQueryService query;
+	
     public static HttpClientConfig clientConfig = new HttpClientConfig();
 
     public static JsonArray getBundlesJsonArray() throws Exception {
@@ -91,6 +113,29 @@ public class QueryUtils {
         clientConfig.sendPost(url, null, payload);
 
         deleteConfig(id_bundle);
+    }
+    
+    public static void uninstallWithData(String id_bundle) throws Exception {
+    	uninstall(id_bundle);
+    	Observable <List<String>> systems_id = query.select(BundleConstants.queryIdSystemsForDriver.replace("${DRIVER}", 
+    			"id_bundle"))
+    			.map((ResultSet rs) -> {
+    				List<String> list = new ArrayList<String>();
+                    while (rs.hasNext()) {
+                        QuerySolution qs = rs.next();
+                        Literal id = qs.getLiteral("id");
+                        list.add(id.getString());
+                    }
+
+                    return list;
+                });
+    	//systems_id.
+                
+        clientConfig.sendGetUrl(
+                BundleConstants.urlRsRemoveFromTsdb + id_bundle, null, false);
+                
+    	clientConfig.sendGetUrl(
+                BundleConstants.urlRsRemoveFromFuseki + id_bundle, null, false);
     }
 
     private static void deleteConfig(String id_bundle) throws Exception {

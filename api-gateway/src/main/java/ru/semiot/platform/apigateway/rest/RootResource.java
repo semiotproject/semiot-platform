@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.platform.apigateway.ContextProvider;
 import static ru.semiot.platform.apigateway.ContextProvider.*;
+import static ru.semiot.platform.apigateway.rest.ResourceHelper.*;
 import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
@@ -126,13 +127,14 @@ public class RootResource {
                             rs, SSN.SensingDevice);
                 });
 
-        Observable.merge(systems, sensors).map((List<Resource> rs) -> {
+        Observable.zip(systems, sensors, (List<Resource> rsSystems, List<Resource> rsSensors) -> {
+            List<Resource> rs = new ArrayList<>(rsSystems);
+            rs.addAll(rsSensors);
             List<Observable<ResultSet>> obs = new ArrayList<>();
             rs.stream().forEach((prototype) -> {
                 obs.add(query.select(QUERY_INDIVIDUAL_PROPERTIES
                         .replace(VAR_PROTOTYPE_URI, prototype.getURI())));
             });
-
             return Observable.merge(obs).toBlocking().toIterable();
         }).map((Iterable<ResultSet> iter) -> {
             iter.forEach((ResultSet rs) -> {
@@ -147,24 +149,14 @@ public class RootResource {
                     apiDoc.add(prototypeResource, Hydra.supportedProperty, property);
                 }
             });
-
             return apiDoc;
         }).lastOrDefault(apiDoc).map((__) -> {
             try {
-                Object result = JsonLdProcessor.frame(
-                        RDFUtils.toJsonLd(apiDoc), frame, new JsonLdOptions());
-
-                return JsonUtils.toString(result);
+                return JsonUtils.toString(RDFUtils.toJsonLdCompact(apiDoc, frame));
             } catch (JsonLdError | IOException e) {
                 throw Exceptions.propagate(e);
             }
-        }).subscribe((o) -> {
-            response.resume(o);
-        }, (e) -> {
-            logger.error(e.getMessage(), e);
-
-            response.resume(e);
-        });
+        }).subscribe(resume(response));
     }
 
     private List<Resource> defineResourceIndividual(Model model, URI root, String collectionName,
@@ -204,7 +196,7 @@ public class RootResource {
                 model.add(restriction, SHACL.clazz, prototypeResource);
             }
         }
-        
+
         return resultPrototypes;
     }
 

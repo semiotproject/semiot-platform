@@ -14,9 +14,17 @@ public class BundleConstants {
     public static final String urlConfigMgr = CONFIG.consoleEndpoint() + "/system/console/configMgr/";
     public static final String urlStatusConfigurationsJson = 
             CONFIG.consoleEndpoint() + "/system/console/status-Configurations.json";
-    public static final int countDefaultBundles = 14;
+    public static final String urlRs =  CONFIG.consoleEndpoint() + "/jersey-http-service";
+    public static final String urlRsRemoveFromFuseki = urlRs + "/remove/fuseki/";
+    public static final String urlRsRemoveFromTsdb  = CONFIG.tsdbRestEndpoint() + "/remove/metric/";
+    public static final int countDefaultBundles = 16;
 
     public static final String managerDomain = "ru.semiot.platform.domain";
     public static final String managerApi = "ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager";
+    
+    public static final String queryIdSystemsForDriver = "SELECT DISTINCT ?id WHERE { "
+    		+ "GRAPH <urn:semiot:graphs:private> {"
+    			+ "?system  semiot:hasDriver ${DRIVER} } "
+    		+ "?system  dcterms:identifier ?id. }";
 
 }

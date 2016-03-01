@@ -24,8 +24,11 @@ public interface ServerConfig extends Config {
     @DefaultValue("realm1")
     String wampRealm();
     
-    @DefaultValue("http://opentsdb:4242/api/query")
+    @DefaultValue("http://opentsdb:4242")
     String tsdbEndpoint();
+    
+    @DefaultValue("http://opentsdb:8787")
+    String tsdbRestEndpoint();
     
     @DefaultValue("http://deviceproxyservice:8181")
     String consoleEndpoint();

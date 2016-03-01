@@ -49,8 +49,23 @@ apidoc:EntryPoint a hydra:Class ;
         hydra:property apidoc:EntryPoint-Sensors
     ] .
 
+apidoc:observations a hydra:Link ;
+    rdfs:domain ssn:System ;
+    rdfs:range [
+        a hydra:Collection, sh:Shape ;
+        sh:property [
+            sh:predicate hydra:member ;
+            sh:class ssn:Observation
+        ]
+    ] ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns hydra:Collection
+    ] .
+
 apidoc:ApiDocumentation a hydra:ApiDocumentation ;
-    hydra:supportedClass apidoc:EntryPoint, ssn:SensingDevice, ssn:System .
+    hydra:supportedClass apidoc:observations, apidoc:EntryPoint, ssn:SensingDevice, ssn:System .
 
 ssn:SensingDevice a hydra:Class ;
     hydra:supportedOperation [

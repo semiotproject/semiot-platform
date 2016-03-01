@@ -1,36 +1,36 @@
 {
-  "@context": {
-    "hydra": "http://www.w3.org/ns/hydra/core#",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "sp": "http://spinrdf.org/sp#",
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
-    "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
-    "proto": "http://w3id.org/semiot/ontologies/proto#",
-    "void": "http://rdfs.org/ns/void#",
-    "xsd": "http://www.w3.org/2001/XMLSchema#",
-    "sh": "http://www.w3.org/ns/shacl#",
-    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
-    "dcterms": "http://purl.org/dc/terms/",
-    "apidoc": "${ROOT_URL}/doc#",
-    
-    "hydra:entrypoint": {"@type": "@id"},
-    "hydra:property": {"@type": "@id"},
-    "hydra:returns": {"@type": "@id"},
-    "hydra:supportedProperty": {"@type": "@id"},
-    "rdfs:domain": {"@type": "@id"},
-    "rdfs:range": {"@type": "@id"},
-    "rdfs:subClassOf": {"@type": "@id"},
-    "hydra:required": {"@type": "xsd:boolean"},
-    "void:classPartition": {"@type": "@id"},
-    "void:class": {"@type": "@id"},
-    "proto:hasPrototype": {"@type": "@id"},
-    "sh:class": {"@type": "@id"},
-    "sh:predicate": {"@type": "@id"},
-    "sh:property": {"@type": "@id"}
-  },
-  "@type": "hydra:ApiDocumentation",
-  "hydra:supportedClass": {
-    "@type": "hydra:Class"
-  }
+    "@context": {
+      "hydra": "http://www.w3.org/ns/hydra/core#",
+      "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+      "sp": "http://spinrdf.org/sp#",
+      "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+      "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
+      "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+      "proto": "http://w3id.org/semiot/ontologies/proto#",
+      "void": "http://rdfs.org/ns/void#",
+      "xsd": "http://www.w3.org/2001/XMLSchema#",
+      "sh": "http://www.w3.org/ns/shacl#",
+      "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+      "dcterms": "http://purl.org/dc/terms/",
+      "apidoc": "${ROOT_URL}/doc#",
+
+      "hydra:entrypoint": {"@type": "@id"},
+      "hydra:property": {"@type": "@id"},
+      "hydra:returns": {"@type": "@id"},
+      "hydra:supportedProperty": {"@type": "@id"},
+      "rdfs:domain": {"@type": "@id"},
+      "rdfs:range": {"@type": "@id"},
+      "rdfs:subClassOf": {"@type": "@id"},
+      "hydra:required": {"@type": "xsd:boolean"},
+      "void:classPartition": {"@type": "@id"},
+      "void:class": {"@type": "@id"},
+      "proto:hasPrototype": {"@type": "@id"},
+      "sh:class": {"@type": "@id"},
+      "sh:predicate": {"@type": "@id"},
+      "sh:property": {"@type": "@id"}
+    },
+    "@type": "hydra:ApiDocumentation",
+    "hydra:supportedClass": {
+        "@type": ["hydra:Link", "hydra:Class"]
+    }
 }

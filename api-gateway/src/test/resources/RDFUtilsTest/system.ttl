@@ -1,0 +1,40 @@
+<http://localhost/systems/3503522021>
+        a       <http://w3id.org/semiot/ontologies/proto#Individual> , <http://purl.oclc.org/NET/ssnx/ssn#System> ;
+        <http://purl.oclc.org/NET/ssnx/ssn#hasSubSystem>
+                <http://localhost/sensors/3503522021-humidity> , <http://localhost/sensors/3503522021-temperature> ;
+        <http://purl.org/dc/terms/identifier>
+                "3503522021" ;
+        <http://w3id.org/semiot/ontologies/proto#hasPrototype>
+                <https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule> ;
+        <http://www.w3.org/2003/01/geo/wgs84_pos#location>
+                [ a       <http://www.w3.org/2003/01/geo/wgs84_pos#Point> ;
+                  <http://www.w3.org/2003/01/geo/wgs84_pos#alt>
+                          "5.0" ;
+                  <http://www.w3.org/2003/01/geo/wgs84_pos#lat>
+                          "59.966570041321" ;
+                  <http://www.w3.org/2003/01/geo/wgs84_pos#long>
+                          "30.274398391541"
+                ] .
+
+<http://localhost/sensors/3503522021-humidity>
+        a       <http://purl.oclc.org/NET/ssnx/ssn#SensingDevice> , <http://w3id.org/semiot/ontologies/proto#Individual> ;
+        <http://purl.org/dc/terms/identifier>
+                "3503522021-humidity" ;
+        <http://w3id.org/semiot/ontologies/proto#hasPrototype>
+                <https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule-HumiditySensor> .
+
+<https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule>
+        a       <http://w3id.org/semiot/ontologies/proto#Prototype> , <http://purl.oclc.org/NET/ssnx/ssn#System> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Netatmo Weather Station (Outdoor module)"@en ;
+        <http://www.w3.org/2000/01/rdf-schema#seeAlso>
+                "http://shop.netatmo.com/eur_en/netatmo-weather-station-400.html"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;
+        <http://purl.oclc.org/NET/ssnx/ssn#hasSubSystem>
+                <https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule-TemperatureSensor> , <https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule-HumiditySensor> .
+
+<http://localhost/sensors/3503522021-temperature>
+        a       <http://purl.oclc.org/NET/ssnx/ssn#SensingDevice> , <http://w3id.org/semiot/ontologies/proto#Individual> ;
+        <http://purl.org/dc/terms/identifier>
+                "3503522021-temperature" ;
+        <http://w3id.org/semiot/ontologies/proto#hasPrototype>
+                <https://raw.githubusercontent.com/semiotproject/semiot-platform/thesis-experiments/device-proxy-service-drivers/netatmo-temperature/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule-TemperatureSensor> .
