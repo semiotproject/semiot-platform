@@ -9,3 +9,7 @@
 /device-proxy-service/api-gateway/nbproject/private/
 /device-proxy-service/api-gateway/build/
 /device-proxy-service/api-gateway/dist/
+web-ui/npm-debug.log
+web-ui/dist
+web-ui/bower_components
+web-ui/node_modules
