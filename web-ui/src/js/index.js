@@ -62,6 +62,8 @@ app.controller('LoginCtrl', require('./controllers/login'));
 app.controller('AnalyzeCtrl', require('./controllers/analyse'));
 app.controller('SystemListCtrl', require('./controllers/system-list'));
 app.controller('SystemDetailCtrl', require('./controllers/system-detail'));
+app.controller('QueryDetailCtrl', require('./controllers/query-detail'));
+app.controller('NewQueryCtrl', require('./controllers/new-query'));
 
 app.config(require('./routing'));
 

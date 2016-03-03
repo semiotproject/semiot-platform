@@ -13,12 +13,20 @@ export default function($routeProvider) {
             templateUrl: 'partials/system-list.html',
             controller: 'SystemListCtrl'
         })
-        .when('/analyze', {
-            templateUrl: 'partials/analyze.html',
-            controller: 'AnalyzeCtrl'
-        })
         .when('/systems/:system_uri*', {
             templateUrl: 'partials/system-detail.html',
             controller: 'SystemDetailCtrl'
+        })
+        .when('/queries', {
+            templateUrl: 'partials/analyze.html',
+            controller: 'AnalyzeCtrl'
+        })
+        .when('/queries/:query_uri', {
+            templateUrl: 'partials/query-detail.html',
+            controller: 'QueryDetailCtrl'
+        })
+        .when('/new-query', {
+            templateUrl: 'partials/new-query.html',
+            controller: 'NewQueryCtrl'
         });
 }

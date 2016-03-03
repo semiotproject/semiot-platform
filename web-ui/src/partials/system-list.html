@@ -23,9 +23,6 @@
                         <input type="text" ng-change="setPagination()" ng-model="search.name" class="form-control" placeholder="Name"/>
                     </th>
                     <th>
-                        State
-                    </th>
-                    <th>
 
                     </th>
                 </tr>
@@ -35,12 +32,10 @@
                     <td>No systems registered</td>
                     <td></td>
                     <td></td>
-                    <td></td>
                 </tr>
                 <tr ng-repeat="system in systems | filter: filterFunction | orderBy: 'name'" ng-click="showSingle(system)">
                     <td>{{ system.index }}</td>
                     <td><a href="{{ '#/systems/' + system.uri }}">{{ system.name }}</a></td>
-                    <td>{{ system.isOnline ? "online" : "offline" }}</td>
                     <td>
                     </td>
                 </tr>

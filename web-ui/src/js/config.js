@@ -1,8 +1,8 @@
 "use strict";
 
 // change it to target hostname when develop
-const DEFAULT_HOSTNAME = "demo.semiot.ru";
-const hostname = location.hostname;
+const DEFAULT_HOSTNAME = "demo-1.semiot.ru";
+const hostname = DEFAULT_HOSTNAME;
 
 const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
 
