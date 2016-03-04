@@ -1,17 +1,16 @@
+<%@page import="com.github.jsonldjava.utils.JsonUtils"%>
 <%@page import="javax.json.JsonArray"%>
 <%@page import="javax.json.JsonObject"%>
 <%@page import="java.util.Iterator"%>
-<%@page import="ru.semiot.platform.apigateway.config.QueryUtils"%>
 <%@page import="ru.semiot.platform.apigateway.config.BundleConstants"%>
+<%@page import="javax.json.Json"%>
 
 <%
-    response.setHeader("Cache-Control",
-            "no-cache, no-store, must-revalidate"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0");
+	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+	response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+	response.setHeader("Expires", "0");
 
-    JsonArray jsonBundles = QueryUtils.getBundlesJsonArray();
-    String statusConfigurations = QueryUtils.getStatusConfigurations();
+	JsonArray jsonBundles = (JsonArray) request.getAttribute("jsonArray");
 %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -47,7 +46,7 @@
 			</div>
 		</div>
 		<form
-			action="${pageContext.request.contextPath}/DriverInstalledHandler"
+			action="${pageContext.request.contextPath}/config/DriversInstalled"
 			method="post">
 			<table class="table table-hover">
 				<CAPTION>List of drivers</CAPTION>
@@ -59,43 +58,38 @@
 				</tr>
 
 				<%
-                        if (jsonBundles.size() <= BundleConstants.countDefaultBundles) {
-                    %>
+					if (jsonBundles.size() <= BundleConstants.countDefaultBundles) {
+				%>
 				<tr>
 					<td>Installed drivers are missing.</td>
 				</tr>
 				<%
-                    } else {
-                        int j = 1;
-                        for (int i = 0; i < jsonBundles.size(); i++) {
-                            JsonObject jObj = jsonBundles.getJsonObject(i);
-                            int id = jObj.getInt("id");
-                            if (id >= BundleConstants.countDefaultBundles) {
-                                String symbName = jObj.getString("symbolicName");
-                    %>
+					} else {
+						int j = 1;
+						for (int i = 0; i < jsonBundles.size(); i++) {
+							JsonObject jObj = jsonBundles.getJsonObject(i);
+							int id = jObj.getInt("id");
+							if (id >= BundleConstants.countDefaultBundles) {
+								String symbName = jObj.getString("symbolicName");
+				%>
 				<tr>
 					<td><%=j++%>
 					<td><%=jObj.get("name")%>
-					<td><input type="submit" class="btn btn-primary btn-sm"
-						name="conf" value="configuration" class="form-control"
-						onClick="ChangeValue('id_bundle', '<%=symbName%>');"
-						<%if (statusConfigurations.indexOf("\"PID = " + symbName
-                                               + "\"") != -1) {%>
-						disabled <%}%> /> <a href="#myModal"
-						class="btn btn-primary btn-sm" data-toggle="modal"
+					<td><a href="#myModal" class="btn btn-primary btn-sm"
+						data-toggle="modal"
 						onClick="ChangeValue('id_bundle', '<%=symbName%>');">uninstall</a>
 					</td>
 
 				</tr>
 				<%
-                                }
-                            }
-                        }
-                    %>
+					}
+						}
+					}
+				%>
 			</table>
-			
+
 			<input type="hidden" name="id_bundle" id="id_bundle" />
-			
+
 			<div id="myModal" class="modal fade">
 				<div class="modal-dialog modal-sm">
 					<div class="modal-content">
@@ -120,9 +114,9 @@
 		</form>
 	</div>
 	<script>
-            function ChangeValue(id, val) {
-                document.getElementById(id).value = val;
-            }
-        </script>
+		function ChangeValue(id, val) {
+			document.getElementById(id).value = val;
+		}
+	</script>
 </body>
 </html>
