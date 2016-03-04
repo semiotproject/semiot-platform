@@ -21,7 +21,7 @@ export default function($routeProvider) {
             templateUrl: 'partials/query-list.html',
             controller: 'QueryListCtrl'
         })
-        .when('/queries/:query_uri', {
+        .when('/queries/:query_id', {
             templateUrl: 'partials/query-detail.html',
             controller: 'QueryDetailCtrl'
         })

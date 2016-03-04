@@ -1,7 +1,7 @@
 "use strict";
 
 // change it to target hostname when develop
-const DEFAULT_HOSTNAME = "demo.semiot.ru";
+const DEFAULT_HOSTNAME = "demo-1.semiot.ru";
 const hostname = location.hostname;
 
 const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
@@ -17,6 +17,10 @@ export default {
             archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{property={3}}`,
             archiveEnum: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{enum_value=*}`,
             last: `${TSDB_BASE_URL}/last/{0}`
+        },
+        analyze: {
+            query: "http://" + hostname + ":8085/api/query",
+            events: "http://" + hostname + ":8085/api/query/{0}/events"
         }
     },
     TOPICS: {

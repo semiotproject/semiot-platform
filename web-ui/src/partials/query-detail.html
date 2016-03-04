@@ -4,27 +4,31 @@
         <li><a href="#/queries">Queries</a></li>
         <li class="active">{{ query.name }}</li>
     </ol>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>
-                    <label>Time</label>
-                </th>
-                <th>
-                    Events
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-show="query.events.length === 0">
-                <td>No events found</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr ng-repeat="event in query.events">
-                <td>{{ event.created }}</td>
-                <td><pre>{{ event.events }}</pre></td>
-            </tr>
-        </tbody>
-    </table>
+
+    <div class="analyzing-service-container">
+        <span ng-if="isLoading">loading...</span>
+        <table ng-if="isLoading === false" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <label>Time</label>
+                    </th>
+                    <th>
+                        Events
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-show="query.events.length === 0">
+                    <td>No events found</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr ng-repeat="event in query.events">
+                    <td>{{ event.created }}</td>
+                    <td><pre>{{ event.events }}</pre></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </section>

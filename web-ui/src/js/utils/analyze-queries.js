@@ -1,19 +1,18 @@
-export default function($http) {
+export default function($http, CONFIG) {
     return {
         fetchQueries() {
             return $http.get(CONFIG.URLS.analyze.query);
         },
-        fetchQueryEvent(queryId) {
-            return $http.get(CONFIG.URLS.analyze.query.events.format(queryId));
+        fetchQueryDetail(queryId) {
+            return $http.get(CONFIG.URLS.analyze.events.format(queryId));
         },
         createQuery(payload) {
-            return $http.post(CONFIG.URLS.analyze.query, {
-                data: JSON.stringify(payload),
+            return $http.post(CONFIG.URLS.analyze.query, payload, {
                 contentType: "application/json"
             });
         },
         removeQuery(queryId) {
-            return $http.remove(CONFIG.URLS.analyze.query.events.format(queryId));
+            return $http.delete(CONFIG.URLS.analyze.query + "/" + queryId);
         }
     };
 }

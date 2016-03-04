@@ -1,5 +1,9 @@
 'use strict';
 
+import moment from 'moment';
+
+window.moment = moment;
+
 // usage: "string {0} is {1}".format("one", "first");
 String.prototype.format = function() {
     let pattern = /\{\d+\}/g;
