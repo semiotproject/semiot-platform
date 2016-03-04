@@ -1,0 +1,42 @@
+{
+	"@context":	{
+		"xsd": "http://www.w3.org/2001/XMLSchema#",
+		"rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+	},
+    "@type": "semiot:DriverConfigurationSchema",
+    "semiot:maxRepeatableSchemas": 2,
+    "semiot:view": {
+        "@type": "semiot:CommonSchema",
+        "ru.semiot.username": {
+            "@type": "xsd:string",
+            "rdfs:label": "Username",
+        },
+        "ru.semiot.password": {
+            "@type": "xsd:string",
+            "rdfs:label": "Password"
+        },
+        "ru.semiot.initialDelay": {
+            "@type": "xsd:integer",
+            "rdfs:label": "The initial delay"
+        },
+        "ru.semiot.pollingInterval": {
+            "@type": "xsd:integer",
+            "rdfs:label": "The polling interval"
+        },
+        "ru.semiot.clientAppID": {
+            "@type": "xsd:string",
+            "rdfs:label": "Client application ID"
+        },
+        "ru.semiot.clientAppSecret": {
+            "@type": "xsd:string",
+            "rdfs:label": "Client application secret"
+        }
+    },
+    "semiot:view": {
+        "@type": "semiot:RepeatableSchema",
+        "ru.semiot.area": {
+            "@type": "schema:GeoCircle",
+            "rdfs:label": "The selection area"
+        }
+    }
+}
