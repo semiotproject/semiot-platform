@@ -48,6 +48,7 @@ app.factory('rdfUtils', require('./utils/rdf'));
 app.factory('sparqlUtils', require('./utils/sparql'));
 app.factory('tsdbUtils', require('./utils/tsdb'));
 app.factory('chartUtils', require('./utils/chart'));
+app.factory('analyzeQueriesUtils', require('./utils/analyze-queries'));
 
 // services
 app.factory('loginService', require('./services/login-service'));
@@ -59,7 +60,7 @@ app.factory('machineToolStates', require('./models/machine-tool-states'));
 
 // controllers
 app.controller('LoginCtrl', require('./controllers/login'));
-app.controller('AnalyzeCtrl', require('./controllers/analyse'));
+app.controller('QueryListCtrl', require('./controllers/query-list'));
 app.controller('SystemListCtrl', require('./controllers/system-list'));
 app.controller('SystemDetailCtrl', require('./controllers/system-detail'));
 app.controller('QueryDetailCtrl', require('./controllers/query-detail'));

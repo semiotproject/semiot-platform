@@ -18,8 +18,8 @@ export default function($routeProvider) {
             controller: 'SystemDetailCtrl'
         })
         .when('/queries', {
-            templateUrl: 'partials/analyze.html',
-            controller: 'AnalyzeCtrl'
+            templateUrl: 'partials/query-list.html',
+            controller: 'QueryListCtrl'
         })
         .when('/queries/:query_uri', {
             templateUrl: 'partials/query-detail.html',

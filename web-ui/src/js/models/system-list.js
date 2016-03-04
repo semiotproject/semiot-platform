@@ -103,8 +103,7 @@ export default function(
                     return {
                         index: index + 1,
                         name: binding.label.value,
-                        uri: binding.uri.value,
-                        isOnline: isDeviceOnline(binding.state.value)
+                        uri: binding.uri.value
                     };
                 });
                 defer.resolve(systems);

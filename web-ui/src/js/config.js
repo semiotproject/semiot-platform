@@ -47,10 +47,9 @@ export default {
         },
         queries: {
             getAllSystems: [
-                "SELECT DISTINCT ?label ?uri ?state",
+                "SELECT DISTINCT ?label ?uri",
                 "WHERE {",
                 "   ?uri a ssn:System ;",
-                "       saref:hasState ?state ;",
                 "       rdfs:label ?label .",
                 "}"
             ].join('\n'),
