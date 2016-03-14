@@ -26,21 +26,30 @@ public class ContextProvider {
     private static final Logger logger = LoggerFactory.getLogger(ContextProvider.class);
 
     private static final String ROOT = "/ru/semiot/platform/apigateway/";
-    private static final String RDF_POSTFIX = ".ttl";
+    private static final String TTL_POSTFIX = ".ttl";
     private static final String FRAME_POSTFIX = "-frame.jsonld";
+    private static final String JSONLD_POSTFIX = ".jsonld";
     private final Map<String, String> rdfModels = new HashMap<>();
     private final Map<String, String> frames = new HashMap<>();
+    private final Map<String, String> contexts = new HashMap<>();
 
+    public static final String COMMON_CONTEXT = "CommonContext";
     public static final String API_DOCUMENTATION = "ApiDocumentation";
     public static final String ENTRYPOINT = "EntryPoint";
     public static final String SYSTEM_COLLECTION = "SystemCollection";
     public static final String SYSTEM_SINGLE = "SystemSingle";
     public static final String SENSOR_COLLECTION = "SensorCollection";
     public static final String SENSOR_SINGLE = "SensorSingle";
-    public static final String OBSERVATIONS_COLLECTION = "ObservationsCollection";
+    public static final String SYSTEM_OBSERVATIONS_COLLECTION = "SystemObservationsCollection";
+    public static final String SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION = "SystemObservationsCollection-Partial";
+    public static final String SENSOR_OBSERVATIONS_COLLECTION = "SensorObservationsCollection";
+    public static final String SENSOR_OBSERVATIONS_PARTIAL_COLLECTION = "SensorObservationsCollection-Partial";
 
     public static final String VAR_ROOT_URL = "${ROOT_URL}";
     public static final String VAR_SYSTEM_ID = "${SYSTEM_ID}";
+    public static final String VAR_SENSOR_ID = "${SENSOR_ID}";
+    public static final String VAR_WAMP_URL = "${WAMP_URL}";
+    public static final String VAR_QUERY_PARAMS = "${QUERY_PARAMS}";
 
     public ContextProvider() {
     }
@@ -48,14 +57,19 @@ public class ContextProvider {
     @PostConstruct
     public void init() {
         try {
-            loadContext(API_DOCUMENTATION);
-            loadContext(ENTRYPOINT);
-            loadContext(SYSTEM_COLLECTION);
-            loadContext(SYSTEM_SINGLE);
-            loadContext(SENSOR_COLLECTION);
-            loadContext(OBSERVATIONS_COLLECTION);
+            loadModelAndFrame(API_DOCUMENTATION);
+            loadModelAndFrame(ENTRYPOINT);
+            loadModelAndFrame(SYSTEM_COLLECTION);
+            loadModelAndFrame(SYSTEM_SINGLE);
+            loadModelAndFrame(SENSOR_COLLECTION);
+            loadModelAndFrame(SENSOR_SINGLE);
+            loadModelAndFrame(SENSOR_OBSERVATIONS_COLLECTION);
+            loadModelAndFrame(SYSTEM_OBSERVATIONS_COLLECTION);
+
+            loadContext(COMMON_CONTEXT);
             
-            loadFrame(SENSOR_SINGLE);
+            loadFrame(SENSOR_OBSERVATIONS_PARTIAL_COLLECTION);
+            loadFrame(SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION);
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
         }
@@ -83,13 +97,24 @@ public class ContextProvider {
         return (Map<String, Object>) JsonUtils.fromString(str);
     }
 
+    public String getContext(String name, URI root) {
+        String str = contexts.get(name).replace(VAR_ROOT_URL,
+                URIUtils.extractRootURL(root));
+
+        return str;
+    }
+
     private void loadFrame(String name) throws IOException {
         frames.put(name, readFile(ROOT + name + FRAME_POSTFIX));
     }
 
-    private void loadContext(String name) throws IOException {
-        rdfModels.put(name, readFile(ROOT + name + RDF_POSTFIX));
+    private void loadModelAndFrame(String name) throws IOException {
+        rdfModels.put(name, readFile(ROOT + name + TTL_POSTFIX));
         frames.put(name, readFile(ROOT + name + FRAME_POSTFIX));
+    }
+
+    private void loadContext(String name) throws IOException {
+        contexts.put(name, readFile(ROOT + name + JSONLD_POSTFIX));
     }
 
     private String readFile(String path) throws IOException {
