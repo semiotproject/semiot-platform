@@ -9,7 +9,7 @@
         "@type": "semiot:CommonSchema",
         "ru.semiot.username": {
             "@type": "xsd:string",
-            "rdfs:label": "Username",
+            "rdfs:label": "Username"
         },
         "ru.semiot.password": {
             "@type": "xsd:string",
