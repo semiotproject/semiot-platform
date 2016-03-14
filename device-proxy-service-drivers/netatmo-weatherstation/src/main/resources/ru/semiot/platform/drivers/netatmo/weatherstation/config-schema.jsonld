@@ -1,42 +1,69 @@
 {
 	"@context":	{
 		"xsd": "http://www.w3.org/2001/XMLSchema#",
-		"rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+		"rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+		"dtype": "http://www.linkedmodel.org/schema/dtype#",
+		"geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"
 	},
-    "@type": "semiot:DriverConfigurationSchema",
-    "semiot:maxRepeatableSchemas": 2,
-    "semiot:view": {
-        "@type": "semiot:CommonSchema",
-        "ru.semiot.username": {
-            "@type": "xsd:string",
-            "rdfs:label": "Username"
-        },
-        "ru.semiot.password": {
-            "@type": "xsd:string",
-            "rdfs:label": "Password"
-        },
-        "ru.semiot.initialDelay": {
-            "@type": "xsd:integer",
-            "rdfs:label": "The initial delay"
-        },
-        "ru.semiot.pollingInterval": {
-            "@type": "xsd:integer",
-            "rdfs:label": "The polling interval"
-        },
-        "ru.semiot.clientAppID": {
-            "@type": "xsd:string",
-            "rdfs:label": "Client application ID"
-        },
-        "ru.semiot.clientAppSecret": {
-            "@type": "xsd:string",
-            "rdfs:label": "Client application secret"
-        }
-    },
-    "semiot:view": {
-        "@type": "semiot:RepeatableSchema",
-        "ru.semiot.area": {
-            "@type": "schema:GeoCircle",
-            "rdfs:label": "The selection area"
-        }
-    }
+	"@type": "semiot:DriverConfigurationSchema",
+	"semiot:maxRepeatableSchemas": 2,
+	"semiot:driverPid": "ru.semiot.platform.drivers.netatmo-weatherstation",
+	"semiot:view": [
+		{
+			"@type": "semiot:CommonSchema",
+			"ru.semiot.username": {
+				"@type": "xsd:string",
+				"rdfs:label": "Username",
+				"dtype:defaultValue": "garayzuev@gmail.com"
+			},
+			"ru.semiot.password": {
+				"@type": "xsd:string",
+				"rdfs:label": "Password",
+				"dtype:defaultValue": "Ny7!Ze#o"
+			},
+			"ru.semiot.initialDelay": {
+				"@type": "xsd:integer",
+				"rdfs:label": "The initial delay",
+				"dtype:defaultValue": 1
+			},
+			"ru.semiot.pollingInterval": {
+				"@type": "xsd:integer",
+				"rdfs:label": "The polling interval",
+				"dtype:defaultValue": 20
+			},
+			"ru.semiot.clientAppID": {
+				"@type": "xsd:string",
+				"rdfs:label": "Client application ID",
+				"dtype:defaultValue": "566ffb00e8ede139a1529208"
+			},
+			"ru.semiot.clientAppSecret": {
+				"@type": "xsd:string",
+				"rdfs:label": "Client application secret",
+				"dtype:defaultValue": "C5hws3Fo0fG0wiZpdd1AKi64OTZK7G3Ic0eu5R"
+			}
+		},
+		{
+			"@type": "semiot:RepeatableSchema",
+			"ru.semiot.area": {
+				"@type": "semiot:GeoRectangle",
+				"rdfs:label": "The selection area",
+				"ru.semiot.area.latitude_ne": {
+					"@type": "geo:latitude",
+					"dtype:defaultValue": 60.108344
+				},
+				"ru.semiot.area.longitude_ne": {
+					"@type": "geo:longitude",
+					"dtype:defaultValue": 30.559627
+				},
+				"ru.semiot.area.latitude_sw": {
+					"@type": "geo:latitude",
+					"dtype:defaultValue": 59.812235
+				},
+				"ru.semiot.area.longitude_sw": {
+					"@type": "geo:longitude",
+					"dtype:defaultValue": 29.975978
+				}
+			}
+		}
+	]
 }
