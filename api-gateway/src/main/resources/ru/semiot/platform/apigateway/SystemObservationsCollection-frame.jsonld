@@ -1,0 +1,31 @@
+{
+    "@context": {
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "hydra-pubsub": "http://w3id.org/semiot/ontologies/hydra-pubsub#",
+        "hydra-filter": "http://w3id.org/semiot/ontologies/hydra-filter#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+        "saref": "http://ontology.tno.nl/saref#",
+        "void": "http://rdfs.org/ns/void#",
+        "dcterms": "http://purl.org/dc/terms/",
+        "qudt-quantity": "http://qudt.org/vocab/quantity#",
+        "qudt-unit": "http://qudt.org/vocab/unit#",
+        "qudt": "http://qudt.org/schema/qudt#",
+        "proto": "http://w3id.org/semiot/ontologies/proto#",
+        "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
+        "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "apidoc": "${ROOT_URL}/doc#",
+
+        "ssn:hasValue": {"@type": "@id"},
+        "void:class": {"@type": "@id"},
+        "ssn:isProducedBy": {"@type": "@id"},
+        "ssn:observedBy": {"@type": "@id"},
+        "ssn:observedProperty": {"@type": "@id"},
+        "ssn:observationResultTime": {"@type": "xsd:dateTime"}
+    },
+    "@type": "hydra:Collection",
+    "hydra:member": {
+        "@type": "ssn:Observation"
+    }
+}

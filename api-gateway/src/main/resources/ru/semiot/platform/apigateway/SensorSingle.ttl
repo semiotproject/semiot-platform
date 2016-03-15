@@ -7,5 +7,4 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
-<${ROOT_URL}/${SYSTEM_ID}/observations> a hydra:Collection, void:Dataset ;
-    void:classPartition [ void:class ssn:Observation ] .
+<${ROOT_URL}/sensors/${SENSOR_ID}> apidoc:observations <${ROOT_URL}/sensors/${SENSOR_ID}/observations> .

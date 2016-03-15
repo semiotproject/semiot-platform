@@ -10,6 +10,7 @@ public class Hydra extends Namespace {
     public static final Resource ApiDocumentation = resource(URI, "ApiDocumentation");
     public static final Resource Class = resource(URI, "Class");
     public static final Resource Collection = resource(URI, "Collection");
+    public static final Resource PartialCollectionView = resource(URI, "PartialCollectionView");
     
     public static final Property supportedClass = property(URI, "supportedClass");
     public static final Property supportedProperty = property(URI, "supportedProperty");

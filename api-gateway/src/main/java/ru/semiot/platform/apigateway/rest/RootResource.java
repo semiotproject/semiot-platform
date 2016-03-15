@@ -20,6 +20,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
@@ -37,6 +38,8 @@ import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.SHACL;
+import ru.semiot.platform.apigateway.ServerConfig;
+import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
@@ -46,6 +49,7 @@ import rx.exceptions.Exceptions;
 @Stateless
 public class RootResource {
 
+    private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
     private static final Logger logger = LoggerFactory.getLogger(RootResource.class);
     private static final String QUERY_SYSTEM_PROTOTYPES
             = "SELECT DISTINCT ?prototype {"
@@ -81,13 +85,13 @@ public class RootResource {
     }
 
     @Inject
-    SPARQLQueryService query;
+    private SPARQLQueryService query;
 
     @Context
-    UriInfo uriInfo;
+    private UriInfo uriInfo;
 
     @Inject
-    ContextProvider contextProvider;
+    private ContextProvider contextProvider;
 
     @GET
     @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
@@ -106,6 +110,13 @@ public class RootResource {
     public Response index() {
         return Response.seeOther(URI.create("/index")).build();
     }
+    
+    @GET
+    @Path("/context")
+    public String context() {
+        URI root = uriInfo.getRequestUri();
+        return contextProvider.getContext(ContextProvider.COMMON_CONTEXT, root);
+    }
 
     @GET
     @Path("/doc")
@@ -113,7 +124,11 @@ public class RootResource {
     public void documentation(@Suspended final AsyncResponse response)
             throws JsonLdError, IOException {
         URI root = uriInfo.getRequestUri();
-        Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION, root);
+        Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION, 
+                MapBuilder.newMap()
+                        .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
+                        .put(ContextProvider.VAR_WAMP_URL, config.wampUri())
+                        .build());
         Map<String, Object> frame = contextProvider.getFrame(API_DOCUMENTATION, root);
 
         Observable<List<Resource>> systems = query.select(QUERY_SYSTEM_PROTOTYPES)
