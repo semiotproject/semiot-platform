@@ -33,7 +33,7 @@
             </div>
             <form action="${pageContext.request.contextPath}/UploadDriverHandler"
                   method="post" enctype="multipart/form-data">
-                <br class="form-control">Download the bundle as a .jar file</br> <input
+                <br class="form-control">Upload a .jar bundle file</br> <input
                     type="file" name="bundlefile" accept="jar|war" /> <input
                     type="submit" class="btn btn-primary" />
             </form>
