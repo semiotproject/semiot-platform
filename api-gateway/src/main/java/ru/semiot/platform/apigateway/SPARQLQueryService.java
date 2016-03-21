@@ -16,6 +16,8 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
+
+import ru.semiot.commons.namespaces.GEO;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.Proto;
@@ -36,7 +38,7 @@ public class SPARQLQueryService {
     private static final String PREFIXES = NamespaceUtils.toSPARQLPrologue(
             SSN.class, RDF.class, OWL.class, RDFS.class, SSNCOM.class, 
             DCTerms.class, XSD.class, Proto.class, Hydra.class, SHACL.class,
-            SEMIOT.class);
+            SEMIOT.class, GEO.class);
 
     private final HttpAuthenticator httpAuthenticator;
 

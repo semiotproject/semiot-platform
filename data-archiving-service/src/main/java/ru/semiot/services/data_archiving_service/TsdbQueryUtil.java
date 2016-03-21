@@ -16,7 +16,7 @@ public class TsdbQueryUtil {
 	
 	private static HttpClient client = new DefaultHttpClient();
 	//http://www.programcreek.com/java-api-examples/org.apache.http.client.methods.HttpDelete
-	private static String deleteMetricQeury = "http://deviceproxyservice:4242/api/query?"
+	private static String deleteMetricQeury = "http://opentsdb:4242/api/query?"
 			+ "start=2000/01/01-00:00:00&m=sum:${METRIC}";
 	
 	public static String deleteMetricRequest(String uid) {

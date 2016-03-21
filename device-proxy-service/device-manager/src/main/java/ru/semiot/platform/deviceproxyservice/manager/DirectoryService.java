@@ -19,6 +19,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.semiot.commons.namespaces.GEO;
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SAREF;
 import ru.semiot.commons.namespaces.SEMIOT;
@@ -39,18 +40,20 @@ public class DirectoryService {
     		"DELETE { "
     			+ "?system ?x1 ?y1. "
     			+ "?sensor ?x2 ?y2. "
-    			+ "GRAPH <urn:semiot:graphs:private>{?system ?x3 ?y3. "
-    				+ "?wamp ?x4 ?y4} } "
+    			+ "?loc ?x3 ?y3. "
+    			+ "GRAPH <urn:semiot:graphs:private>{?system ?x4 ?y4. "
+    				+ "?wamp ?x5 ?y5} } "
     			+ "WHERE { "
     				+ "GRAPH <urn:semiot:graphs:private> {"
     					+ "?system semiot:hasDriver <urn:semiot:drivers:${PID}>} . "
     				+ "{ ?system  ssn:hasSubSystem  ?sensor . "
     					+ "?system ?x1 ?y1. ?sensor ?x2 ?y2 } "
+    				+ "UNION { ?system geo:location ?loc. ?loc ?x3 ?y3 } "
     				+ "UNION { "
     					+ "GRAPH <urn:semiot:graphs:private> { "
     						+ "?system ssncom:hasCommunicationEndpoint  ?wamp . "
-    						+ "?system ?x3 ?y3. ?wamp ?x4 ?y4} } }", 
-    		SSN.class, SSNCOM.class, SEMIOT.class);
+    						+ "?system ?x4 ?y4. ?wamp ?x5 ?y5} } }", 
+    		SSN.class, SSNCOM.class, SEMIOT.class, GEO.class);
     
     protected static final String QUERY_UPDATE_STATE_SYSTEM = NamespaceUtils.newSPARQLQuery(
             "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
