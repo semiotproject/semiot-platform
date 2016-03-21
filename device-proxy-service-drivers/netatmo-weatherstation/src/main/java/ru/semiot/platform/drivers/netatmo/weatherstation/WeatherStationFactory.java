@@ -50,7 +50,7 @@ public class WeatherStationFactory {
         while (keys.hasNext()) {
             String sensorId = (String) keys.next();
             JSONArray types = obj.getJSONObject(sensorId).optJSONArray(TYPE_KEY);
-            if (types.length() == 2) {
+            if (types!=null && types.length() == 2) {
                 if (JSONUtils.contains(types, WeatherStationObservation.TEMPERATURE_TYPE)
                         && JSONUtils.contains(types, WeatherStationObservation.HUMIDITY_TYPE)) {
                     return true;

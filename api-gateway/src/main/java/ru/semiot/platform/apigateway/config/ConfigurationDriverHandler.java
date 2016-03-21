@@ -110,6 +110,7 @@ public class ConfigurationDriverHandler extends HttpServlet {
 			final AsyncContext ctx = request.startAsync();
 			HttpSession session = request.getSession(true);
 			String pid = (String) session.getAttribute("pid");
+			session.removeAttribute("pid");
 			Observable<String> post = null;
 			if (request.getParameter("save") != null) {
 				parameters.remove("save");
@@ -119,7 +120,6 @@ public class ConfigurationDriverHandler extends HttpServlet {
 				String filename = (String) session.getAttribute("filename");
 				session.removeAttribute("inputStreamFile");
 				session.removeAttribute("filename");
-				session.removeAttribute("pid");
 				post = service.sendPostUploadFile(is,
 						filename, pid, parameters);
 			} else if (request.getParameter("configure") != null) {
@@ -135,10 +135,12 @@ public class ConfigurationDriverHandler extends HttpServlet {
 					// response.flushBuffer();
 					response.sendRedirect("/config/DriversInstalled");
 				} catch (Exception e1) {
-					e1.printStackTrace();
+					logger.error(e1.getMessage(), e1);
 				}
 				ctx.complete();
 			});
+		} else {
+			response.sendRedirect("/config/DriversInstalled");
 		}
 	}
 
@@ -150,7 +152,6 @@ public class ConfigurationDriverHandler extends HttpServlet {
 			String key = (String) _enum.nextElement();
 			String value = request.getParameter(key);
 			parameters.put(key, value);
-			System.out.println(key + " " + value);
 		}
 		return parameters;
 	}

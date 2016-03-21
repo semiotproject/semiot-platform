@@ -12,7 +12,7 @@ public abstract class Keys {
     public static final String POLLING_INTERVAL = PREFIX + ".pollingInterval";
     public static final String POLLING_START_PAUSE = PREFIX + ".initialDelay";
     public static final String USERNAME = PREFIX + ".username";
-    public static final String PASSWORD = PREFIX + ".pass";
+    public static final String PASSWORD = PREFIX + ".password";
     public static final String CLIENT_APP_ID = PREFIX + ".clientAppID";
     public static final String CLIENT_SECRET = PREFIX + ".clientAppSecret";
     public static final String AREA = PREFIX + ".area";

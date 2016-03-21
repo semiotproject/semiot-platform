@@ -245,10 +245,10 @@ public class OSGiApiService {
 		return urlParameters;
 	}
 
+	// not used
 	public Observable<Response> postUpload(MultiPart multipart) {
 		Observable<Response> post = Rx.newClient(RxObservableInvoker.class, mes)
 				.register(MultiPartFeature.class)
-				// .register(FormDataParamValueFactoryProvider.class)
 				.target(UriBuilder.fromPath(config.consoleEndpoint())
 						.path(urlBundles).build())
 				.request(MediaType.APPLICATION_JSON)

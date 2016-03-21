@@ -30,7 +30,7 @@ public class DriversInstalledHandler extends HttpServlet {
 
 	public static final String queryIdSystemsForDriver = "SELECT DISTINCT ?id "
 			+ "WHERE { " + "GRAPH <urn:semiot:graphs:private> {"
-			+ "?system  semiot:hasDriver <${DRIVER}> } "
+			+ "?system  semiot:hasDriver <urn:semiot:drivers:${DRIVER}> } "
 			+ "?system  dcterms:identifier ?id. }";
 
 	private static final Logger logger = LoggerFactory
