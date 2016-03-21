@@ -1,9 +1,11 @@
 package ru.semiot.platform.drivers.netatmo.weatherstation;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -32,26 +34,46 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private final Configuration configuration = new Configuration();
     private final DriverInformation info = new DriverInformation(
             Keys.DRIVER_PID,
-            URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule"));; 
+            URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule"));
+    ; 
 
     private volatile DeviceManager deviceManager;
 
     private ScheduledExecutorService scheduler;
-    private ScheduledFuture handle = null;
-    
-    
+    private List<ScheduledFuture> handles = null;
+    private List<Configuration> configurations;
+    private NetatmoAPI netAtmoAPI;
+    private int countRepeatableProperty;
+
     public void start() {
         logger.info("{} started!", driverName);
+        //deviceManager.registerDriver(info);
 
-        deviceManager.registerDriver(info);
-
-        this.scheduler = Executors.newScheduledThreadPool(1);
-        startScheduled();
+        handles = new ArrayList<>();
+        this.scheduler = Executors.newScheduledThreadPool(countRepeatableProperty);
+        logger.debug("Try to start {} pullers", countRepeatableProperty);
+        for (Configuration cfg : configurations) {
+            handles.add(startPuller(cfg));
+        }
+        logger.debug("All pullers started");
     }
 
     public void stop() {
-        stopScheduled();
-
+        logger.debug("Try to stop {} pullers", handles.size());
+        for (ScheduledFuture handle : handles) {
+            stopPuller(handle);
+        }
+        logger.debug("All pullers stoped");
+        handles = null;
+        scheduler.shutdown();
+        try {
+            scheduler.awaitTermination(1, TimeUnit.MINUTES);
+        }
+        catch (InterruptedException ex) {
+            logger.warn(ex.getMessage(), ex);
+        }
+        scheduler.shutdownNow();
+        logger.debug("Sheduler stoped");
         logger.info("{} stopped!", driverName);
     }
 
@@ -60,9 +82,23 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         synchronized (this) {
             if (dictionary != null) {
                 if (!configuration.isConfigured()) {
-                    configuration.putAll(dictionary);
-
-                    configuration.setConfigured();
+                    logger.debug("Configuration got");
+                    try {
+                        configuration.putAll(dictionary);
+                        Configuration commonConfiguration = getCommonConfiguration();
+                        netAtmoAPI = new NetatmoAPI(commonConfiguration.get(Keys.CLIENT_APP_ID),
+                                                    commonConfiguration.get(Keys.CLIENT_SECRET));
+                        checkConnection(commonConfiguration.get(Keys.USERNAME),
+                                        commonConfiguration.get(Keys.PASSWORD));
+                        countRepeatableProperty = getCountRepeatableProperty(Keys.AREA);
+                        configurations = getConfigurations();
+                        configuration.setConfigured();
+                        logger.info("Received configuration is correct!");
+                    }
+                    catch (ConfigurationException ex) {
+                        configuration.clear();
+                        throw ex;
+                    }
                 } else {
                     logger.warn("Driver is already configured! Ignoring it");
                 }
@@ -70,6 +106,26 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
                 logger.debug("Configuration is empty. Skipping it");
             }
         }
+    }
+
+    public void checkConnection(String user, String pass) throws ConfigurationException {
+        logger.debug("Try to authenticate with server");
+        if (netAtmoAPI.authenticate(user, pass)) {
+            logger.info("Successfully authenticated!");
+        } else {
+            logger.error("Couldn't authenticate!");
+            throw new ConfigurationException(user + ":" + pass, "Login or password is incorrect");
+        }
+    }
+
+    private List<Configuration> getConfigurations() throws ConfigurationException {
+        logger.debug("Try to get repeatable configuration for each puller");
+        List<Configuration> conf = new ArrayList<>();
+        for (int i = 1; i <= countRepeatableProperty; i++) {
+            Configuration cfg = getAreaConfiguration(i);
+            conf.add(cfg);
+        }
+        return conf;
     }
 
     public Configuration getConfiguration() {
@@ -122,46 +178,104 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         deviceManager.registerObservation(devicesMap.get(deviceId), observation);
     }
 
-    public void startScheduled() {
-        if (this.handle != null) {
-            logger.debug("Try to stop scheduler");
-            stopScheduled();
-        }
+    public ScheduledFuture startPuller(Configuration config) {
+        logger.debug("Try to start puller!");
+        ScheduledPuller puller = new ScheduledPuller(this, config, netAtmoAPI);
 
-        ScheduledPuller puller = new ScheduledPuller(this);
-        puller.init();
-
-        this.handle = this.scheduler.scheduleAtFixedRate(
+        ScheduledFuture handle = this.scheduler.scheduleAtFixedRate(
                 puller,
                 configuration.getAsLong(Keys.POLLING_START_PAUSE),
                 configuration.getAsLong(Keys.POLLING_INTERVAL),
                 TimeUnit.MINUTES);
 
-        logger.debug("Polling scheduled. Starts in {}min with interval {}min",
-                configuration.get(Keys.POLLING_START_PAUSE),
-                configuration.get(Keys.POLLING_INTERVAL));
+        logger.debug("Polling scheduled. Starts in {}min with interval {}min with configuration [{}]",
+                     configuration.get(Keys.POLLING_START_PAUSE),
+                     configuration.get(Keys.POLLING_INTERVAL),
+                     config.toString());
+        logger.debug("Puller started!");
+        return handle;
     }
 
-    public void stopScheduled() {
-        logger.debug("Hello from stopScheduled!");
+    public void stopPuller(ScheduledFuture handle) {
+        logger.debug("Try to stop puller!");
         if (handle == null) {
             return;
         }
-
         handle.cancel(true);
-        handle = null;
-
-        scheduler.shutdown();
-        try {
-            scheduler.awaitTermination(1, TimeUnit.MINUTES);
-        } catch (InterruptedException ex) {
-            logger.warn(ex.getMessage(), ex);
-        }
-        scheduler.shutdownNow();
-        logger.debug("UScheduled stoped");
+        logger.debug("Puller stoped!");
     }
-    
+
     private String toObsKey(String deviceId, String type) {
         return deviceId + "-" + type;
+    }
+
+    private int getCountRepeatableProperty(String propPrefix) throws ConfigurationException {
+        logger.debug("Try to get count of repeatable property \"{}\"", propPrefix);
+        int index = (propPrefix + ".").length();
+        int max = 0;
+        for (String key : configuration.keySet()) {
+            if (key.startsWith(propPrefix) && Integer.parseInt(key.substring(index, key.indexOf('.', index))) > max) {
+                max = Integer.parseInt(key.substring(index, key.indexOf('.', index)));
+            }
+        }
+        if (max == 0) {
+            logger.error("Bad repeatable configuration! Did not find a repeatable property");
+            throw new ConfigurationException(propPrefix, "Did not find a repeatable property");
+        }
+        return max;
+    }
+
+    private Configuration getCommonConfiguration() throws ConfigurationException {
+        logger.debug("Try to get common configuration");
+        Configuration config = new Configuration();
+        try {
+            //Put only needed properties
+            config.put(Keys.CLIENT_APP_ID, configuration.get(Keys.CLIENT_APP_ID));
+            config.put(Keys.CLIENT_SECRET, configuration.get(Keys.CLIENT_SECRET));
+            config.put(Keys.USERNAME, configuration.get(Keys.USERNAME));
+            config.put(Keys.PASSWORD, configuration.get(Keys.PASSWORD));
+            config.put(Keys.POLLING_START_PAUSE, configuration.get(Keys.POLLING_START_PAUSE));
+            config.put(Keys.POLLING_INTERVAL, configuration.get(Keys.POLLING_INTERVAL));
+        }
+        catch (java.lang.NullPointerException ex) {
+            logger.error("Bad common configuration! Can not extract fields");
+            throw new ConfigurationException("Common property", "Can not extract fields", ex);
+        }
+        return config;
+    }
+
+    private Configuration getAreaConfiguration(int area) throws ConfigurationException {
+        logger.debug("Try to get configuration for {} area", area);
+        Configuration config = new Configuration();
+        double lon_ne, lat_ne, lon_sw, lat_sw;
+        try {
+
+            lon_ne = Double.parseDouble(configuration.get(Keys.AREA + "." + area + ".1.longitude"));
+            lat_ne = Double.parseDouble(configuration.get(Keys.AREA + "." + area + ".1.latitude"));
+            lon_sw = Double.parseDouble(configuration.get(Keys.AREA + "." + area + ".2.longitude"));
+            lat_sw = Double.parseDouble(configuration.get(Keys.AREA + "." + area + ".2.latitude"));
+            if (lon_ne > 180 || lon_ne < -180 || lon_sw > 180 || lon_sw < -180
+                    || lat_ne > 90 || lat_ne < -90 || lat_sw > 90 || lat_sw < -90
+                    || lon_ne < lon_sw && lat_ne > lat_sw || lon_ne > lon_sw && lat_ne < lat_sw) {
+                throw new java.lang.NullPointerException();
+            }
+            if (lon_ne < lon_sw && lat_ne < lat_sw) {
+                logger.debug("Swop values");
+                config.put(Keys.LONGITUDE_NORTH_EAST, String.valueOf(lon_sw));
+                config.put(Keys.LATITUDE_NORTH_EAST, String.valueOf(lat_sw));
+                config.put(Keys.LONGITUDE_SOUTH_WEST, String.valueOf(lon_ne));
+                config.put(Keys.LATITUDE_SOUTH_WEST, String.valueOf(lat_ne));
+            } else {
+                config.put(Keys.LONGITUDE_NORTH_EAST, String.valueOf(lon_ne));
+                config.put(Keys.LATITUDE_NORTH_EAST, String.valueOf(lat_ne));
+                config.put(Keys.LONGITUDE_SOUTH_WEST, String.valueOf(lon_sw));
+                config.put(Keys.LATITUDE_SOUTH_WEST, String.valueOf(lat_sw));
+            }
+        }
+        catch (java.lang.NullPointerException ex) {
+            logger.error("Bad repeatable configuration! Can not extract field of property {}.{}", Keys.AREA, area);
+            throw new ConfigurationException(Keys.AREA + "." + area, "Can not extract field of repeatable property", ex);
+        }
+        return config;
     }
 }
