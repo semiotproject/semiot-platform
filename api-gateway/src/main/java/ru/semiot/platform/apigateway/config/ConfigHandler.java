@@ -41,7 +41,7 @@ public class ConfigHandler extends HttpServlet {
 				ctx.dispatch("/config/SystemSettings");
 			}
 		},(Throwable e) -> {
-			logger.warn(e.getMessage(), e);
+			// logger.warn(e.getMessage(), e);
 			ctx.dispatch("/notConnect");
 		}, () -> {
 		});	

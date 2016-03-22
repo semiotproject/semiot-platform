@@ -27,8 +27,8 @@ public interface ServerConfig extends Config {
     @DefaultValue("http://opentsdb:4242")
     String tsdbEndpoint();
     
-    @DefaultValue("http://opentsdb:8787")
-    String tsdbRestEndpoint();
+    @DefaultValue("http://dataarchivingservice:8787")
+    String archivRestEndpoint();
     
     @DefaultValue("http://deviceproxyservice:8181")
     String consoleEndpoint();

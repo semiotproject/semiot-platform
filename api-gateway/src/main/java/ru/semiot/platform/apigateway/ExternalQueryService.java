@@ -9,6 +9,9 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.aeonbits.owner.ConfigFactory;
@@ -28,8 +31,8 @@ public class ExternalQueryService {
 			+ "/jersey-http-service";
 	private static final String urlRsRemoveFromFuseki = urlRs
 			+ "/remove/fuseki/";
-	private static final String urlRsRemoveFromTsdb = config.tsdbRestEndpoint()
-			+ "/remove/metric/";
+	private static final String urlRsRemoveFromTsdb = config
+			.archivRestEndpoint() + "/remove/metric";
 
 	@javax.annotation.Resource
 	ManagedExecutorService mes;
@@ -58,8 +61,10 @@ public class ExternalQueryService {
 		});
 	}
 
-	public Observable<Response> sendRsRemoveFromTsdb(String pid) {
-		return getObservableRespForPath(urlRsRemoveFromTsdb + pid);
+	public Observable<Response> sendRsRemoveFromTsdb(JsonObject metrics) {
+		return Rx.newClient(RxObservableInvoker.class, mes)
+				.target(urlRsRemoveFromTsdb).request().rx()
+				.post(Entity.entity(metrics.toString(), MediaType.TEXT_PLAIN));
 	}
 
 	public Observable<Response> sendRsRemoveFromFuseki(String pid) {
@@ -68,8 +73,7 @@ public class ExternalQueryService {
 
 	private Observable<Response> getObservableRespForPath(String url) {
 		return Rx.newClient(RxObservableInvoker.class, mes).target(url)
-				.request()
-				.rx().get();
+				.request().rx().get();
 	}
 
 }

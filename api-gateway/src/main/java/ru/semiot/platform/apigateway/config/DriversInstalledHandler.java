@@ -5,7 +5,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.inject.Inject;
+import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -86,12 +89,15 @@ public class DriversInstalledHandler extends HttpServlet {
 					Observable<ResultSet> obsSystemsRS = query.select(
 							queryIdSystemsForDriver.replace("${DRIVER}", pid));
 					ResultSet systemsRS = obsSystemsRS.toBlocking().single();
+					JsonArrayBuilder jArrBuilder = Json.createArrayBuilder();
 					while (systemsRS.hasNext()) {
 						QuerySolution qs = systemsRS.next();
 						Literal id = qs.getLiteral("id");
-						externalService.sendRsRemoveFromTsdb(id.toString())
-								.subscribe();
+						jArrBuilder.add(id.toString());
 					}
+					JsonObject metrics = Json.createObjectBuilder().add(
+							"metrics", jArrBuilder).build();
+					externalService.sendRsRemoveFromTsdb(metrics).subscribe();
 					externalService.sendRsRemoveFromFuseki(pid).subscribe();
 					Observable<JsonArray> jsonArray = service
 							.getBundlesJsonArray();

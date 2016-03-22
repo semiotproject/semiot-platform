@@ -2,6 +2,7 @@ package ru.semiot.services.data_archiving_service;
 
 import java.io.IOException;
 
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -14,12 +15,13 @@ public class TsdbQueryUtil {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TsdbQueryUtil.class);
 	
-	private static HttpClient client = new DefaultHttpClient();
-	//http://www.programcreek.com/java-api-examples/org.apache.http.client.methods.HttpDelete
-	private static String deleteMetricQeury = "http://opentsdb:4242/api/query?"
+	private static final ServiceConfig config = ConfigFactory
+            .create(ServiceConfig.class);
+	private static String deleteMetricQeury = config.tsdbUrl() + "/api/query?"
 			+ "start=2000/01/01-00:00:00&m=sum:${METRIC}";
 	
 	public static String deleteMetricRequest(String uid) {
+		HttpClient client = new DefaultHttpClient();
 		HttpDelete delete = new HttpDelete(deleteMetricQeury.replace("${METRIC}", uid));
 		delete.addHeader("Accept", "application/json");
 		delete.addHeader("Content-Type", "application/x-www-form-urlencoded");

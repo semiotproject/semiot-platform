@@ -10,6 +10,8 @@ dataarchivingservice:
     - opentsdb
     - wamprouter
     - deviceproxyservice
+  ports:
+    - "8787:8787"
   volumes:
     - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
@@ -65,6 +67,7 @@ apigateway:
     - wamprouter
     - opentsdb
     - deviceproxyservice
+    - dataarchivingservice
   ports:
     - "8383:8080"
   volumes:
