@@ -68,6 +68,7 @@ apigateway:
     - opentsdb
     - deviceproxyservice
     - dataarchivingservice
+    - mysqlbase
   ports:
     - "8383:8080"
   volumes:
@@ -85,3 +86,8 @@ frontend:
     - "80:80"
   restart: always
 
+mysqlbase:
+  image: docker.semiot.ru/mysql
+  ports:
+    - "3306:3306"
+  restart: always
