@@ -33,6 +33,7 @@
 	<div class="container">
 		<h3>Drivers Installed</h3>
 		<ul class="nav nav-pills nav-justified">
+                    <li><a href="/config/AdminPanel">Administration Panel</a></li>
 			<li><a href="/config/SystemSettings">System Settings</a></li>
 			<li class="active"><a href="/config/DriversInstalled">Drivers</a></li>
 		</ul>
