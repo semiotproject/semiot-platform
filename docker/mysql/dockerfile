@@ -1,0 +1,8 @@
+FROM ubuntu:14.04
+
+RUN apt-get install -y mysql-server
+RUN service mysql start && mysql --execute="create database semiot; connect semiot;\
+ create table credentials (id int (4), login char(40), password char(20), role char(10), primary key(id));"
+
+EXPOSE 3306
+CMD ["mysqld"]
