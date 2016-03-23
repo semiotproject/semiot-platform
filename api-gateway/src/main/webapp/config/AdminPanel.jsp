@@ -158,6 +158,7 @@
         <script>
             function AddNewUser() {
                 var max = sessionStorage.getItem("max");
+                max++;
                 CreateTableLine(max, "default", "default", "user");
                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel",
                     type: 'post',
@@ -169,7 +170,7 @@
                     }
                 });
 
-                sessionStorage.setItem("max", ++max);
+                sessionStorage.setItem("max", max);
             }
         </script>
         <script>
