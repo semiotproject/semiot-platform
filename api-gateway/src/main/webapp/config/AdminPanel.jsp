@@ -20,8 +20,7 @@
     </head>
     <body>
         <script>
-            sessionStorage.setItem("counter", "0");</script>
-        <script>
+            sessionStorage.setItem("counter", "1");
             function CreateTableLine(id, name, passw, role) {
                 var element = document.getElementById("table");
                 var counter = sessionStorage.getItem("counter");
@@ -74,7 +73,8 @@
                 rmvBtn.setAttribute("onClick", "RemoveUser(" + id + ");");
                 rmvBtn.setAttribute("value", "-");
                 rmvBtn.setAttribute("style", "width: 30px");
-                rmvBtn.style.height=20;
+                rmvBtn.setAttribute("readonly", "true");
+                rmvBtn.style.height = 20;
                 var hid = document.createElement("input");
                 hid.setAttribute("type", "hidden");
                 hid.setAttribute("id", "id");
@@ -138,13 +138,13 @@
                         <script>sessionStorage.setItem("max",<%=max%>);</script>
                     </table>
                     <div class="text-center">
-                        <input class="btn btn-primary btn-sm" onClick="AddNewUser()"
+                        <input class="btn btn-primary btn-sm" onClick="AddNewUser()" readonly
                                value="Append new user" style="width: 150px" style = "height: 30px" id="add"/>
                     </div>
                 </div>
 
                 <div class="text-right">
-                    <input class="btn btn-primary btn-sm" onClick ="Update()" name="save" id="save"
+                    <input class="btn btn-primary btn-sm" onClick ="Update()" name="save" id="save" readonly
                            value="save" />
                 </div>                
             </form>
@@ -154,8 +154,6 @@
                 document.getElementById(id).focus();
                 document.getElementById(id).select();
             }
-        </script>
-        <script>
             function AddNewUser() {
                 var max = sessionStorage.getItem("max");
                 max++;
@@ -165,35 +163,34 @@
                     contentType: 'application/json; charset=utf-8',
                     data: {"id": max, "login": "default", "password": "default", "role": "user"},
                     error: function () {
-                        console.log("yeap");
-                        window.location.replace(window.location.host + "/config/AdminPanel");
+                        window.location.replace("/AdminPanel");
                     }
                 });
 
                 sessionStorage.setItem("max", max);
             }
-        </script>
-        <script>
             function RemoveUser(id) {
                 var form = "form" + id;
                 var line = "line" + id;
                 var element1 = document.getElementById(form);
                 var element2 = document.getElementById(line);
+                var root = document.getElementById("table");
+                var counter = element2.children[0].innerHTML;
                 element1.parentNode.removeChild(element1);
                 element2.parentNode.removeChild(element2);
-
-                console.log("Try to send");
-
+                
                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel?id=" + id,
                     type: 'DELETE',
                     contentType: 'application/json; charset=utf-8',
                     error: function () {
-                        window.location.replace(window.location.host + "/config/AdminPanel");
+                        window.location.replace("AdminPanel");
                     }
                 });
+                for (; counter < root.childElementCount; counter++) {
+                    root.children[counter].children[0].innerHTML = counter;
+                }
+                sessionStorage.setItem("counter", counter);
             }
-        </script>
-        <script>
             function Update() {
                 var template = "{\"id\":\"{0}\",\"login\":\"{1}\",\"password\":\"{2}\",\"role\":\"{3}\"},";
                 var root = document.getElementById("table");
@@ -208,17 +205,15 @@
                 }
                 payload += "]";
 
-                console.log(payload);
                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel",
                     type: 'put',
                     contentType: 'application/json; charset=utf-8',
                     data: payload,
                     error: function () {
-                        console.log("yeap");
-                        window.location.replace(window.location.host + "/config/AdminPanel");
+                        window.location.replace("/AdminPanel");
                     }
                 });
-                
+
             }
 
             function getUserId(element) {

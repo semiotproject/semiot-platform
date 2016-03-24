@@ -17,7 +17,7 @@ public class DataBase {
 
     public Credentials addUser(int id, String login, String password, String role) {
         try {
-            Credentials c = new Credentials(++id, login, password, role);
+            Credentials c = new Credentials(id, login, password, role);
             em.merge(c);
             return c;
         }
