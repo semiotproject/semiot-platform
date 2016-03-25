@@ -70,7 +70,9 @@ public class AdminPanelHandler extends HttpServlet {
             return;
         }
         if (db.removeUser(id)) {
-            credentials.remove(c);
+            synchronized (this) {
+                credentials.remove(c);
+            }
         } else {
             resp.sendError(500);
             return;
@@ -82,17 +84,34 @@ public class AdminPanelHandler extends HttpServlet {
         StringBuilder query = new StringBuilder();
         BufferedReader reader = req.getReader();
         String str;
-        while((str = reader.readLine())!=null){
+        while ((str = reader.readLine()) != null) {
             query.append(str);
         }
-        List <Credentials> changedList = parseJsonToCredentials(query.toString());
-        
+        List<Credentials> changedList = parseJsonToCredentials(query.toString());
+        str = null;
         Credentials c;
-        for(Credentials old : credentials){
-            if(changedList.contains(old) && old.needUpdate(c = changedList.get(changedList.indexOf(old))))
-                db.updateUser(c);
+        for (Credentials cred : changedList) {
+            if (credentials.contains(cred)) {
+                if (cred.needUpdate(c = credentials.get(credentials.indexOf(cred)))) {
+                    db.updateUser(cred);
+                }
+            } else {
+                if (!cred.getLogin().isEmpty() && db.isUniqueLogin(cred.getLogin())) {
+                    synchronized (this) {
+                        db.addUser(cred);
+                    }
+                } else {
+                    str = (cred.getLogin().isEmpty()) ? "Empty login!" : "Bad login: " + cred.getLogin();
+                }
+            }
         }
-        this.credentials = db.getAllUsers();
+        synchronized (this) {
+            this.credentials = db.getAllUsers();
+        }
+        if (str != null) {
+            resp.sendError(400, str);
+        }
+
     }
 
     private Credentials findCredentialByID(int id) {
@@ -112,14 +131,15 @@ public class AdminPanelHandler extends HttpServlet {
 
     private List<Credentials> parseJsonToCredentials(String str) {
         JSONArray arr = new JSONArray(str);
-        List <Credentials> lst = new ArrayList<>();
+        List<Credentials> lst = new ArrayList<>();
         JSONObject obj;
         for (int i = 0; i < arr.length(); i++) {
             obj = (JSONObject) arr.get(i);
             lst.add(new Credentials(obj.getInt("id"), obj.getString("login"), obj.getString("password"), obj.getString("role")));
         }
-        if(lst.isEmpty())
+        if (lst.isEmpty()) {
             return null;
+        }
         return lst;
     }
 }

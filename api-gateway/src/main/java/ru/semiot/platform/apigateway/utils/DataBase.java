@@ -26,6 +26,26 @@ public class DataBase {
         }
     }
 
+    public Credentials addUser(Credentials c) {
+        try {
+            em.merge(c);
+            return c;
+        }
+        catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public boolean isUniqueLogin(String login) {
+        try {
+            em.createNamedQuery("Credentials.findByLogin").setParameter("login", login).getSingleResult();
+            return false;
+        }
+        catch (Exception ex) {
+            return true;
+        }
+    }
+
     public boolean updateUser(int id, String login, String password, String role) {
         try {
             Credentials user = em.find(Credentials.class, id);
@@ -37,11 +57,10 @@ public class DataBase {
             return false;
         }
     }
-    
+
     public boolean updateUser(Credentials user) {
-        try {            
-            em.merge(user);
-            return true;
+        try {
+            return updateUser(user.getId(), user.getLogin(), user.getPassword(), user.getRole());
         }
         catch (Exception ex) {
             return false;

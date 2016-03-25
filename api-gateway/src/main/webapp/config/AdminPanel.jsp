@@ -23,11 +23,7 @@
             sessionStorage.setItem("counter", "1");
             function CreateTableLine(id, name, passw, role) {
                 var element = document.getElementById("table");
-                var counter = sessionStorage.getItem("counter");
-                var form = document.createElement("form");
-                form.setAttribute("action", "${pageContext.request.contextPath}/config/AdminPanel");
-                form.setAttribute("method", "post");
-                form.setAttribute("id", "form" + id);
+                var counter = sessionStorage.getItem("counter");                
                 var line = document.createElement("tr");
                 line.setAttribute("id", "line" + id);
                 var num = document.createElement("td");
@@ -40,22 +36,28 @@
                 var user_input = document.createElement("input");
                 user_input.setAttribute("type", "text");
                 user_input.setAttribute("id", "login" + id);
-                user_input.setAttribute("onClick", "SelectAll(login" + id + ");");
-                user_input.setAttribute("style", "width: 200px");
+                user_input.setAttribute("onClick", "SelectAll(\"login" + id + "\");");
+                user_input.setAttribute("onChange", "changeSaveBtn(true)");
+                user_input.setAttribute("class", "input-small");
+                user_input.setAttribute("placeholder", "Login");
                 user_input.setAttribute("value", name);
+                user_input.setAttribute("style", "height: 26px");
                 var pass_input = document.createElement("input");
                 pass_input.setAttribute("type", "text");
-                pass_input.setAttribute("id", "password" + id);
-                pass_input.setAttribute("onClick", "SelectAll(password" + id + ");");
-                pass_input.setAttribute("style", "width: 200px");
+                pass_input.setAttribute("id", "password" + id);                
+                pass_input.setAttribute("onClick", "SelectAll(\"password" + id + "\");");
+                pass_input.setAttribute("onChange", "changeSaveBtn(true)");
+                pass_input.setAttribute("class", "input-small");
+                pass_input.setAttribute("placeholder", "Password");
                 pass_input.setAttribute("value", passw);
+                pass_input.setAttribute("style", "height: 26px");
                 var select = document.createElement("select");
                 select.setAttribute("id", "role" + id);
-                select.setAttribute("style", "width: 120px");
+                select.setAttribute("style", "height: 26px");
                 if (id === 1) {
                     select.setAttribute("disabled", "true");
                 }
-
+                
                 var opt1 = document.createElement("option");
                 var opt2 = document.createElement("option");
                 opt1.setAttribute("value", "admin");
@@ -68,13 +70,17 @@
                 else {
                     opt2.setAttribute("selected", "true");
                 }
-                var rmvBtn = document.createElement("input");
-                rmvBtn.setAttribute("class", "btn btn-primary btn-sm");
-                rmvBtn.setAttribute("onClick", "RemoveUser(" + id + ");");
-                rmvBtn.setAttribute("value", "-");
-                rmvBtn.setAttribute("style", "width: 30px");
+                var rmvBtn = document.createElement("button");
+                rmvBtn.setAttribute("class", "btn-primary btn-small glyphicon glyphicon-minus");
+                //<!--rmvBtn.setAttribute("class", "btn btn-primary btn-sm");-->
+                if(name===""){
+                    rmvBtn.setAttribute("onClick", "RemoveUser(" + id + ", true);");
+                }
+                else
+                {
+                    rmvBtn.setAttribute("onClick", "RemoveUser(" + id + ", false);");
+                }
                 rmvBtn.setAttribute("readonly", "true");
-                rmvBtn.style.height = 20;
                 var hid = document.createElement("input");
                 hid.setAttribute("type", "hidden");
                 hid.setAttribute("id", "id");
@@ -95,7 +101,6 @@
                 line.appendChild(select);
                 line.appendChild(rmB);
                 line.appendChild(hid);
-                line.appendChild(form);
                 element.appendChild(line);
             }
         </script> 
@@ -115,7 +120,7 @@
                     <table class="table table-hover" id="table">
                         <tr>
                         <tr>
-                            <th>№</th>
+                            <th>#</th>
                             <th>Login</th>
                             <th>Password</th>
                             <th>Role</th>
@@ -138,15 +143,19 @@
                         <script>sessionStorage.setItem("max",<%=max%>);</script>
                     </table>
                     <div class="text-center">
-                        <input class="btn btn-primary btn-sm" onClick="AddNewUser()" readonly
-                               value="Append new user" style="width: 150px" style = "height: 30px" id="add"/>
+                        <a class="btn btn-primary " onClick="AddNewUser()" readonly id="add"/>
+                            <i class="glyphicon glyphicon-plus"> </i> 
+                            Append new user
+                        </a>
                     </div>
                 </div>
 
                 <div class="text-right">
-                    <input class="btn btn-primary btn-sm" onClick ="Update()" name="save" id="save" readonly
-                           value="save" />
-                </div>                
+                    <a class="btn btn-primary btn-sm" onClick ="Update()" name="save" id="save" readonly/>
+                        <i class="glyphicon glyphicon-floppy-saved"></i>
+                        Save
+                    </a>
+                </div>
             </form>
         </div>
         <script>
@@ -154,43 +163,48 @@
                 document.getElementById(id).focus();
                 document.getElementById(id).select();
             }
+            
             function AddNewUser() {
                 var max = sessionStorage.getItem("max");
                 max++;
-                CreateTableLine(max, "default", "default", "user");
+                CreateTableLine(max, "", "", "user");
+                /*
                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel",
                     type: 'post',
                     contentType: 'application/json; charset=utf-8',
                     data: {"id": max, "login": "default", "password": "default", "role": "user"},
                     error: function () {
-                        window.location.replace("/AdminPanel");
+                        window.location.replace("/config/AdminPanel");
                     }
                 });
-
+                */
+                changeSaveBtn(true);
                 sessionStorage.setItem("max", max);
             }
-            function RemoveUser(id) {
-                var form = "form" + id;
-                var line = "line" + id;
-                var element1 = document.getElementById(form);
+            
+            function RemoveUser(id, isNew) {
+                
+                var line = "line" + id;                
                 var element2 = document.getElementById(line);
                 var root = document.getElementById("table");
-                var counter = element2.children[0].innerHTML;
-                element1.parentNode.removeChild(element1);
+                var counter = element2.children[0].innerHTML;                
                 element2.parentNode.removeChild(element2);
                 
-                $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel?id=" + id,
-                    type: 'DELETE',
-                    contentType: 'application/json; charset=utf-8',
-                    error: function () {
-                        window.location.replace("AdminPanel");
-                    }
-                });
+                if(!isNew){
+                    $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel?id=" + id,
+                        type: 'DELETE',
+                        contentType: 'application/json; charset=utf-8',
+                        error: function () {
+                            window.location.replace("/config/AdminPanel");
+                        }
+                    });
+                }
                 for (; counter < root.childElementCount; counter++) {
                     root.children[counter].children[0].innerHTML = counter;
                 }
                 sessionStorage.setItem("counter", counter);
             }
+            
             function Update() {
                 var template = "{\"id\":\"{0}\",\"login\":\"{1}\",\"password\":\"{2}\",\"role\":\"{3}\"},";
                 var root = document.getElementById("table");
@@ -204,16 +218,30 @@
                     payload += template.replace("{0}", id).replace("{1}", login).replace("{2}", pass).replace("{3}", role);
                 }
                 payload += "]";
-
+                //console.log(payload);
+                //changeSaveBtn(false);
                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel",
                     type: 'put',
                     contentType: 'application/json; charset=utf-8',
                     data: payload,
-                    error: function () {
-                        window.location.replace("/AdminPanel");
+                    success: function(xhr){
+                        changeSaveBtn(false);
+                    },
+                    error: function (xhr) {
+                        if(xhr.status === 400){
+                            var htmlText = xhr.responseText;
+                            var text = htmlText.split("body")[1];
+                            text = text.substr(1,text.length-3);
+                            console.log(text);
+                            changeSaveBtn(true);
+                            alert(text);
+                        }
+                        else{
+                            window.location.replace("/config/AdminPanel");
+                        }
+                        
                     }
-                });
-
+                });                
             }
 
             function getUserId(element) {
@@ -224,6 +252,15 @@
                 }
                 return null;
             }
+            
+            function changeSaveBtn(flag){
+                if(flag){
+                    document.getElementById("save").children[0].setAttribute("class","glyphicon glyphicon-floppy-disk");
+                }
+                else{
+                    document.getElementById("save").children[0].setAttribute("class","glyphicon glyphicon-floppy-saved");
+                }
+            }                    
         </script>
     </body>
 </html>
