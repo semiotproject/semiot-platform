@@ -47,7 +47,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     public void start() {
         logger.info("{} started!", driverName);
-        //deviceManager.registerDriver(info);
+        deviceManager.registerDriver(info);
 
         handles = new ArrayList<>();
         this.scheduler = Executors.newScheduledThreadPool(countRepeatableProperty);
