@@ -39,6 +39,7 @@ export default {
             qudt: 'http://qudt.org/schema/qudt#',
             "qudt-quantity": 'http://qudt.org/vocab/quantity#',
             "qudt-unit": "http://qudt.org/vocab/unit#",
+            proto: "http://w3id.org/semiot/ontologies/proto#",
             om: 'http://purl.org/ifgi/om#',
             ext: 'http://w3id.org/qudt/vocab/quantity/ext#'
         },
@@ -54,7 +55,7 @@ export default {
                 "SELECT DISTINCT ?label ?uri",
                 "WHERE {",
                 "   ?uri a ssn:System ;",
-                "       rdfs:label ?label .",
+                "       proto:hasPrototype/rdfs:label ?label .",
                 "}"
             ].join('\n'),
             getSystemSensors: `
