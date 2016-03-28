@@ -71,6 +71,7 @@ apigateway:
     - mysqlbase
   ports:
     - "8383:8080"
+    - "9990:9990"
   volumes:
     - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
   restart: always
