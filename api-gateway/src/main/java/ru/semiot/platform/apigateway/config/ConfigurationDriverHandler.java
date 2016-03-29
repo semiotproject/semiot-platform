@@ -69,19 +69,15 @@ public class ConfigurationDriverHandler extends HttpServlet {
 			ze = zis.getNextEntry();
 		}
 
-		JsonArray jsonArray = null;
-		String pid = null;
+		JsonObject jsonConfig = null;
 		try (JsonReader reader = Json
 				.createReader(new StringReader(s.toString()))) {
-			JsonObject jsonConfig = reader.readObject();
-			pid = jsonConfig.getString("semiot:driverPid");
-			jsonArray = jsonConfig.getJsonArray("semiot:view");
+			jsonConfig = reader.readObject();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		session.setAttribute("inputStreamFile", input2);
-		session.setAttribute("jsonConfig", jsonArray);
-		session.setAttribute("pid", pid);
+		session.setAttribute("jsonConfig", jsonConfig);
 
 		ctx.dispatch("/configuration/ConfigurationDriver");
 	}
