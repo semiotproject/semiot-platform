@@ -43,15 +43,15 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private List<ScheduledFuture> handles = null;
     private List<Configuration> configurations;
     private NetatmoAPI netAtmoAPI;
-    private int countRepeatableProperty;
-
+    private List<Integer> countsRepeatableProperties;
+    
     public void start() {
         logger.info("{} started!", driverName);
         deviceManager.registerDriver(info);
 
         handles = new ArrayList<>();
-        this.scheduler = Executors.newScheduledThreadPool(countRepeatableProperty);
-        logger.debug("Try to start {} pullers", countRepeatableProperty);
+        this.scheduler = Executors.newScheduledThreadPool(countsRepeatableProperties.size());
+        logger.debug("Try to start {} pullers", countsRepeatableProperties.size());
         for (Configuration cfg : configurations) {
             handles.add(startPuller(cfg));
         }
@@ -90,8 +90,8 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
                                                     commonConfiguration.get(Keys.CLIENT_SECRET));
                         checkConnection(commonConfiguration.get(Keys.USERNAME),
                                         commonConfiguration.get(Keys.PASSWORD));
-                        countRepeatableProperty = getCountRepeatableProperty(Keys.AREA);
-                        configurations = getConfigurations();
+                        countsRepeatableProperties = getCountsRepeatableProperties(Keys.AREA);
+                        configurations = getConfigurations(countsRepeatableProperties);
                         configuration.setConfigured();
                         logger.info("Received configuration is correct!");
                     }
@@ -118,10 +118,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
     }
 
-    private List<Configuration> getConfigurations() throws ConfigurationException {
+    private List<Configuration> getConfigurations(List <Integer> counts) throws ConfigurationException {
         logger.debug("Try to get repeatable configuration for each puller");
         List<Configuration> conf = new ArrayList<>();
-        for (int i = 1; i <= countRepeatableProperty; i++) {
+        for (int i : counts) {
             Configuration cfg = getAreaConfiguration(i);
             conf.add(cfg);
         }
@@ -180,18 +180,20 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
     public ScheduledFuture startPuller(Configuration config) {
         logger.debug("Try to start puller!");
+        logger.debug("Config is " + config.toString());
         ScheduledPuller puller = new ScheduledPuller(this, config, netAtmoAPI);
-
+        
+        logger.debug("Try to schedule polling. Starts in {}min with interval {}min with configuration [{}]",
+                     configuration.get(Keys.POLLING_START_PAUSE),
+                     configuration.get(Keys.POLLING_INTERVAL),
+                     config.toString());
+        
         ScheduledFuture handle = this.scheduler.scheduleAtFixedRate(
                 puller,
                 configuration.getAsLong(Keys.POLLING_START_PAUSE),
                 configuration.getAsLong(Keys.POLLING_INTERVAL),
                 TimeUnit.MINUTES);
-
-        logger.debug("Polling scheduled. Starts in {}min with interval {}min with configuration [{}]",
-                     configuration.get(Keys.POLLING_START_PAUSE),
-                     configuration.get(Keys.POLLING_INTERVAL),
-                     config.toString());
+        
         logger.debug("Puller started!");
         return handle;
     }
@@ -209,20 +211,22 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         return deviceId + "-" + type;
     }
 
-    private int getCountRepeatableProperty(String propPrefix) throws ConfigurationException {
+    private List <Integer> getCountsRepeatableProperties (String propPrefix) throws ConfigurationException {
         logger.debug("Try to get count of repeatable property \"{}\"", propPrefix);
-        int index = (propPrefix + ".").length();
-        int max = 0;
+        List <Integer> counts = new ArrayList<>();
+        int index;
+        
         for (String key : configuration.keySet()) {
-            if (key.startsWith(propPrefix) && Integer.parseInt(key.substring(index, key.indexOf('.', index))) > max) {
-                max = Integer.parseInt(key.substring(index, key.indexOf('.', index)));
+            if (key.contains(propPrefix) && !counts.contains(
+                    index = Integer.parseInt(key.substring(0, key.indexOf("." + propPrefix))))) {                
+                counts.add(index);                
             }
         }
-        if (max == 0) {
+        if (counts.isEmpty()) {
             logger.error("Bad repeatable configuration! Did not find a repeatable property");
             throw new ConfigurationException(propPrefix, "Did not find a repeatable property");
         }
-        return max;
+        return counts;
     }
 
     private Configuration getCommonConfiguration() throws ConfigurationException {
@@ -250,10 +254,10 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         double lon_ne, lat_ne, lon_sw, lat_sw;
         try {
 
-            lon_ne = Double.parseDouble(configuration.get(Keys.AREA + "." + area + ".1.longitude"));
-            lat_ne = Double.parseDouble(configuration.get(Keys.AREA + "." + area + ".1.latitude"));
-            lon_sw = Double.parseDouble(configuration.get(Keys.AREA + "." + area + ".2.longitude"));
-            lat_sw = Double.parseDouble(configuration.get(Keys.AREA + "." + area + ".2.latitude"));
+            lon_ne = Double.parseDouble(configuration.get(area + "." + Keys.AREA + ".1.longitude"));
+            lat_ne = Double.parseDouble(configuration.get(area + "." + Keys.AREA + ".1.latitude"));
+            lon_sw = Double.parseDouble(configuration.get(area + "." + Keys.AREA + ".2.longitude"));
+            lat_sw = Double.parseDouble(configuration.get(area + "." + Keys.AREA + ".2.latitude"));
             if (lon_ne > 180 || lon_ne < -180 || lon_sw > 180 || lon_sw < -180
                     || lat_ne > 90 || lat_ne < -90 || lat_sw > 90 || lat_sw < -90
                     || lon_ne < lon_sw && lat_ne > lat_sw || lon_ne > lon_sw && lat_ne < lat_sw) {
