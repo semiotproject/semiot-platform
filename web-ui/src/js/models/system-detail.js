@@ -32,8 +32,8 @@ export default function(
         fetchSystemSensors(uri, callback) {
             return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemSensors.format(uri), callback);
         }
-        fetchSystemDetail(uri, callback) {
-            return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemDetail.format(uri), callback);
+        fetchSystemTopic(uri, callback) {
+            return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemTopic.format(uri), callback);
         }
         fetchArchiveObservations(metric, range, type) {
             return tsdbUtils.getArchiveObservations(metric, range, type);
