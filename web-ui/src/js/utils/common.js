@@ -23,7 +23,7 @@ export default function($q, CONFIG) {
             return endpoint.substr(prefix.length);
         },
         parseMetricFromType(sensorType) {
-            return sensorType.replace(':', '_').replace('#', '-');
+            return encodeURIComponent(sensorType).split("%").join("/");
         },
         getMockMachineToolStateObservation: function() {
             const TIMESTAMP = "43534654";
