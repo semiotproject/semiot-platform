@@ -4,6 +4,8 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -11,6 +13,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minidev.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -27,6 +31,7 @@ import org.apache.jena.riot.system.StreamRDFBase;
 public class RDFUtils {
 
     private static final JsonLdOptions DEFAULT_OPTIONS = new JsonLdOptions();
+    private static final String JSONPATH_BN_OBJECTS = "$..[?(@.@id =~ /_:.*/i)]";
 
     public static boolean match(String turtle, Node subject, Node predicate, Node object) {
         MatchSinkRDF matcher = new MatchSinkRDF(subject, predicate, object);
@@ -45,9 +50,26 @@ public class RDFUtils {
 
     public static Object toJsonLdCompact(Model model, Object frame)
             throws JsonLdError, IOException {
-        return JsonLdProcessor.compact(JsonLdProcessor.frame(
+        return deleteRedundantBNIds(JsonLdProcessor.compact(JsonLdProcessor.frame(
                 RDFUtils.toJsonLd(model), frame, DEFAULT_OPTIONS),
-                frame, DEFAULT_OPTIONS);
+                frame, DEFAULT_OPTIONS));
+    }
+
+    public static Object deleteRedundantBNIds(Object json) throws IOException {
+        String json_str = JsonUtils.toString(json);
+        DocumentContext path = JsonPath.parse(json);
+        
+        JSONArray bnResources = path.read(JSONPATH_BN_OBJECTS);
+
+        bnResources.stream()
+                .map((resource) -> (Map<String, Object>) resource)
+                .map((Map<String, Object> m) -> (String) m.get(JsonLdKeys.ID))
+                .filter((bnId) -> (StringUtils.countMatches(json_str, "\"" + bnId + "\"") < 2))
+                .forEach((bnId) -> {
+                    path.delete("$..*[?(@.@id=~/" + bnId + "/i)].@id");
+                });
+
+        return path.json();
     }
 
     public static Literal toLiteral(Object value) {
@@ -81,8 +103,8 @@ public class RDFUtils {
         return Arrays.asList(counts.keySet().stream().filter(
                 (resource) -> (counts.get(resource) == objects.length)).toArray(Resource[]::new));
     }
-    
-    public static Resource subjectWithProperty(Model model, Property property, 
+
+    public static Resource subjectWithProperty(Model model, Property property,
             RDFNode object) {
         return model.listSubjectsWithProperty(property, object).next();
     }
