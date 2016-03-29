@@ -20,7 +20,7 @@
     </head>
     <body>
         <%String username = request.getRemoteUser();%>
-        <div class="text-right">
+        <div class="navbar-form navbar-right" role="navigation">
             <button class="btn btn-primary btn-sm" onClick="logout()" name="logout" readonly>
                 <%=username%>  
                 <i class="glyphicon glyphicon-log-out"></i>
@@ -28,7 +28,7 @@
         </div>
         <script>
             function logout(){
-                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel?logout",
+                 $.ajax({url: "${pageContext.request.contextPath}/logout",
                     type: 'GET',
                     success: function(){
                         window.location.replace("/");
@@ -182,7 +182,7 @@
                         <script>sessionStorage.setItem("max",<%=max%>);</script>
                     </table>
                     <div class="text-center">
-                        <a class="btn btn-primary " onClick="addNewUser()" readonly id="add"/>
+                        <a class="btn btn-primary btn-sm" onClick="addNewUser()" readonly id="add"/>
                             <i class="glyphicon glyphicon-plus"> </i> 
                             Append new user
                         </a>

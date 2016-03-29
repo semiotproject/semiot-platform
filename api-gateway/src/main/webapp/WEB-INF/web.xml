@@ -101,7 +101,8 @@
     <security-constraint>  
         <web-resource-collection>  
             <web-resource-name>Access to configuration</web-resource-name>  
-            <url-pattern>/*</url-pattern>  
+            <url-pattern>/*</url-pattern>
+            <url-pattern>/config/AdminPanel?logout</url-pattern> 
             <http-method>GET</http-method>  
         </web-resource-collection>  
         <auth-constraint>  

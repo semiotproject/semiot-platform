@@ -31,7 +31,7 @@
 </head>
 <body>
     <%String username = request.getRemoteUser();%>
-        <div class="text-right">
+        <div class="navbar-form navbar-right" role="navigation">
             <button class="btn btn-primary btn-sm" onClick="logout()" name="logout" readonly>
                 <%=username%>  
                 <i class="glyphicon glyphicon-log-out"></i>
@@ -39,13 +39,13 @@
         </div>
         <script>
             function logout(){
-                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel?logout",
+                 $.ajax({url: "${pageContext.request.contextPath}/logout",
                     type: 'GET',
                     success: function(){
                         window.location.replace("/");
                     },
                     error: function () {
-                        window.location.replace("/config/AdminPanel");
+                        window.location.reload();
                     }
                 });
             }
