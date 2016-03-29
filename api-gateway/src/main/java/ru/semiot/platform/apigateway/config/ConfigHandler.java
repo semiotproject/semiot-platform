@@ -10,17 +10,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ru.semiot.platform.apigateway.OSGiApiService;
 import rx.Observable;
 
 @WebServlet(urlPatterns = "/config", asyncSupported = true)
 public class ConfigHandler extends HttpServlet {
-	
-	private static final Logger logger = 
-			LoggerFactory.getLogger(ConfigHandler.class);
 		
 	@Inject
 	OSGiApiService service;

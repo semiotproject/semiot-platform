@@ -12,6 +12,13 @@
     <logger name="org.apache.jena" level="INFO"/>
     <logger name="com.hp.hpl.jena" level="INFO"/>
     <logger name="com.hp.hpl.jena.util.FileManager" level="DEBUG"/>
+    <logger name="org.eclipse.jetty.io" level="INFO"/>
+    <logger name="org.eclipse.jetty.util.thread" level="INFO"/>
+    <logger name="org.eclipse.jetty.server" level="INFO"/>
+	<logger name="org.eclipse.jetty.http" level="INFO"/>
+	<logger name="org.eclipse.jetty.server.handler" level="INFO"/>
+	<logger name="org.eclipse.jetty.util.component" level="INFO"/>
+	<logger name="org.eclipse.jetty.servlet" level="INFO"/>
 
     <root level="debug">
         <appender-ref ref="STDOUT" />

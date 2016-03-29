@@ -119,7 +119,6 @@ public class DriversInstalledHandler extends HttpServlet {
 			String value = request.getParameter(key);
 			// request.get
 			parameters.put(key, value);
-			System.out.println(key + " " + value);
 		}
 		return parameters;
 	}

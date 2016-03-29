@@ -99,7 +99,6 @@ public class ConfigurationDriverHandler extends HttpServlet {
 				}
 				propertyList.append(entry.getKey());
 			}
-			System.out.println(propertyList.toString());
 			parameters.put("apply", "true");
 			parameters.put("propertylist", propertyList.toString());
 			

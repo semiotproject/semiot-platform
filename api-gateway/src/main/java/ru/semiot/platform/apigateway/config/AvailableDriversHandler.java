@@ -96,7 +96,6 @@ public class AvailableDriversHandler extends HttpServlet {
 			String key = (String) _enum.nextElement();
 			String value = request.getParameter(key);
 			parameters.put(key, value);
-			System.out.println(key + " " + value);
 		}
 		return parameters;
 	}
