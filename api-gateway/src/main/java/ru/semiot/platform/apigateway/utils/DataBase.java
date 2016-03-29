@@ -36,10 +36,9 @@ public class DataBase {
         }
     }
 
-    public boolean isUniqueLogin(String login) {
+    public boolean isUniqueLogin(String login, int id) {
         try {
-            em.createNamedQuery("Credentials.findByLogin").setParameter("login", login).getSingleResult();
-            return false;
+            return ((Credentials)em.createNamedQuery("Credentials.findByLogin").setParameter("login", login).getSingleResult()).getId()==id;
         }
         catch (Exception ex) {
             return true;

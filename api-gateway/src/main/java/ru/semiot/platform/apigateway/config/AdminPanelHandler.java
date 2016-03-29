@@ -1,17 +1,15 @@
 package ru.semiot.platform.apigateway.config;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import ru.semiot.platform.apigateway.utils.Credentials;
 import ru.semiot.platform.apigateway.utils.DataBase;
 
@@ -28,6 +26,17 @@ public class AdminPanelHandler extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String s = req.getQueryString();
+        if (s!=null && s.contains("logout")) {
+            resp.setHeader("Cache-Control", "no-cache, no-store");
+            resp.setHeader("Pragma", "no-cache");
+            resp.setHeader("Expires", new java.util.Date().toString());
+            if (req.getSession(false) != null) {
+                req.getSession(false).invalidate();// remove session.
+            }
+            req.logout();
+            resp.sendRedirect("/");
+        }
         synchronized (this) {
             credentials = db.getAllUsers();
         };
@@ -37,109 +46,41 @@ public class AdminPanelHandler extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final String user = req.getReader().readLine();
-        if (!user.contains("id") || !user.contains("login") || !user.contains("password") || !user.contains("role")) {
-            resp.sendError(400);
-            return;
-        }
-        final int id = Integer.parseInt(getParam(user, "id"));
-        final String login = getParam(user, "login");
-        final String pass = getParam(user, "password");
-        final String role = getParam(user, "role");
-        Credentials c;
-        if ((c = db.addUser(id, login, pass, role)) == null) {
-            resp.sendError(500);
-            return;
-        }
-        synchronized (this) {
-            credentials.add(c);
-        };
-    }
 
-    @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String query = req.getQueryString();
-        if (!query.contains("id")) {
-            resp.sendError(400);
-            return;
-        }
-        final int id = Integer.parseInt(getParam(query, "id"));
-        Credentials c;
-        if ((c = findCredentialByID(id)) == null) {
-            resp.sendError(404);
-            return;
-        }
-        if (db.removeUser(id)) {
-            synchronized (this) {
-                credentials.remove(c);
-            }
-        } else {
-            resp.sendError(500);
-            return;
-        }
-    }
+        if (req.getParameter("save") != null) {
+            Map m = req.getParameterMap();
+            String[] ids = (String[]) m.get("id");
+            String[] logins = (String[]) m.get("login");
+            String[] passwords = (String[]) m.get("password");
+            String[] roles = (String[]) m.get("role");
+            List<Credentials> newList = new ArrayList<>();
+            Credentials c;
+            for (int i = 0; i < ids.length; i++) {
 
-    @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        StringBuilder query = new StringBuilder();
-        BufferedReader reader = req.getReader();
-        String str;
-        while ((str = reader.readLine()) != null) {
-            query.append(str);
-        }
-        List<Credentials> changedList = parseJsonToCredentials(query.toString());
-        str = null;
-        Credentials c;
-        for (Credentials cred : changedList) {
-            if (credentials.contains(cred)) {
-                if (cred.needUpdate(c = credentials.get(credentials.indexOf(cred)))) {
-                    db.updateUser(cred);
-                }
-            } else {
-                if (!cred.getLogin().isEmpty() && db.isUniqueLogin(cred.getLogin())) {
-                    synchronized (this) {
-                        db.addUser(cred);
+                c = new Credentials(Integer.parseInt(ids[i]), logins[i], passwords[i], (i == 0) ? "admin" : roles[i - 1]);
+                if (c.getLogin().isEmpty() || c.getLogin().contains(" ") || !db.isUniqueLogin(c.getLogin(), c.getId())) {
+                    if (credentials.contains(c)) {
+                        newList.add(credentials.get(credentials.indexOf(c)));
                     }
-                } else {
-                    str = (cred.getLogin().isEmpty()) ? "Empty login!" : "Bad login: " + cred.getLogin();
+                    continue;
+                }
+                newList.add(c);
+                if (credentials.contains(c)) {
+                    if (c.needUpdate(credentials.get(credentials.indexOf(c)))) {
+                        if (!db.updateUser(c)) {
+                            newList.remove(c);
+                        }
+                    }
+                } else if (db.addUser(c) == null) {
+                    newList.remove(c);
                 }
             }
-        }
-        synchronized (this) {
-            this.credentials = db.getAllUsers();
-        }
-        if (str != null) {
-            resp.sendError(400, str);
-        }
-
-    }
-
-    private Credentials findCredentialByID(int id) {
-        for (Credentials c : credentials) {
-            if (c.getId() == id) {
-                return c;
+            for (Credentials q : credentials) {
+                if (!newList.contains(q)) {
+                    db.removeUser(q.getId());
+                }
             }
+            resp.sendRedirect("/config/AdminPanel");
         }
-        return null;
-    }
-
-    private String getParam(String query, String param) {
-        final int start = query.lastIndexOf(param + "=") + (param + "=").length();
-        final int end = (query.indexOf("&", start) != -1) ? query.indexOf("&", start) : query.length();
-        return query.substring(start, end);
-    }
-
-    private List<Credentials> parseJsonToCredentials(String str) {
-        JSONArray arr = new JSONArray(str);
-        List<Credentials> lst = new ArrayList<>();
-        JSONObject obj;
-        for (int i = 0; i < arr.length(); i++) {
-            obj = (JSONObject) arr.get(i);
-            lst.add(new Credentials(obj.getInt("id"), obj.getString("login"), obj.getString("password"), obj.getString("role")));
-        }
-        if (lst.isEmpty()) {
-            return null;
-        }
-        return lst;
     }
 }
