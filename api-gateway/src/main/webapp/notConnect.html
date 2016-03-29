@@ -12,6 +12,26 @@
 	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </head>
 <body>
+    <%String username = request.getRemoteUser();%>
+        <div class="text-right">
+            <button class="btn btn-primary btn-sm" onClick="logout()" name="logout" readonly>
+                <%=username%>  
+                <i class="glyphicon glyphicon-log-out"></i>
+            </button>                
+        </div>
+        <script>
+            function logout(){
+                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel?logout",
+                    type: 'GET',
+                    success: function(){
+                        window.location.replace("/");
+                    },
+                    error: function () {
+                        window.location.replace("/config/AdminPanel");
+                    }
+                });
+            }
+        </script>
 	<div class="container">
 		<h1>SemIoT Platform</h1>
 		<b>Can`t connect to webconsole. Please reload the page after a few

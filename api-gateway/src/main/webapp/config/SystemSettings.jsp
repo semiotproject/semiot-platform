@@ -33,6 +33,26 @@
 	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </head>
 <body>
+    <%String username = request.getRemoteUser();%>
+        <div class="text-right">
+            <button class="btn btn-primary btn-sm" onClick="logout()" name="logout" readonly>
+                <%=username%>  
+                <i class="glyphicon glyphicon-log-out"></i>
+            </button>                
+        </div>
+        <script>
+            function logout(){
+                 $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel?logout",
+                    type: 'GET',
+                    success: function(){
+                        window.location.replace("/");
+                    },
+                    error: function () {
+                        window.location.replace("/config/AdminPanel");
+                    }
+                });
+            }
+        </script>
 	<div class="container">
 		<h3>System Settings</h3>
 		<ul class="nav nav-pills nav-justified">
