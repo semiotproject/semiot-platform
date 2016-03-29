@@ -41,7 +41,8 @@ export default {
             "qudt-unit": "http://qudt.org/vocab/unit#",
             proto: "http://w3id.org/semiot/ontologies/proto#",
             om: 'http://purl.org/ifgi/om#',
-            ext: 'http://w3id.org/qudt/vocab/quantity/ext#'
+            ext: 'http://w3id.org/qudt/vocab/quantity/ext#',
+            dcterm: "http://purl.org/dc/terms/"
         },
         types: {
             heatSystem: "http://purl.org/NET/ssnext/heatmeters#HeatMeter",
@@ -52,10 +53,11 @@ export default {
         },
         queries: {
             getAllSystems: [
-                "SELECT DISTINCT ?label ?uri",
+                "SELECT DISTINCT ?label ?id ?uri",
                 "WHERE {",
                 "   ?uri a ssn:System ;",
-                "       proto:hasPrototype/rdfs:label ?label .",
+                "       proto:hasPrototype/rdfs:label ?label ;",
+                "        dcterm:identifier ?id .",
                 "}"
             ].join('\n'),
             getSystemSensors: `
@@ -74,8 +76,9 @@ export default {
                 }
             `,
             getSystemName: [
-                "SELECT ?label {",
-                "   <{0}> proto:hasPrototype/rdfs:label ?label .",
+                "SELECT ?label ?id {",
+                "   <{0}> proto:hasPrototype/rdfs:label ?label ;",
+                "       dcterm:identifier ?id .",
                 "}"
             ].join('\n'),
             getSystemTopic: `

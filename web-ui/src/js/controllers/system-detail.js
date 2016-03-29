@@ -62,7 +62,7 @@ export default function(
 
         systemDetail.fetchSystemName(uri, function(data) {
             if (data.results.bindings[0]) {
-                $scope.title = data.results.bindings[0].label.value;
+                $scope.title = `${data.results.bindings[0].label.value} / ${data.results.bindings[0].id.value}`;
 
                 systemDetail.fetchSystemTopic(uri, function(data) {
                     if (data.results.bindings[0]) {

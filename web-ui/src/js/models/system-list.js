@@ -102,7 +102,7 @@ export default function(
                 }).map(function(binding, index) {
                     return {
                         index: index + 1,
-                        name: binding.label.value,
+                        name: `${binding.label.value} / ${binding.id.value}`,
                         uri: binding.uri.value
                     };
                 });
