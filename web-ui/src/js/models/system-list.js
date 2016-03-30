@@ -29,10 +29,6 @@ export default function(
                 {
                     topic:  CONFIG.TOPICS.device_registered,
                     callback: this.onDeviceRegistered.bind(this)
-                },
-                {
-                    topic:  CONFIG.TOPICS.device_turned_off,
-                    callback: this.onDeviceTurnedOff.bind(this)
                 }
             ]);
         }

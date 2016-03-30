@@ -87,7 +87,7 @@ export default function(
             // create sensor list
             data.results.bindings.forEach((binding) => {
                 let sensor = $.extend({}, {
-                    uri: binding.subsystem.value,
+                    uri: binding.instance.value,
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
                     sensorType: binding.type.value,

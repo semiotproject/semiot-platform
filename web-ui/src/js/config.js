@@ -61,7 +61,7 @@ export default {
                 "}"
             ].join('\n'),
             getSystemSensors: `
-                SELECT ?subsystem ?type ?observationType ?propLabel ?valueUnitLabel {
+                SELECT ?instance ?type ?observationType ?propLabel ?valueUnitLabel {
                   <{0}> ssn:hasSubSystem ?instance .
                   ?instance proto:hasPrototype ?subsystem .
                   ?subsystem ssn:observes ?type .
