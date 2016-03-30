@@ -47,10 +47,12 @@ export default function(
                 N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
                 N3Store.addTriples(triples);
 
+                console.log(JSON.stringify(triples));
+
                 // can not find another way to get system from description
                 let system = N3Store.find(null, "ssn:hasSubSystem", null, "")[0];
                 let uri = system.subject;
-                let label = N3Store.find(uri, "rdfs:label", null, "")[0].object;
+                let id = N3Store.find(uri, "http://purl.org/dc/terms/identifier", null, "")[0].object;
 
                 if (!systems.find(function(system) { // if system is new
                     return system.uri === uri;
@@ -58,7 +60,8 @@ export default function(
                     systems.push({
                         index: systems.length + 1,
                         uri,
-                        name: N3.Util.getLiteralValue(label),
+                        // fixme: add model label to id
+                        name: N3.Util.getLiteralValue(id),
                         isOnline: true
                     });
                     this.emit("systemsUpdate", systems);
