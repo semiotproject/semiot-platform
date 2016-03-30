@@ -102,7 +102,10 @@ export default function(
                         uri: binding.uri.value
                     };
                 });
-                defer.resolve(systems);
+                const s = systems.sort((a, b) => {
+                    return a.index > b.index ? 1 : -1;
+                });
+                defer.resolve(s);
             });
             return defer.promise;
         }
