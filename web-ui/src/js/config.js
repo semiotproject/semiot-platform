@@ -97,6 +97,11 @@ export default {
                         rdfs:label ?stateLabel ;
                         rdfs:comment ?stateDescription .
                 }
+            `,
+            getPrototypeLabel: `
+                SELECT ?label WHERE {
+                    <{0}> rdfs:label ?label .
+                }
             `
         }
     },

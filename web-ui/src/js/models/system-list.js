@@ -18,6 +18,8 @@ export default function(
 
     let systems = [];
 
+    let models = {};
+
     class Instance extends EventEmitter {
         constructor() {
             super();
@@ -40,33 +42,58 @@ export default function(
         }
 
         onDeviceRegistered(args) {
+            try {
             rdfUtils.parseTTL(args[0]).then((triples) => {
 
-                let N3Store = N3.Store();
+                    let N3Store = N3.Store();
 
-                N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
-                N3Store.addTriples(triples);
+                    N3Store.addPrefixes(CONFIG.SPARQL.prefixes);
+                    N3Store.addTriples(triples);
 
-                console.log(JSON.stringify(triples));
+                    // can not find another way to get system from description
+                    let system = N3Store.find(null, "ssn:hasSubSystem", null, "")[0];
+                    let uri = system.subject;
+                    let id = N3Store.find(uri, "http://purl.org/dc/terms/identifier", null, "")[0].object;
+                    let proto = N3Store.find(uri, "proto:hasPrototype", null, "")[0].object;
+                    let label;
+                    if (proto) {
+                        this.getPrototypeLabel(proto).then((l) => {
+                            if (!systems.find(function(system) { // if system is new
+                                return system.uri === uri;
+                            })) {
+                                systems.push({
+                                    index: systems.length + 1,
+                                    uri,
+                                    // fixme: add model label to id
+                                    name: `${l} / ${N3.Util.getLiteralValue(id)}`,
+                                    isOnline: true
+                                });
+                                this.emit("systemsUpdate", systems);
+                            }
+                        });
+                    }
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+        getPrototypeLabel(uri) {
+            const defer = $q.defer();
 
-                // can not find another way to get system from description
-                let system = N3Store.find(null, "ssn:hasSubSystem", null, "")[0];
-                let uri = system.subject;
-                let id = N3Store.find(uri, "http://purl.org/dc/terms/identifier", null, "")[0].object;
+            if (!models[uri]) {
+                console.info(`no model ${uri} is found in cache; fetching via SPARQL..`);
+                sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getPrototypeLabel.format(uri), (data) => {
+                    const label = data.results.bindings[0].label.value;
+                    models[uri] = label;
+                    console.info(`added new model label for proto = ${uri}; label is "${label}"`);
+                    defer.resolve(label);
+                });
+            } else {
+                console.info(`found model label in cache; using..`);
+                defer.resolve(models[uri]);
+            }
 
-                if (!systems.find(function(system) { // if system is new
-                    return system.uri === uri;
-                })) {
-                    systems.push({
-                        index: systems.length + 1,
-                        uri,
-                        // fixme: add model label to id
-                        name: N3.Util.getLiteralValue(id),
-                        isOnline: true
-                    });
-                    this.emit("systemsUpdate", systems);
-                }
-            });
+            return defer.promise;
         }
         onDeviceTurnedOff(payload) {
             console.info('received message on `turnOff` topic, processing..');
