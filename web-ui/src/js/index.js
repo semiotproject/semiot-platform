@@ -73,10 +73,10 @@ app.controller('NewQueryCtrl', require('./controllers/new-query'));
 app.config(require('./routing'));
 
 // redirect to login page if unauthorized
-app.run(['$rootScope', '$location', 'loginService', 'wampUtils', function ($rootScope, $location, loginService, wampUtils) {
+app.run(['$rootScope', '$location', 'loginService', 'wampUtils', function($rootScope, $location, loginService, wampUtils) {
     $rootScope.$on('$routeChangeStart', function (event, next) {
         if (!loginService.isLogged()) {
-            $location.path('/login');
+            // $location.path('/login');
         }
 
     });

@@ -18,6 +18,7 @@ export default function($scope, systemList, commonUtils, CONFIG) {
         let total_systems = systemList.getSystems().filter(function(s) {
             return !$scope.search.name || s.name.toLowerCase().indexOf($scope.search.name.toLowerCase()) > -1;
         });
+        console.log(total_systems);
         $scope.systems = total_systems.slice(
             ($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage,
             ($scope.pagination.currentPage) * $scope.pagination.itemsPerPage

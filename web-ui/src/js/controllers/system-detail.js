@@ -60,17 +60,20 @@ export default function(
 
         let defer = $q.defer();
 
-        systemDetail.fetchSystemDetail(uri, function(data) {
+        systemDetail.fetchSystemName(uri, function(data) {
             if (data.results.bindings[0]) {
-                $scope.title = data.results.bindings[0].label.value;
+                $scope.title = `${data.results.bindings[0].label.value} / ${data.results.bindings[0].id.value}`;
 
-                // store topic in scope to make available unsubscribe
-                $scope.topic = data.results.bindings[0].topic.value;
-                $scope.subscribe();
+                systemDetail.fetchSystemTopic(uri, function(data) {
+                    if (data.results.bindings[0]) {
+                        $scope.topic = data.results.bindings[0].topic.value;
+                        $scope.subscribe();
+                    }
+                    defer.resolve();
+                });
             } else {
                 $scope.title = "Unknown system";
             }
-            defer.resolve();
         });
 
         return defer.promise;
@@ -84,7 +87,7 @@ export default function(
             // create sensor list
             data.results.bindings.forEach((binding) => {
                 let sensor = $.extend({}, {
-                    uri: binding.subsystem.value,
+                    uri: binding.instance.value,
                     title: `${binding.propLabel.value}, ${binding.valueUnitLabel.value}`,
                     observationType: binding.observationType.value,
                     sensorType: binding.type.value,

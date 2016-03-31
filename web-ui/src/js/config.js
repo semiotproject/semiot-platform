@@ -1,7 +1,7 @@
 "use strict";
 
 // change it to target hostname when develop
-const DEFAULT_HOSTNAME = "demo-1.semiot.ru";
+const DEFAULT_HOSTNAME = "demo.semiot.ru";
 const hostname = location.hostname;
 
 const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
@@ -41,7 +41,8 @@ export default {
             "qudt-unit": "http://qudt.org/vocab/unit#",
             proto: "http://w3id.org/semiot/ontologies/proto#",
             om: 'http://purl.org/ifgi/om#',
-            ext: 'http://w3id.org/qudt/vocab/quantity/ext#'
+            ext: 'http://w3id.org/qudt/vocab/quantity/ext#',
+            dcterm: "http://purl.org/dc/terms/"
         },
         types: {
             heatSystem: "http://purl.org/NET/ssnext/heatmeters#HeatMeter",
@@ -52,15 +53,17 @@ export default {
         },
         queries: {
             getAllSystems: [
-                "SELECT DISTINCT ?label ?uri",
+                "SELECT DISTINCT ?label ?id ?uri",
                 "WHERE {",
                 "   ?uri a ssn:System ;",
-                "       proto:hasPrototype/rdfs:label ?label .",
+                "       proto:hasPrototype/rdfs:label ?label ;",
+                "        dcterm:identifier ?id .",
                 "}"
             ].join('\n'),
             getSystemSensors: `
-                SELECT ?subsystem ?type ?observationType ?propLabel ?valueUnitLabel {
-                  <{0}> ssn:hasSubSystem ?subsystem .
+                SELECT ?instance ?type ?observationType ?propLabel ?valueUnitLabel {
+                  <{0}> ssn:hasSubSystem ?instance .
+                  ?instance proto:hasPrototype ?subsystem .
                   ?subsystem ssn:observes ?type .
                   ?subsystem ssn:hasMeasurementCapability ?mc .
                   ?mc ssn:forProperty ?prop .
@@ -73,16 +76,18 @@ export default {
                 }
             `,
             getSystemName: [
-                "SELECT ?label {",
-                "   <{0}> rdfs:label ?label, .",
+                "SELECT ?label ?id {",
+                "   <{0}> proto:hasPrototype/rdfs:label ?label ;",
+                "       dcterm:identifier ?id .",
                 "}"
             ].join('\n'),
-            getSystemDetail: `
-                SELECT ?label ?topic {
-                    <{0}> rdfs:label ?label ;
-                        ssncom:hasCommunicationEndpoint ?endpoint .
-                    ?endpoint ssncom:protocol "WAMP" ;
-                        ssncom:topic ?topic .
+            getSystemTopic: `
+                SELECT ?topic {
+                    graph ?g {
+                        <{0}> ssncom:hasCommunicationEndpoint ?endpoint .
+                        ?endpoint ssncom:protocol "WAMP" ;
+                            ssncom:topic ?topic .
+                    }
                 }
             `,
             getMachineToolStates: `
@@ -91,6 +96,11 @@ export default {
                     ?stateURI rdf:type mcht:MachineToolWorkingStateValue ;
                         rdfs:label ?stateLabel ;
                         rdfs:comment ?stateDescription .
+                }
+            `,
+            getPrototypeLabel: `
+                SELECT ?label WHERE {
+                    <{0}> rdfs:label ?label .
                 }
             `
         }
