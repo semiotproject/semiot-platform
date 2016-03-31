@@ -15,5 +15,6 @@ public abstract class Keys {
     public static final String PASSWORD = PREFIX + ".password";
     public static final String CLIENT_APP_ID = PREFIX + ".clientAppID";
     public static final String CLIENT_SECRET = PREFIX + ".clientAppSecret";
+    public static final String ONLY_NEW_OBS = PREFIX + ".onlyNewObservations";
     public static final String AREA = PREFIX + ".area";
 }

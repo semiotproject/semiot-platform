@@ -44,7 +44,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private List<Configuration> configurations;
     private NetatmoAPI netAtmoAPI;
     private List<Integer> countsRepeatableProperties;
-    
+
     public void start() {
         logger.info("{} started!", driverName);
         deviceManager.registerDriver(info);
@@ -118,11 +118,12 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
     }
 
-    private List<Configuration> getConfigurations(List <Integer> counts) throws ConfigurationException {
+    private List<Configuration> getConfigurations(List<Integer> counts) throws ConfigurationException {
         logger.debug("Try to get repeatable configuration for each puller");
         List<Configuration> conf = new ArrayList<>();
         for (int i : counts) {
             Configuration cfg = getAreaConfiguration(i);
+            cfg.put(Keys.ONLY_NEW_OBS, configuration.get(Keys.ONLY_NEW_OBS));
             conf.add(cfg);
         }
         return conf;
@@ -182,18 +183,18 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         logger.debug("Try to start puller!");
         logger.debug("Config is " + config.toString());
         ScheduledPuller puller = new ScheduledPuller(this, config, netAtmoAPI);
-        
+
         logger.debug("Try to schedule polling. Starts in {}min with interval {}min with configuration [{}]",
                      configuration.get(Keys.POLLING_START_PAUSE),
                      configuration.get(Keys.POLLING_INTERVAL),
                      config.toString());
-        
+
         ScheduledFuture handle = this.scheduler.scheduleAtFixedRate(
                 puller,
                 configuration.getAsLong(Keys.POLLING_START_PAUSE),
                 configuration.getAsLong(Keys.POLLING_INTERVAL),
                 TimeUnit.MINUTES);
-        
+
         logger.debug("Puller started!");
         return handle;
     }
@@ -211,15 +212,15 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         return deviceId + "-" + type;
     }
 
-    private List <Integer> getCountsRepeatableProperties (String propPrefix) throws ConfigurationException {
+    private List<Integer> getCountsRepeatableProperties(String propPrefix) throws ConfigurationException {
         logger.debug("Try to get count of repeatable property \"{}\"", propPrefix);
-        List <Integer> counts = new ArrayList<>();
+        List<Integer> counts = new ArrayList<>();
         int index;
-        
+
         for (String key : configuration.keySet()) {
             if (key.contains(propPrefix) && !counts.contains(
-                    index = Integer.parseInt(key.substring(0, key.indexOf("." + propPrefix))))) {                
-                counts.add(index);                
+                    index = Integer.parseInt(key.substring(0, key.indexOf("." + propPrefix))))) {
+                counts.add(index);
             }
         }
         if (counts.isEmpty()) {
@@ -240,6 +241,13 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             config.put(Keys.PASSWORD, configuration.get(Keys.PASSWORD));
             config.put(Keys.POLLING_START_PAUSE, configuration.get(Keys.POLLING_START_PAUSE));
             config.put(Keys.POLLING_INTERVAL, configuration.get(Keys.POLLING_INTERVAL));
+            if (configuration.get(Keys.ONLY_NEW_OBS).equalsIgnoreCase("true")
+                    || configuration.get(Keys.ONLY_NEW_OBS).equalsIgnoreCase("false")) {
+                config.put(Keys.ONLY_NEW_OBS, configuration.get(Keys.ONLY_NEW_OBS));
+            }
+            else{
+                throw new java.lang.NullPointerException();
+            }
         }
         catch (java.lang.NullPointerException ex) {
             logger.error("Bad common configuration! Can not extract fields");

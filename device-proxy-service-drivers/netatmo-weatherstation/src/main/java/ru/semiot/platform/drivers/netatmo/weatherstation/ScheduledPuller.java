@@ -83,8 +83,8 @@ public class ScheduledPuller implements Runnable {
 
                     WeatherStationObservation oldObs = driver.getObservation(
                             deviceId, type);
-
-                    if (oldObs == null || !newObs.getProperty(DeviceProperties.OBSERVATION_TIMESTAMP)
+                                        
+                    if (config.get(Keys.ONLY_NEW_OBS).equalsIgnoreCase("false") || oldObs == null || !newObs.getProperty(DeviceProperties.OBSERVATION_TIMESTAMP)
                             .equalsIgnoreCase(oldObs.getProperty(DeviceProperties.OBSERVATION_TIMESTAMP))) {
                         driver.publishNewObservation(newObs);
                     } else {
