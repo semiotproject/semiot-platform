@@ -1,4 +1,4 @@
-package ru.semiot.platform.apigateway;
+package ru.semiot.platform.apigateway.beans.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.ejb.Singleton;
+import javax.enterprise.inject.Alternative;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -32,15 +33,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.QUDT;
 import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.platform.apigateway.ServerConfig;
+import ru.semiot.platform.apigateway.beans.TSDBQueryService;
 import ru.semiot.platform.apigateway.utils.JsonNavigator;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
 
 @Singleton
-public class TSDBQueryService {
+@Alternative
+public class OpenTSDBQueryService implements TSDBQueryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TSDBQueryService.class);
+    private static final Logger logger = LoggerFactory.getLogger(OpenTSDBQueryService.class);
     private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
     private static final String SLASH = "/";
     private static final String PERCENT = "%";
@@ -55,19 +59,23 @@ public class TSDBQueryService {
     @javax.annotation.Resource
     ManagedExecutorService mes;
 
-    public TSDBQueryService() {
+    public OpenTSDBQueryService() {
     }
 
     public Observable<String> queryTimeOfLatestBySensorUri(
-            String systemId, String sensorUri) 
-            throws UnsupportedEncodingException {
-        URI uri = UriBuilder
-                        .fromPath(config.tsdbEndpoint())
-                        .path(QUERY_LAST_ENDPOINT)
-                        .queryParam(PARAM_TIMESERIES, URLEncoder.encode(systemId + 
-                                "{sensor_uri=" + encode(sensorUri) + "}", 
-                                StandardCharsets.UTF_8.name()))
-                        .build();
+            String systemId, String sensorUri) {
+        URI uri = null;
+        try {
+            uri = UriBuilder
+                            .fromPath(config.tsdbEndpoint())
+                            .path(QUERY_LAST_ENDPOINT)
+                            .queryParam(PARAM_TIMESERIES, URLEncoder.encode(systemId +
+                                    "{sensor_uri=" + encode(sensorUri) + "}",
+                                    StandardCharsets.UTF_8.name()))
+                            .build();
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
         Observable<Response> get
                 = Rx.newClient(RxObservableInvoker.class, mes)
                 .target(uri)
@@ -127,8 +135,7 @@ public class TSDBQueryService {
         });
     }
 
-    public Observable<Model> queryLatestBySystemId(String systemId)
-            throws UnsupportedEncodingException {
+    public Observable<Model> queryLatestBySystemId(String systemId) {
         Observable<Response> get
                 = Rx.newClient(RxObservableInvoker.class, mes)
                 .target(UriBuilder
@@ -168,16 +175,20 @@ public class TSDBQueryService {
     }
 
     public Observable<Model> queryBySensorUri(String systemId, String uri,
-            String start, String end)
-            throws UnsupportedEncodingException {
-        UriBuilder uriBuilder = UriBuilder
-                .fromPath(config.tsdbEndpoint())
-                .path(QUERY_ENDPOINT)
-                .queryParam(PARAM_METRICS, URLEncoder.encode(
-                                "sum:" + systemId 
-                                        + "{sensor_uri=" + encode(uri)
-                                        + ",property=*,value_type=*}",
-                                StandardCharsets.UTF_8.name()));
+            String start, String end) {
+        UriBuilder uriBuilder = null;
+        try {
+            uriBuilder = UriBuilder
+                    .fromPath(config.tsdbEndpoint())
+                    .path(QUERY_ENDPOINT)
+                    .queryParam(PARAM_METRICS, URLEncoder.encode(
+                                    "sum:" + systemId
+                                            + "{sensor_uri=" + encode(uri)
+                                            + ",property=*,value_type=*}",
+                                    StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
         if (Strings.isNullOrEmpty(start)) {
             throw new IllegalArgumentException();
         }
@@ -222,14 +233,18 @@ public class TSDBQueryService {
     }
 
     public Observable<Model> queryBySystemId(String systemId, String start,
-            String end)
-            throws UnsupportedEncodingException {
-        UriBuilder uriBuilder = UriBuilder
-                .fromPath(config.tsdbEndpoint())
-                .path(QUERY_ENDPOINT)
-                .queryParam(PARAM_METRICS, URLEncoder.encode(
-                                "sum:" + systemId + "{property=*,value_type=*}",
-                                StandardCharsets.UTF_8.name()));
+            String end) {
+        UriBuilder uriBuilder = null;
+        try {
+            uriBuilder = UriBuilder
+                    .fromPath(config.tsdbEndpoint())
+                    .path(QUERY_ENDPOINT)
+                    .queryParam(PARAM_METRICS, URLEncoder.encode(
+                                    "sum:" + systemId + "{property=*,value_type=*}",
+                                    StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
         if (Strings.isNullOrEmpty(start)) {
             throw new IllegalArgumentException();
         }

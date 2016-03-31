@@ -2,6 +2,9 @@ package ru.semiot.services.data_archiving_service;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonArray;
@@ -9,14 +12,13 @@ import org.apache.jena.atlas.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/remove")
 public class RestServiceImpl {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(RestServiceImpl.class);
 	
 	@POST
-	@Path("metric")
+	@Path("/remove/metric")
 	public String removeMetric(String message) {
 		JsonObject jObj = JSON.parse(message);
 		JsonArray jarray = jObj.get("metrics").getAsArray();
@@ -32,4 +34,22 @@ public class RestServiceImpl {
 		}
 		return "Removing metrics completed";
 	}
+
+	@POST
+	@Path("/observations/latest")
+	public void getObservationLatest(
+			@Suspended final AsyncResponse response,
+			@QueryParam("sensor_id") String sensorId) {
+
+	}
+
+    @POST
+    @Path("/observations")
+    public void getObservationByRange(
+            @Suspended final AsyncResponse response,
+            @QueryParam("sensor_id") String sensorId,
+            @QueryParam("start") String start,
+            @QueryParam("end") String end) {
+
+    }
 }

@@ -2,24 +2,6 @@ package ru.semiot.platform.apigateway.rest;
 
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.Map;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Produces;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -30,19 +12,35 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.commons.namespaces.SSN;
-import ru.semiot.platform.apigateway.ContextProvider;
-import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
+import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.VOID;
-import ru.semiot.platform.apigateway.TSDBQueryService;
+import ru.semiot.platform.apigateway.ContextProvider;
+import ru.semiot.platform.apigateway.SPARQLQueryService;
+import ru.semiot.platform.apigateway.beans.TSDBQueryService;
+import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
+import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
-import static ru.semiot.platform.apigateway.rest.ResourceHelper.*;
-import ru.semiot.platform.apigateway.utils.MapBuilder;
-import ru.semiot.platform.apigateway.utils.URIUtils;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.Map;
+
+import static ru.semiot.platform.apigateway.rest.ResourceHelper.resume;
+import static ru.semiot.platform.apigateway.rest.ResourceHelper.resumeOnError;
 
 @Path("/sensors")
 @Stateless
@@ -153,13 +151,13 @@ public class SensorResource {
     @Path("{id}")
     @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void getSensor(@Suspended final AsyncResponse response,
-            @PathParam("id") String id) throws IOException {
+                          @PathParam("id") String id) throws IOException {
         URI root = uriInfo.getRequestUri();
         Model model = contextProvider.getRDFModel(ContextProvider.SENSOR_SINGLE,
                 MapBuilder.newMap()
-                .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
-                .put(ContextProvider.VAR_SENSOR_ID, id)
-                .build());
+                        .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
+                        .put(ContextProvider.VAR_SENSOR_ID, id)
+                        .build());
         Map<String, Object> frame = contextProvider.getFrame(
                 ContextProvider.SENSOR_SINGLE, root);
 
@@ -172,7 +170,7 @@ public class SensorResource {
                         Resource prototype = model.listObjectsOfProperty(
                                 sensor, Proto.hasPrototype).next().asResource();
                         Resource prototypeResource = ResourceUtils
-                        .createResourceFromClass(root, prototype.getLocalName());
+                                .createResourceFromClass(root, prototype.getLocalName());
                         model.add(sensor, RDF.type, prototypeResource);
 
                         return JsonUtils.toPrettyString(
@@ -186,9 +184,9 @@ public class SensorResource {
     @GET
     @Path("{id}/observations")
     public void observations(@Suspended final AsyncResponse response,
-            @PathParam("id") String sensorId,
-            @QueryParam("start") String start,
-            @QueryParam("end") String end)
+                             @PathParam("id") String sensorId,
+                             @QueryParam("start") String start,
+                             @QueryParam("end") String end)
             throws IOException {
         URI root = uriInfo.getRequestUri();
         Map params = MapBuilder.newMap()
@@ -201,12 +199,9 @@ public class SensorResource {
                     QuerySolution qs = rs.next();
                     String sensorUri = qs.getResource("sensorUri").getURI();
                     String systemId = qs.getLiteral("systemId").getString();
-                    try {
-                        return tsdbQuery.queryTimeOfLatestBySensorUri(systemId, sensorUri)
-                                .toBlocking().single();
-                    } catch (UnsupportedEncodingException ex) {
-                        throw Exceptions.propagate(ex);
-                    }
+
+                    return tsdbQuery.queryTimeOfLatestBySensorUri(systemId, sensorUri)
+                            .toBlocking().single();
                 } else {
                     throw Exceptions.propagate(new WebApplicationException(
                             Response.Status.NOT_FOUND));
@@ -277,15 +272,11 @@ public class SensorResource {
                         QuerySolution qs = rs.next();
                         String sensorUri = qs.getResource("sensorUri").getURI();
                         String systemId = qs.getLiteral("systemId").getString();
-                        try {
-                            return tsdbQuery.queryBySensorUri(systemId, sensorUri, start, end)
-                            .toBlocking().single();
-                        } catch (UnsupportedEncodingException ex) {
-                            throw Exceptions.propagate(ex);
-                        }
+                        return tsdbQuery.queryBySensorUri(systemId, sensorUri, start, end)
+                                .toBlocking().single();
                     } else {
                         throw Exceptions.propagate(new WebApplicationException(
-                                        Response.Status.NOT_FOUND));
+                                Response.Status.NOT_FOUND));
                     }
                 });
     }
