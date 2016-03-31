@@ -56,6 +56,8 @@ public class Launcher {
 								}
 							});
 
+			WriterCasandra.getInstance().init();
+			
 			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 	        context.setContextPath("/");
 	 
@@ -89,7 +91,7 @@ public class Launcher {
 			logger.error(e.getMessage(), e);
 		} finally {
 			try {
-				WriterOpenTsdb.getInstance().stop();
+				WriterCasandra.getInstance().stop();
 				WAMPClient.getInstance().close();
 			} catch (IOException ex) {
 				logger.error(ex.getMessage(), ex);
