@@ -34,11 +34,11 @@
             <artifactId>owner-java8</artifactId>
             <version>1.0.9</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.KMax</groupId>
-            <artifactId>metrics-opentsdb</artifactId>
-            <version>master-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+		  <groupId>com.datastax.cassandra</groupId>
+		  <artifactId>cassandra-driver-core</artifactId>
+		  <version>3.0.0</version>
+		</dependency>
         <dependency>
             <groupId>ru.semiot.commons</groupId>
             <artifactId>commons-namespaces</artifactId>
