@@ -37,16 +37,18 @@ public class RestServiceImpl {
 
 	@POST
 	@Path("/observations/latest")
-	public void getObservationLatest(
+	public void getObservationsLatest(
 			@Suspended final AsyncResponse response,
+            @QueryParam("system_id") String systemId,
 			@QueryParam("sensor_id") String sensorId) {
 
 	}
 
     @POST
     @Path("/observations")
-    public void getObservationByRange(
+    public void getObservationsByRange(
             @Suspended final AsyncResponse response,
+            @QueryParam("system_id") String systemId,
             @QueryParam("sensor_id") String sensorId,
             @QueryParam("start") String start,
             @QueryParam("end") String end) {
