@@ -1,4 +1,4 @@
-package ru.semiot.services.data_archiving_service;
+package ru.semiot.services.tsdbservice;
 
 import java.io.IOException;
 

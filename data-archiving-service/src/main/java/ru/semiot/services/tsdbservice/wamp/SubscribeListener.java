@@ -1,4 +1,4 @@
-package ru.semiot.services.data_archiving_service;
+package ru.semiot.services.tsdbservice.wamp;
 
 import java.io.StringReader;
 import java.util.LinkedList;
@@ -21,6 +21,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.semiot.services.tsdbservice.ServiceConfig;
 import rx.Observer;
 
 import ru.semiot.commons.namespaces.NamespaceUtils;
@@ -125,7 +126,7 @@ public class SubscribeListener implements Observer<String> {
                     wampClient.addSubscription(
                             topicName,
                             wampClient.subscribe(topicName).subscribe(
-                                    new WriterMetricsListener(topicName)));
+                                    new ObservationListener(topicName)));
                 } else {
                     logger.debug("Topic {} is already known", topicName);
                 }

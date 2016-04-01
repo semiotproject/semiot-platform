@@ -1,4 +1,4 @@
-package ru.semiot.services.data_archiving_service;
+package ru.semiot.services.tsdbservice;
 
 import java.io.IOException;
 
@@ -9,6 +9,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.semiot.services.tsdbservice.rest.Observations;
+import ru.semiot.services.tsdbservice.wamp.RemoveListener;
+import ru.semiot.services.tsdbservice.wamp.SubscribeListener;
+import ru.semiot.services.tsdbservice.wamp.WAMPClient;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 
@@ -56,7 +60,7 @@ public class Launcher {
 								}
 							});
 
-			WriterCasandra.getInstance().init();
+			TSDBClient.getInstance().init();
 			
 			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 	        context.setContextPath("/");
@@ -71,7 +75,7 @@ public class Launcher {
 	        // Tells the Jersey Servlet which REST service/class to load.
 	        jerseyServlet.setInitParameter(
 	           "jersey.config.server.provider.classnames",
-	           RestServiceImpl.class.getCanonicalName());
+	           Observations.class.getCanonicalName());
 	 
 	        try {
 	            jettyServer.start();
@@ -91,7 +95,7 @@ public class Launcher {
 			logger.error(e.getMessage(), e);
 		} finally {
 			try {
-				WriterCasandra.getInstance().stop();
+				TSDBClient.getInstance().stop();
 				WAMPClient.getInstance().close();
 			} catch (IOException ex) {
 				logger.error(ex.getMessage(), ex);

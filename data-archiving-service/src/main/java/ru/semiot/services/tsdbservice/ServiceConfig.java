@@ -1,4 +1,4 @@
-package ru.semiot.services.data_archiving_service;
+package ru.semiot.services.tsdbservice;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
@@ -9,7 +9,7 @@ import org.aeonbits.owner.Config.Sources;
 @Sources({ "file:/semiot-platform/data-archiving-service/config.properties" })
 public interface ServiceConfig extends Config {
 
-	@DefaultValue("ws://wamprouter:8080/ws")
+	@DefaultValue("ws://demo.semiot.ru:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
 
@@ -26,11 +26,11 @@ public interface ServiceConfig extends Config {
 	@Key("services.topics.subscriber")
 	String topicsSubscriber();
 
-	@DefaultValue("tsdb")
+	@DefaultValue("demo.semiot.ru")
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
-	@DefaultValue("http://deviceproxyservice:3030/ds/query")
+	@DefaultValue("http://demo.semiot.ru:3030/ds/query")
 	@Key("services.fuseki.store.url")
 	String storeUrl();
 

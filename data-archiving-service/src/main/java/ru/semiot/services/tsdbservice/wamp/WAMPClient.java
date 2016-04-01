@@ -1,4 +1,4 @@
-package ru.semiot.services.data_archiving_service;
+package ru.semiot.services.tsdbservice.wamp;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.semiot.services.tsdbservice.ServiceConfig;
 import rx.Observable;
 import rx.Subscription;
 import ws.wamp.jawampa.ApplicationError;

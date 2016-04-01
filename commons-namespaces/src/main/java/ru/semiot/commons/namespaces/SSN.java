@@ -10,6 +10,8 @@ public class SSN extends Namespace {
     public static final Property hasSubsystem = property(URI, "hasSubsystem");
     public static final Property observedProperty = 
             property(URI, "observedProperty");
+    public static final Property featureOfInterest =
+            property(URI, "featureOfInterest");
     public static final Property observedBy = property(URI, "observedBy");
     public static final Property isProducedBy = property(URI, "isProducedBy");
     public static final Property hasValue = property(URI, "hasValue");
