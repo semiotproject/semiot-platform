@@ -71,7 +71,7 @@ public class ScheduledPuller implements Runnable {
 
                 //Send new observations
                 List<WeatherStationObservation> observations = wsFactory
-                        .parseObservations(data);
+                        .parseObservations(data, config.get(Keys.ONLY_NEW_OBS).equalsIgnoreCase("false"));
 
                 logger.info("Found [{}] observations", observations.size());
 
