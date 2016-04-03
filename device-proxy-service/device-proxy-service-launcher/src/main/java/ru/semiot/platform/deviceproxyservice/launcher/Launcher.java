@@ -80,6 +80,9 @@ public class Launcher {
             bundles.add(context.installBundle(
                     "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/jersey-all-2.22.1.jar?raw=true"));
 
+            bundles.add(context.installBundle("http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.whiteboard-3.0.0.jar"));
+            bundles.add(context.installBundle("https://repo1.maven.org/maven2/com/eclipsesource/jaxrs/publisher/5.3.1/publisher-5.3.1.jar"));
+
             //Device Proxy Service bundles
             bundles.add(context.installBundle(
                     "device-proxy-service-api-1.0-SNAPSHOT.jar",
