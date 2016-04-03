@@ -139,6 +139,7 @@ public class NetatmoAPI {
             String lat_sw, String lon_sw) 
             throws JSONException {
         if(isEmpty(lat_ne, lon_ne, lat_sw, lon_sw)) {
+            logger.warn("Empty area values: lat_ne: {}, lon_ne: {}, lat_sw: {}, lon_sw: {}", lat_ne, lon_ne, lat_sw, lon_sw);
             return null;
         }
         
@@ -182,6 +183,10 @@ public class NetatmoAPI {
                     } catch (JSONException ex) {
                         logger.warn(ex.getMessage(), ex);
                     }
+                }
+                else{
+                    logger.warn("Failed to \"getpublicdata\"! Unrecognized response code. URL: {}, Status: {}, Message: {}.", 
+                            uri, response.getStatusLine(), EntityUtils.toString(response.getEntity()));
                 }
             }
         } catch (IOException | URISyntaxException ex) {
