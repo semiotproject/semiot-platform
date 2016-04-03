@@ -8,7 +8,7 @@ module.exports = function (grunt) {
     // custom options
     var BUILD_CONFIG = {
         src_dir: './src/',
-        dist_dir: './dist/'
+        dist_dir: '../webapp/'
     };
 
     // legacy tasks
@@ -21,7 +21,7 @@ module.exports = function (grunt) {
             index: {
                 expand: true,
                 cwd: BUILD_CONFIG.src_dir,
-                src: ['css/main.less'],
+                src: ['css/*.less'],
                 dest: BUILD_CONFIG.dist_dir,
                 ext: '.css'
             }
@@ -33,8 +33,8 @@ module.exports = function (grunt) {
                 }
             },
             index: {
-                src: BUILD_CONFIG.src_dir + "js/index.js",
-                dest: BUILD_CONFIG.dist_dir + "js/index.js",
+                src: BUILD_CONFIG.src_dir + "js/explorer/index.js",
+                dest: BUILD_CONFIG.dist_dir + "js/explorer/index.js",
                 options: {
                     browserifyOptions: {
                         debug: true

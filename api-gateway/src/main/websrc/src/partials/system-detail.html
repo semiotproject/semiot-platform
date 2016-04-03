@@ -1,4 +1,3 @@
-<h2>SemIoT Platform</h2>
 <section>
     <ol class="breadcrumb">
         <li><a href="#/systems">Systems</a></li>
@@ -7,13 +6,13 @@
     <div id="single-system-wrapper" ng-class="{preloader: isLoading}">
         <div ng-repeat="sensor in sensors" class="sensor-view">
             <div class="mode-control btn-group">
-                <label class="btn btn-primary" ng-click="onSetModeClick(sensor, getModes()['real-time'])" ng-model="sensor.mode" btn-radio="getModes()['real-time']">Real-Time</label>
-                <label class="btn btn-primary" ng-click="onSetModeClick(sensor, getModes()['archive'])" ng-model="sensor.mode" btn-radio="getModes()['archive']">Archive</label>
+                <label class="btn btn-raised" ng-click="onSetModeClick(sensor, getModes()['real-time'])" ng-model="sensor.mode" btn-radio="getModes()['real-time']">Real-Time</label>
+                <label class="btn btn-raised" ng-click="onSetModeClick(sensor, getModes()['archive'])" ng-model="sensor.mode" btn-radio="getModes()['archive']">Archive</label>
             </div>
 
             <div class="range-control" ng-if="sensor.mode === getModes()['archive']">
                 <div class="chart-control">
-                    <button class="btn btn-primary" ng-click="onSetRangeClick($index)">Select</button>
+                    <button class="btn btn-primary btn-raised" ng-click="onSetRangeClick($index)">Select</button>
                 </div>
                 <div class="chart-control">
                     <label>From</label>
@@ -51,8 +50,17 @@
                 </div>
             </div>
             <highchart ng-if="sensor.chartConfig.series[0].data.length > 0" config="sensor.chartConfig"></highchart>
-            <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['archive']" class="empty-sensor-chart">No observations found for this period</div>
-            <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['real-time']" class="empty-sensor-chart">Waiting for the first observation..</div>
+            <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['archive']" class="empty-sensor-chart">
+                <span>{{ sensor.title }}</span>
+                <br>
+                <span>No observations found for this period</span>
+            </div>
+            <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['real-time']" class="empty-sensor-chart">
+
+                <span>{{ sensor.title }}</span>
+                <br>
+                <span>Waiting for the first observation..</span>
+            </div>
         </div>
     </div>
 </section>
