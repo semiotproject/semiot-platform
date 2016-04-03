@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ru.semiot.drivers.mocks</groupId>
+    <artifactId>plainlamp</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>Plain Lamp (Mock) Driver</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.dependencymanager</artifactId>
+            <version>4.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.semiot.platform</groupId>
+            <artifactId>device-proxy-service-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>3.0.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Import-Package>
+                            org.apache.felix.dm;version="[4.1,5)",
+                            org.osgi.framework;version="[1.8,2)",
+                            org.osgi.service.cm;version="[1.5,2)",
+                            ru.semiot.platform.deviceproxyservice.api.drivers;version="[1.0,2)",
+                            javax.security.cert,
+                            javax.net.ssl,
+                            javax.naming,
+                            javax.net,
+                            javax.security.auth.x500,
+                            org.xml.sax,
+                            org.xml.sax.helpers,
+                            javax.xml.parsers
+                        </Import-Package>
+                        <Embed-Dependency>*;scope=compile|runtime
+                        </Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
+                        <Bundle-Activator>
+                            ru.semiot.platform.drivers.netatmo.weatherstation.Activator
+                        </Bundle-Activator>
+                        <Export-Package/>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
