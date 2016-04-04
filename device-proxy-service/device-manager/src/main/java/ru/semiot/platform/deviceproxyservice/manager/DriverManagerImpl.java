@@ -1,7 +1,7 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import org.apache.jena.rdf.model.Model;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Dictionary;
 
 public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
@@ -185,6 +186,20 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
         if(pid != null) {
             logger.info(pid);
+
+            try {
+                Collection services = bundleContext.getServiceReferences(
+                        ActuatingDeviceDriver.class, null);
+                if(!services.isEmpty()) {
+                    ActuatingDeviceDriver driver = (ActuatingDeviceDriver)
+                            services.iterator().next();
+                    driver.executeCommand(command);
+                } else {
+                    logger.warn("Driver [{}] not found!", pid);
+                }
+            } catch (InvalidSyntaxException e) {
+                logger.error(e.getMessage(), e);
+            }
         } else {
             logger.warn("System [{}] not found!", deviceId);
             throw new IllegalArgumentException();
