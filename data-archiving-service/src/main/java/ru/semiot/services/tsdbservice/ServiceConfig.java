@@ -30,7 +30,7 @@ public interface ServiceConfig extends Config {
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
-	@DefaultValue("http://localhost:3030/ds/query")
+	@DefaultValue("http://deviceproxyservice:3030/ds/query")
 	@Key("services.fuseki.store.url")
 	String storeUrl();
 
