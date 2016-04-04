@@ -26,7 +26,7 @@ public interface ServiceConfig extends Config {
 	@Key("services.topics.subscriber")
 	String topicsSubscriber();
 
-	@DefaultValue("demo.semiot.ru")
+	@DefaultValue("tsdb")
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
