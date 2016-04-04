@@ -15,6 +15,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RiotException;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,12 @@ public class DirectoryService {
             SAREF.class);
     private static final String GET_SYSTEM_URI = NamespaceUtils.newSPARQLQuery(
             "SELECT ?uri {?uri a ssn:System} LIMIT 1", SSN.class);
+    private static final String GET_DRIVER_PID_BY_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
+            "SELECT ?pid {" +
+                    "?system dcterms:identifier \"${SYSTEM_ID}\" ." +
+                    "GRAPH <urn:semiot:graphs:private> {" +
+                    "?system semiot:hasDriver ?pid" +
+                    "}} LIMIT 1", DCTerms.class, SEMIOT.class);
 
     private final RDFStore store;
 
@@ -175,6 +182,19 @@ public class DirectoryService {
     
     public void removeDataOfDriver(String pid) {
     	store.update(QUERY_DELETE_ALL_DATA_DRIVER.replace("${PID}", pid));
+    }
+
+    public String findDriverPidByDeviceId(String deviceId) {
+        String query = GET_DRIVER_PID_BY_SYSTEM_ID.replace("${SYSTEM_ID}", deviceId);
+        logger.info(query);
+        ResultSet resultSet = store.select(query);
+        if(resultSet.hasNext()) {
+            QuerySolution qs = resultSet.next();
+            Resource pid = qs.getResource("pid");
+            return pid.getURI();
+        } else {
+            return null;
+        }
     }
 
     private static abstract class Vars {

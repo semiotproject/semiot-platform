@@ -4,8 +4,9 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 
+import javax.servlet.Servlet;
 import java.util.Properties;
 
 
@@ -18,7 +19,7 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Object.class.getName(), new Properties())
                 .setImplementation(RemoveServiceImpl.class)
                 .add(createServiceDependency()
-                        .setService(DeviceManager.class)
+                        .setService(DeviceDriverManager.class)
                         .setRequired(true)));
 
         //StatusResource
@@ -27,11 +28,13 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(StatusResource.class));
 
         //CommandAPI
+//        Properties commandAPIProps = new Properties();
+//        commandAPIProps.setProperty("alias", "/rest/commands");
         manager.add(createComponent()
                 .setInterface(Object.class.getName(), new Properties())
                 .setImplementation(CommandAPI.class)
                 .add(createServiceDependency()
-                        .setService(DeviceManager.class)
+                        .setService(DeviceDriverManager.class)
                         .setRequired(true)));
     }
 

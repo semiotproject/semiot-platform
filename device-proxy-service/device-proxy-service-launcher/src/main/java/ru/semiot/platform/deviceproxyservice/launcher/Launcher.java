@@ -78,8 +78,7 @@ public class Launcher {
             bundles.add(context.installBundle(
                     "http://central.maven.org/maven2/org/apache/servicemix/bundles/org.apache.servicemix.bundles.json/20140107_1/org.apache.servicemix.bundles.json-20140107_1.jar"));
             bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/jersey-all-2.22.1.jar?raw=true"));
-
+                    "https://repo1.maven.org/maven2/com/eclipsesource/jaxrs/jersey-all/2.22.2/jersey-all-2.22.2.jar"));
             bundles.add(context.installBundle("http://apache-mirror.rbc.ru/pub/apache//felix/org.apache.felix.http.whiteboard-3.0.0.jar"));
             bundles.add(context.installBundle("https://repo1.maven.org/maven2/com/eclipsesource/jaxrs/publisher/5.3.1/publisher-5.3.1.jar"));
 

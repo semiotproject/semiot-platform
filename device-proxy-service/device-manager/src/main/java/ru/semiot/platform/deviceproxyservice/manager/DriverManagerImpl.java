@@ -1,28 +1,27 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import java.io.IOException;
-import java.util.Dictionary;
-
+import org.apache.jena.rdf.model.Model;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
-
-import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
-import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
-import ru.semiot.platform.deviceproxyservice.api.drivers.TemplateUtils;
+import ru.semiot.platform.deviceproxyservice.api.drivers.*;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 
-public class DeviceManagerImpl implements DeviceManager, ManagedService {
+import java.io.IOException;
+import java.util.Dictionary;
+
+public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
     private static final Logger logger = LoggerFactory.getLogger(
-            DeviceManagerImpl.class);
+            DriverManagerImpl.class);
 
     private final Configuration configuration = new Configuration();
+
+    //Injected by Dependency Manager
+    private BundleContext bundleContext;
 
     private DirectoryService directoryService;
 
@@ -177,9 +176,19 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
     }
 
     @Override
-    public boolean registerCommand(String command) {
-        logger.info(command);
-        return true;
+    public void registerCommand(Command command) {
+    }
+
+    @Override
+    public void executeCommand(String deviceId, String command) {
+        String pid = directoryService.findDriverPidByDeviceId(deviceId);
+
+        if(pid != null) {
+            logger.info(pid);
+        } else {
+            logger.warn("System [{}] not found!", deviceId);
+            throw new IllegalArgumentException();
+        }
     }
 
     public Configuration getConfiguration() {

@@ -1,6 +1,6 @@
 package rs.proxy.service;
 
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 @Path("remove")
 public class RemoveServiceImpl {
 
-	private DeviceManager manager;
+	private DeviceDriverManager manager;
 
 	@DELETE
 	@Path("fuseki/{pid}")

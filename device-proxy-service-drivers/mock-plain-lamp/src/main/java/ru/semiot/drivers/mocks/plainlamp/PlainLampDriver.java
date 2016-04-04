@@ -4,15 +4,15 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.semiot.platform.deviceproxyservice.api.drivers.ActuatingDeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
 import java.net.URI;
 import java.util.Dictionary;
 
-public class PlainLampDriver implements DeviceDriver, ManagedService {
+public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
 
     private static final Logger logger = LoggerFactory.getLogger(
             PlainLampDriver.class);
@@ -24,10 +24,10 @@ public class PlainLampDriver implements DeviceDriver, ManagedService {
                     "master/device-proxy-service-drivers/mock-plain-lamp/" +
                     "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#"));
 
-    private volatile DeviceManager deviceManager;
+    private volatile DeviceDriverManager manager;
 
     public void start() {
-        deviceManager.registerDriver(info);
+        manager.registerDriver(info);
 
         logger.info("{} started!", DRIVER_NAME);
     }
@@ -52,5 +52,9 @@ public class PlainLampDriver implements DeviceDriver, ManagedService {
 
     public String getDriverName() {
         return DRIVER_NAME;
+    }
+
+    public void executeCommand(String s) {
+
     }
 }
