@@ -18,6 +18,7 @@ public class Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
     private static final String BUNDLES_PATH = "/bundles/";
+    private static final String BUNDLE_NAME_PREFIX = "file://" + BUNDLES_PATH;
     private static final String[] LOCAL_BUNDLES = new String[]{
             //Apache Felix bundles and their dependencies
             "org.apache.felix.configadmin-1.8.8.jar",
@@ -100,8 +101,8 @@ public class Launcher {
 
     private static Bundle loadAndInstallBundle(BundleContext context, String name)
             throws BundleException {
-        return context.installBundle(
-                name, Launcher.class.getResourceAsStream(BUNDLES_PATH + name));
+        return context.installBundle(BUNDLE_NAME_PREFIX + name,
+                Launcher.class.getResourceAsStream(BUNDLES_PATH + name));
     }
 
 }
