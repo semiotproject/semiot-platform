@@ -27,6 +27,8 @@ public class PlainLampDriver implements ActuatingDeviceDriver {
     public void start() {
         manager.registerDriver(info);
 
+        logger.info("{} started!", DRIVER_NAME);
+
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
@@ -38,8 +40,6 @@ public class PlainLampDriver implements ActuatingDeviceDriver {
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
         }
-
-        logger.info("{} started!", DRIVER_NAME);
     }
 
     public void stop() {

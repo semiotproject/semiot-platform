@@ -28,7 +28,7 @@
 
 :PlainLamp-Actuator a san:ActuatingDevice, proto:Prototype ;
   san:actsOn qudt-quantity:LuminousFlux ;
-  san:actsOn qudt-quantity-ex:CorrelatedColorTemperature ;
+  san:actsOn qudt-quantity-ext:CorrelatedColorTemperature ;
   san:hasActuatingCapability [
     a san:ActuatingCapability ;
     ssn:forProperty qudt-quantity:LuminousFlux ;
@@ -40,7 +40,7 @@
   ] ;
   san:hasActuatingCapability [
     a san:ActuatingCapability ;
-    ssn:forProperty qudt-quantity-ex:CorrelatedColorTemperature ;
+    ssn:forProperty qudt-quantity-ext:CorrelatedColorTemperature ;
     san:hasActuatingProperty [
       a san:ActuatingProperty, semiot:FixedValueOfActuatingProperty ;
       dul:hasDataValue "4000"^^xsd:integer ;
