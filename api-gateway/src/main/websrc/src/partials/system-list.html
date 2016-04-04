@@ -2,15 +2,6 @@
     <ol class="breadcrumb">
         <li class="active">Systems</li>
     </ol>
-    <pagination
-        ng-model="pagination.currentPage"
-        items-per-page="pagination.itemsPerPage"
-        total-items="pagination.totalItems"
-        max-size="pagination.maxSize"
-        boundary-links="true"
-        num-pages="pagination.numPages"
-        ng-change="setPagination()">
-    </pagination>
     <div class="table-responsive system-list">
         <table class="table table-striped">
             <thead>
@@ -41,4 +32,14 @@
             </tbody>
         </table>
     </div>
+
+    <pagination
+        ng-model="pagination.currentPage"
+        items-per-page="pagination.itemsPerPage"
+        total-items="pagination.totalItems"
+        max-size="pagination.maxSize"
+        boundary-links="true"
+        num-pages="pagination.numPages"
+        ng-change="setPagination()">
+    </pagination>
 </section>

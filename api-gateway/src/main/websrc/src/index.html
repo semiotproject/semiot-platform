@@ -6,24 +6,34 @@
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://fezvrasta.github.io/bootstrap-material-design/dist/css/bootstrap-material-design.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
     <div class="container">
-        <ul class="nav nav-tabs">
-            <li class="active"><a href="/">SemIoT</a></li>
-            <li class="dropdown" style="float: right;">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="bootstrap-elements.html" data-target="#" aria-expanded="false">
-                Root <span class="caret"></span>
-              <div class="ripple-container"></div></a>
-              <ul class="dropdown-menu">
-                <li><a href="${pageContext.request.contextPath}/logout">Logout</a></li>
-              </ul>
-            </li>
-          </ul>
+        <div class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">SemIoT Platform</a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                        <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/logout/">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
         <div class="main-navigation">
             <a href="/explorer/" class="btn btn-raised btn-success">Explorer <i class="fa fa-search"></i></a>
             <a href="/config/" class="btn btn-raised btn-info">Configuration <i class="fa fa-cogs"></i></a>

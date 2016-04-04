@@ -21,7 +21,7 @@ module.exports = function (grunt) {
             index: {
                 expand: true,
                 cwd: BUILD_CONFIG.src_dir,
-                src: ['css/*.less'],
+                src: ['css/**/*.less'],
                 dest: BUILD_CONFIG.dist_dir,
                 ext: '.css'
             }
