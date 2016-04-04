@@ -9,7 +9,7 @@ import org.aeonbits.owner.Config.Sources;
 @Sources({ "file:/semiot-platform/data-archiving-service/config.properties" })
 public interface ServiceConfig extends Config {
 
-	@DefaultValue("ws://demo.semiot.ru:8080/ws")
+	@DefaultValue("ws://wamprouter:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
 
@@ -30,7 +30,7 @@ public interface ServiceConfig extends Config {
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
-	@DefaultValue("http://demo.semiot.ru:3030/ds/query")
+	@DefaultValue("http://localhost:3030/ds/query")
 	@Key("services.fuseki.store.url")
 	String storeUrl();
 
