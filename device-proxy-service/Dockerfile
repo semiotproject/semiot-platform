@@ -1,4 +1,4 @@
-FROM fedora:22
+FROM fedora:23
 
 MAINTAINER Shilin Ivan <proniment@gmail.com>
 

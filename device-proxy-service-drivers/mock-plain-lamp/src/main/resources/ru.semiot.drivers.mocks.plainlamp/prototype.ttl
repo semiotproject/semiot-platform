@@ -15,7 +15,7 @@
   ssn:hasSubSystem :PlainLamp-Actuator ;
   semiot:hasOperation :PlainLamp-Shine ;
   semiot:hasOperation :PlainLamp-Idle ;
-  semiot:supportedCommand :PlainLamp-Command-Switch-Operation ;
+  semiot:supportedCommand :PlainLamp-Command-Switch-Operation .
 
 :PlainLamp-Command-Switch-Operation a semiot:SwitchOperationCommand ;
   semiot:supportedOperation :PlainLamp-Shine ;
