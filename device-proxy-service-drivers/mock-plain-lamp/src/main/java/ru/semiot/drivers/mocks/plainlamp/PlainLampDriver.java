@@ -10,7 +10,7 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.*;
 import java.net.URI;
 import java.util.Dictionary;
 
-public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
+public class PlainLampDriver implements ActuatingDeviceDriver {
 
     private static final Logger logger = LoggerFactory.getLogger(
             PlainLampDriver.class);
@@ -46,19 +46,19 @@ public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
         logger.info("{} stopped!", DRIVER_NAME);
     }
 
-    public void updated(Dictionary dictionary) throws ConfigurationException {
-        synchronized (this) {
-            if (dictionary != null) {
-                if (configuration.isConfigured()) {
-                    logger.debug("Configured!");
-                } else {
-                    logger.warn("Is already configured! Skipping.");
-                }
-            } else {
-                logger.debug("Configuration is empty. Skipping.");
-            }
-        }
-    }
+//    public void updated(Dictionary dictionary) throws ConfigurationException {
+//        synchronized (this) {
+//            if (dictionary != null) {
+//                if (configuration.isConfigured()) {
+//                    logger.debug("Configured!");
+//                } else {
+//                    logger.warn("Is already configured! Skipping.");
+//                }
+//            } else {
+//                logger.debug("Configuration is empty. Skipping.");
+//            }
+//        }
+//    }
 
     public String getDriverName() {
         return DRIVER_NAME;

@@ -98,6 +98,7 @@
                             org.osgi.service.cm,
                             org.osgi.service.http,
                             org.glassfish.jersey.servlet,
+                            javax.naming,
                             javax.servlet,
                             javax.servlet.http,
                             javax.ws.rs,
