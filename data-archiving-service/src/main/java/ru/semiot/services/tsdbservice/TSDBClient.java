@@ -29,7 +29,7 @@ public class TSDBClient {
                     + "  property text,"
                     + "  feature_of_interest text,"
                     + "  value text,"
-                    + "  PRIMARY KEY ((system_id,sensor_id),eventTime)"
+                    + "  PRIMARY KEY ((system_id,sensor_id),event_time)"
                     + ")" +
                     "WITH CLUSTERING ORDER BY (event_time DESC);";
 
