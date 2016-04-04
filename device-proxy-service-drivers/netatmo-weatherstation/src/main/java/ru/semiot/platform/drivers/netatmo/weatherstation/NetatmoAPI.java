@@ -40,6 +40,7 @@ public class NetatmoAPI {
     private static final String LONGITUDE_SOUTH_WEST_KEY = "lon_sw";
     private static final String ERROR_KEY = "error";
     private static final String ERROR_INVALID_GRANT = "invalid grant";
+    private static final String ERROR_INVALID_ACCESS_TOKEN = "Invalid access token";
     private static final String BODY_KEY = "body";
 
     private final String client_app_id;
@@ -162,7 +163,7 @@ public class NetatmoAPI {
                 return new JSONObject(EntityUtils.toString(response.getEntity()))
                         .getJSONArray(BODY_KEY);
             } else {
-                if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+                if (statusCode == HttpStatus.SC_BAD_REQUEST || statusCode == HttpStatus.SC_FORBIDDEN) {
                     logger.warn(
                             "Failed to \"getpublicdata\"! URL: {}, Status: {}, Message: {}.", 
                             uri, response.getStatusLine(), EntityUtils.toString(response.getEntity()));
@@ -170,7 +171,7 @@ public class NetatmoAPI {
                         JSONObject msg = new JSONObject(
                                 EntityUtils.toString(response.getEntity()));
 
-                        if (msg.optString(ERROR_KEY).equals(ERROR_INVALID_GRANT)) {
+                        if (msg.optString(ERROR_KEY).equals(ERROR_INVALID_GRANT) || msg.optString(ERROR_KEY).contains(ERROR_INVALID_ACCESS_TOKEN)) {
                             logger.debug("Looks like access_token expired. Refreshing.");
                             
                             if(_authenticate()) {
