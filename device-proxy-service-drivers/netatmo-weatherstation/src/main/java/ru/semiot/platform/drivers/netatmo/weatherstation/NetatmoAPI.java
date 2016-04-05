@@ -41,6 +41,7 @@ public class NetatmoAPI {
     private static final String ERROR_KEY = "error";
     private static final String ERROR_INVALID_GRANT = "invalid grant";
     private static final String ERROR_INVALID_ACCESS_TOKEN = "Invalid access token";
+    private static final String ERROR_ACCESS_TOKEN_EXPIRED = "Access token expired";
     private static final String BODY_KEY = "body";
 
     private final String client_app_id;
@@ -171,7 +172,9 @@ public class NetatmoAPI {
                         JSONObject msg = new JSONObject(
                                 EntityUtils.toString(response.getEntity()));
 
-                        if (msg.optString(ERROR_KEY).equals(ERROR_INVALID_GRANT) || msg.optString(ERROR_KEY).contains(ERROR_INVALID_ACCESS_TOKEN)) {
+                        if (msg.optString(ERROR_KEY).equals(ERROR_INVALID_GRANT) 
+                                || msg.optString(ERROR_KEY).contains(ERROR_INVALID_ACCESS_TOKEN)
+                                || msg.optString(ERROR_KEY).contains(ERROR_ACCESS_TOKEN_EXPIRED)) {
                             logger.debug("Looks like access_token expired. Refreshing.");
                             
                             if(_authenticate()) {
