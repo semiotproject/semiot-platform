@@ -35,7 +35,30 @@ h3 {
     }
 }
 
+.main-navigation {
+    text-align: center;
+    position: relative;
+    top: 40px;
+    .btn.btn-raised {
+        height: 125px;
+        width: 270px;
+        line-height: 125px;
+        padding: 0;
+        font-size: 20px;
+    }
+    .btn.btn-raised:first-child {
+        margin-right: 10px;
+    }
+    .btn.btn-raised:last-child {
+        margin-left: 10px;
+    }
+}
+table {
+    margin-bottom: 0;
 
-.form-group .form-control {
-    border-bottom: 1px solid rgba(0,0,0,.2);
+    tr > td:last-child,
+    tr > th:last-child {
+        width: 40px;
+        text-align: center;
+    }
 }

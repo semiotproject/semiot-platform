@@ -16,102 +16,145 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>Available Drivers</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet"
-	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script
-	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+    <title>SemIoT Platform | Available Drivers</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/common.css">
+    <link rel="stylesheet" href="/static/css/drivers.css">
 </head>
 <body>
-    <%String username = request.getRemoteUser();%>
-        <div class="navbar-form navbar-right" role="navigation">
-            <button class="btn btn-primary btn-sm" onClick="logout()" name="logout" readonly>
-                <%=username%>  
-                <i class="glyphicon glyphicon-log-out"></i>
-            </button>                
+    <div class="navbar navbar-default">
+        <div class="container-fluid container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">SemIoT Platform</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/explorer">Explorer</a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Drivers</li>
+                        <li><a href="/config/DriversInstalled">Installed</a></li>
+                        <li><a href="/config/AvailableDrivers">Available</a></li>
+                        <li><a href="/config/UploadDriver">New</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Settings</li>
+                        <li><a href="/config/SystemSettings">System</a></li>
+                        <li><a href="/config/AdminPanel">Users</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown"><%=request.getRemoteUser()%> <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-        <script>
-            function logout(){
-                 $.ajax({url: "${pageContext.request.contextPath}/logout",
-                    type: 'GET',
-                    success: function(){
-                        window.location.replace("/");
-                    },
-                    error: function () {
-                        window.location.reload();
-                    }
-                });
-            }
-        </script>
-	<div class="container">
-		<h3>Available Drivers</h3>
-		<ul class="nav nav-pills nav-justified">
-		<li><a href="/config/AdminPanel">Administration Panel</a></li>
-			<li><a href="/config/SystemSettings">System Settings</a></li>
-			<li class="active"><a href="/config/UploadDriver">Drivers</a></li>
-		</ul>
-		<div class="text-center">
-			<br />
-			<div class="btn-group">
-				<a href="/config/DriversInstalled" class="btn btn-primary"
-					role="button">Installed</a> <a href="/config/AvailableDrivers"
-					class="btn btn-primary active" role="button">Available</a> <a
-					href="/config/UploadDriver" class="btn btn-primary" role="button">Upload</a>
-			</div>
-		</div>
-		<form
-			action="${pageContext.request.contextPath}/config/AvailableDrivers"
-			method="post">
-			<table class="table table-hover">
-				<CAPTION>List of available drivers</CAPTION>
-				<tr>
-				<tr>
-					<th>№</th>
-					<th>Name</th>
-					<th>Command</th>
-				</tr>
-				<%
-					boolean isMissing = true;
-					int j = 1;
-					for (int i = 0; i < jsonBundles.size(); i++) {
-						JsonObject jObj = jsonBundles.getJsonObject(i);
-						if (!listInstalledBundles.contains(jObj.getString("pid"))) {
-							isMissing = false;
-							String url = jObj.getString("url");
-				%>
-				<tr>
-					<td><%=j++%>
-					<td><%=jObj.get("name")%>
-					<td><input type="submit" class="btn btn-primary btn-sm"
-						name="install" value="install" class="form-control"
-						onClick="ChangeValue('url', '<%=url%>');" />
-				</tr>
-				<%
-					}
-					}
-					if (isMissing) {
-				%>
-				<tr>
-					<td>Available drivers are missing.</td>
-				</tr>
-				<%
-					}
-				%>
-			</table>
-			<input type="hidden" name="url" id="url" />
-		</form>
-		<script>
-			function ChangeValue(id, url) {
-				document.getElementById(id).value = url;
-			}
-		</script>
+    </div>
+    <div class="container">
+        <div class="main-wrapper">
+            <ul class="breadcrumb">
+                <li class="active"><a href="/">Home</a></li>
+                <li class="active"><a href="/drivers">Drivers</a></li>
+                <li>Available drivers</li>
+            </ul>
+            <h3>Available drivers</h3>
+            <form
+                action="${pageContext.request.contextPath}/config/AvailableDrivers"
+                method="post"
+                id="form">
+                <div class="table-responsive system-list">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>№</label>
+                                </th>
+                                <th>
+                                    <label>Name</label>
+                                </th>
+                                <th>
+                                    <label>Action</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                boolean isMissing = true;
+                                int j = 1;
+                                for (int i = 0; i < jsonBundles.size(); i++) {
+                                    JsonObject bundle = jsonBundles.getJsonObject(i);
+                                    if (!listInstalledBundles.contains(bundle.getString("pid"))) {
+                                        isMissing = false;
+                                        String url = bundle.getString("url");
+                            %>
+                                <tr>
+                                    <td>
+                                        <span><%=j++%></span>
+                                    </td>
+                                    <td>
+                                        <span><%=bundle.get("name")%></span>
+                                    </td>
+                                    <td>
+                                        <input class="btn btn-primary btn-sm install-button"
+                                            data-url='<%=url%>'
+                                            name="install"
+                                            value="install"
+                                        />
+                                </tr>
+                            <%
+                                }
+                            }
+                                if (isMissing) {
+                            %>
+                            <tr>
+                                <td></td>
+                                <td>Available drivers are missing.</td>
+                                <td></td>
+                            </tr>
+                            <%
+                                }
+                            %>
+                        </tbody>
+                    </table>
+                    <input type="hidden" name="url" id="url" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/js/material.min.js"></script>
+    <script>$.material.init();</script>
+    <script>
+        $('.install-button').on('click', function() {
+            var url = $(this).attr('data-url');
+            $('#url').val(url);
+            console.info('submitting form with url = ', url);
+            $('#form').submit();
+        })
+    </script>
 </body>
 </html>
+

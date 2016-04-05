@@ -8,35 +8,58 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/common.css">
-    <link rel="stylesheet" href="/css/config/user-list.css">
+    <link rel="stylesheet" href="/static/css/common.css">
+    <link rel="stylesheet" href="/static/css/settings.css">
 </head>
 <body>
-    <div class="container">
-        <div class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="/">SemIoT Platform</a>
-                </div>
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown">
-                        <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
-                        <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/logout/">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
+    <div class="navbar navbar-default">
+        <div class="container-fluid container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">SemIoT Platform</a>
             </div>
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/explorer/">Explorer</a>
+                </li>
+                <li class="dropdown">
+                    <a href="/drivers/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Drivers
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/drivers/installed/">Installed</a></li>
+                        <li><a href="/drivers/available/">Available</a></li>
+                        <li><a href="/drivers/new/">New</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown active">
+                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Settings
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/settings/system/">System</a></li>
+                        <li><a href="/settings/users/">Users</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/logout/">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
+    </div>
+    <div class="container">
         <div class="main-wrapper">
             <ul class="breadcrumb">
-                <li class="active"><a href="/">SemIoT Platform</a></li>
+                <li class="active"><a href="/">Home</a></li>
+                <li class="active"><a href="/settings/">Settings</a></li>
                 <li>Users</li>
             </ul>
             <h3>
@@ -68,13 +91,11 @@
                             <td>
                                 <div class="form-group form-group-sm is-empty">
                                     <input class="form-control" type="text" id="inputSmall" placeholder="ss" value="22">
-                                  <span class="material-input"></span>
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group form-group-sm is-empty">
                                     <input class="form-control" type="text" id="inputSmall" placeholder="ss" value="22">
-                                  <span class="material-input"></span>
                                 </div>
                             </td>
                             <td>

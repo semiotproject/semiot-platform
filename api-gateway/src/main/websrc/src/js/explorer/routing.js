@@ -6,27 +6,27 @@ export default function($routeProvider) {
             redirectTo: '/systems'
         })
         .when('/login', {
-            templateUrl: 'partials/login.html',
+            templateUrl: '/static/partials/login.html',
             controller: 'LoginCtrl'
         })
         .when('/systems', {
-            templateUrl: 'partials/system-list.html',
+            templateUrl: '/static/partials/system-list.html',
             controller: 'SystemListCtrl'
         })
         .when('/systems/:system_uri*', {
-            templateUrl: 'partials/system-detail.html',
+            templateUrl: '/static/partials/system-detail.html',
             controller: 'SystemDetailCtrl'
         })
         .when('/queries', {
-            templateUrl: 'partials/query-list.html',
+            templateUrl: '/static/partials/query-list.html',
             controller: 'QueryListCtrl'
         })
         .when('/queries/:query_id', {
-            templateUrl: 'partials/query-detail.html',
+            templateUrl: '/static/partials/query-detail.html',
             controller: 'QueryDetailCtrl'
         })
         .when('/new-query', {
-            templateUrl: 'partials/new-query.html',
+            templateUrl: '/static/partials/new-query.html',
             controller: 'NewQueryCtrl'
         });
 }

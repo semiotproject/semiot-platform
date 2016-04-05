@@ -10,51 +10,68 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" type="text/css" href="css/lib/datetimepicker.css">
-    <link rel="stylesheet" type="text/css" href="css/explorer.css">
+    <link rel="stylesheet" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/lib/datetimepicker.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/explorer.css">
 </head>
 <body>
-    <div class="container">
-
-        <div class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="/">SemIoT Platform</a>
-                </div>
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown">
-                        <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
-                        <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/logout/">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
+    <div class="navbar navbar-default">
+        <div class="container-fluid container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">SemIoT Platform</a>
             </div>
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/explorer">Explorer</a>
+                </li>
+                <li class="dropdown">
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Drivers</li>
+                        <li><a href="/config/DriversInstalled">Installed</a></li>
+                        <li><a href="/config/AvailableDrivers">Available</a></li>
+                        <li><a href="/config/UploadDriver">New</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Settings</li>
+                        <li><a href="/config/SystemSettings">System</a></li>
+                        <li><a href="/config/AdminPanel">Users</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown"><%=request.getRemoteUser()%> <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
+    </div>
+    <div class="container">
         <div ng-view class="app-wrapper"></div>
         <footer>
             <div class="left">&copy; <a href="http://semiot.ru/">SemIoT Project</a>&nbsp;2014-2016</div>
             <div class="right">SemIoT Platform v __PLATFORM_VERSION__</div>
         </footer>
     </div>
-    <script src="js/lib/jquery.js"></script>
-    <script src="js/lib/angular.js"></script>
-    <script src="js/lib/moment.js"></script>
-    <script src="js/lib/bootstrap.min.js"></script>
-    <script src="js/lib/datetimepicker.js"></script>
-    <script src="js/lib/highstock.js"></script>
-    <script src="js/lib/highcharts-ng.js"></script>
+    <script src="/static/js/lib/jquery.js"></script>
+    <script src="/static/js/lib/angular.js"></script>
+    <script src="/static/js/lib/moment.js"></script>
+    <script src="/static/js/lib/bootstrap.min.js"></script>
+    <script src="/static/js/lib/datetimepicker.js"></script>
+    <script src="/static/js/lib/highstock.js"></script>
+    <script src="/static/js/lib/highcharts-ng.js"></script>
 
-    <script src="http://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/js/material.min.js"></script>
     <script>$.material.init();</script>
 
-    <script src="js/explorer/index.js"></script>
+    <script src="/static/js/explorer/index.js"></script>
 </body>
 </html>

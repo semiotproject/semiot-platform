@@ -6,138 +6,178 @@
 <%@page import="javax.json.Json"%>
 
 <%
-	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
-	response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-	response.setHeader("Expires", "0");
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+    response.setHeader("Expires", "0");
 
-	JsonArray jsonBundles = (JsonArray) request.getAttribute("jsonArray");
+    JsonArray jsonBundles = (JsonArray) request.getAttribute("jsonArray");
 %>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+    pageEncoding="UTF-8"%>
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>Drivers Installed</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet"
-	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script
-	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+    <title>SemIoT Platform | System Settings</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/common.css">
+    <link rel="stylesheet" href="/static/css/drivers.css">
 </head>
 <body>
-    <%String username = request.getRemoteUser();%>
-        <div class="navbar-form navbar-right" role="navigation">
-            <button class="btn btn-primary btn-sm" onClick="logout()" name="logout" readonly>
-                <%=username%>  
-                <i class="glyphicon glyphicon-log-out"></i>
-            </button>                
+    <div class="navbar navbar-default">
+        <div class="container-fluid container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">SemIoT Platform</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/explorer/">Explorer</a>
+                </li>
+                <li class="dropdown active">
+                    <a href="/drivers/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Drivers
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/drivers/installed/">Installed</a></li>
+                        <li><a href="/drivers/available/">Available</a></li>
+                        <li><a href="/drivers/new/">New</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Settings
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/settings/system/">System</a></li>
+                        <li><a href="/settings/users/">Users</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                    <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/logout/">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-        <script>
-            function logout(){
-                 $.ajax({url: "${pageContext.request.contextPath}/logout",
-                    type: 'GET',
-                    success: function(){
-                        window.location.replace("/");
-                    },
-                    error: function () {
-                        window.location.reload();
-                    }
-                });
-            }
-        </script>
-	<div class="container">
-		<h3>Drivers Installed</h3>
-		<ul class="nav nav-pills nav-justified">
-                    <li><a href="/config/AdminPanel">Administration Panel</a></li>
-			<li><a href="/config/SystemSettings">System Settings</a></li>
-			<li class="active"><a href="/config/DriversInstalled">Drivers</a></li>
-		</ul>
-		<div class="text-center">
-			<br />
-			<div class="btn-group">
-				<a href="/config/DriversInstalled" class="btn btn-primary active"
-					role="button">Installed</a> <a href="/config/AvailableDrivers"
-					class="btn btn-primary" role="button">Available</a> <a
-					href="/config/UploadDriver" class="btn btn-primary" role="button">Upload</a>
-			</div>
-		</div>
-		<form
-			action="${pageContext.request.contextPath}/config/DriversInstalled"
-			method="post">
-			<table class="table table-hover">
-				<CAPTION>List of drivers</CAPTION>
-				<tr>
-				<tr>
-					<th>№</th>
-					<th>Name</th>
-					<th>Select</th>
-				</tr>
+    </div>
+    <div class="container">
+        <div class="main-wrapper">
+            <ul class="breadcrumb">
+                <li class="active"><a href="/">Home</a></li>
+                <li class="active"><a href="/drivers">Drivers</a></li>
+                <li>Installed drivers</li>
+            </ul>
+            <h3>Installed drivers</h3>
+            <%
+            if (jsonBundles.size() <= BundleConstants.countDefaultBundles) {
+            %>
+                <p>No installed drivers found; check out one of <a href="/config/AvailableDrivers">available drivers</a></p>
+            <%
+                } else {
+            %>
+                <form action="${pageContext.request.contextPath}/config/DriversInstalled" method="post">
+                    <div class="table-responsive system-list">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label>№</label>
+                                    </th>
+                                    <th>
+                                        <label>Name</label>
+                                    </th>
+                                    <th>
+                                        <label>Action</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%
+                                    int j = 1;
+                                    for (int i = 0; i < jsonBundles.size(); i++) {
+                                        JsonObject obj = jsonBundles.getJsonObject(i);
+                                        int id = obj.getInt("id");
+                                        if (id >= BundleConstants.countDefaultBundles) {
+                                            String symbName = obj.getString("symbolicName");
+                                %>
+                                            <tr>
+                                                <td>
+                                                    <span><%=j++%></span>
+                                                <td>
+                                                    <span><%=obj.get("name")%></span>
+                                                <td>
+                                                    <a
+                                                        href="#myModal"
+                                                        class="btn btn-primary btn-sm uninstall"
+                                                        data-id="<%=symbName%>"
+                                                    >
+                                                        uninstall
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                <%
+                                        }
+                                    }
+                                %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <input type="hidden" name="id_bundle" id="id_bundle" />
+                </form>
+            <%
+                }
+            %>
+        </div>
+    </div>
 
-				<%
-					if (jsonBundles.size() <= BundleConstants.countDefaultBundles) {
-				%>
-				<tr>
-					<td>Installed drivers are missing.</td>
-				</tr>
-				<%
-					} else {
-						int j = 1;
-						for (int i = 0; i < jsonBundles.size(); i++) {
-							JsonObject jObj = jsonBundles.getJsonObject(i);
-							int id = jObj.getInt("id");
-							if (id >= BundleConstants.countDefaultBundles) {
-								String symbName = jObj.getString("symbolicName");
-				%>
-				<tr>
-					<td><%=j++%>
-					<td><%=jObj.get("name")%>
-					<td><a href="#myModal" class="btn btn-primary btn-sm"
-						data-toggle="modal"
-						onClick="ChangeValue('id_bundle', '<%=symbName%>');">uninstall</a>
-					</td>
 
-				</tr>
-				<%
-					}
-						}
-					}
-				%>
-			</table>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Remove driver</h4>
+          </div>
+          <div class="modal-body">
+            <p>All related data will be destroyed</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default modal-decline" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary modal-accept">Remove</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
-			<input type="hidden" name="id_bundle" id="id_bundle" />
 
-			<div id="myModal" class="modal fade">
-				<div class="modal-dialog modal-sm">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal"
-								aria-hidden="true">×</button>
-							<h4 class="modal-title">Optional feature</h4>
-						</div>
-						<!-- Основное содержимое модального окна -->
-						<div class="modal-body">Do you want to remove all data
-							connected with the driver?</div>
-						<!-- Футер модального окна -->
-						<div class="modal-footer">
-							<input type="submit" class="btn btn-primary btn-sm"
-								name="uninstall" value="no" class="form-control" /> <input
-								type="submit" class="btn btn-primary btn-sm"
-								name="uninstallWithDeleteData" value="yes" class="form-control" />
-						</div>
-					</div>
-				</div>
-			</div>
-		</form>
-	</div>
-	<script>
-		function ChangeValue(id, val) {
-			document.getElementById(id).value = val;
-		}
-	</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/js/material.min.js"></script>
+    <script>$.material.init();</script>
+    <script>
+        $('.uninstall').on('click', function() {
+            var driverId = $(this).attr('data-id');
+            $('.modal-accept').off().on('click', function() {
+                console.log('removing driver with id = ', driverId);
+                $('#id_bundle').val(driverId);
+                $('form').submit();
+            });
+            $('#myModal').modal({});
+        });
+    </script>
 </body>
 </html>
+
