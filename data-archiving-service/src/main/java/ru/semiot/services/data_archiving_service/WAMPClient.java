@@ -4,14 +4,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
-
 import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import rx.Observable;
 import rx.Subscription;
-import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
 
@@ -32,7 +29,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
         return INSTANCE;
     }
 
-    public Observable<WampClient.Status> init() throws ApplicationError {
+    public Observable<WampClient.State> init() throws Exception {
         WampClientBuilder builder = new WampClientBuilder();
         builder.withUri(config.wampUri())
                 .withRealm(config.wampRealm())

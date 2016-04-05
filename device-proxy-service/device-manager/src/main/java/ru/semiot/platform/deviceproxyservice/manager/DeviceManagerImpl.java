@@ -2,19 +2,16 @@ package ru.semiot.platform.deviceproxyservice.manager;
 
 import java.io.IOException;
 import java.util.Dictionary;
-
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
-
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
 import ru.semiot.platform.deviceproxyservice.api.drivers.TemplateUtils;
-import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 
 public class DeviceManagerImpl implements DeviceManager, ManagedService {
@@ -40,17 +37,17 @@ public class DeviceManagerImpl implements DeviceManager, ManagedService {
                             configuration.get(Keys.WAMP_REALM),
                             configuration.getAsInteger(Keys.WAMP_RECONNECT))
                     .subscribe(
-                            (WampClient.Status newStatus) -> {
-                                if (newStatus == WampClient.Status.Connected) {
+                            (WampClient.State newState) -> {
+                                if (newState instanceof WampClient.ConnectedState) {
                                     logger.info("Connected to {}", configuration.get(Keys.WAMP_URI));
-                                } else if (newStatus == WampClient.Status.Disconnected) {
+                                } else if (newState instanceof WampClient.DisconnectedState) {
                                     logger.info("Disconnected from {}", configuration.get(Keys.WAMP_URI));
-                                } else if (newStatus == WampClient.Status.Connecting) {
+                                } else if (newState instanceof WampClient.ConnectingState) {
                                     logger.info("Connecting to {}", configuration.get(Keys.WAMP_URI));
                                 }
                             });
             logger.info("Device Proxy Service Manager started!");
-        } catch (ApplicationError ex) {
+        } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {
                 WAMPClient.getInstance().close();

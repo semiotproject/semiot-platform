@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import rx.Observable;
-import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
 
@@ -20,9 +19,9 @@ public class WAMPClient implements Closeable, AutoCloseable {
         return INSTANCE;
     }
 
-    public Observable<WampClient.Status> init(
+    public Observable<WampClient.State> init(
             String wampUri, String wampRealm, int wampReconnectInterval) 
-            throws ApplicationError {
+            throws Exception {
         WampClientBuilder builder = new WampClientBuilder();
         builder.withUri(wampUri)
                 .withRealm(wampRealm)

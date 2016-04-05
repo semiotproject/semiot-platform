@@ -23,8 +23,8 @@
         </dependency>
         <dependency>
             <groupId>ws.wamp.jawampa</groupId>
-            <artifactId>jawampa</artifactId>
-            <version>0.2.0</version>
+            <artifactId>jawampa-core</artifactId>
+            <version>0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.aeonbits.owner</groupId>
@@ -52,14 +52,6 @@
         <repository>
             <id>cqels</id>
             <url>https://raw.github.com/KMax/cqels/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>jawampa.mvn-repo</id>
-            <url>https://raw.github.com/Matthias247/jawampa/mvn-repo/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>

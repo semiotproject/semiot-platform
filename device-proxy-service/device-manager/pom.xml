@@ -44,11 +44,6 @@
             <version>2.4</version>
         </dependency>
         <dependency>
-            <groupId>ws.wamp.jawampa</groupId>
-            <artifactId>jawampa</artifactId>
-            <version>0.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
             <version>3.0.0</version>
@@ -84,18 +79,12 @@
             <artifactId>commons-namespaces</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>ws.wamp.jawampa</groupId>
+            <artifactId>jawampa-core</artifactId>
+            <version>0.4.1</version>
+        </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>jawampa.mvn-repo</id>
-            <url>https://raw.github.com/Matthias247/jawampa/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
     <build>
         <plugins>
             <plugin>
