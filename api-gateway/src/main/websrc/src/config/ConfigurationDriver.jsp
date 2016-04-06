@@ -22,51 +22,6 @@
     JsonObject repeatbleJson = null;
 %>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-
-<head>
-<title>Configuration Driver</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet"
-    href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<script
-    src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script
-    src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-ыскшзе
-</head>
-<body>
-    <%String username = request.getRemoteUser();%>
-        <div class="navbar-form navbar-right" role="navigation">
-            <button class="btn btn-primary btn-sm" onClick="logout()" name="logout" readonly>
-                <%=username%>
-                <i class="glyphicon glyphicon-log-out"></i>
-            </button>
-        </div>
-        <script>
-            function logout(){
-                 $.ajax({url: "${pageContext.request.contextPath}/logout",
-                    type: 'GET',
-                    success: function(){
-                        window.location.replace("/");
-                    },
-                    error: function () {
-                        window.location.reload();
-                    }
-                });
-            }
-        </script>
-    <div class="container">
-        <h3>Configuration Driver</h3>
-        <form
-        </form>
-</body>
-</html>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -81,7 +36,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css">
     <link rel="stylesheet" href="/static/css/common.css">
     <link rel="stylesheet" href="/static/css/drivers.css">
-    <script>var CONFIG = JSON.parse('<%=jsonArray%>');</script>
+    <script>\
+        var DRIVER_SCHEMA = JSON.parse('<%=jsonArray%>');
+        var MAX_REPEATABLE_COUNT = parseInt('<%=repeatbleMax%>')
+    </script>
 </head>
 <body>
     <div class="navbar navbar-default">
@@ -96,65 +54,80 @@
             </div>
             <ul class="nav navbar-nav">
                 <li>
-                    <a href="/explorer/">Explorer</a>
-                </li>
-                <li class="dropdown active">
-                    <a href="/drivers/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Drivers
-                    <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/drivers/installed/">Installed</a></li>
-                        <li><a href="/drivers/available/">Available</a></li>
-                        <li><a href="/drivers/new/">New</a></li>
-                    </ul>
+                    <a href="/explorer">Explorer</a>
                 </li>
                 <li class="dropdown">
-                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Settings
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/settings/system/">System</a></li>
-                        <li><a href="/settings/users/">Users</a></li>
+                        <li class="dropdown-header">Drivers</li>
+                        <li><a href="/config/DriversInstalled">Installed</a></li>
+                        <li><a href="/config/AvailableDrivers">Available</a></li>
+                        <li><a href="/config/UploadDriver">New</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Settings</li>
+                        <li><a href="/config/SystemSettings">System</a></li>
+                        <li><a href="/config/AdminPanel">Users</a></li>
                     </ul>
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="/logout">Logout</a></li>
                     </ul>
                 </li>
             </ul>
         </div>
     </div>
     <div class="container">
-        <ul class="breadcrumb">
-            <li class="active"><a href="/">Home</a></li>
-            <li class="active"><a href="/">Drivers</a></li>
-            <li>New driver</li>
-        </ul>
-        <h3>New driver configuration</h3>
+        <h3>
+            <span>New driver configuration</span>
+            <button class="btn btn-raised btn-primary btn-lg">Save <i class="fa fa-save"></i></button>
+        </h3>
         <form
             method="POST"
             action="${pageContext.request.contextPath}/config/ConfigurationDriver"
         >
 
-            <div class="container">
-                <div class="well bs-component regular-fields">
-                </div>
+            <div class="container well bs-component common-fields"></div>
+
+            <h3>
+                <span>Repeatable configuration</span>
+                <button class="btn btn-raised btn-primary btn-lg add-repeatable">Add <i class="fa fa-plus"></i></button>
+            </h3>
+            <div class="repeatable-configurations">
+
             </div>
 
-            <h3>Repeatable configuration</h3>
-            <div class="container">
-                <div class="well bs-component">
-                    <div id="map" style="height: 500px;"></div>
-                </div>
-            </div>
-            <div style="text-align: center;">
-                <button class="btn btn-raised btn-info btn-lg">Save <i class="fa fa-save"></i></button>
-            </div>
         </form>
     </div>
+
+    <div class="common-field template" style="display: none;">
+        <div class="form-group is-empty">
+            <label class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input
+                    class="form-control"
+                    type="text"
+                />
+            </div>
+            <span class="material-input"></span>
+        </div>
+    </div>
+
+    <div class="repeatable-configuration template" style="display: none;">
+        <div class="container well bs-component ">
+            <button class="btn btn-raised btn-primary btn-lg remove-repeatable">Remove <i class="fa fa-minus"></i></button>
+        </div>
+    </div>
+
+    <div class="map-wrapper template" style="display: none;">
+         <div style="height: 500px;"></div>
+    </div>
+
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
@@ -164,40 +137,155 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.js"></script>
     <script>$.material.init();</script>
     <script>
-        console.log(CONFIG);
-    /*
-        var map = L.map('map').setView([51.505, -0.09], 13);
+        console.log(DRIVER_SCHEMA);
 
-        L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roadsg/x={x}&y={y}&z={z}', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        var commonSchema = (function() {
+            return DRIVER_SCHEMA.filter((i) => {
+                return i['@type'] === 'semiot:CommonSchema';
+            })[0];
+        })();
 
-        var drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
+        var repeatableSchema = (function() {
+            return DRIVER_SCHEMA.filter((i) => {
+                return i['@type'] === "semiot:RepeatableSchema";
+            })[0];
+        })();
 
-        var drawControl = new L.Control.Draw({
-            position: 'topright',
-            draw: {
-                rect: {
-                    shapeOptions: {
-                        color: 'orange'
+        function getLocationFromSchema(data) {
+            return [
+                [
+                    data['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
+                    data['ru.semiot.area.longitude_ne']['dtype:defaultValue'],
+                ],
+                [
+                    data['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
+                    data['ru.semiot.area.longitude_ne']['dtype:defaultValue'],
+                ],
+                [
+                    data['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
+                    data['ru.semiot.area.longitude_sw']['dtype:defaultValue'],
+                ],
+                [
+                    data['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
+                    data['ru.semiot.area.longitude_sw']['dtype:defaultValue'],
+                ]
+            ];
+        }
+
+        function initMap(mapId, data) {
+            console.info('initing map with id = ', mapId);
+            var map = L.map(mapId).setView([51.505, -0.09], 13);
+
+            L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roadsg/x={x}&y={y}&z={z}', {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+
+            var drawControl = new L.Control.Draw({
+                position: 'topright',
+                draw: {
+                    rect: {
+                        shapeOptions: {
+                            color: 'orange'
+                        },
                     },
+                    polyline: false,
+                    marker: false,
+                    polygon: false,
+                    circle: false
                 },
-                polyline: false,
-                marker: false,
-                polygon: false,
-                circle: false
-            },
-            edit: {
-                featureGroup: drawnItems
-            }
-        });
-        map.addControl(drawControl);
+                edit: {
+                    featureGroup: drawnItems
+                }
+            });
+            map.addControl(drawControl);
 
-        map.on('draw:created', function (e) {
-            drawnItems.addLayer(e.layer);
+            map.on('draw:created', function (e) {
+                drawnItems.addLayer(e.layer);
+            });
+
+            L.polygon(getLocationFromSchema(data), {
+                color: 'orange'
+            }).addTo(drawnItems);
+        }
+
+        function renderField(f, key) {
+            if (!f['rdfs:label']) {
+                return null;
+            }
+            var field = $('.common-field.template').find('.form-group').clone();
+
+            field.find('label').text(f['rdfs:label']);
+            field.find('input').val(f['dtype:defaultValue']).attr({
+                name: key
+            });
+
+            return field;
+        }
+
+        function addCommonBlock() {
+            Object.keys(commonSchema).forEach(function(key, index) {
+                $('.common-fields').append(renderField(commonSchema[key], key));
+            });
+        }
+
+        function addRepeatableBlock() {
+            var formTemplate = $('.repeatable-configuration.template').find('> div').clone();
+            formTemplate.appendTo('.repeatable-configurations');
+            Object.keys(repeatableSchema).forEach(function(key, index) {
+
+                if (repeatableSchema[key]['@type'] === "semiot:GeoRectangle") {
+                    var map = $('.map-wrapper.template').find('> div').clone();
+
+                    // generate random id
+                    var mapId = 'map' + Date.now();
+                    map.attr({
+                        id: mapId
+                    });
+
+                    // initialize map
+
+                    map.appendTo(formTemplate);
+                    initMap(mapId, repeatableSchema[key]);
+                } else {
+                    formTemplate.append(renderField(repeatableSchema[key], key));
+                }
+            });
+        }
+
+        function checkMaxRepeatableCount() {
+            if ($('.repeatable-configurations').length === MAX_REPEATABLE_COUNT) {
+                $('.add-repeatable').attr('disabled', 'disabled');
+            } else {
+                $('.add-repeatable').removeAttr('disabled');
+            }
+        }
+
+        $('.add-repeatable').on('click', function(e) {
+            e.preventDefault();
+            addRepeatableBlock();
+            checkMaxRepeatableCount();
         });
-    */
+        $('body').on('click', '.remove-repeatable', function(e) {
+            e.preventDefault();
+            $(this).parent().remove();
+            checkMaxRepeatableCount();
+        });
+        $('.save-button').on('click', () => {
+            var data = {};
+            $('[name]').each(function(elem, index) {
+                data[$(elem).attr['name']] = $(elem).val();
+            });
+            console.info('common data is: ', data);
+
+
+        })
+
+        addCommonBlock();
+        repeatableSchema && addRepeatableBlock();
+
     </script>
 </body>
 </html>

@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="/static/css/drivers.css">
 </head>
 <body>
+
     <div class="navbar navbar-default">
         <div class="container-fluid container">
             <div class="navbar-header">
@@ -42,32 +43,29 @@
             </div>
             <ul class="nav navbar-nav">
                 <li>
-                    <a href="/explorer/">Explorer</a>
-                </li>
-                <li class="dropdown active">
-                    <a href="/drivers/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Drivers
-                    <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/drivers/installed/">Installed</a></li>
-                        <li><a href="/drivers/available/">Available</a></li>
-                        <li><a href="/drivers/new/">New</a></li>
-                    </ul>
+                    <a href="/explorer">Explorer</a>
                 </li>
                 <li class="dropdown">
-                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Settings
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/settings/system/">System</a></li>
-                        <li><a href="/settings/users/">Users</a></li>
+                        <li class="dropdown-header">Drivers</li>
+                        <li><a href="/config/DriversInstalled">Installed</a></li>
+                        <li><a href="/config/AvailableDrivers">Available</a></li>
+                        <li><a href="/config/UploadDriver">New</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Settings</li>
+                        <li><a href="/config/SystemSettings">System</a></li>
+                        <li><a href="/config/AdminPanel">Users</a></li>
                     </ul>
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="/logout">Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -75,11 +73,6 @@
     </div>
     <div class="container">
         <div class="main-wrapper">
-            <ul class="breadcrumb">
-                <li class="active"><a href="/">Home</a></li>
-                <li class="active"><a href="/drivers">Drivers</a></li>
-                <li>Installed drivers</li>
-            </ul>
             <h3>Installed drivers</h3>
             <%
             if (jsonBundles.size() <= BundleConstants.countDefaultBundles) {

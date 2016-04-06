@@ -46,7 +46,7 @@
                     <a href="/explorer">Explorer</a>
                 </li>
                 <li class="dropdown">
-                    <a href="#" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li class="dropdown-header">Drivers</li>
@@ -62,7 +62,8 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown"><%=request.getRemoteUser()%> <b class="caret"></b></a>
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                    <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="/logout">Logout</a></li>
                     </ul>
@@ -72,11 +73,6 @@
     </div>
     <div class="container">
         <div class="main-wrapper">
-            <ul class="breadcrumb">
-                <li class="active"><a href="/">Home</a></li>
-                <li class="active"><a href="/drivers">Drivers</a></li>
-                <li>Available drivers</li>
-            </ul>
             <h3>Available drivers</h3>
             <form
                 action="${pageContext.request.contextPath}/config/AvailableDrivers"
