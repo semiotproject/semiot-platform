@@ -111,11 +111,9 @@
                                         <span><%=bundle.get("name")%></span>
                                     </td>
                                     <td>
-                                        <input class="btn btn-primary btn-sm install-button"
+                                        <button class="btn btn-primary btn-sm install-button"
                                             data-url='<%=url%>'
-                                            name="install"
-                                            value="install"
-                                        />
+                                        >Install</button>
                                 </tr>
                             <%
                                 }
@@ -132,6 +130,8 @@
                             %>
                         </tbody>
                     </table>
+
+                    <input name="install" value="install" type="hidden"/>
                     <input type="hidden" name="url" id="url" />
                 </div>
             </form>

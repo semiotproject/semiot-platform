@@ -123,8 +123,8 @@
                                             <td>
                                                 <div class="form-group form-group-sm is-empty">
                                                     <select name="role" class="form-control" value=<%=user.getRole()%>>
-                                                        <option value="admin" <% if (user.getRole() == "admin") { %>selected<% } %>>admin</option>
-                                                        <option value="user" <% if (user.getRole() == "user") { %>selected<% } %>>user</option>
+                                                        <option value="user" <%= (user.getRole().equals("user") ? "selected='selected'" : "") %>>user</option>
+                                                        <option value="admin" <%= (user.getRole().equals("admin") ? "selected='selected'": "") %>>admin</option>
                                                     </select>
                                                 </div>
                                             </td>

@@ -261,16 +261,23 @@
                 this._map.addControl(this._drawControls.zero);
 
                 this._map.on('draw:created', function (e) {
+                    that.clearItems();
                     that._drawnItems.addLayer(e.layer);
-                    that.checkMaxRectangles();
+                    // that.checkMaxRectangles();
                 });
                 this._map.on('draw:edited', function (e) {
                     //
                 });
                 this._map.on('draw:deleted', function (e) {
-                    that.checkMaxRectangles();
+                    // that.checkMaxRectangles();
                 });
             },
+            clearItems: function() {
+                var that = this;
+                this._drawnItems.getLayers().map(function(layer) {
+                    that._drawnItems.removeLayer(layer);
+                });
+            }
             addDrawnItems: function(rectangles) {
                 var that = this;
                 rectangles.map(function(r) {
