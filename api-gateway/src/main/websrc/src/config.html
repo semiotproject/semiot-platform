@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SemIoT Platform</title>
+    <title>SemIoT Platform | Configuration</title>
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
@@ -27,7 +27,7 @@
                 <li>
                     <a href="/explorer">Explorer</a>
                 </li>
-                <li class="dropdown">
+                <li class="dropdown active">
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -55,8 +55,9 @@
     </div>
     <div class="container">
         <div class="main-navigation">
-            <a href="/explorer" class="btn btn-raised btn-success">Explorer <i class="fa fa-search"></i></a>
-            <a href="/config" class="btn btn-raised btn-info">Configuration <i class="fa fa-cogs"></i></a>
+            <a href="/config/DriversInstalled" class="btn btn-raised btn-success">Installed <i class="fa fa-check-circle"></i></a>
+            <a href="/config/AvailableDrivers" class="btn btn-raised btn-info">Available <i class="fa fa-database"></i></a>
+            <a href="/config/UploadDriver" class="btn btn-raised btn-warning">New <i class="fa fa-cloud-upload"></i></a>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>

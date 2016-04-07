@@ -1,0 +1,161 @@
+.app-wrapper {
+    padding: 20px 20px 10px 20px;
+    height: 100%;
+}
+
+.preloader {
+    background: url("../img/preloader.gif") center no-repeat;
+    height: 300px;
+    background-size: 6%;
+    * {
+        display: none;
+    }
+}
+
+.breadcrumb {
+    margin-bottom: 0px;
+}
+
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
+.datetimepicker {
+    width: 280px;
+}
+.dropdown-menu {
+    right: 0;
+    min-width: initial;
+    left: initial;
+}
+footer {
+    height: 50px;
+    line-height: 50px;
+    width: 100%;
+    div {
+        display: inline-block;
+        line-height: 50px;
+        height: 50px;
+        margin: 0 10px;
+    }
+}
+pre {
+    white-space: normal;
+    word-break: break-all;
+    max-width: 1000px;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 50px;
+    line-height: 50px;
+    div {
+        display: inline-block;
+        line-height: 50px;
+        height: 50px;
+        margin: 0 10px;
+    }
+}
+
+.system-list {
+    .table {
+        margin-bottom: 0;
+        background-color: white;
+        thead {
+            background-color: rgba(231, 231, 231, 0.45);
+            > tr > th {
+                padding: 5px 5px 5px 0;
+                &:first-child,
+                &:nth-of-type(3) {
+                    padding: 8px;
+                }
+                input {
+                    padding: 0 10px;
+                }
+                select {
+                    padding: 0 2px;
+                }
+            }
+        }
+        tr {
+            cursor: pointer;
+        }
+        tr:hover > td {
+            background-color: rgba(231, 231, 231, 0.45) !important;
+        }
+        tr > td {
+            height: 30px;
+            line-height: 45px;
+            padding: 0 8px;
+        }
+        tbody td:last-child {
+            text-align: right;
+        }
+    }
+}
+
+/* highcharts */
+.sensor-view {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    background: white;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border: 1px solid rgb(219, 219, 219);
+}
+.highcharts-button {
+    display: none;
+}
+.highcharts-container {
+    margin-top: 10px;
+}
+.chart-control {
+    display: inline-block;
+    max-width: 225px;
+    margin: 0 0 10px 10px;
+    vertical-align: bottom;
+    &.mode-control {
+        vertical-align: top;
+    }
+}
+.range-control {
+    float: right;
+    display: inline-block;
+    .btn.btn-raised {
+        margin-bottom: 0;
+    }
+    .input-group {
+        border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+        input:focus {
+            box-shadow: none !important;
+        }
+    }
+}
+.mode-control {
+    height: 70px;
+}
+.empty-sensor-chart {
+    height: 400px;
+    padding-top: 180px;
+    text-align: center;
+    font-style: italic;
+}
+.btn.btn-raised.ng-pristine.ng-untouched.ng-valid.active {
+    background-color: #0fb2fc;
+    color: white;
+}
+

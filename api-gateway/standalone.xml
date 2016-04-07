@@ -331,7 +331,7 @@
                         </login-module>
                     </authentication>
                 </security-domain>
-				<security-domain name="credential">
+                <security-domain name="credential">
                     <authentication>
                         <login-module code="Database" flag="required">
                             <module-option name="dsJndiName" value="java:jboss/datasources/SemiotDS"/>
