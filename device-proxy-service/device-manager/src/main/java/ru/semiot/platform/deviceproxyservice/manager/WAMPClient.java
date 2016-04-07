@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
+import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 public class WAMPClient implements Closeable, AutoCloseable {
 
@@ -23,7 +24,8 @@ public class WAMPClient implements Closeable, AutoCloseable {
             String wampUri, String wampRealm, int wampReconnectInterval) 
             throws Exception {
         WampClientBuilder builder = new WampClientBuilder();
-        builder.withUri(wampUri)
+        builder.withConnectorProvider(new NettyWampClientConnectorProvider())
+                .withUri(wampUri)
                 .withRealm(wampRealm)
                 .withInfiniteReconnects()
                 .withReconnectInterval(wampReconnectInterval,
