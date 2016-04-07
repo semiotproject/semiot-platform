@@ -26,12 +26,6 @@ opentsdb:
     - /etc/opentsdb:/etc/opentsdb
   restart: always
 
-webui:
-  image: docker.semiot.ru/web-ui
-  ports:
-    - "8484:80"
-  restart: always
-
 deviceproxyservice:
   image: docker.semiot.ru/device-proxy-service
   links:
