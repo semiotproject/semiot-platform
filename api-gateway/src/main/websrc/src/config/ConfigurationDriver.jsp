@@ -235,11 +235,7 @@
                     zero: new L.Control.Draw({
                         position: 'topright',
                         draw: {
-                            rectangle: {
-                                shapeOptions: {
-                                    color: 'orange'
-                                },
-                            },
+                            rectangle: {},
                             polyline: false,
                             marker: false,
                             polygon: false,
