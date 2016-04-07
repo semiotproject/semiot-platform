@@ -11,6 +11,7 @@ import rx.Observable;
 import rx.Subscription;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
+import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 public class WAMPClient implements Closeable, AutoCloseable {
 
@@ -31,7 +32,8 @@ public class WAMPClient implements Closeable, AutoCloseable {
 
     public Observable<WampClient.State> init() throws Exception {
         WampClientBuilder builder = new WampClientBuilder();
-        builder.withUri(config.wampUri())
+        builder.withConnectorProvider(new NettyWampClientConnectorProvider())
+                .withUri(config.wampUri())
                 .withRealm(config.wampRealm())
                 .withInfiniteReconnects()
                 .withReconnectInterval(config.wampReconnectInterval(),
