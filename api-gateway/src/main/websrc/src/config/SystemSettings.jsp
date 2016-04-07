@@ -95,6 +95,7 @@
                             <button class="btn btn-lg btn-primary btn-raised" type="submit">Save <i class="fa fa-save"></i></button>
                         </div>
                         <input type="hidden" name="configure" value="Save" />
+                        <input type="hidden" name="pid" id="pid" value=<%=BundleConstants.managerPid%> />
                     </form>
                 </div>
             </div>
