@@ -15,7 +15,7 @@ dataarchivingservice:
   volumes:
     - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
-  
+
 opentsdb:
   image: docker.semiot.ru/opentsdb
   links:
@@ -47,7 +47,7 @@ deviceproxyservice:
     - /semiot-platform/fuseki/app:/fuseki/app
     - /semiot-platform/device-proxy-service/proxy-logs:/root/semiot-platform/device-proxy-service/proxy-logs
   restart: always
-  
+
 hbase:
   image: docker.semiot.ru/hbase
   ports:
@@ -74,17 +74,6 @@ apigateway:
     - "9990:9990"
   volumes:
     - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
-  restart: always
-
-frontend:
-  image: docker.semiot.ru/frontend
-  links:
-    - wamprouter
-    - deviceproxyservice
-    - webui
-    - apigateway
-  ports:
-    - "80:80"
   restart: always
 
 mysqlbase:
