@@ -128,8 +128,10 @@
     </security-constraint>
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>Access to configuration</web-resource-name>
+            <web-resource-name>Common</web-resource-name>
             <url-pattern>/*</url-pattern>
+            <url-pattern>/static/css/common.css</url-pattern>
+            <url-pattern>/static/css/login.css</url-pattern>
             <url-pattern>/config/AdminPanel?logout</url-pattern>
             <http-method>GET</http-method>
         </web-resource-collection>
