@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SemIoT Platform | Index</title>
+    <title>SemIoT Platform | Configuration</title>
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/common.css">
-    <link rel="stylesheet" href="/static/css/drivers.css">
+    <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
+
     <div class="navbar navbar-default">
         <div class="container-fluid container">
             <div class="navbar-header">
@@ -24,46 +25,39 @@
             </div>
             <ul class="nav navbar-nav">
                 <li>
-                    <a href="/explorer/">Explorer</a>
+                    <a href="/explorer">Explorer</a>
                 </li>
                 <li class="dropdown active">
-                    <a href="/drivers/" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Drivers
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/drivers/installed/">Installed</a></li>
-                        <li><a href="/drivers/available/">Available</a></li>
-                        <li><a href="/drivers/new/">New</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Settings
-                    <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/settings/system/">System</a></li>
-                        <li><a href="/settings/users/">Users</a></li>
+                        <li class="dropdown-header">Drivers</li>
+                        <li><a href="/config/DriversInstalled">Installed</a></li>
+                        <li><a href="/config/AvailableDrivers">Available</a></li>
+                        <li><a href="/config/UploadDriver">New</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Settings</li>
+                        <li><a href="/config/SystemSettings">System</a></li>
+                        <li><a href="/config/AdminPanel">Users</a></li>
                     </ul>
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/logout/">Logout</a></li>
+                        <li><a href="/logout">Logout</a></li>
                     </ul>
                 </li>
             </ul>
         </div>
     </div>
     <div class="container">
-        <ul class="breadcrumb">
-            <li class="active"><a href="/">Home</a></li>
-            <li>Drivers</li>
-        </ul>
         <div class="main-navigation">
-            <a href="/explorer/" class="btn btn-raised btn-success">Installed drivers <i class="fa fa-check-circle"></i></a>
-            <a href="/explorer/" class="btn btn-raised btn-primary">Available drivers <i class="fa fa-database"></i></a>
-            <a href="/explorer/" class="btn btn-raised btn-warning">Upload drivers <i class="fa fa-cloud-upload"></i></a>
+            <a href="/config/DriversInstalled" class="btn btn-raised btn-success">Installed <i class="fa fa-check-circle"></i></a>
+            <a href="/config/AvailableDrivers" class="btn btn-raised btn-info">Available <i class="fa fa-database"></i></a>
+            <a href="/config/UploadDriver" class="btn btn-raised btn-warning">New <i class="fa fa-cloud-upload"></i></a>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>

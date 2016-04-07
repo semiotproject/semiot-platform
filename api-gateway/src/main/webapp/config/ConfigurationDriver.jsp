@@ -36,9 +36,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css">
     <link rel="stylesheet" href="/static/css/common.css">
     <link rel="stylesheet" href="/static/css/drivers.css">
-    <script>\
+    <script>
         var DRIVER_SCHEMA = JSON.parse('<%=jsonArray%>');
-        var MAX_REPEATABLE_COUNT = parseInt('<%=repeatbleMax%>')
+        var MAX_REPEATABLE_COUNT = parseInt('<%=repeatbleMax%>');
+        var REPEATABLE_CONFIGURATIONS = [];
     </script>
 </head>
 <body>
@@ -56,7 +57,7 @@
                 <li>
                     <a href="/explorer">Explorer</a>
                 </li>
-                <li class="dropdown">
+                <li class="dropdown active">
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -85,7 +86,7 @@
     <div class="container">
         <h3>
             <span>New driver configuration</span>
-            <button class="btn btn-raised btn-primary btn-lg">Save <i class="fa fa-save"></i></button>
+            <button class="btn btn-raised btn-primary btn-lg save-button">Save <i class="fa fa-save"></i></button>
         </h3>
         <form
             method="POST"
@@ -105,7 +106,7 @@
         </form>
     </div>
 
-    <div class="common-field template" style="display: none;">
+    <div class="field template" style="display: none;">
         <div class="form-group is-empty">
             <label class="col-md-2 control-label"></label>
             <div class="col-md-10">
@@ -128,7 +129,9 @@
          <div style="height: 500px;"></div>
     </div>
 
-
+    <form action="${pageContext.request.contextPath}/config/ConfigurationDriver" method="post" id='target-form'>
+        <input type="hidden" name="save" value="Save and start">
+    </form>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -137,155 +140,307 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.js"></script>
     <script>$.material.init();</script>
     <script>
-        console.log(DRIVER_SCHEMA);
 
-        var commonSchema = (function() {
-            return DRIVER_SCHEMA.filter((i) => {
-                return i['@type'] === 'semiot:CommonSchema';
-            })[0];
-        })();
+        var AREA_TYPE = "semiot:GeoRectangle";
 
-        var repeatableSchema = (function() {
-            return DRIVER_SCHEMA.filter((i) => {
-                return i['@type'] === "semiot:RepeatableSchema";
-            })[0];
-        })();
-
-        function getLocationFromSchema(data) {
-            return [
-                [
-                    data['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
-                    data['ru.semiot.area.longitude_ne']['dtype:defaultValue'],
-                ],
-                [
-                    data['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
-                    data['ru.semiot.area.longitude_ne']['dtype:defaultValue'],
-                ],
-                [
-                    data['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
-                    data['ru.semiot.area.longitude_sw']['dtype:defaultValue'],
-                ],
-                [
-                    data['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
-                    data['ru.semiot.area.longitude_sw']['dtype:defaultValue'],
-                ]
-            ];
-        }
-
-        function initMap(mapId, data) {
-            console.info('initing map with id = ', mapId);
-            var map = L.map(mapId).setView([51.505, -0.09], 13);
-
-            L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roadsg/x={x}&y={y}&z={z}', {
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            var drawnItems = new L.FeatureGroup();
-            map.addLayer(drawnItems);
-
-            var drawControl = new L.Control.Draw({
-                position: 'topright',
-                draw: {
-                    rect: {
-                        shapeOptions: {
-                            color: 'orange'
-                        },
-                    },
-                    polyline: false,
-                    marker: false,
-                    polygon: false,
-                    circle: false
-                },
-                edit: {
-                    featureGroup: drawnItems
+        var SCHEMAS = {
+            common: (function() {
+                return DRIVER_SCHEMA.filter((i) => {
+                    return i['@type'] === 'semiot:CommonSchema';
+                })[0];
+            })(),
+            repeatable: (function() {
+                var result = DRIVER_SCHEMA.filter((i) => {
+                    return i['@type'] === "semiot:RepeatableSchema";
+                });
+                if (result.length > 0) {
+                    console.info('found repeatable schema: ', result[0]);
+                    return result[0];
                 }
-            });
-            map.addControl(drawControl);
+            })()
+        };
 
-            map.on('draw:created', function (e) {
-                drawnItems.addLayer(e.layer);
-            });
+        var RESULT_CONFIG = {
+            repeatable: {}
+        };
 
-            L.polygon(getLocationFromSchema(data), {
-                color: 'orange'
-            }).addTo(drawnItems);
-        }
+        var UTILS = {
+            getRectangeFromSchema: function(data) {
+                return [
+                    [
+                        data['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
+                        data['ru.semiot.area.longitude_ne']['dtype:defaultValue'],
+                    ],
+                    [
+                        data['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
+                        data['ru.semiot.area.longitude_ne']['dtype:defaultValue'],
+                    ],
+                    [
+                        data['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
+                        data['ru.semiot.area.longitude_sw']['dtype:defaultValue'],
+                    ],
+                    [
+                        data['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
+                        data['ru.semiot.area.longitude_sw']['dtype:defaultValue'],
+                    ]
+                ];
+            },
+            serializeRectangleToForm: function(prefix, rect) {
+                var data = {};
 
-        function renderField(f, key) {
-            if (!f['rdfs:label']) {
-                return null;
-            }
-            var field = $('.common-field.template').find('.form-group').clone();
+                data[prefix + '1.latitude'] = rect[0][0];
+                data[prefix + '1.longitude'] = rect[0][1];
+                data[prefix + '2.latitude'] = rect[1][0];
+                data[prefix + '2.longitude'] = rect[1][1];
 
-            field.find('label').text(f['rdfs:label']);
-            field.find('input').val(f['dtype:defaultValue']).attr({
-                name: key
-            });
-
-            return field;
-        }
-
-        function addCommonBlock() {
-            Object.keys(commonSchema).forEach(function(key, index) {
-                $('.common-fields').append(renderField(commonSchema[key], key));
-            });
-        }
-
-        function addRepeatableBlock() {
-            var formTemplate = $('.repeatable-configuration.template').find('> div').clone();
-            formTemplate.appendTo('.repeatable-configurations');
-            Object.keys(repeatableSchema).forEach(function(key, index) {
-
-                if (repeatableSchema[key]['@type'] === "semiot:GeoRectangle") {
-                    var map = $('.map-wrapper.template').find('> div').clone();
-
-                    // generate random id
-                    var mapId = 'map' + Date.now();
-                    map.attr({
-                        id: mapId
-                    });
-
-                    // initialize map
-
-                    map.appendTo(formTemplate);
-                    initMap(mapId, repeatableSchema[key]);
+                return data;
+            },
+            checkMaxRepeatableCount: function() {
+                if ($('.repeatable-configurations').length === MAX_REPEATABLE_COUNT) {
+                    $('.add-repeatable').attr('disabled', 'disabled');
                 } else {
-                    formTemplate.append(renderField(repeatableSchema[key], key));
+                    $('.add-repeatable').removeAttr('disabled');
                 }
-            });
-        }
-
-        function checkMaxRepeatableCount() {
-            if ($('.repeatable-configurations').length === MAX_REPEATABLE_COUNT) {
-                $('.add-repeatable').attr('disabled', 'disabled');
-            } else {
-                $('.add-repeatable').removeAttr('disabled');
+            },
+            generateMapId: function() {
+                return 'map' + Date.now();
             }
+        };
+
+        var LeafletMap = function(mapId, rectangle) {
+            console.info('initializing new leaflet map');
+            this._map = L.map(mapId);// .setView([51.505, -0.09], 13);
+
+            this.addTileLayer();
+            this.addDrawLayer();
+            if (rectangle) {
+                this.addDrawnItems([rectangle]);
+                this.setCenter(rectangle[0]);
+            }
+            this.checkMaxRectangles();
+        };
+        LeafletMap.prototype = {
+            constructor: LeafletMap,
+            addTileLayer: function() {
+                L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roadsg/x={x}&y={y}&z={z}', {
+                    attribution: ''
+                }).addTo(this._map);
+            },
+            addDrawLayer: function() {
+                var that = this;
+                this._drawnItems = new L.FeatureGroup();
+                this._map.addLayer(this._drawnItems);
+
+                this._drawControls = {
+                    zero: new L.Control.Draw({
+                        position: 'topright',
+                        draw: {
+                            rectangle: {
+                                shapeOptions: {
+                                    color: 'orange'
+                                },
+                            },
+                            polyline: false,
+                            marker: false,
+                            polygon: false,
+                            circle: false
+                        },
+                        edit: {
+                            featureGroup: this._drawnItems
+                        }
+                    }),
+                    one: new L.Control.Draw({
+                        position: 'topright',
+                        draw: false,
+                        edit: {
+                            featureGroup: this._drawnItems
+                        }
+                    })
+                }
+
+                this._map.addControl(this._drawControls.zero);
+
+                this._map.on('draw:created', function (e) {
+                    that._drawnItems.addLayer(e.layer);
+                    that.checkMaxRectangles();
+                });
+                this._map.on('draw:edited', function (e) {
+                    //
+                });
+                this._map.on('draw:deleted', function (e) {
+                    that.checkMaxRectangles();
+                });
+            },
+            addDrawnItems: function(rectangles) {
+                var that = this;
+                rectangles.map(function(r) {
+                    L.rectangle(r).addTo(that._drawnItems);
+                });
+            },
+            setCenter: function(point) {
+                this._map.setView(point, 13);
+            },
+            getRectangle: function() {
+                try {
+                    return this._drawnItems.getLayers()[0].getLatLngs().map(function(p) {
+                        return [p.lat, p.lng];
+                    }).filter(function(p, i) {
+                        // to get only first and third points
+                        return i % 2 === 0;
+                    });
+                } catch(e) {
+                    console.error('failed to get rectangle from map: e = ', e);
+                }
+            },
+            checkMaxRectangles: function() {
+                /*
+                if (Object.keys(this._drawnItems._layers).length >= 1) {
+                    console.info('one rectangle on the map; hiding draw controls..');
+                    this._drawControls.zero.removeFrom(this._map);
+                    this._drawControls.one.addTo(this._map);
+                } else {
+                    console.info('zero rectangles on the map; showing draw controls..');
+                    this._drawControls.one.removeFrom(this._map);
+                    this._drawControls.zero.addTo(this._map);
+                }
+                */
+            },
+        };
+
+        var DOM_BUILDERS = {
+            field: function(f, key) {
+                if (!f['rdfs:label']) {
+                    return null;
+                }
+                var field = $('.field.template').find('.form-group').clone();
+
+                field.find('label').text(f['rdfs:label']);
+                field.find('input').val(f['dtype:defaultValue']).attr({
+                    name: key
+                });
+
+                return field;
+            },
+            map: function(rectangle, container) {
+                var map = $('.map-wrapper.template').find('> div').clone();
+                var mapId = UTILS.generateMapId()
+                map.attr({
+                    id: mapId
+                });
+                map.appendTo(container);
+                return new LeafletMap(mapId, rectangle);
+            }
+        };
+
+        var BLOCK_BUILDERS = {
+            common: function() {
+                Object.keys(SCHEMAS.common).forEach(function(key, index) {
+                    $('.common-fields').append(DOM_BUILDERS.field(SCHEMAS.common[key], key));
+                });
+            },
+            repeatable: function() {
+                var formTemplate = $('.repeatable-configuration.template').find('> div').clone();
+                formTemplate.appendTo('.repeatable-configurations');
+
+                var newRepeatableConfig = {};
+
+                Object.keys(SCHEMAS.repeatable).forEach(function(key, index) {
+                    if (key !== "@type") {
+                        if (SCHEMAS.repeatable[key]['@type'] === AREA_TYPE) {
+                            newRepeatableConfig[key] = $.extend({}, SCHEMAS.repeatable[key], {
+                                map: DOM_BUILDERS.map(UTILS.getRectangeFromSchema(SCHEMAS.repeatable[key]), formTemplate)
+                            });
+                        } else {
+                            var field = DOM_BUILDERS.field(SCHEMAS.repeatable[key], key);
+                            newRepeatableConfig[key] = $.extend({}, SCHEMAS.repeatable[key], {
+                                field: field
+                            });
+                            formTemplate.append(field);
+                        }
+                    }
+                });
+
+                var newRepeatableConfigIndex = Object.keys(RESULT_CONFIG.repeatable).length;
+
+                RESULT_CONFIG.repeatable[newRepeatableConfigIndex] = newRepeatableConfig;
+                formTemplate.find('.remove-repeatable').attr({
+                    'data-index': newRepeatableConfigIndex
+                });
+            }
+        };
+
+        var GETTERS = {
+            common: function() {
+                var data = {};
+                $('.common-fields [name]').each(function(index, elem) {
+                    console.log( $(elem).val());
+                    data[$(elem).attr('name')] = $(elem).val();
+                });
+                console.info('common config is: ', data);
+                return data;
+            },
+            repeatable: function() {
+                var data = {};
+                Object.keys(RESULT_CONFIG.repeatable).map(function(key) {
+                    return r = RESULT_CONFIG.repeatable[key];
+                }).filter(function(r) {
+                    return r;
+                }).map(function(r, i) {
+                    Object.keys(r).map(function(key, j) {
+                        if (r[key]) {
+                            var prefix = (i + 1).toString() + "." + key + ".";
+                            if (r[key]['@type'] === AREA_TYPE) {
+                                // get value from LeafletMap
+                                var rectangle = r[key].map.getRectangle();
+                                data = $.extend(data, UTILS.serializeRectangleToForm(prefix, rectangle));
+                            } else {
+                                // get value from DOM
+                                data[prefix] = r[key].field.val();
+                            }
+                        }
+                    });
+                });
+                console.info('repeatable config is: ', data);
+                return data;
+            }
+        };
+
+        function addEventListeners() {
+            $('.add-repeatable').on('click', function(e) {
+                e.preventDefault();
+                BLOCK_BUILDERS.repeatable();
+                UTILS.checkMaxRepeatableCount();
+            });
+            $('body').on('click', '.remove-repeatable', function(e) {
+                e.preventDefault();
+                $(this).parent().remove();
+                UTILS.checkMaxRepeatableCount();
+                RESULT_CONFIG.repeatable[$(this).attr('data-index')] = null;
+            });
+            $('.save-button').on('click', () => {
+                var data = $.extend({}, GETTERS.common(), GETTERS.repeatable());
+                console.info('result config is: ', data);
+                submit(data);
+            })
         }
 
-        $('.add-repeatable').on('click', function(e) {
-            e.preventDefault();
-            addRepeatableBlock();
-            checkMaxRepeatableCount();
-        });
-        $('body').on('click', '.remove-repeatable', function(e) {
-            e.preventDefault();
-            $(this).parent().remove();
-            checkMaxRepeatableCount();
-        });
-        $('.save-button').on('click', () => {
-            var data = {};
-            $('[name]').each(function(elem, index) {
-                data[$(elem).attr['name']] = $(elem).val();
+        function submit(data) {
+            Object.keys(data).map(function(key) {
+                $('#target-form').append('<input name="' + key + '" value="' + data[key] + '">');
             });
-            console.info('common data is: ', data);
+            // $('#target-form').attr({ action: '/' });
+            $('#target-form').submit();
+        }
 
+        function init() {
+            BLOCK_BUILDERS.common();
+            if (SCHEMAS.repeatable) {
+                BLOCK_BUILDERS.repeatable();
+            }
+            addEventListeners();
+        }
 
-        })
-
-        addCommonBlock();
-        repeatableSchema && addRepeatableBlock();
-
+        init();
     </script>
 </body>
 </html>

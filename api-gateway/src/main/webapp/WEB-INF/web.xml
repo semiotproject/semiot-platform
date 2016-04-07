@@ -27,6 +27,16 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>config</servlet-name>
+        <jsp-file>/config.html</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>config</servlet-name>
+        <url-pattern>/config</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
         <servlet-name>Login</servlet-name>
         <jsp-file>/login.html</jsp-file>
     </servlet>

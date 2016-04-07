@@ -45,7 +45,7 @@
                 <li>
                     <a href="/explorer">Explorer</a>
                 </li>
-                <li class="dropdown">
+                <li class="dropdown active">
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -92,7 +92,7 @@
                             <span class="material-input"></span>
                         </div>
                         <div style="text-align: center;">
-                            <button class="btn btn-lg btn-info btn-raised" type="submit">Save <i class="fa fa-save"></i></button>
+                            <button class="btn btn-lg btn-primary btn-raised" type="submit">Save <i class="fa fa-save"></i></button>
                         </div>
                     </form>
                 </div>

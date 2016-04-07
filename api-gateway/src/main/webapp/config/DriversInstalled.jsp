@@ -45,7 +45,7 @@
                 <li>
                     <a href="/explorer">Explorer</a>
                 </li>
-                <li class="dropdown">
+                <li class="dropdown active">
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -129,6 +129,7 @@
                         </table>
                     </div>
                     <input type="hidden" name="id_bundle" id="id_bundle" />
+                    <input type="hidden" name="uninstallWithDeleteData" value="yes" />
                 </form>
             <%
                 }
