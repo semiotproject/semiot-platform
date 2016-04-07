@@ -75,7 +75,6 @@ frontend:
   links:
     - wamprouter
     - deviceproxyservice
-    - webui
     - apigateway
   ports:
     - "80:80"
