@@ -76,6 +76,17 @@ apigateway:
     - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
   restart: always
 
+frontend:
+  image: docker.semiot.ru/frontend
+  links:
+    - wamprouter
+    - deviceproxyservice
+    - webui
+    - apigateway
+  ports:
+    - "80:80"
+  restart: always
+
 mysqlbase:
   image: docker.semiot.ru/mysql
   ports:
