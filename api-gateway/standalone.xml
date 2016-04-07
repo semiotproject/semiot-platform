@@ -139,7 +139,7 @@
         <subsystem xmlns="urn:jboss:domain:datasources:3.0">
             <datasources>
                 <datasource jndi-name="java:jboss/datasources/SemiotDS" pool-name="SemiotDS" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:mysql://demo.semiot.ru:3306/semiot?zeroDateTimeBehavior=convertToNull</connection-url>
+                    <connection-url>jdbc:mysql://mysqlbase:3306/semiot?zeroDateTimeBehavior=convertToNull</connection-url>
                     <driver>com.mysql</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>
@@ -331,7 +331,7 @@
                         </login-module>
                     </authentication>
                 </security-domain>
-				<security-domain name="credential">
+                <security-domain name="credential">
                     <authentication>
                         <login-module code="Database" flag="required">
                             <module-option name="dsJndiName" value="java:jboss/datasources/SemiotDS"/>
@@ -365,6 +365,7 @@
             <server name="default-server">
                 <http-listener name="default" socket-binding="http" redirect-socket="https"/>
                 <host name="default-host" alias="localhost">
+                    <location name="/" handler="welcome-content"/>
                     <filter-ref name="server-header"/>
                     <filter-ref name="x-powered-by-header"/>
                 </host>
