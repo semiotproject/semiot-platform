@@ -273,7 +273,7 @@
                 this._drawnItems.getLayers().map(function(layer) {
                     that._drawnItems.removeLayer(layer);
                 });
-            }
+            },
             addDrawnItems: function(rectangles) {
                 var that = this;
                 rectangles.map(function(r) {
