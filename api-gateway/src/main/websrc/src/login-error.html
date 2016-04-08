@@ -7,8 +7,53 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
-    <link rel="stylesheet" href="/static/css/common.css">
-    <link rel="stylesheet" href="/static/css/login.css">
+    <style>
+        html {
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+
+        body {
+            margin-bottom: 60px;
+            width: 100%;
+        }
+
+        a {
+            cursor: pointer;
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        .well {
+            background-color: #fff;
+            padding: 19px;
+            margin-bottom: 20px;
+            -webkit-box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 2px;
+            border: 0;
+        }
+        body .container .well {
+            padding: 30px;
+        }
+        .login-container {
+            margin-left: 25%;
+            margin-top: 5%;
+        }
+        form {
+            padding: 0 15px;
+        }
+        form button.btn.btn-primary {
+            display: block;
+            margin: 10px auto 0 auto;
+        }
+        .form-group.label-floating label.control-label, .form-group.label-placeholder label.control-label {
+            top: -12px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">

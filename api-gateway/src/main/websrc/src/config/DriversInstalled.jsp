@@ -62,7 +62,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown"><%=request.getRemoteUser()%>
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="/config/AdminPanel?logout">Logout</a></li>
@@ -129,7 +129,7 @@
                         </table>
                     </div>
                     <input type="hidden" name="id_bundle" id="id_bundle" />
-                    <input type="hidden" name="uninstallWithDeleteData" value="yes" />
+                    <input type="hidden" class="remove-with-data" />
                 </form>
             <%
                 }
@@ -146,11 +146,11 @@
             <h4 class="modal-title">Remove driver</h4>
           </div>
           <div class="modal-body">
-            <p>All related data will be destroyed</p>
+            <p>Do you want to remove all data related to this driver?</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default modal-decline" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary modal-accept">Remove</button>
+            <button type="button" class="btn btn-primary modal-decline">No</button>
+            <button type="button" class="btn btn-warning modal-accept">Yes</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
@@ -162,12 +162,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/js/material.min.js"></script>
     <script>$.material.init();</script>
     <script>
+        function removeDriver(id, withData) {
+            console.log('removing driver with id = ', driverId);
+            $('#id_bundle').val(driverId);
+            // ‎(╯°□°)╯︵ ┻━┻
+            if (withData) {
+                $('.remove-with-data').attr({
+                    name: 'uninstallWithDeleteData',
+                    value: 'yes'
+                });
+            } else {
+                $('.remove-with-data').attr({
+                    name: 'uninstall',
+                    value: 'no'
+                });
+            }
+            $('form').submit();
+        }
         $('.uninstall').on('click', function() {
             var driverId = $(this).attr('data-id');
             $('.modal-accept').off().on('click', function() {
-                console.log('removing driver with id = ', driverId);
-                $('#id_bundle').val(driverId);
-                $('form').submit();
+                removeDriver(driverId, true)
+            });
+            $('.modal-decline').off().on('click', function() {
+                removeDriver(driverId, false)
             });
             $('#myModal').modal({});
         });

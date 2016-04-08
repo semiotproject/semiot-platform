@@ -45,7 +45,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">root
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown"><%=request.getRemoteUser()%>
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="/config/AdminPanel?logout">Logout</a></li>
