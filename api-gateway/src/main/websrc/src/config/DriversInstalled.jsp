@@ -163,8 +163,8 @@
     <script>$.material.init();</script>
     <script>
         function removeDriver(id, withData) {
-            console.log('removing driver with id = ', driverId);
-            $('#id_bundle').val(driverId);
+            console.log('removing driver with id = ', id);
+            $('#id_bundle').val(id);
             // ‎(╯°□°)╯︵ ┻━┻
             if (withData) {
                 $('.remove-with-data').attr({
