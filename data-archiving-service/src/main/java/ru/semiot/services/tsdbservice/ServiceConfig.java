@@ -4,12 +4,13 @@ import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
 import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
+import org.apache.jena.riot.RDFLanguages;
 
 @LoadPolicy(LoadType.FIRST)
 @Sources({ "file:/semiot-platform/data-archiving-service/config.properties" })
 public interface ServiceConfig extends Config {
 
-	@DefaultValue("ws://wamprouter:8080/ws")
+	@DefaultValue("ws://winghouse.semiot.ru:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
 
@@ -22,15 +23,19 @@ public interface ServiceConfig extends Config {
 	@Key("services.wamp.reconnect")
 	int wampReconnectInterval();
 
+	@Key("services.wamp.messageFormat")
+	@DefaultValue(RDFLanguages.strLangTurtle)
+	String wampMessageFormat();
+
 	@DefaultValue("ru.semiot.devices.newandobserving")
 	@Key("services.topics.subscriber")
 	String topicsSubscriber();
 
-	@DefaultValue("tsdb")
+	@DefaultValue("winghouse.semiot.ru")
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
-	@DefaultValue("http://deviceproxyservice:3030/ds/query")
+	@DefaultValue("http://winghouse.semiot.ru:3030/ds/query")
 	@Key("services.fuseki.store.url")
 	String storeUrl();
 

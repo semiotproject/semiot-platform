@@ -13,11 +13,11 @@
 
 <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> a ssn:System, proto:Individual ;
     proto:hasPrototype ws:PlainLamp ;
-    ssn:hasSubSystem <${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-actuator> ;
+    ssn:hasSubSystem <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-actuator> ;
     dcterms:identifier "${ru.semiot.platform.device.id}"^^xsd:string ;
     .
 
-<${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-actuator>
+<${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-actuator>
     a san:ActuatingDevice, proto:Individual ;
     proto:hasPrototype ws:PlainLamp-Actuator ;
     dcterms:identifier "${ru.semiot.platform.device.id}-actuator"^^xsd:string ;

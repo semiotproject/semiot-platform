@@ -2,11 +2,13 @@ package ru.semiot.platform.deviceproxyservice.manager;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.*;
+import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionException;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 
@@ -75,34 +77,31 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
         synchronized (this) {
             if (dictionary != null) {
                 if (!configuration.isConfigured()) {
-                	// default values
-					configuration.put(Keys.WAMP_URI, "ws://wamprouter:8080/ws");
-					configuration.put(Keys.WAMP_REALM, "realm1");
-					configuration.put(Keys.WAMP_RECONNECT, "15");
-					configuration.put(Keys.TOPIC_NEWANDOBSERVING,
-							"ru.semiot.devices.newandobserving");
-					configuration.put(Keys.TOPIC_INACTIVE,
-							"ru.semiot.devices.turnoff");
-					configuration.put(Keys.FUSEKI_PASSWORD, "pw");
-					configuration.put(Keys.FUSEKI_USERNAME, "admin");
-					configuration.put(Keys.FUSEKI_UPDATE_URL,
-							"http://localhost:3030/ds/update");
-					configuration.put(Keys.FUSEKI_QUERY_URL,
-							"http://localhost:3030/ds/query");
-					configuration.put(Keys.FUSEKI_STORE_URL,
-							"http://localhost:3030/ds/data");
-					configuration.put(Keys.PLATFORM_DOMAIN, "http://localhost");
-					configuration.put(Keys.PLATFORM_SYSTEMS_PATH, "systems");
-					configuration.put(Keys.PLATFORM_SENSORS_PATH, "sensors");
-                	
+                    // default values
+                    configuration.put(Keys.WAMP_URI, "ws://wamprouter:8080/ws");
+                    configuration.put(Keys.WAMP_REALM, "realm1");
+                    configuration.put(Keys.WAMP_RECONNECT, "15");
+                    configuration.put(Keys.TOPIC_NEWANDOBSERVING,
+                            "ru.semiot.devices.newandobserving");
+                    configuration.put(Keys.TOPIC_INACTIVE,
+                            "ru.semiot.devices.turnoff");
+                    configuration.put(Keys.FUSEKI_PASSWORD, "pw");
+                    configuration.put(Keys.FUSEKI_USERNAME, "admin");
+                    configuration.put(Keys.FUSEKI_UPDATE_URL,
+                            "http://localhost:3030/ds/update");
+                    configuration.put(Keys.FUSEKI_QUERY_URL,
+                            "http://localhost:3030/ds/query");
+                    configuration.put(Keys.FUSEKI_STORE_URL,
+                            "http://localhost:3030/ds/data");
+                    configuration.put(Keys.PLATFORM_DOMAIN, "http://localhost");
+                    configuration.put(Keys.PLATFORM_SYSTEMS_PATH, "systems");
+                    configuration.put(Keys.PLATFORM_SUBSYSTEM_PATH, "subsystems");
+
                     configuration.putAll(dictionary);
 
                     configuration.put(Keys.PLATFORM_SYSTEMS_URI_PREFIX,
                             configuration.get(Keys.PLATFORM_DOMAIN) + "/"
-                            + configuration.get(Keys.PLATFORM_SYSTEMS_PATH));
-                    configuration.put(Keys.PLATFORM_SENSORS_URI_PREFIX,
-                            configuration.get(Keys.PLATFORM_DOMAIN) + "/"
-                            + configuration.get(Keys.PLATFORM_SENSORS_PATH));
+                                    + configuration.get(Keys.PLATFORM_SYSTEMS_PATH));
 
                     configuration.setConfigured();
 
@@ -133,7 +132,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     @Override
     public void registerDevice(DriverInformation info, Device device) {
         if (directoryService != null) {
-            logger.info("Device [ID={}] is being registered", device.getId());
+            logger.debug("Device [{}] is being registered", device.getId());
 
             /**
              * Resolve common variables, e.g. platform's domain name.
@@ -144,9 +143,12 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
             boolean isAdded = directoryService.addNewDevice(info, device, description);
 
             if (isAdded) {
+                logger.info("Device [{}] was registered!", device.getId());
                 WAMPClient.getInstance().publish(
                         getConfiguration().get(Keys.TOPIC_NEWANDOBSERVING),
-                        description);
+                        description).subscribe(WAMPClient.onError());
+            } else {
+                logger.warn("Device [{}] was not added in database!");
             }
         } else {
             logger.error("DirectoryService hasn't been initialized!");
@@ -155,54 +157,60 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
     @Override
     public void registerObservation(Device device, Observation observation) {
-        //TODO: Can we get rid of this null check?
-        if (directoryService != null) {
-            logger.info("Observation [ID={}] is being registered", device.getId());
+        logger.info("Observation [ID={}] is being registered", device.getId());
 
-            String description = TemplateUtils.resolve(
-                    observation.toTurtleString(),
-                    device.getProperties(),
-                    configuration);
+        String description = TemplateUtils.resolve(
+                observation.toTurtleString(),
+                device.getProperties(),
+                configuration);
 
-            //TODO: There's no garantee that WAMPClient is connected.
-            WAMPClient.getInstance().publish(device.getId(), description);
-        } else {
-            logger.error("DirectoryService hasn't been initialized!");
-        }
+        //TODO: There's no guarantee that WAMPClient is connected.
+        WAMPClient.getInstance().publish(device.getId(), description)
+                .subscribe(WAMPClient.onError());
     }
 
     @Override
     public void removeDataOfDriverFromFuseki(String pid) {
-    	directoryService.removeDataOfDriver(pid);
+        directoryService.removeDataOfDriver(pid);
     }
 
     @Override
-    public void registerCommand(Command command) {
+    public void registerCommand(Device device, Command command) {
+
+        String description = TemplateUtils.resolve(
+                command.toTurtleString(),
+                device.getProperties(),
+                configuration);
+
+        //TODO: There's no guarantee that WAMPClient is connected?
+        WAMPClient.getInstance().publish(device.getId(), description)
+                .subscribe(WAMPClient.onError());
     }
 
     @Override
-    public void executeCommand(String deviceId, String command) {
+    public void executeCommand(String deviceId, String command)
+            throws CommandExecutionException {
         String pid = directoryService.findDriverPidByDeviceId(deviceId);
 
-        if(pid != null) {
-            logger.info(pid);
-
+        if (pid != null) {
             try {
                 Collection services = bundleContext.getServiceReferences(
-                        ActuatingDeviceDriver.class, null);
-                if(!services.isEmpty()) {
-                    ActuatingDeviceDriver driver = (ActuatingDeviceDriver)
-                            services.iterator().next();
+                        ActuatingDeviceDriver.class, "(service.pid=" + pid + ")");
+                if (!services.isEmpty()) {
+                    logger.info("Driver [{}] found!", pid);
+                    ServiceReference<ActuatingDeviceDriver> reference =
+                            (ServiceReference) services.iterator().next();
+                    ActuatingDeviceDriver driver = bundleContext.getService(reference);
+
                     driver.executeCommand(command);
                 } else {
-                    logger.warn("Driver [{}] not found!", pid);
+                    throw CommandExecutionException.driverNotFound();
                 }
             } catch (InvalidSyntaxException e) {
-                logger.error(e.getMessage(), e);
+                throw CommandExecutionException.driverNotFound(e);
             }
         } else {
-            logger.warn("System [{}] not found!", deviceId);
-            throw new IllegalArgumentException();
+            throw CommandExecutionException.driverNotFound();
         }
     }
 

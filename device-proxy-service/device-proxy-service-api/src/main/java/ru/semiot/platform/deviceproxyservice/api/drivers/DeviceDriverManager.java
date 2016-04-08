@@ -21,9 +21,10 @@ public interface DeviceDriverManager {
      *
      * @param command a command performed on a device
      */
-    public void registerCommand(Command command);
+    public void registerCommand(Device device, Command command);
 
-    public void executeCommand(String systemId, String command);
+    public void executeCommand(String systemId, String command)
+            throws CommandExecutionException;
     
     public void removeDataOfDriverFromFuseki(String pid);
     

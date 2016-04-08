@@ -23,11 +23,14 @@ public class Activator extends DependencyActivatorBase {
 
         manager.add(createComponent()
                 .setInterface(new String[]{
-                        ActuatingDeviceDriver.class.getName(),
-                        DeviceDriver.class.getName()}, properties)
+                                ActuatingDeviceDriver.class.getName(),
+                                DeviceDriver.class.getName(),
+                                ManagedService.class.getName()},
+                        properties)
                 .setImplementation(PlainLampDriver.class)
                 .add(createServiceDependency()
                         .setService(DeviceDriverManager.class)
                         .setRequired(true)));
+//                .add(createConfigurationDependency().setPid(DRIVER_PID)));
     }
 }

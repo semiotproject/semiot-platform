@@ -32,7 +32,7 @@ public class ExternalQueryService {
 	private static final String urlRsRemoveFromFuseki = urlRs
 			+ "/remove/fuseki/";
 	private static final String urlRsRemoveFromTsdb = config
-			.archivRestEndpoint() + "/remove/metric";
+			.tsdbEndpoint() + "/remove/metric";
 
 	@javax.annotation.Resource
 	ManagedExecutorService mes;

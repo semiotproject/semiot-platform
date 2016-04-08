@@ -3,13 +3,19 @@ package ru.semiot.platform.deviceproxyservice.manager;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
+import rx.Subscriber;
+import rx.observers.SafeSubscriber;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
 
 public class WAMPClient implements Closeable, AutoCloseable {
 
+    private static final Logger logger = LoggerFactory.getLogger(WAMPClient.class);
     private static final WAMPClient INSTANCE = new WAMPClient();
     private WampClient client;
 
@@ -18,6 +24,21 @@ public class WAMPClient implements Closeable, AutoCloseable {
 
     public static WAMPClient getInstance() {
         return INSTANCE;
+    }
+
+    public static Subscriber onError() {
+        return new Subscriber() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                logger.error(e.getMessage(), e);
+            }
+
+            @Override
+            public void onNext(Object o) {}
+        };
     }
 
     public Observable<WampClient.Status> init(

@@ -24,9 +24,7 @@ public class Keys {
             "ru.semiot.platform.systems_path";
     public static final String PLATFORM_SYSTEMS_URI_PREFIX = 
             "ru.semiot.platform.systems_uri_prefix";
-    public static final String PLATFORM_SENSORS_PATH = 
-            "ru.semiot.platform.sensors_path";
-    public static final String PLATFORM_SENSORS_URI_PREFIX = 
-            "ru.semiot.platform.sensors_uri_prefix";
+    public static final String PLATFORM_SUBSYSTEM_PATH =
+            "ru.semiot.platform.subsystem_path";
 
 }

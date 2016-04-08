@@ -26,7 +26,8 @@ import rx.schedulers.Schedulers;
 @Stateful
 public class SystemObservationsEndpoint {
 
-    private static final Logger logger = LoggerFactory.getLogger(SystemObservationsEndpoint.class);
+    private static final Logger logger = LoggerFactory.getLogger(
+            SystemObservationsEndpoint.class);
     private static final String SELECT_TOPIC_BY_SYSTEM_ID
             = "SELECT ?topic {"
             + "?system_uri dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ;"
@@ -113,7 +114,7 @@ public class SystemObservationsEndpoint {
         Subscription subscription = message.subscribe(topic)
                 .observeOn(Schedulers.from(executor))
                 .subscribe((m) -> {
-                    System.out.println(m);
+                    logger.debug(m);
 
                     session.getAsyncRemote().sendText(m);
                 }, (e) -> {

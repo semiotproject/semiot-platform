@@ -41,7 +41,12 @@ public class Launcher {
             "device-proxy-service-api-1.0-SNAPSHOT.jar",
             "device-proxy-service-manager-1.0-SNAPSHOT.jar",
             "rs-proxy-service-1.0.0-SNAPSHOT.jar",
-            "configurator-1.0.0.jar"
+            "configurator-1.0.0.jar",
+
+            //Device Proxy Service dependencies
+            "slf4j-api-1.7.21.jar",
+            "logback-core-1.1.7.jar",
+            "logback-classic-1.1.7.jar"
     };
 
     private static Framework framework = null;

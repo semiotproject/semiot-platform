@@ -1,31 +1,20 @@
 package ru.semiot.services.tsdbservice.wamp;
 
-import java.io.StringReader;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.DCTerms;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ru.semiot.services.tsdbservice.model.Observation;
-import ru.semiot.services.tsdbservice.TSDBClient;
-import rx.Observer;
-
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.QUDT;
 import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.services.tsdbservice.TSDBClient;
+import ru.semiot.services.tsdbservice.model.Observation;
 
-public class ObservationListener implements Observer<String> {
+public class ObservationListener extends RDFMessageObserver {
 
     private static final Logger logger = LoggerFactory
             .getLogger(ObservationListener.class);
@@ -34,10 +23,10 @@ public class ObservationListener implements Observer<String> {
     private static final String PROPERTY = "property";
     private static final String FEATURE_OF_INTEREST = "feature_of_interest";
     private static final String SENSOR_URI = "sensor_uri";
-    private final String system_id;
+    private final String systemId;
 
-    private static final Query METRICS_QUERY = QueryFactory
-            .create(NamespaceUtils.newSPARQLQuery(
+    private static final Query METRICS_QUERY = QueryFactory.create(
+            NamespaceUtils.newSPARQLQuery(
                     "SELECT ?timestamp ?property ?value ?feature_of_interest ?sensor_uri"
                             + "{" + " ?x a ssn:Observation ;"
                             + "     ssn:observedProperty ?property ;"
@@ -47,33 +36,22 @@ public class ObservationListener implements Observer<String> {
                             + " ?result ssn:hasValue ?res_value ."
                             + " ?res_value qudt:quantityValue ?value ."
                             + " OPTIONAL {?x ssn:featureOfInterest ?feature_of_interest}"
-                            + "}",
-                    SSN.class, QUDT.class, DCTerms.class));
+                            + "}", SSN.class, QUDT.class, DCTerms.class));
 
     public ObservationListener(String system_id) {
-        this.system_id = system_id;
-    }
-
-    @Override
-    public void onCompleted() {
-
+        this.systemId = system_id;
     }
 
     @Override
     public void onError(Throwable e) {
-        logger.warn(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
     }
 
     @Override
-    public void onNext(String message) {
+    public void onNext(Model description) {
         try {
-            Model description = ModelFactory.createDefaultModel().read(
-                    new StringReader(message), null,
-                    RDFLanguages.TURTLE.getName());
-            if (!description.isEmpty()) {
-                QueryExecution qe = QueryExecutionFactory.create(METRICS_QUERY,
-                        description);
-                ResultSet metrics = qe.execSelect();
+            if (isObservation(description)) {
+                ResultSet metrics = query(description, METRICS_QUERY);
                 while (metrics.hasNext()) {
                     QuerySolution qs = metrics.next();
                     String timestamp = qs.getLiteral(TIMESTAMP).getString();
@@ -94,18 +72,19 @@ public class ObservationListener implements Observer<String> {
                         TSDBClient.getInstance().write(
                                 new Observation(sensorUri.substring(
                                         sensorUri.lastIndexOf("/") + 1),
-                                        system_id, timestamp, property,
+                                        systemId, timestamp, property,
                                         featureOfInterest, value));
                     } else {
-                        logger.warn(
-                                "In the message not found required fields for the metric");
+                        logger.warn("Required properties not found!");
                     }
                 }
-            } else {
-                logger.warn("Received an empty message or in a wrong format!");
             }
         } catch (Throwable ex) {
             logger.error(ex.getMessage(), ex);
         }
+    }
+
+    private boolean isObservation(Model model) {
+        return !model.isEmpty() && model.contains(null, RDF.type, SSN.Observaton);
     }
 }

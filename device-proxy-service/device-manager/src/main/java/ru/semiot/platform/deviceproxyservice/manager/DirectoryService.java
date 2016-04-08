@@ -1,17 +1,10 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import java.io.StringReader;
-import java.net.URI;
-
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RiotException;
@@ -19,15 +12,12 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ru.semiot.commons.namespaces.GEO;
-import ru.semiot.commons.namespaces.NamespaceUtils;
-import ru.semiot.commons.namespaces.SAREF;
-import ru.semiot.commons.namespaces.SEMIOT;
-import ru.semiot.commons.namespaces.SSN;
-import ru.semiot.commons.namespaces.SSNCOM;
+import ru.semiot.commons.namespaces.*;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
+
+import java.io.StringReader;
+import java.net.URI;
 
 public class DirectoryService {
 
@@ -186,12 +176,12 @@ public class DirectoryService {
 
     public String findDriverPidByDeviceId(String deviceId) {
         String query = GET_DRIVER_PID_BY_SYSTEM_ID.replace("${SYSTEM_ID}", deviceId);
-        logger.info(query);
         ResultSet resultSet = store.select(query);
         if(resultSet.hasNext()) {
             QuerySolution qs = resultSet.next();
             Resource pid = qs.getResource("pid");
-            return pid.getURI();
+            String driverUri = pid.getURI();
+            return driverUri.replace("urn:semiot:drivers:", "");
         } else {
             return null;
         }

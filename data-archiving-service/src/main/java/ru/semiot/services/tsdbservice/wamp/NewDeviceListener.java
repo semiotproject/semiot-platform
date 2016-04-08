@@ -28,10 +28,10 @@ import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.SSNCOM;
 
-public class SubscribeListener implements Observer<String> {
+public class NewDeviceListener implements Observer<String> {
 
     private static final Logger logger = LoggerFactory
-            .getLogger(SubscribeListener.class);
+            .getLogger(NewDeviceListener.class);
     private static final ServiceConfig config = ConfigFactory
             .create(ServiceConfig.class);
     private static final long TIMEOUT = 5000;
@@ -43,21 +43,21 @@ public class SubscribeListener implements Observer<String> {
     private static final Query GET_TOPICS_QUERY = QueryFactory.create(
             NamespaceUtils.newSPARQLQuery(
                     "SELECT ?topic { "
-                    + "GRAPH <urn:semiot:graphs:private> {"
-                    + " ?x ssncom:hasCommunicationEndpoint ?e ."
-                    + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
-                    + "}"
-                    + "}", SSN.class, SSNCOM.class));
+                            + "GRAPH <urn:semiot:graphs:private> {"
+                            + " ?x ssncom:hasCommunicationEndpoint ?e ."
+                            + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
+                            + "}"
+                            + "}", SSN.class, SSNCOM.class));
     private static final String GET_TOPIC_BY_URI_QUERY
             = NamespaceUtils.newSPARQLQuery(
-                    "SELECT ?topic { "
+            "SELECT ?topic { "
                     + "GRAPH <urn:semiot:graphs:private> {"
                     + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
                     + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
                     + "}"
                     + "}", SSN.class, SSNCOM.class);
 
-    public SubscribeListener() {
+    public NewDeviceListener() {
         httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
                 config.storePassword().toCharArray());
         subscribeTopics(null);
@@ -123,10 +123,14 @@ public class SubscribeListener implements Observer<String> {
             if (StringUtils.isNotBlank(topicName)) {
                 if (!listTopics.contains(topicName)) {
                     listTopics.add(topicName);
-                    wampClient.addSubscription(
-                            topicName,
-                            wampClient.subscribe(topicName).subscribe(
-                                    new ObservationListener(topicName)));
+                    //Subscribe to observations
+                    wampClient.addSubscription(topicName,
+                            wampClient.subscribe(topicName)
+                                    .subscribe(new ObservationListener(topicName)));
+                    //Subscribe to commands
+                    wampClient.addSubscription(topicName,
+                            wampClient.subscribe(topicName)
+                                    .subscribe(new CommandListener()));
                 } else {
                     logger.debug("Topic {} is already known", topicName);
                 }

@@ -35,6 +35,12 @@
             <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+            <scope>provided</scope>
+        </dependency>
         
         <!-- Compile dependencies -->
         
@@ -64,19 +70,15 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.7.19</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.6</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>
             <version>4.5.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>ru.semiot.commons</groupId>
@@ -108,7 +110,10 @@
                             org.apache.felix.dm;version="[4.1,5)",
                             org.osgi.framework;version="[1.8,2)",
                             org.osgi.service.cm;version="[1.5,2)",
-                            ru.semiot.platform.deviceproxyservice.api.drivers;version="[1.0,2)",
+                            org.slf4j,
+                            org.slf4j.impl,
+                            org.slf4j.spi,
+                            ru.semiot.platform.deviceproxyservice.api.drivers,
                             javax.net.ssl,
                             sun.misc,
                             javax.naming,

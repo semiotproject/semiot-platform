@@ -1,27 +1,23 @@
 package ru.semiot.services.tsdbservice;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.ResultSetFuture;
-import com.datastax.driver.core.Session;
+import com.datastax.driver.core.*;
 import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.tsdbservice.model.Observation;
 import rx.Observable;
+import rx.Subscriber;
 
 public class TSDBClient {
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(TSDBClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(TSDBClient.class);
     private static final ServiceConfig config = ConfigFactory
             .create(ServiceConfig.class);
-    private static final String queryCreateKeyspace =
+    private static final String CREATE_KEYSPACE =
             "CREATE KEYSPACE IF NOT EXISTS semiot WITH replication = { "
                     + "  'class': 'SimpleStrategy', "
                     + "  'replication_factor': 1 } ;";
-
-    private static final String queryCreateObservationTable =
+    private static final String CREATE_OBSERVATION_TABLE =
             "CREATE TABLE IF NOT EXISTS semiot.observation ("
                     + "  sensor_id text,"
                     + "  system_id text,"
@@ -32,6 +28,25 @@ public class TSDBClient {
                     + "  PRIMARY KEY ((system_id,sensor_id),event_time)"
                     + ")" +
                     "WITH CLUSTERING ORDER BY (event_time DESC);";
+    private static final String CREATE_COMMAND_PARAMETER_TYPE =
+            "CREATE TYPE IF NOT EXISTS semiot.command_parameter (" +
+                    "for_parameter text, value text" +
+                    ");";
+    private static final String CREATE_COMMAND_PROPERTY_TYPE =
+            "CREATE TYPE IF NOT EXISTS semiot.command_property (" +
+                    "property text," +
+                    "value text," +
+                    "datatype text" +
+                    ");";
+    private static final String CREATE_COMMAND_TABLE =
+            "CREATE TABLE IF NOT EXISTS semiot.command (" +
+                    "  system_id text," +
+                    "  event_time timestamp," +
+                    "  command_type text," +
+                    "  command_properties list<frozen <command_property>>," +
+                    "  command_parameters list<frozen <command_parameter>>," +
+                    "  PRIMARY KEY((system_id, event_time))" +
+                    ");";
 
     private static volatile TSDBClient instance = null;
 
@@ -40,11 +55,6 @@ public class TSDBClient {
 
     private TSDBClient() {
 
-    }
-
-    private void createTables() {
-        session.execute(queryCreateKeyspace);
-        session.execute(queryCreateObservationTable);
     }
 
     public static TSDBClient getInstance() {
@@ -58,14 +68,41 @@ public class TSDBClient {
         return instance;
     }
 
+    public static Subscriber onError() {
+        return new Subscriber() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                logger.error(e.getMessage(), e);
+            }
+
+            @Override
+            public void onNext(Object o) {}
+        };
+    }
+
     public void init() {
         logger.info("Connecting to {}", config.tsdbUrl());
 
-        cluster = Cluster.builder().addContactPoint(config.tsdbUrl()).build(); // demo.semiot.ru
+        cluster = Cluster.builder().addContactPoint(config.tsdbUrl()).build();
         session = cluster.connect();
+
         createTables();
 
         logger.info("Connected to {}", config.tsdbUrl());
+    }
+
+    private void createTables() {
+        session.execute(CREATE_KEYSPACE);
+        logger.info("Created 'semiot' keyspace");
+
+        session.execute(CREATE_OBSERVATION_TABLE);
+        session.execute(CREATE_COMMAND_PARAMETER_TYPE);
+        session.execute(CREATE_COMMAND_PROPERTY_TYPE);
+        session.execute(CREATE_COMMAND_TABLE);
+        logger.info("Created types and tables!");
     }
 
     public void stop() {
@@ -74,6 +111,12 @@ public class TSDBClient {
 
     public void write(Observation obs) {
         session.execute(obs.insert());
+    }
+
+    public Observable<ResultSet> executeAsync(Statement statement) {
+        ResultSetFuture rsf = session.executeAsync(statement);
+
+        return Observable.from(rsf);
     }
 
     public Observable<ResultSet> executeAsync(String query) {

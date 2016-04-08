@@ -16,35 +16,39 @@ public class Observation {
     public static final String SENSOR_URI_PREFIX = "http://localhost/sensors/";
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ");
 
-    String sensorId;
-    String system_id;
-    ZonedDateTime eventTime;
-    Resource property;
-    Resource featureOfInterest;
-    String value;
+    private final String sensorId;
+    private final String system_id;
+    private final ZonedDateTime eventTime;
+    private final Resource property;
+    private final String value;
+    private final Resource featureOfInterest;
 
     public Observation(@NotNull String sensorId, @NotNull String system_id,
                        @NotNull String eventTime, @NotNull String property,
                        String featureOfInterest, @NotNull String value) {
         this.sensorId = sensorId;
         this.system_id = system_id;
+        ZonedDateTime tmp;
         try {
-            this.eventTime = ZonedDateTime.parse(eventTime,
+            tmp = ZonedDateTime.parse(eventTime,
                     DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        } catch(DateTimeParseException dtpe) {
+        } catch (DateTimeParseException dtpe) {
             //Must be the time came from Cassandra. Try it.
-            this.eventTime = ZonedDateTime.parse(eventTime, DTF);
+            tmp = ZonedDateTime.parse(eventTime, DTF);
         }
+        this.eventTime = tmp;
         this.property = ResourceFactory.createResource(property);
-        if(featureOfInterest != null) {
+        if (featureOfInterest != null) {
             this.featureOfInterest = ResourceFactory.createResource(featureOfInterest);
+        } else {
+            this.featureOfInterest = null;
         }
         this.value = value;
     }
 
     public String insert() {
         String foi = null;
-        if(featureOfInterest != null) {
+        if (featureOfInterest != null) {
             foi = featureOfInterest.getURI();
         }
         return "INSERT INTO semiot.observation (sensor_id, system_id, "
@@ -66,7 +70,7 @@ public class Observation {
                 .add(observation, SSN.observationResultTime, ResourceFactory
                         .createTypedLiteral(eventTime.toString(), XSDDatatype.XSDdateTime));
 
-        if(featureOfInterest != null) {
+        if (featureOfInterest != null) {
             model.add(observation, SSN.featureOfInterest, featureOfInterest);
         }
 

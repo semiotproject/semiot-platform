@@ -39,7 +39,7 @@ public class ContextProvider {
     public static final String SYSTEM_COLLECTION = "SystemCollection";
     public static final String SYSTEM_SINGLE = "SystemSingle";
     public static final String SENSOR_COLLECTION = "SensorCollection";
-    public static final String SENSOR_SINGLE = "SensorSingle";
+    public static final String SUBSYSTEM_SINGLE = "SubSystemSingle";
     public static final String SYSTEM_OBSERVATIONS_COLLECTION = "SystemObservationsCollection";
     public static final String SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION = "SystemObservationsCollection-Partial";
     public static final String SENSOR_OBSERVATIONS_COLLECTION = "SensorObservationsCollection";
@@ -47,7 +47,7 @@ public class ContextProvider {
 
     public static final String VAR_ROOT_URL = "${ROOT_URL}";
     public static final String VAR_SYSTEM_ID = "${SYSTEM_ID}";
-    public static final String VAR_SENSOR_ID = "${SENSOR_ID}";
+    public static final String VAR_SUBSYSTEM_ID = "${SUBSYSTEM_ID}";
     public static final String VAR_WAMP_URL = "${WAMP_URL}";
     public static final String VAR_QUERY_PARAMS = "${QUERY_PARAMS}";
 
@@ -62,7 +62,7 @@ public class ContextProvider {
             loadModelAndFrame(SYSTEM_COLLECTION);
             loadModelAndFrame(SYSTEM_SINGLE);
             loadModelAndFrame(SENSOR_COLLECTION);
-            loadModelAndFrame(SENSOR_SINGLE);
+            loadModelAndFrame(SUBSYSTEM_SINGLE);
             loadModelAndFrame(SENSOR_OBSERVATIONS_COLLECTION);
             loadModelAndFrame(SYSTEM_OBSERVATIONS_COLLECTION);
 
