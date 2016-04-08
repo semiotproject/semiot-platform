@@ -101,7 +101,7 @@ public class SubscribeListener implements Observer<String> {
                     isConnected = true;
                 } catch (Exception ex) {
                     logger.warn(ex.getMessage());
-                    logger.warn("Can`t connect to the triplestore! Retry in {}ms", TIMEOUT);
+                    logger.warn("Can't connect to the triplestore! Retry in {}ms", TIMEOUT);
                     try {
                         Thread.sleep(TIMEOUT);
                     } catch (InterruptedException e) {

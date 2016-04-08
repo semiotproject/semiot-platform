@@ -1,17 +1,21 @@
 package ru.semiot.platform.apigateway.beans;
 
+import java.util.List;
+
+import javax.json.JsonArray;
+import javax.ws.rs.core.Response;
+
 import org.apache.jena.rdf.model.Model;
 import rx.Observable;
 
 public interface TSDBQueryService {
 
-    public Observable<String> queryTimeOfLatestBySensorUri(String systemId, String sensorUri);
+    public Observable<String> queryTimeOfLatestBySystemId(String systemId, List<String> sensorsId);
 
-    public Observable<String> queryTimeOfLatestBySystemId(String systemId);
+    public Observable<Model> queryLatestBySystemId(String systemId, List<String> sensorsId);
 
-    public Observable<Model> queryLatestBySystemId(String systemId);
-
-    public Observable<Model> queryBySensorUri(String systemId, String sensorUri, String start, String end);
-
-    public Observable<Model> queryBySystemId(String systemId, String start, String end);
+    public Observable<Model> queryBySystemId(String systemId, List<String> sensorsId, String start, String end);
+    
+    public Observable<Response> remove(JsonArray array);
+    
 }

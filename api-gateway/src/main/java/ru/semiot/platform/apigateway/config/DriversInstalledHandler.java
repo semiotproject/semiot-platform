@@ -26,15 +26,22 @@ import org.slf4j.LoggerFactory;
 import ru.semiot.platform.apigateway.ExternalQueryService;
 import ru.semiot.platform.apigateway.OSGiApiService;
 import ru.semiot.platform.apigateway.SPARQLQueryService;
+import ru.semiot.platform.apigateway.beans.TSDBQueryService;
+import ru.semiot.platform.apigateway.beans.impl.TSDBQueryServiceImpl;
 import rx.Observable;
 
 @WebServlet(urlPatterns = "/config/DriversInstalled", asyncSupported = true)
 public class DriversInstalledHandler extends HttpServlet {
 
-	public static final String queryIdSystemsForDriver = "SELECT DISTINCT ?id "
-			+ "WHERE { " + "GRAPH <urn:semiot:graphs:private> {"
-			+ "?system  semiot:hasDriver <urn:semiot:drivers:${DRIVER}> } "
-			+ "?system  dcterms:identifier ?id. }";
+    public static final String queryIdSystemsForDriver = "SELECT DISTINCT "
+            + "?system_id ?sensor_id  "
+            + "WHERE { "
+                + "GRAPH <urn:semiot:graphs:private> { "
+                    + "?system  semiot:hasDriver "
+                    + "<urn:semiot:drivers:ru.semiot.platform.drivers.netatmo-weatherstation> } "
+                + "?system  dcterms:identifier ?system_id; "
+                    + "ssn:hasSubSystem ?sensor. "
+                + "?sensor dcterms:identifier ?sensor_id. }";
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(DriversInstalledHandler.class);
@@ -44,6 +51,9 @@ public class DriversInstalledHandler extends HttpServlet {
 
 	@Inject
 	SPARQLQueryService query;
+	
+	@Inject
+    TSDBQueryService tsdbQuery;
 
 	@Inject
 	ExternalQueryService externalService;
@@ -92,12 +102,14 @@ public class DriversInstalledHandler extends HttpServlet {
 					JsonArrayBuilder jArrBuilder = Json.createArrayBuilder();
 					while (systemsRS.hasNext()) {
 						QuerySolution qs = systemsRS.next();
-						Literal id = qs.getLiteral("id");
-						jArrBuilder.add(id.toString());
+						Literal system_id = qs.getLiteral("system_id");
+						Literal sensor_id = qs.getLiteral("sensor_id");
+						JsonObject object = Json.createObjectBuilder()
+						        .add("system_id", system_id.toString())
+						        .add("sensor_id", sensor_id.toString()).build();
+						jArrBuilder.add(object);
 					}
-					JsonObject metrics = Json.createObjectBuilder().add(
-							"metrics", jArrBuilder).build();
-					externalService.sendRsRemoveFromTsdb(metrics).subscribe();
+					tsdbQuery.remove(jArrBuilder.build()).subscribe();
 					externalService.sendRsRemoveFromFuseki(pid).subscribe();
 					Observable<JsonArray> jsonArray = service
 							.getBundlesJsonArray();

@@ -31,8 +31,6 @@ public class ExternalQueryService {
 			+ "/jersey-http-service";
 	private static final String urlRsRemoveFromFuseki = urlRs
 			+ "/remove/fuseki/";
-	private static final String urlRsRemoveFromTsdb = config
-			.archivRestEndpoint() + "/remove/metric";
 
 	@javax.annotation.Resource
 	ManagedExecutorService mes;
@@ -61,11 +59,7 @@ public class ExternalQueryService {
 		});
 	}
 
-	public Observable<Response> sendRsRemoveFromTsdb(JsonObject metrics) {
-		return Rx.newClient(RxObservableInvoker.class, mes)
-				.target(urlRsRemoveFromTsdb).request().rx()
-				.post(Entity.entity(metrics.toString(), MediaType.TEXT_PLAIN));
-	}
+	
 
 	public Observable<Response> sendRsRemoveFromFuseki(String pid) {
 		return getObservableRespForPath(urlRsRemoveFromFuseki + pid);

@@ -1,9 +1,14 @@
 package ru.semiot.services.tsdbservice;
 
+import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.SimpleStatement;
+
+import java.util.List;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +34,7 @@ public class TSDBClient {
                     + "  property text,"
                     + "  feature_of_interest text,"
                     + "  value text,"
-                    + "  PRIMARY KEY ((system_id,sensorId),eventTime)"
+                    + "  PRIMARY KEY ((system_id,sensor_id),event_time)"
                     + ")" +
                     "WITH CLUSTERING ORDER BY (event_time DESC);";
 
@@ -75,9 +80,25 @@ public class TSDBClient {
     public void write(Observation obs) {
         session.execute(obs.insert());
     }
+    
+    public void deleteSystems(List<String> systemsId) {
+    	/* for() {
+    		
+    	} */
+    }
 
     public Observable<ResultSet> executeAsync(String query) {
         ResultSetFuture rsf = session.executeAsync(query);
+
+        return Observable.from(rsf);
+    }
+    
+    public Observable<ResultSet> executeAsync(List<String> queries) {
+    	BatchStatement batch = new BatchStatement();
+    	for(String query : queries) {
+    		batch.add(new SimpleStatement(query));
+    	}
+        ResultSetFuture rsf = session.executeAsync(batch);
 
         return Observable.from(rsf);
     }

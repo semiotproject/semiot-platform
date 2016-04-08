@@ -70,12 +70,6 @@ public class SensorResource {
             + "  FILTER isBlank(?o)"
             + " }"
             + "}";
-    private static final String QUERY_SENSOR_URI_BY_ID
-            = "SELECT ?sensorUri ?systemId {"
-            + " ?systemUri ssn:hasSubSystem ?sensorUri ;"
-            + "   dcterms:identifier ?systemId ."
-            + " ?sensorUri dcterms:identifier \"${SENSOR_ID}\"^^xsd:string ."
-            + "} LIMIT 1";
 
     private static final String VAR_URI = "uri";
     private static final String VAR_PROTOTYPE = "prototype";
@@ -179,106 +173,6 @@ public class SensorResource {
                         throw Exceptions.propagate(ex);
                     }
                 }).subscribe(resume(response));
-    }
-
-    @GET
-    @Path("{id}/observations")
-    public void observations(@Suspended final AsyncResponse response,
-                             @PathParam("id") String sensorId,
-                             @QueryParam("start") String start,
-                             @QueryParam("end") String end)
-            throws IOException {
-        URI root = uriInfo.getRequestUri();
-        Map params = MapBuilder.newMap()
-                .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
-                .put(ContextProvider.VAR_SENSOR_ID, sensorId)
-                .build();
-        if (Strings.isNullOrEmpty(start)) {
-            sparqlQuery.select(QUERY_SENSOR_URI_BY_ID.replace("${SENSOR_ID}", sensorId)).map((rs) -> {
-                if (rs.hasNext()) {
-                    QuerySolution qs = rs.next();
-                    String sensorUri = qs.getResource("sensorUri").getURI();
-                    String systemId = qs.getLiteral("systemId").getString();
-
-                    return tsdbQuery.queryTimeOfLatestBySensorUri(systemId, sensorUri)
-                            .toBlocking().single();
-                } else {
-                    throw Exceptions.propagate(new WebApplicationException(
-                            Response.Status.NOT_FOUND));
-                }
-            }).subscribe((result) -> {
-                if (result != null) {
-                    logger.info("exists");
-                    response.resume(Response.seeOther(UriBuilder.fromUri(root)
-                            .queryParam("start", result)
-                            .build())
-                            .build());
-                } else {
-                    logger.info("not exists");
-                    try {
-                        Map<String, Object> frame = contextProvider.getFrame(
-                                ContextProvider.SENSOR_OBSERVATIONS_COLLECTION, root);
-                        params.put(ContextProvider.VAR_QUERY_PARAMS, "?noparams");
-                        Model model = contextProvider.getRDFModel(
-                                ContextProvider.SENSOR_OBSERVATIONS_COLLECTION, params);
-                        Resource view = RDFUtils.subjectWithProperty(
-                                model, RDF.type, Hydra.PartialCollectionView);
-                        model.remove(view, null, null);
-
-                        response.resume(JsonUtils.toPrettyString(
-                                RDFUtils.toJsonLdCompact(model, frame)));
-                    } catch (Throwable ex) {
-                        response.resume(ex);
-                    }
-                }
-            }, resumeOnError(response));
-        } else {
-            logger.info("find");
-            Map<String, Object> frame = contextProvider.getFrame(
-                    ContextProvider.SENSOR_OBSERVATIONS_PARTIAL_COLLECTION, root);
-
-            String queryParams = "?start=" + start;
-            if (!Strings.isNullOrEmpty(end)) {
-                queryParams += "&end=" + end;
-            }
-            params.put(ContextProvider.VAR_QUERY_PARAMS, queryParams);
-
-            Model model = contextProvider.getRDFModel(
-                    ContextProvider.SENSOR_OBSERVATIONS_COLLECTION, params);
-            queryTSDBBySensorUri(sensorId, start, end).map((result) -> {
-                model.add(result);
-                Resource collection = model.listSubjectsWithProperty(
-                        RDF.type, Hydra.PartialCollectionView).next();
-                ResIterator iter = model.listSubjectsWithProperty(
-                        RDF.type, SSN.Observaton);
-                while (iter.hasNext()) {
-                    Resource obs = iter.next();
-                    model.add(collection, Hydra.member, obs);
-                }
-                try {
-                    return JsonUtils.toPrettyString(
-                            RDFUtils.toJsonLdCompact(model, frame));
-                } catch (JsonLdError | IOException ex) {
-                    throw Exceptions.propagate(ex);
-                }
-            }).subscribe(resume(response));
-        }
-    }
-
-    private Observable<Model> queryTSDBBySensorUri(String sensorId, String start, String end) {
-        return sparqlQuery.select(QUERY_SENSOR_URI_BY_ID.replace("${SENSOR_ID}", sensorId))
-                .map((ResultSet rs) -> {
-                    if (rs.hasNext()) {
-                        QuerySolution qs = rs.next();
-                        String sensorUri = qs.getResource("sensorUri").getURI();
-                        String systemId = qs.getLiteral("systemId").getString();
-                        return tsdbQuery.queryBySensorUri(systemId, sensorUri, start, end)
-                                .toBlocking().single();
-                    } else {
-                        throw Exceptions.propagate(new WebApplicationException(
-                                Response.Status.NOT_FOUND));
-                    }
-                });
     }
 
 }

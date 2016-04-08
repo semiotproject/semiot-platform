@@ -9,11 +9,13 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.ejb.Singleton;
 import javax.enterprise.inject.Alternative;
+import javax.json.JsonArray;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -339,6 +341,33 @@ public class OpenTSDBQueryService implements TSDBQueryService {
                 .format(DateTimeFormatter
                         .ofPattern("yyyy/MM/dd-HH:mm:ss")
                         .withZone(TimeZone.getTimeZone("UTC").toZoneId()));
+    }
+
+    @Override
+    public Observable<String> queryTimeOfLatestBySystemId(String systemId,
+            List<String> sensorsId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Observable<Model> queryLatestBySystemId(String systemId,
+            List<String> sensorsId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Observable<Model> queryBySystemId(String systemId,
+            List<String> sensorsId, String start, String end) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Observable<Response> remove(JsonArray array) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

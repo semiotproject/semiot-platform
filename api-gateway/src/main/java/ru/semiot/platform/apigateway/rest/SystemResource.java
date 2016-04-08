@@ -39,6 +39,8 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static ru.semiot.platform.apigateway.rest.ResourceHelper.resume;
@@ -74,9 +76,16 @@ public class SystemResource {
             + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"
             + "  }"
             + "}";
+    private static final String QUERY_GET_SYSTEM_SENSORS = 
+    		"SELECT DISTINCT ?sensor_id {"
+	    		+ " ?uri a ssn:System ;"
+	    		+ "     dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ;"
+	    		+ "     ssn:hasSubSystem ?sensor ."
+	    		+ "	?sensor dcterms:identifier ?sensor_id }";
 
     private static final String VAR_URI = "uri";
     private static final String VAR_PROTOTYPE = "prototype";
+    private static final String VAR_SENSOR_ID = "sensor_id";
     private static final int FIRST = 0;
 
     public SystemResource() {
@@ -165,18 +174,25 @@ public class SystemResource {
                 .map((Model result) -> {
                     model.add(result);
                     try {
-                        Resource system = RDFUtils.listResourcesWithProperty(
-                                model, RDF.type, SSN.System, Proto.Individual)
-                                .get(FIRST);
-                        Resource prototype = model.listObjectsOfProperty(
-                                system, Proto.hasPrototype).next().asResource();
-                        Resource prototypeResource = ResourceUtils
-                                .createResourceFromClass(root, prototype.getLocalName());
-                        model.add(system, RDF.type, prototypeResource);
-
-                        return JsonUtils.toPrettyString(
-                                RDFUtils.toJsonLdCompact(model, frame));
-                    } catch (JsonLdError | IOException ex) {
+                        List<Resource> list = RDFUtils.listResourcesWithProperty(
+                                model, RDF.type, SSN.System, Proto.Individual);
+                        if(!list.isEmpty()) {
+                            Resource system = RDFUtils.listResourcesWithProperty(
+                                    model, RDF.type, SSN.System, Proto.Individual)
+                                    .get(FIRST);
+                            Resource prototype = model.listObjectsOfProperty(
+                                    system, Proto.hasPrototype).next().asResource();
+                            Resource prototypeResource = ResourceUtils
+                                    .createResourceFromClass(root, prototype.getLocalName());
+                            model.add(system, RDF.type, prototypeResource);
+                        
+                            return JsonUtils.toPrettyString(
+                                    RDFUtils.toJsonLdCompact(model, frame));
+                        }
+                        else {
+                            throw new WebApplicationException(Response.Status.NOT_FOUND);
+                        }
+                    } catch (Exception ex) {
                         throw Exceptions.propagate(ex);
                     }
                 }).subscribe(resume(response));
@@ -196,29 +212,32 @@ public class SystemResource {
                 .put(ContextProvider.VAR_SYSTEM_ID, systemId)
                 .build();
         if (Strings.isNullOrEmpty(start)) {
-            tsdbQuery.queryTimeOfLatestBySystemId(systemId).subscribe((result) -> {
-                if (result != null) {
-                    response.resume(Response.seeOther(UriBuilder.fromUri(root)
-                            .queryParam("start", result)
-                            .build())
-                            .build());
-                } else {
-                    try {
-                        Map<String, Object> frame = contextProvider.getFrame(
-                                ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, root);
-                        params.put(ContextProvider.VAR_QUERY_PARAMS, "?noparams");
-                        Model model = contextProvider.getRDFModel(
-                                ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, params);
-                        Resource view = RDFUtils.subjectWithProperty(
-                                model, RDF.type, Hydra.PartialCollectionView);
-                        model.remove(view, null, null);
-
-                        response.resume(JsonUtils.toPrettyString(
-                                RDFUtils.toJsonLdCompact(model, frame)));
-                    } catch (Throwable ex) {
-                        response.resume(ex);
-                    }
-                }
+        	sparqlQuery.select(QUERY_GET_SYSTEM_SENSORS.replace("${SYSTEM_ID}", systemId)).subscribe((rs) -> {
+	            tsdbQuery.queryTimeOfLatestBySystemId(systemId, rsToList(rs)).map((result) -> {
+	                if (result != null) {
+	                    response.resume(Response.seeOther(UriBuilder.fromUri(root)
+	                            .queryParam("start", result)
+	                            .build())
+	                            .build());
+	                } else {
+	                    try {
+	                        Map<String, Object> frame = contextProvider.getFrame(
+	                                ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, root);
+	                        params.put(ContextProvider.VAR_QUERY_PARAMS, "?noparams");
+	                        Model model = contextProvider.getRDFModel(
+	                                ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, params);
+	                        Resource view = RDFUtils.subjectWithProperty(
+	                                model, RDF.type, Hydra.PartialCollectionView);
+	                        model.remove(view, null, null);
+	
+	                        response.resume(JsonUtils.toPrettyString(
+	                                RDFUtils.toJsonLdCompact(model, frame)));
+	                    } catch (Throwable ex) {
+	                        response.resume(ex);
+	                    }
+	                }
+	                return new String();
+	            }).toBlocking().single();
             }, resumeOnError(response));
         } else {
             Map<String, Object> frame = contextProvider.getFrame(
@@ -232,26 +251,39 @@ public class SystemResource {
 
             Model model = contextProvider.getRDFModel(
                     ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, params);
-            tsdbQuery.queryBySystemId(systemId, start, end).map((result) -> {
-                model.add(result);
-                Resource collection = model.listSubjectsWithProperty(
-                        RDF.type, Hydra.PartialCollectionView).next();
-                ResIterator iter = model.listSubjectsWithProperty(RDF.type, SSN.Observaton);
-                while (iter.hasNext()) {
-                    Resource obs = iter.next();
-                    model.add(collection, Hydra.member, obs);
-                }
-                try {
-                    return JsonUtils.toPrettyString(
-                            RDFUtils.toJsonLdCompact(model, frame));
-                } catch (JsonLdError | IOException ex) {
-                    throw Exceptions.propagate(ex);
-                }
-            }).map((json) -> {
-                return Response.ok(json)
-                        .build();
+            
+            
+            sparqlQuery.select(QUERY_GET_SYSTEM_SENSORS.replace("${SYSTEM_ID}", systemId)).map((rs) -> {
+	            return tsdbQuery.queryBySystemId(systemId, rsToList(rs), start, end).map((result) -> {
+	                model.add(result);
+	                Resource collection = model.listSubjectsWithProperty(
+	                        RDF.type, Hydra.PartialCollectionView).next();
+	                ResIterator iter = model.listSubjectsWithProperty(RDF.type, SSN.Observaton);
+	                while (iter.hasNext()) {
+	                    Resource obs = iter.next();
+	                    model.add(collection, Hydra.member, obs);
+	                }
+	                try {
+	                    return JsonUtils.toPrettyString(
+	                            RDFUtils.toJsonLdCompact(model, frame));
+	                } catch (JsonLdError | IOException ex) {
+	                    throw Exceptions.propagate(ex);
+	                }
+	            }).map((json) -> {
+	                return Response.ok(json)
+	                        .build();
+	            }).toBlocking().single();
             }).subscribe(resume(response));
         }
+    }
+    
+    private List<String> rsToList(ResultSet rs) {
+    	List<String> list = new ArrayList<String>(); 
+        while (rs.hasNext()) {
+            QuerySolution qs = rs.next();
+            list.add(qs.getLiteral(VAR_SENSOR_ID).getString());
+        }
+        return list;
     }
 
 }
