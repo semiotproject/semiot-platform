@@ -39,6 +39,12 @@
             <version>1.7.19</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-osgi</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Compile dependencies -->
 
@@ -51,19 +57,10 @@
             <groupId>ru.semiot.commons</groupId>
             <artifactId>commons-namespaces</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-            <version>3.0.0</version>
             <exclusions>
                 <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -79,6 +76,7 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
+                            org.apache.jena.*,
                             org.apache.felix.dm,
                             org.osgi.framework,
                             org.osgi.service.cm,

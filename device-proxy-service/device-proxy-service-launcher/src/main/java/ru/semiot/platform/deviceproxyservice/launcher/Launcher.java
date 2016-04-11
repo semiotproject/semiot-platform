@@ -45,8 +45,21 @@ public class Launcher {
 
             //Device Proxy Service dependencies
             "slf4j-api-1.7.21.jar",
-            "logback-core-1.1.7.jar",
-            "logback-classic-1.1.7.jar"
+                "logback-core-1.1.7.jar",
+                "logback-classic-1.1.7.jar",
+            "jena-osgi-3.0.0.jar",
+                "jackson-core-2.6.6.jar",
+                "jackson-databind-2.6.6.jar",
+                "jackson-annotations-2.6.6.jar",
+                "jsonld-java-0.8.2.jar",
+                "httpcore-osgi-4.4.4.jar",
+                "httpclient-osgi-4.5.1.jar",
+                "jcl-over-slf4j-1.7.21.jar",
+                "commons-cli-1.3.1.jar",
+                "commons-csv-1.2.jar",
+                "commons-lang3-3.4.jar",
+                "log4j-over-slf4j-1.7.21.jar",
+                "libthrift-0.9.3.jar"
     };
 
     private static Framework framework = null;

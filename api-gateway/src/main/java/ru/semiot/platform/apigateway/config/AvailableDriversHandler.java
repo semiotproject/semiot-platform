@@ -19,8 +19,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.semiot.platform.apigateway.ExternalQueryService;
-import ru.semiot.platform.apigateway.OSGiApiService;
+import ru.semiot.platform.apigateway.beans.impl.ExternalQueryService;
+import ru.semiot.platform.apigateway.beans.impl.OSGiApiService;
 import rx.Observable;
 import rx.exceptions.Exceptions;
 

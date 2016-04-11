@@ -1,19 +1,22 @@
 package ru.semiot.services.tsdbservice;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.semiot.services.tsdbservice.rest.Observations;
+import ru.semiot.services.tsdbservice.rest.ApplicationConfig;
 import ru.semiot.services.tsdbservice.wamp.NewDeviceListener;
 import ru.semiot.services.tsdbservice.wamp.WAMPClient;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
+
+import javax.ws.rs.core.UriBuilder;
 
 public class Launcher {
     private static final Logger logger = LoggerFactory
@@ -51,32 +54,17 @@ public class Launcher {
 
             TSDBClient.getInstance().init();
 
-            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-            context.setContextPath("/");
+            URI uri = UriBuilder.fromUri("http://0.0.0.0/").port(8787).build();
+            ResourceConfig resourceConfig = new ApplicationConfig();
 
-            Server jettyServer = new Server(8787);
-            jettyServer.setHandler(context);
-
-            ServletHolder jerseyServlet = context.addServlet(
-                    org.glassfish.jersey.servlet.ServletContainer.class, "/*");
-            jerseyServlet.setInitOrder(0);
-
-            // Tells the Jersey Servlet which REST service/class to load.
-            jerseyServlet.setInitParameter(
-                    "jersey.config.server.provider.classnames",
-                    Observations.class.getCanonicalName());
+            Server jettyServer = JettyHttpContainerFactory
+                    .createServer(uri, resourceConfig);
 
             try {
                 jettyServer.start();
                 jettyServer.join();
             } finally {
                 jettyServer.destroy();
-            }
-
-            synchronized (this) {
-                while (!Thread.interrupted()) {
-                    wait();
-                }
             }
         } catch (ApplicationError | InterruptedException ex) {
             logger.error(ex.getMessage(), ex);

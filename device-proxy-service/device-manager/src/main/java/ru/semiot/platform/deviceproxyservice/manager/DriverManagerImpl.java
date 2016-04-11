@@ -1,5 +1,7 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFLanguages;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -9,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.*;
 import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionException;
-import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 
 import java.io.IOException;
@@ -20,7 +21,6 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
     private static final Logger logger = LoggerFactory.getLogger(
             DriverManagerImpl.class);
-
     private final Configuration configuration = new Configuration();
 
     //Injected by Dependency Manager
@@ -28,14 +28,18 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
     private DirectoryService directoryService;
 
+    public DriverManagerImpl() {
+
+    }
+
     public void start() {
         logger.info("Device Manager is starting...");
-
-        directoryService = new DirectoryService(new RDFStore(configuration));
-
-        logger.debug("Directory service is ready");
-
         try {
+            directoryService = new DirectoryService(new RDFStore(configuration));
+
+            logger.debug("Directory service is ready");
+
+
             WAMPClient
                     .getInstance()
                     .init(configuration.get(Keys.WAMP_URI),
@@ -52,7 +56,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
                                 }
                             });
             logger.info("Device Proxy Service Manager started!");
-        } catch (ApplicationError ex) {
+        } catch (Throwable ex) {
             logger.error(ex.getMessage(), ex);
             try {
                 WAMPClient.getInstance().close();
@@ -175,42 +179,45 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     }
 
     @Override
-    public void registerCommand(Device device, Command command) {
-
-        String description = TemplateUtils.resolve(
-                command.toTurtleString(),
-                device.getProperties(),
-                configuration);
-
+    public void registerCommand(CommandExecutionResult result) {
         //TODO: There's no guarantee that WAMPClient is connected?
-        WAMPClient.getInstance().publish(device.getId(), description)
+        WAMPClient.getInstance().publish(result.getDevice().getId(),
+                result.toActuationAsString(configuration, RDFLanguages.JSONLD))
                 .subscribe(WAMPClient.onError());
     }
 
     @Override
-    public void executeCommand(String deviceId, String command)
+    public Model executeCommand(String deviceId, Model command)
             throws CommandExecutionException {
-        String pid = directoryService.findDriverPidByDeviceId(deviceId);
+        try {
+            String pid = directoryService.findDriverPidByDeviceId(deviceId);
 
-        if (pid != null) {
-            try {
-                Collection services = bundleContext.getServiceReferences(
-                        ActuatingDeviceDriver.class, "(service.pid=" + pid + ")");
-                if (!services.isEmpty()) {
-                    logger.info("Driver [{}] found!", pid);
-                    ServiceReference<ActuatingDeviceDriver> reference =
-                            (ServiceReference) services.iterator().next();
-                    ActuatingDeviceDriver driver = bundleContext.getService(reference);
+            if (pid != null) {
+                try {
+                    Collection services = bundleContext.getServiceReferences(
+                            ActuatingDeviceDriver.class, "(service.pid=" + pid + ")");
+                    if (!services.isEmpty()) {
+                        logger.info("Driver [{}] found!", pid);
+                        ServiceReference<ActuatingDeviceDriver> reference =
+                                (ServiceReference) services.iterator().next();
+                        ActuatingDeviceDriver driver = bundleContext.getService(reference);
 
-                    driver.executeCommand(command);
-                } else {
-                    throw CommandExecutionException.driverNotFound();
+                        CommandExecutionResult result = driver.executeCommand(command);
+
+                        return result.toActuationAsModel(configuration);
+                    } else {
+                        throw CommandExecutionException.driverNotFound();
+                    }
+                } catch (InvalidSyntaxException e) {
+                    throw CommandExecutionException.driverNotFound(e);
                 }
-            } catch (InvalidSyntaxException e) {
-                throw CommandExecutionException.driverNotFound(e);
+            } else {
+                throw CommandExecutionException.driverNotFound();
             }
-        } else {
-            throw CommandExecutionException.driverNotFound();
+        } catch (Throwable e) {
+            logger.error(e.getMessage(), e);
+
+            return null;
         }
     }
 

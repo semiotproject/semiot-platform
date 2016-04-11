@@ -28,14 +28,26 @@ public interface ServerConfig extends Config {
     @DefaultValue("realm1")
     @Key("services.wamp.realm")
     String wampRealm();
-    
-    @DefaultValue("http://dataarchivingservice:8787")
+
     @Key("services.tsdb.url")
+    @DefaultValue("http://dataarchivingservice:8787")
     String tsdbEndpoint();
-    
+
+    @Key("services.tsdb.actuators.path")
+    @DefaultValue("/actuations")
+    String tsdbActuatorsPath();
+
+    @Key("services.tsdb.actuators.latest.path")
+    @DefaultValue("/actuations/latest")
+    String tsdbActuatorsLatestPath();
+
     @DefaultValue("http://deviceproxyservice:8181")
-    @Key("services.proxy.url")
-    String consoleEndpoint();
+    @Key("services.deviceproxy.url")
+    String deviceProxyEndpoint();
+
+    @Key("services.deviceproxy.commands.path")
+    @DefaultValue("/services/commands")
+    String deviceProxyCommandAPI();
     
     @DefaultValue("https://raw.githubusercontent.com/semiotproject/semiot-platform/bundles/drivers.json")
     @Key("services.repository.url")

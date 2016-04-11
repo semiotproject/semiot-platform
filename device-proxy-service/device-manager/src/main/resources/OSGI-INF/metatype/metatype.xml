@@ -3,7 +3,7 @@
     <OCD description="Device Proxy Service Manager" name="Device Proxy Service Manager"
          id="ru.semiot.platform.deviceproxyservice.manager">
         <AD name="WAMP URI" id="ru.semiot.platform.deviceproxyservice.manager.wamp_uri"
-            required="false" type="String" default="ws://winghouse.semiot.ru:8080/ws"/>
+            required="false" type="String" default="ws://wamprouter:8080/ws"/>
         <AD name="WAMP Realm" id="ru.semiot.platform.deviceproxyservice.manager.wamp_realm"
             required="false" type="String" default="realm1"/>
         <AD name="WAMP Reconnect interval" id="ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect"
@@ -17,14 +17,14 @@
         <AD name="Fuseki username" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_username"
                     required="false" type="String" default="admin"/>
         <AD name="Fuseki update url" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url"
-                    required="false" type="String" default="http://winghouse.semiot.ru:3030/ds/update"/>
+                    required="false" type="String" default="http://localhost:3030/ds/update"/>
         <AD name="Fuseki query url" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url"
-                    required="false" type="String" default="http://winghouse.semiot.ru:3030/ds/query"/>
+                    required="false" type="String" default="http://localhost:3030/ds/query"/>
         <AD name="Fuseki store url" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url"
-                    required="false" type="String" default="http://winghouse.semiot.ru:3030/ds/data"/>
+                    required="false" type="String" default="http://localhost:3030/ds/data"/>
         
         <AD name="Domain" id="ru.semiot.platform.domain"
-            required="true" type="String" default="http://localhost:8383"/>
+            required="true" type="String" default="http://localhost"/>
         <AD name="System URL Path" id="ru.semiot.platform.systems_path"
             required="false" type="String" default="systems"/>
         <AD name="Sensor URL Path" id="ru.semiot.platform.subsystem_path"

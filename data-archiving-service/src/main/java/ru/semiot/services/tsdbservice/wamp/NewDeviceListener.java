@@ -130,7 +130,7 @@ public class NewDeviceListener implements Observer<String> {
                     //Subscribe to commands
                     wampClient.addSubscription(topicName,
                             wampClient.subscribe(topicName)
-                                    .subscribe(new CommandListener()));
+                                    .subscribe(new ActuationListener()));
                 } else {
                     logger.debug("Topic {} is already known", topicName);
                 }

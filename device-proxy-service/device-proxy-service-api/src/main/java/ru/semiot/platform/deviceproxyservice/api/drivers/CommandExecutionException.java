@@ -26,6 +26,12 @@ public class CommandExecutionException extends Exception {
         this.reason = reason;
     }
 
+    public CommandExecutionException(Reason reason, String message) {
+        super(reason.getDescription() + " Message: " + message);
+
+        this.reason = reason;
+    }
+
     public CommandExecutionException(Reason reason, Throwable cause) {
         super(reason.getDescription(), cause);
 
@@ -50,6 +56,10 @@ public class CommandExecutionException extends Exception {
 
     public static CommandExecutionException driverNotFound(Throwable cause) {
         return new CommandExecutionException(Reason.DRIVER_NOT_FOUND, cause);
+    }
+
+    public static CommandExecutionException badCommand(String message) {
+        return new CommandExecutionException(Reason.BAD_COMMAND, message);
     }
 
     public static CommandExecutionException badCommand() {

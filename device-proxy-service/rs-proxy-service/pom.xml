@@ -54,23 +54,11 @@
             <version>1.7.21</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Compile dependencies -->
-
         <dependency>
             <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
+            <artifactId>jena-osgi</artifactId>
             <version>3.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -84,6 +72,8 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
+                            org.apache.jena.*,
+                            org.apache.commons.lang3,
                             org.apache.felix.dm,
                             org.osgi.framework,
                             org.osgi.service.cm,
@@ -100,7 +90,7 @@
                         </Import-Package>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
-                        <Bundle-Activator>rs.proxy.service.Activator
+                        <Bundle-Activator>ru.semiot.platform.deviceproxyservice.rest.Activator
                         </Bundle-Activator>
                     </instructions>
                     <unpackBundle>true</unpackBundle>

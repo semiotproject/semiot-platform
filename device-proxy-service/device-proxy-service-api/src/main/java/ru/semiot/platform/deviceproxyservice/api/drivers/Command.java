@@ -11,7 +11,7 @@ public abstract class Command {
 
     public Command(String deviceId, ZonedDateTime dateTime) {
         properties.put(DeviceProperties.DEVICE_ID, deviceId);
-        properties.put(DeviceProperties.COMMAND_DATETIME,
+        properties.put(DeviceProperties.ACTUATION_DATETIME,
                 dateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
     }
 

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ru.semiot.platform.apigateway.OSGiApiService;
+import ru.semiot.platform.apigateway.beans.impl.OSGiApiService;
 import rx.Observable;
 
 @WebServlet(urlPatterns = "/config/SystemSettings", asyncSupported = true)

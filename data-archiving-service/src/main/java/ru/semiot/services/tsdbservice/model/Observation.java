@@ -13,7 +13,7 @@ import java.time.format.DateTimeParseException;
 
 public class Observation {
 
-    public static final String SENSOR_URI_PREFIX = "http://localhost/sensors/";
+    private static final String SENSOR_URI_PREFIX = "http://localhost/sensors/";
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ");
 
     private final String sensorId;

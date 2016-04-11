@@ -1,9 +1,0 @@
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
-@prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
-
-[ a semiot:Command, semiot:SwitchOperationCommand ;
-    dul:hasEventTime "${ru.semiot.platform.command.datetime}"^^xsd:dateTime ;
-    dul:involvesAgent <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
-    semiot:targetOperation <${ru.semiot.drivers.mocks.plainlamp.command.targetOperation}> ;
-] .

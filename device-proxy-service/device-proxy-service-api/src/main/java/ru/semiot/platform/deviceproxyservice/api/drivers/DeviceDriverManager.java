@@ -1,5 +1,7 @@
 package ru.semiot.platform.deviceproxyservice.api.drivers;
 
+import org.apache.jena.rdf.model.Model;
+
 public interface DeviceDriverManager {
 
     public void registerDriver(DriverInformation info);
@@ -19,11 +21,11 @@ public interface DeviceDriverManager {
     /**
      * It's called by a device driver.
      *
-     * @param command a command performed on a device
+     * @param commandExecutionResult a command performed on a device
      */
-    public void registerCommand(Device device, Command command);
+    public void registerCommand(CommandExecutionResult commandExecutionResult);
 
-    public void executeCommand(String systemId, String command)
+    public Model executeCommand(String systemId, Model command)
             throws CommandExecutionException;
     
     public void removeDataOfDriverFromFuseki(String pid);

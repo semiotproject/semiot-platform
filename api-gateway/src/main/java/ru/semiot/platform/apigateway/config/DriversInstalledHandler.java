@@ -23,9 +23,9 @@ import org.apache.jena.rdf.model.Literal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.semiot.platform.apigateway.ExternalQueryService;
-import ru.semiot.platform.apigateway.OSGiApiService;
-import ru.semiot.platform.apigateway.SPARQLQueryService;
+import ru.semiot.platform.apigateway.beans.impl.ExternalQueryService;
+import ru.semiot.platform.apigateway.beans.impl.OSGiApiService;
+import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import rx.Observable;
 
 @WebServlet(urlPatterns = "/config/DriversInstalled", asyncSupported = true)

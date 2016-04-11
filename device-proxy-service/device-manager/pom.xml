@@ -41,6 +41,12 @@
             <version>1.7.21</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-osgi</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
         
         <!-- Compile dependencies -->
         
@@ -53,21 +59,6 @@
             <groupId>ws.wamp.jawampa</groupId>
             <artifactId>jawampa</artifactId>
             <version>0.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-            <version>3.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -84,6 +75,12 @@
             <groupId>ru.semiot.commons</groupId>
             <artifactId>commons-namespaces</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -107,6 +104,8 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
+                            com.fasterxml.jackson.core.*,
+                            org.apache.jena.*,
                             org.apache.felix.dm;version="[4.1,5)",
                             org.osgi.framework;version="[1.8,2)",
                             org.osgi.service.cm;version="[1.5,2)",

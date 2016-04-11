@@ -12,11 +12,7 @@ import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.DUL;
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SEMIOT;
-import ru.semiot.platform.deviceproxyservice.api.drivers.ActuatingDeviceDriver;
-import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
-import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionException;
+import ru.semiot.platform.deviceproxyservice.api.drivers.*;
 
 import java.io.StringReader;
 import java.net.URI;
@@ -36,24 +32,20 @@ public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
             Activator.DRIVER_PID,
             URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/" +
                     "support_actuators/device-proxy-service-drivers/mock-plain-lamp/" +
-                    "src/main/resources/ru.semiot.drivers.mocks.plainlamp/prototype.ttl#"));
+                    "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#"));
     private Map<String, PlainLamp> devices = new HashMap<>();
 
     private volatile DeviceDriverManager manager;
 
     public void start() {
-        configuration.put(ConfigurationKeys.NUMBER_OF_LAMPS, "5");
-        manager.registerDriver(info);
-
-        logger.info("{} started!", DRIVER_NAME);
-
         try {
+            configuration.put(ConfigurationKeys.NUMBER_OF_LAMPS, "5");
+            manager.registerDriver(info);
+
+            logger.info("{} started!", DRIVER_NAME);
+
             Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
-        }
 
-        try {
             for (int i = 0; i < configuration.getAsInteger(
                     ConfigurationKeys.NUMBER_OF_LAMPS); i++) {
                 PlainLamp lamp = new PlainLamp(DEVICE_ID_PREFIX + i);
@@ -89,43 +81,52 @@ public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
         return DRIVER_NAME;
     }
 
-    public void executeCommand(String command) throws CommandExecutionException {
-        logger.info("Received executeCommand: {}", command);
-
+    public CommandExecutionResult executeCommand(Model command)
+            throws CommandExecutionException {
+        logger.debug("executeCommand");
         //Algorithm:
         // 1. Check whether the command is supported
         // 1. Get the device id
         // 1. Run the command against the given device id
         // 1. Notify others about success or failure
 
-        Model model = ModelFactory.createDefaultModel()
-                .read(new StringReader(command), null, RDFLanguages.strLangTurtle);
-        NodeIterator deviceIterator = model.listObjectsOfProperty(DUL.involvesAgent);
-        NodeIterator operationIterator = model.listObjectsOfProperty(SEMIOT.targetOperation);
+        try {
+            NodeIterator deviceIterator = command.listObjectsOfProperty(DUL.involvesAgent);
+            NodeIterator operationIterator = command.listObjectsOfProperty(SEMIOT.targetOperation);
 
-        if (deviceIterator.hasNext() && operationIterator.hasNext()) {
-            Resource deviceUri = (Resource) deviceIterator.next();
-            Resource operationUri = (Resource) operationIterator.next();
+            if (deviceIterator.hasNext() && operationIterator.hasNext()) {
+                Resource deviceUri = (Resource) deviceIterator.next();
+                Resource operationUri = (Resource) operationIterator.next();
 
-            String deviceId = NamespaceUtils.extractLocalName(deviceUri.getURI());
+                String deviceId = NamespaceUtils.extractLocalName(deviceUri.getURI());
 
-            if (devices.containsKey(deviceId)) {
-                PlainLamp device = devices.get(deviceId);
+                if (devices.containsKey(deviceId)) {
+                    PlainLamp device = devices.get(deviceId);
 
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    logger.error(e.getMessage(), e);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        logger.error(e.getMessage(), e);
+                    }
+
+                    CommandExecutionResult result = new CommandExecutionResult(
+                            device, command, ZonedDateTime.now());
+
+                    manager.registerCommand(result);
+
+                    return result;
+                } else {
+                    throw CommandExecutionException.systemNotFound();
                 }
-
-                manager.registerCommand(device,
-                        new SwitchOperationCommand(deviceId,
-                                ZonedDateTime.now(), operationUri));
             } else {
-                throw CommandExecutionException.systemNotFound();
+                throw CommandExecutionException.badCommand("Some information is missing!");
             }
-        } else {
-            throw CommandExecutionException.badCommand();
+        } catch (Throwable e) {
+            logger.error(e.getMessage(), e);
+
+            return null;
         }
     }
 }
+
+

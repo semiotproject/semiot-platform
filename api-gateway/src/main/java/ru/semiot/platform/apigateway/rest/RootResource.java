@@ -4,22 +4,6 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.ws.rs.Produces;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -30,20 +14,40 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.commons.namespaces.SSN;
-import ru.semiot.platform.apigateway.ContextProvider;
-import static ru.semiot.platform.apigateway.ContextProvider.*;
-import static ru.semiot.platform.apigateway.rest.ResourceHelper.*;
-import ru.semiot.platform.apigateway.SPARQLQueryService;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.SHACL;
+import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
+import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
+import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
+import static ru.semiot.platform.apigateway.beans.impl.ContextProvider.API_DOCUMENTATION;
+import static ru.semiot.platform.apigateway.beans.impl.ContextProvider.ENTRYPOINT;
 
 @Path("/")
 @Stateless
@@ -110,7 +114,7 @@ public class RootResource {
     public Response index() {
         return Response.seeOther(URI.create("/index")).build();
     }
-    
+
     @GET
     @Path("/context")
     public String context() {
@@ -124,7 +128,7 @@ public class RootResource {
     public void documentation(@Suspended final AsyncResponse response)
             throws JsonLdError, IOException {
         URI root = uriInfo.getRequestUri();
-        Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION, 
+        Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION,
                 MapBuilder.newMap()
                         .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
                         .put(ContextProvider.VAR_WAMP_URL, config.wampUri())
@@ -132,24 +136,20 @@ public class RootResource {
         Map<String, Object> frame = contextProvider.getFrame(API_DOCUMENTATION, root);
 
         Observable<List<Resource>> systems = query.select(QUERY_SYSTEM_PROTOTYPES)
-                .map((ResultSet rs) -> {
-                    return defineResourceIndividual(apiDoc, root, "EntryPoint-Systems",
-                            rs, SSN.System);
-                });
+                .map((ResultSet rs) -> defineResourceIndividual(
+                        apiDoc, root, "EntryPoint-Systems", rs, SSN.System));
         Observable<List<Resource>> sensors = query.select(QUERY_SENSOR_PROTOTYPES)
-                .map((ResultSet rs) -> {
-                    return defineResourceIndividual(apiDoc, root, "EntryPoint-Sensors",
-                            rs, SSN.SensingDevice);
-                });
+                .map((ResultSet rs) -> defineResourceIndividual(
+                        apiDoc, root, "EntryPoint-Sensors", rs, SSN.SensingDevice));
 
-        Observable.zip(systems, sensors, (List<Resource> rsSystems, List<Resource> rsSensors) -> {
+        Observable.zip(systems, sensors, (rsSystems, rsSensors) -> {
             List<Resource> rs = new ArrayList<>(rsSystems);
             rs.addAll(rsSensors);
             List<Observable<ResultSet>> obs = new ArrayList<>();
-            rs.stream().forEach((prototype) -> {
-                obs.add(query.select(QUERY_INDIVIDUAL_PROPERTIES
-                        .replace(VAR_PROTOTYPE_URI, prototype.getURI())));
-            });
+            rs.stream().forEach((prototype) -> obs.add(
+                    query.select(QUERY_INDIVIDUAL_PROPERTIES
+                            .replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+
             return Observable.merge(obs).toBlocking().toIterable();
         }).map((Iterable<ResultSet> iter) -> {
             iter.forEach((ResultSet rs) -> {
@@ -175,7 +175,7 @@ public class RootResource {
     }
 
     private List<Resource> defineResourceIndividual(Model model, URI root, String collectionName,
-            ResultSet rs, Resource... classes) {
+                                                    ResultSet rs, Resource... classes) {
         List<Resource> resultPrototypes = new ArrayList<>();
         final Resource apiDocResource = model.listResourcesWithProperty(
                 RDF.type, Hydra.ApiDocumentation).next();

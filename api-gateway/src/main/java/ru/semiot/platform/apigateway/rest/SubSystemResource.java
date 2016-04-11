@@ -12,8 +12,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Proto;
-import ru.semiot.platform.apigateway.ContextProvider;
-import ru.semiot.platform.apigateway.SPARQLQueryService;
+import ru.semiot.commons.restapi.MediaType;
+import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
+import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import rx.exceptions.Exceptions;
 
@@ -31,7 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import static ru.semiot.platform.apigateway.rest.ResourceHelper.resume;
+import static ru.semiot.commons.restapi.AsyncResponseHelper.*;
 
 @Path("/systems/{system_id}/subsystems")
 @Stateless

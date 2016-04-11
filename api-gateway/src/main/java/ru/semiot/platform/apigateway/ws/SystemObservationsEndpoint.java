@@ -17,8 +17,8 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.jena.query.QuerySolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.platform.apigateway.MessageBusService;
-import ru.semiot.platform.apigateway.SPARQLQueryService;
+import ru.semiot.platform.apigateway.beans.impl.MessageBusService;
+import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 

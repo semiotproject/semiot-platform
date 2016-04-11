@@ -21,6 +21,8 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
 import java.io.StringWriter;
 
+import static ru.semiot.services.tsdbservice.rest.ResponseModelOrError.responseModelOrError;
+
 @Path("/observations")
 public class Observations {
 
@@ -77,16 +79,16 @@ public class Observations {
                     Observation observation = new Observation(
                             row.getString("system_id"),
                             row.getString("sensor_id"),
-                            row.getString("event_time"),
+                            row.getTimestamp("event_time").toInstant().toString(),
                             row.getString("property"),
                             row.getString("feature_of_interest"),
-                            row.getString("observation_value"));
+                            row.getString("value"));
 
                     observations.add(observation.toRDF());
                 });
 
                 return observations;
-            }).subscribe(new ResponseOrError(response));
+            }).subscribe(responseModelOrError(response));
         }
     }
 
@@ -104,33 +106,4 @@ public class Observations {
         }
     }
 
-    private class ResponseOrError extends Subscriber<Model> {
-
-        private final AsyncResponse response;
-
-        ResponseOrError(AsyncResponse response) {
-            this.response = response;
-        }
-
-        @Override
-        public void onCompleted() {
-
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            logger.warn(e.getMessage(), e);
-            if (e instanceof InvalidQueryException) {
-                response.resume(Response.status(Response.Status.BAD_REQUEST).build());
-            }
-            response.resume(e);
-        }
-
-        @Override
-        public void onNext(Model model) {
-            StringWriter writer = new StringWriter();
-            model.write(writer, RDFLanguages.strLangJSONLD);
-            response.resume(writer.toString());
-        }
-    }
 }

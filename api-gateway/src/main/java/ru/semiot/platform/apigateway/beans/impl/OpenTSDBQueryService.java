@@ -288,6 +288,16 @@ public class OpenTSDBQueryService implements TSDBQueryService {
         });
     }
 
+    @Override
+    public Observable<ZonedDateTime> queryDateTimeOfLatestActuation(String systemId) {
+        return null;
+    }
+
+    @Override
+    public Observable<Model> queryActuationsByRange(String systemId, ZonedDateTime start, ZonedDateTime end) {
+        return null;
+    }
+
     private void createObservation(Model model, Resource valueType,
             Resource sensorUri, Resource property, long timestamp, Object value) {
         Resource observation = ResourceFactory.createResource();

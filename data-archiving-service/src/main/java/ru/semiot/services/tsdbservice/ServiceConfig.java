@@ -10,7 +10,7 @@ import org.apache.jena.riot.RDFLanguages;
 @Sources({ "file:/semiot-platform/data-archiving-service/config.properties" })
 public interface ServiceConfig extends Config {
 
-	@DefaultValue("ws://winghouse.semiot.ru:8080/ws")
+	@DefaultValue("ws://wamprouter:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
 
@@ -24,18 +24,18 @@ public interface ServiceConfig extends Config {
 	int wampReconnectInterval();
 
 	@Key("services.wamp.messageFormat")
-	@DefaultValue(RDFLanguages.strLangTurtle)
+	@DefaultValue(RDFLanguages.strLangJSONLD)
 	String wampMessageFormat();
 
 	@DefaultValue("ru.semiot.devices.newandobserving")
 	@Key("services.topics.subscriber")
 	String topicsSubscriber();
 
-	@DefaultValue("winghouse.semiot.ru")
+	@DefaultValue("tsdb")
 	@Key("services.tsdb.url")
 	String tsdbUrl();
 
-	@DefaultValue("http://winghouse.semiot.ru:3030/ds/query")
+	@DefaultValue("http://deviceproxyservice:3030/ds/query")
 	@Key("services.fuseki.store.url")
 	String storeUrl();
 
