@@ -1,7 +1,18 @@
 package ru.semiot.platform.apigateway.beans.impl;
 
+import java.io.StringReader;
+import java.util.List;
+
+import javax.ejb.Singleton;
+import javax.enterprise.concurrent.ManagedExecutorService;
+import javax.enterprise.inject.Default;
+import javax.json.JsonArray;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+
 import org.aeonbits.owner.ConfigFactory;
-import org.aeonbits.owner.util.Collections;
 import org.apache.http.HttpStatus;
 import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.rdf.model.Model;
@@ -15,23 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import ru.semiot.platform.apigateway.ServerConfig;
 import ru.semiot.platform.apigateway.beans.TSDBQueryService;
-import ru.semiot.platform.apigateway.utils.JsonNavigator;
 import rx.Observable;
-import rx.exceptions.Exceptions;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.List;
-
-import javax.ejb.Singleton;
-import javax.enterprise.concurrent.ManagedExecutorService;
-import javax.enterprise.inject.Default;
-import javax.json.JsonArray;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 @Singleton
 @Default
@@ -90,31 +85,31 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
         if (Strings.isNullOrEmpty(start)) {
             throw new IllegalArgumentException();
         }
-        
+
         UriBuilder uriBuilder = UriBuilder.fromPath(config.tsdbEndpoint())
                 .path(QUERY_OBSERVATIONS).queryParam(PARAM_SYSTEM_ID, systemId)
                 .queryParam(PARAM_SENSOR_ID, sensorsId.toArray())
                 .queryParam(PARAM_START, start);
-        
+
         if (!Strings.isNullOrEmpty(end)) {
             uriBuilder.queryParam(PARAM_END, end);
         }
 
         Observable<Response> get = Rx.newClient(RxObservableInvoker.class, mes)
-                .target(uriBuilder.build())
-                .request().rx().get();
-        
+                .target(uriBuilder.build()).request().rx().get();
+
         return responseToModel(get);
     }
-    
+
     Observable<Model> responseToModel(Observable<Response> get) {
         return get.map((response) -> {
             Model model = ModelFactory.createDefaultModel();
             try {
-            if (response.getStatus() == HttpStatus.SC_OK) {
-                StringReader reader = new StringReader(response.readEntity(String.class));
-                model.read(reader, null, RDFLanguages.strLangJSONLD);
-            }
+                if (response.getStatus() == HttpStatus.SC_OK) {
+                    StringReader reader = new StringReader(
+                            response.readEntity(String.class));
+                    model.read(reader, null, RDFLanguages.strLangJSONLD);
+                }
             } catch (RiotException re) {
                 logger.error(re.getMessage(), re);
             }
@@ -126,7 +121,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
         return Rx.newClient(RxObservableInvoker.class, mes)
                 .target(UriBuilder.fromPath(config.tsdbEndpoint())
                         .path(QUERY_REMOVE))
-                .request().rx()
-                .post(Entity.entity(jsonArray.toString(), MediaType.TEXT_PLAIN));
+                .request().rx().post(Entity.entity(jsonArray.toString(),
+                        MediaType.TEXT_PLAIN));
     }
 }

@@ -1,17 +1,9 @@
 package ru.semiot.services.tsdbservice.rest;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.exceptions.InvalidQueryException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.RDFLanguages;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.semiot.services.tsdbservice.model.Observation;
-import ru.semiot.services.tsdbservice.TSDBClient;
-import rx.Observable;
-import rx.Subscriber;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -25,10 +17,20 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFLanguages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.exceptions.InvalidQueryException;
+
+import ru.semiot.services.tsdbservice.TSDBClient;
+import ru.semiot.services.tsdbservice.model.Observation;
+import rx.Observable;
+import rx.Subscriber;
 
 @Path("/observations")
 public class Observations {

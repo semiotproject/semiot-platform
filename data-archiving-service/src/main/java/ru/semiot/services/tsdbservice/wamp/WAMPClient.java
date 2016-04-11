@@ -35,8 +35,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
 
     public Observable<WampClient.State> init() throws Exception {
         WampClientBuilder builder = new WampClientBuilder();
-        builder.withUri(config.wampUri())
-                .withRealm(config.wampRealm())
+        builder.withUri(config.wampUri()).withRealm(config.wampRealm())
                 .withInfiniteReconnects()
                 .withReconnectInterval(config.wampReconnectInterval(),
                         TimeUnit.SECONDS)

@@ -20,7 +20,7 @@ public class Launcher {
             .getLogger(Launcher.class);
     private static final ServiceConfig config = ConfigFactory
             .create(ServiceConfig.class);
-    
+
     private static final long TIMEOUT = 5000;
 
     public static void main(String[] args) {
@@ -30,14 +30,15 @@ public class Launcher {
 
     private void run() {
         boolean isConnected = false;
-        while(!isConnected) {
+        while (!isConnected) {
             try {
                 TSDBClient.getInstance().init();
                 logger.info("Connected to the tsdb");
                 isConnected = true;
             } catch (Exception e) {
                 logger.warn(e.getMessage());
-                logger.warn("Can't connect to the tsdb! Retry in {}ms", TIMEOUT);
+                logger.warn("Can't connect to the tsdb! Retry in {}ms",
+                        TIMEOUT);
                 try {
                     Thread.sleep(TIMEOUT);
                 } catch (InterruptedException ex) {

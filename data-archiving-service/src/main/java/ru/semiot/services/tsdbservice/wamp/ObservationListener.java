@@ -17,13 +17,12 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.semiot.services.tsdbservice.model.Observation;
-import ru.semiot.services.tsdbservice.TSDBClient;
-import rx.Observer;
-
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.QUDT;
 import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.services.tsdbservice.TSDBClient;
+import ru.semiot.services.tsdbservice.model.Observation;
+import rx.Observer;
 
 public class ObservationListener implements Observer<String> {
 
@@ -91,9 +90,10 @@ public class ObservationListener implements Observer<String> {
                             featureOfInterest = featureOfInterestResource
                                     .getURI();
                         }
-                        TSDBClient.getInstance().write(
-                                new Observation(sensorUri.substring(
-                                        sensorUri.lastIndexOf("/") + 1),
+                        TSDBClient.getInstance()
+                                .write(new Observation(
+                                        sensorUri.substring(
+                                                sensorUri.lastIndexOf("/") + 1),
                                         system_id, timestamp, property,
                                         featureOfInterest, value));
                     } else {

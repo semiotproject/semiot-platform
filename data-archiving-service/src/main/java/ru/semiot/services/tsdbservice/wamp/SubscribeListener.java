@@ -21,12 +21,11 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.semiot.services.tsdbservice.ServiceConfig;
-import rx.Observer;
-
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.SSNCOM;
+import ru.semiot.services.tsdbservice.ServiceConfig;
+import rx.Observer;
 
 public class SubscribeListener implements Observer<String> {
 
@@ -40,22 +39,20 @@ public class SubscribeListener implements Observer<String> {
     private final WAMPClient wampClient = WAMPClient.getInstance();
     private final LinkedList<String> listTopics = new LinkedList<>();
 
-    private static final Query GET_TOPICS_QUERY = QueryFactory.create(
-            NamespaceUtils.newSPARQLQuery(
-                    "SELECT ?topic { "
-                    + "GRAPH <urn:semiot:graphs:private> {"
-                    + " ?x ssncom:hasCommunicationEndpoint ?e ."
-                    + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
-                    + "}"
-                    + "}", SSN.class, SSNCOM.class));
-    private static final String GET_TOPIC_BY_URI_QUERY
-            = NamespaceUtils.newSPARQLQuery(
-                    "SELECT ?topic { "
-                    + "GRAPH <urn:semiot:graphs:private> {"
-                    + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
-                    + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
-                    + "}"
-                    + "}", SSN.class, SSNCOM.class);
+    private static final Query GET_TOPICS_QUERY = QueryFactory
+            .create(NamespaceUtils.newSPARQLQuery(
+                    "SELECT ?topic { " + "GRAPH <urn:semiot:graphs:private> {"
+                            + " ?x ssncom:hasCommunicationEndpoint ?e ."
+                            + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
+                            + "}" + "}",
+                    SSN.class, SSNCOM.class));
+    private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils
+            .newSPARQLQuery(
+                    "SELECT ?topic { " + "GRAPH <urn:semiot:graphs:private> {"
+                            + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
+                            + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
+                            + "}" + "}",
+                    SSN.class, SSNCOM.class);
 
     public SubscribeListener() {
         httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
@@ -77,7 +74,8 @@ public class SubscribeListener implements Observer<String> {
     public void onNext(String message) {
         try {
             Model description = ModelFactory.createDefaultModel().read(
-                    new StringReader(message), null, RDFLanguages.TURTLE.getName());
+                    new StringReader(message), null,
+                    RDFLanguages.TURTLE.getName());
             if (description != null && !description.isEmpty()) {
                 subscribeTopics(description);
             } else {
@@ -101,7 +99,9 @@ public class SubscribeListener implements Observer<String> {
                     isConnected = true;
                 } catch (Exception ex) {
                     logger.warn(ex.getMessage());
-                    logger.warn("Can't connect to the triplestore! Retry in {}ms", TIMEOUT);
+                    logger.warn(
+                            "Can't connect to the triplestore! Retry in {}ms",
+                            TIMEOUT);
                     try {
                         Thread.sleep(TIMEOUT);
                     } catch (InterruptedException e) {
@@ -118,13 +118,12 @@ public class SubscribeListener implements Observer<String> {
             }
         }
         while (topics != null && topics.hasNext()) {
-            String topicName = topics.next().get(VAR_TOPIC)
-                    .asLiteral().getString();
+            String topicName = topics.next().get(VAR_TOPIC).asLiteral()
+                    .getString();
             if (StringUtils.isNotBlank(topicName)) {
                 if (!listTopics.contains(topicName)) {
                     listTopics.add(topicName);
-                    wampClient.addSubscription(
-                            topicName,
+                    wampClient.addSubscription(topicName,
                             wampClient.subscribe(topicName).subscribe(
                                     new ObservationListener(topicName)));
                 } else {
@@ -142,14 +141,14 @@ public class SubscribeListener implements Observer<String> {
     }
 
     private QueryExecution getQEFromModelTopics(Model description) {
-        ResIterator iter = description.listResourcesWithProperty(
-                RDF.type, SSN.System);
+        ResIterator iter = description.listResourcesWithProperty(RDF.type,
+                SSN.System);
 
         if (iter.hasNext()) {
             Resource system = iter.nextResource();
             return QueryExecutionFactory.sparqlService(
-                    config.storeUrl(),
-                    GET_TOPIC_BY_URI_QUERY.replace("${SYSTEM_URI}", system.getURI()),
+                    config.storeUrl(), GET_TOPIC_BY_URI_QUERY
+                            .replace("${SYSTEM_URI}", system.getURI()),
                     httpAuthenticator);
         } else {
             return null;
