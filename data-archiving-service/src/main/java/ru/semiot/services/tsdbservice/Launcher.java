@@ -3,6 +3,8 @@ package ru.semiot.services.tsdbservice;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.ws.rs.core.UriBuilder;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.eclipse.jetty.server.Server;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
@@ -16,13 +18,13 @@ import ru.semiot.services.tsdbservice.wamp.WAMPClient;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 
-import javax.ws.rs.core.UriBuilder;
-
 public class Launcher {
     private static final Logger logger = LoggerFactory
             .getLogger(Launcher.class);
     private static final ServiceConfig config = ConfigFactory
             .create(ServiceConfig.class);
+
+    private static final long TIMEOUT = 5000;
 
     public static void main(String[] args) {
         Launcher launcher = new Launcher();
@@ -30,35 +32,48 @@ public class Launcher {
     }
 
     private void run() {
+        boolean isConnected = false;
+        while (!isConnected) {
+            try {
+                TSDBClient.getInstance().init();
+                logger.info("Connected to the tsdb");
+                isConnected = true;
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
+                logger.warn("Can't connect to the tsdb! Retry in {}ms",
+                        TIMEOUT);
+                try {
+                    Thread.sleep(TIMEOUT);
+                } catch (InterruptedException ex) {
+                    logger.error(ex.getMessage());
+                }
+            }
+        }
         try {
-            WAMPClient
-                    .getInstance()
-                    .init()
-                    .subscribe(
-                            (WampClient.Status newStatus) -> {
-                                if (newStatus == WampClient.Status.Connected) {
-                                    logger.info("Connected to {}", config.wampUri());
+            WAMPClient.getInstance().init()
+                    .subscribe((WampClient.State newState) -> {
+                        if (newState instanceof WampClient.ConnectedState) {
+                            logger.info("Connected to {}", config.wampUri());
 
-                                    WAMPClient.getInstance().subscribe(
-                                            config.topicsSubscriber())
-                                            .subscribe(new NewDeviceListener());
+                            WAMPClient.getInstance()
+                                    .subscribe(config.topicsSubscriber())
+                                    .subscribe(new NewDeviceListener());
 
-                                } else if (newStatus == WampClient.Status.Disconnected) {
-                                    logger.info("Disconnected from {}",
-                                            config.wampUri());
-                                } else if (newStatus == WampClient.Status.Connecting) {
-                                    logger.debug("Connecting to {}",
-                                            config.wampUri());
-                                }
-                            });
+                        } else if (newState instanceof WampClient.DisconnectedState) {
+                            logger.info("Disconnected from {}",
+                                    config.wampUri());
+                        } else if (newState instanceof WampClient.ConnectingState) {
+                            logger.debug("Connecting to {}", config.wampUri());
+                        }
+                    });
 
             TSDBClient.getInstance().init();
 
             URI uri = UriBuilder.fromUri("http://0.0.0.0/").port(8787).build();
             ResourceConfig resourceConfig = new ApplicationConfig();
 
-            Server jettyServer = JettyHttpContainerFactory
-                    .createServer(uri, resourceConfig);
+            Server jettyServer = JettyHttpContainerFactory.createServer(uri,
+                    resourceConfig);
 
             try {
                 jettyServer.start();

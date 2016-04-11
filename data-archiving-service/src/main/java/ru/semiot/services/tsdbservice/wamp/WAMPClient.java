@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import ru.semiot.services.tsdbservice.ServiceConfig;
 import rx.Observable;
 import rx.Subscription;
-import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
+import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 public class WAMPClient implements Closeable, AutoCloseable {
 
@@ -33,13 +33,13 @@ public class WAMPClient implements Closeable, AutoCloseable {
         return INSTANCE;
     }
 
-    public Observable<WampClient.Status> init() throws ApplicationError {
+    public Observable<WampClient.State> init() throws Exception {
         WampClientBuilder builder = new WampClientBuilder();
-        builder.withUri(config.wampUri())
-                .withRealm(config.wampRealm())
+        builder.withUri(config.wampUri()).withRealm(config.wampRealm())
                 .withInfiniteReconnects()
                 .withReconnectInterval(config.wampReconnectInterval(),
-                        TimeUnit.SECONDS);
+                        TimeUnit.SECONDS)
+                .withConnectorProvider(new NettyWampClientConnectorProvider());
         client = builder.build();
         client.open();
         return client.statusChanged();

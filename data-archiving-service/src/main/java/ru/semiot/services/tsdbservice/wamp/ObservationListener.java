@@ -23,7 +23,7 @@ public class ObservationListener extends RDFMessageObserver {
     private static final String PROPERTY = "property";
     private static final String FEATURE_OF_INTEREST = "feature_of_interest";
     private static final String SENSOR_URI = "sensor_uri";
-    private final String systemId;
+    private final String system_id;
 
     private static final Query METRICS_QUERY = QueryFactory.create(
             NamespaceUtils.newSPARQLQuery(
@@ -39,7 +39,7 @@ public class ObservationListener extends RDFMessageObserver {
                             + "}", SSN.class, QUDT.class, DCTerms.class));
 
     public ObservationListener(String system_id) {
-        this.systemId = system_id;
+        this.system_id = system_id;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ObservationListener extends RDFMessageObserver {
                         TSDBClient.getInstance().write(
                                 new Observation(sensorUri.substring(
                                         sensorUri.lastIndexOf("/") + 1),
-                                        systemId, timestamp, property,
+                                        system_id, timestamp, property,
                                         featureOfInterest, value));
                     } else {
                         logger.warn("Required properties not found!");

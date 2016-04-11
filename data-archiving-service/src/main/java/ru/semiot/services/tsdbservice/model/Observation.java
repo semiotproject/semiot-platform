@@ -28,15 +28,8 @@ public class Observation {
                        String featureOfInterest, @NotNull String value) {
         this.sensorId = sensorId;
         this.system_id = system_id;
-        ZonedDateTime tmp;
-        try {
-            tmp = ZonedDateTime.parse(eventTime,
-                    DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        } catch (DateTimeParseException dtpe) {
-            //Must be the time came from Cassandra. Try it.
-            tmp = ZonedDateTime.parse(eventTime, DTF);
-        }
-        this.eventTime = tmp;
+        this.eventTime = ZonedDateTime.parse(eventTime,
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         this.property = ResourceFactory.createResource(property);
         if (featureOfInterest != null) {
             this.featureOfInterest = ResourceFactory.createResource(featureOfInterest);

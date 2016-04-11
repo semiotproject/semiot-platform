@@ -9,14 +9,18 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import javax.enterprise.concurrent.ManagedExecutorService;
+
 import javax.ejb.Singleton;
+import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.enterprise.inject.Alternative;
+import javax.json.JsonArray;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.http.HttpStatus;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -31,6 +35,7 @@ import org.glassfish.jersey.client.rx.Rx;
 import org.glassfish.jersey.client.rx.rxjava.RxObservableInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.semiot.commons.namespaces.QUDT;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.platform.apigateway.ServerConfig;
@@ -44,8 +49,10 @@ import rx.exceptions.Exceptions;
 @Alternative
 public class OpenTSDBQueryService implements TSDBQueryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(OpenTSDBQueryService.class);
-    private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(OpenTSDBQueryService.class);
+    private static final ServerConfig config = ConfigFactory
+            .create(ServerConfig.class);
     private static final String SLASH = "/";
     private static final String PERCENT = "%";
     private static final String QUERY_ENDPOINT = "/api/query";
@@ -62,26 +69,23 @@ public class OpenTSDBQueryService implements TSDBQueryService {
     public OpenTSDBQueryService() {
     }
 
-    public Observable<String> queryTimeOfLatestBySensorUri(
-            String systemId, String sensorUri) {
+    public Observable<String> queryTimeOfLatestBySensorUri(String systemId,
+            String sensorUri) {
         URI uri = null;
         try {
-            uri = UriBuilder
-                            .fromPath(config.tsdbEndpoint())
-                            .path(QUERY_LAST_ENDPOINT)
-                            .queryParam(PARAM_TIMESERIES, URLEncoder.encode(systemId +
-                                    "{sensor_uri=" + encode(sensorUri) + "}",
+            uri = UriBuilder.fromPath(config.tsdbEndpoint())
+                    .path(QUERY_LAST_ENDPOINT)
+                    .queryParam(PARAM_TIMESERIES,
+                            URLEncoder.encode(
+                                    systemId + "{sensor_uri="
+                                            + encode(sensorUri) + "}",
                                     StandardCharsets.UTF_8.name()))
-                            .build();
+                    .build();
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
-        Observable<Response> get
-                = Rx.newClient(RxObservableInvoker.class, mes)
-                .target(uri)
-                .request(MediaType.APPLICATION_JSON)
-                .rx()
-                .get();
+        Observable<Response> get = Rx.newClient(RxObservableInvoker.class, mes)
+                .target(uri).request(MediaType.APPLICATION_JSON).rx().get();
 
         return get.map((response) -> {
             try {
@@ -104,16 +108,11 @@ public class OpenTSDBQueryService implements TSDBQueryService {
     }
 
     public Observable<String> queryTimeOfLatestBySystemId(String systemId) {
-        Observable<Response> get
-                = Rx.newClient(RxObservableInvoker.class, mes)
-                .target(UriBuilder
-                        .fromPath(config.tsdbEndpoint())
+        Observable<Response> get = Rx.newClient(RxObservableInvoker.class, mes)
+                .target(UriBuilder.fromPath(config.tsdbEndpoint())
                         .path(QUERY_LAST_ENDPOINT)
-                        .queryParam(PARAM_TIMESERIES, systemId)
-                        .build())
-                .request(MediaType.APPLICATION_JSON)
-                .rx()
-                .get();
+                        .queryParam(PARAM_TIMESERIES, systemId).build())
+                .request(MediaType.APPLICATION_JSON).rx().get();
 
         return get.map((response) -> {
             try {
@@ -136,32 +135,30 @@ public class OpenTSDBQueryService implements TSDBQueryService {
     }
 
     public Observable<Model> queryLatestBySystemId(String systemId) {
-        Observable<Response> get
-                = Rx.newClient(RxObservableInvoker.class, mes)
-                .target(UriBuilder
-                        .fromPath(config.tsdbEndpoint())
+        Observable<Response> get = Rx.newClient(RxObservableInvoker.class, mes)
+                .target(UriBuilder.fromPath(config.tsdbEndpoint())
                         .path(QUERY_LAST_ENDPOINT)
                         .queryParam(PARAM_TIMESERIES, systemId)
-                        .queryParam(PARAM_RESOLVE, true)
-                        .build())
-                .request(MediaType.APPLICATION_JSON)
-                .rx()
-                .get();
+                        .queryParam(PARAM_RESOLVE, true).build())
+                .request(MediaType.APPLICATION_JSON).rx().get();
 
         return get.map((response) -> {
             try {
                 Model model = ModelFactory.createDefaultModel();
 
                 if (response.getStatus() == HttpStatus.SC_OK) {
-                    JsonNavigator body = JsonNavigator.create(
-                            response.readEntity(String.class));
+                    JsonNavigator body = JsonNavigator
+                            .create(response.readEntity(String.class));
                     while (body.hasNext()) {
                         JsonNavigator obsParam = body.next();
                         String timestamp = obsParam.readToString("$.timestamp");
                         String value = obsParam.readToString("$.value");
-                        Resource valueType = decode(obsParam.readToString("$.tags.value_type"));
-                        Resource sensorUri = decode(obsParam.readToString("$.tags.sensor_uri"));
-                        Resource property = decode(obsParam.readToString("$.tags.property"));
+                        Resource valueType = decode(
+                                obsParam.readToString("$.tags.value_type"));
+                        Resource sensorUri = decode(
+                                obsParam.readToString("$.tags.sensor_uri"));
+                        Resource property = decode(
+                                obsParam.readToString("$.tags.property"));
                         createObservation(model, valueType, sensorUri, property,
                                 Long.valueOf(timestamp), value);
                     }
@@ -178,13 +175,10 @@ public class OpenTSDBQueryService implements TSDBQueryService {
             String start, String end) {
         UriBuilder uriBuilder = null;
         try {
-            uriBuilder = UriBuilder
-                    .fromPath(config.tsdbEndpoint())
-                    .path(QUERY_ENDPOINT)
-                    .queryParam(PARAM_METRICS, URLEncoder.encode(
-                                    "sum:" + systemId
-                                            + "{sensor_uri=" + encode(uri)
-                                            + ",property=*,value_type=*}",
+            uriBuilder = UriBuilder.fromPath(config.tsdbEndpoint())
+                    .path(QUERY_ENDPOINT).queryParam(PARAM_METRICS,
+                            URLEncoder.encode("sum:" + systemId + "{sensor_uri="
+                                    + encode(uri) + ",property=*,value_type=*}",
                                     StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
@@ -197,26 +191,26 @@ public class OpenTSDBQueryService implements TSDBQueryService {
         if (!Strings.isNullOrEmpty(end)) {
             uriBuilder.queryParam(PARAM_END, xsddateTimeToTSDBDateTime(end));
         }
-        
-        Observable<Response> get
-                = Rx.newClient(RxObservableInvoker.class, mes)
-                .target(uriBuilder.build())
-                .request(MediaType.APPLICATION_JSON)
-                .rx()
-                .get();
+
+        Observable<Response> get = Rx.newClient(RxObservableInvoker.class, mes)
+                .target(uriBuilder.build()).request(MediaType.APPLICATION_JSON)
+                .rx().get();
 
         return get.map((response) -> {
             try {
                 Model model = ModelFactory.createDefaultModel();
 
                 if (response.getStatus() == HttpStatus.SC_OK) {
-                    JsonNavigator body = JsonNavigator.create(
-                            response.readEntity(String.class));
+                    JsonNavigator body = JsonNavigator
+                            .create(response.readEntity(String.class));
                     while (body.hasNext()) {
                         JsonNavigator obsParam = body.next();
-                        Resource valueType = decode(obsParam.readToString("$.tags.value_type"));
-                        Resource sensorUri = decode(obsParam.readToString("$.tags.sensor_uri"));
-                        Resource property = decode(obsParam.readToString("$.tags.property"));
+                        Resource valueType = decode(
+                                obsParam.readToString("$.tags.value_type"));
+                        Resource sensorUri = decode(
+                                obsParam.readToString("$.tags.sensor_uri"));
+                        Resource property = decode(
+                                obsParam.readToString("$.tags.property"));
                         Map<String, Object> obs = obsParam.readToMap("$.dps");
                         obs.keySet().stream().forEach((key) -> {
                             createObservation(model, valueType, sensorUri,
@@ -236,11 +230,11 @@ public class OpenTSDBQueryService implements TSDBQueryService {
             String end) {
         UriBuilder uriBuilder = null;
         try {
-            uriBuilder = UriBuilder
-                    .fromPath(config.tsdbEndpoint())
-                    .path(QUERY_ENDPOINT)
-                    .queryParam(PARAM_METRICS, URLEncoder.encode(
-                                    "sum:" + systemId + "{property=*,value_type=*}",
+            uriBuilder = UriBuilder.fromPath(config.tsdbEndpoint())
+                    .path(QUERY_ENDPOINT).queryParam(PARAM_METRICS,
+                            URLEncoder.encode(
+                                    "sum:" + systemId
+                                            + "{property=*,value_type=*}",
                                     StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
@@ -254,25 +248,25 @@ public class OpenTSDBQueryService implements TSDBQueryService {
             uriBuilder.queryParam(PARAM_END, xsddateTimeToTSDBDateTime(end));
         }
 
-        Observable<Response> get
-                = Rx.newClient(RxObservableInvoker.class, mes)
-                .target(uriBuilder.build())
-                .request(MediaType.APPLICATION_JSON)
-                .rx()
-                .get();
+        Observable<Response> get = Rx.newClient(RxObservableInvoker.class, mes)
+                .target(uriBuilder.build()).request(MediaType.APPLICATION_JSON)
+                .rx().get();
 
         return get.map((response) -> {
             try {
                 Model model = ModelFactory.createDefaultModel();
 
                 if (response.getStatus() == HttpStatus.SC_OK) {
-                    JsonNavigator body = JsonNavigator.create(
-                            response.readEntity(String.class));
+                    JsonNavigator body = JsonNavigator
+                            .create(response.readEntity(String.class));
                     while (body.hasNext()) {
                         JsonNavigator obsParam = body.next();
-                        Resource valueType = decode(obsParam.readToString("$.tags.value_type"));
-                        Resource sensorUri = decode(obsParam.readToString("$.tags.sensor_uri"));
-                        Resource property = decode(obsParam.readToString("$.tags.property"));
+                        Resource valueType = decode(
+                                obsParam.readToString("$.tags.value_type"));
+                        Resource sensorUri = decode(
+                                obsParam.readToString("$.tags.sensor_uri"));
+                        Resource property = decode(
+                                obsParam.readToString("$.tags.property"));
                         Map<String, Object> obs = obsParam.readToMap("$.dps");
                         obs.keySet().stream().forEach((key) -> {
                             createObservation(model, valueType, sensorUri,
@@ -299,15 +293,16 @@ public class OpenTSDBQueryService implements TSDBQueryService {
     }
 
     private void createObservation(Model model, Resource valueType,
-            Resource sensorUri, Resource property, long timestamp, Object value) {
+            Resource sensorUri, Resource property, long timestamp,
+            Object value) {
         Resource observation = ResourceFactory.createResource();
         Resource obsResult = ResourceFactory.createResource();
         Resource obsValue = ResourceFactory.createResource();
 
         model.add(observation, RDF.type, SSN.Observaton)
                 .add(observation, SSN.observedProperty, property)
-                .add(observation, SSN.observedBy, sensorUri)
-                .add(observation, SSN.observationResultTime,
+                .add(observation, SSN.observedBy, sensorUri).add(observation,
+                        SSN.observationResultTime,
                         timestampToXSDdateTime(timestamp));
 
         model.add(observation, SSN.observationResult, obsResult)
@@ -315,11 +310,12 @@ public class OpenTSDBQueryService implements TSDBQueryService {
                 .add(obsResult, SSN.isProducedBy, sensorUri)
                 .add(obsResult, SSN.hasValue, obsValue);
 
-        model.add(obsValue, RDF.type, QUDT.QuantityValue)
-                .add(obsValue, QUDT.quantityValue, RDFUtils.toLiteral(value));
+        model.add(obsValue, RDF.type, QUDT.QuantityValue).add(obsValue,
+                QUDT.quantityValue, RDFUtils.toLiteral(value));
     }
 
-    private Resource decode(String decodedUri) throws UnsupportedEncodingException {
+    private Resource decode(String decodedUri)
+            throws UnsupportedEncodingException {
         String strUri = URLDecoder.decode(decodedUri.replace(SLASH, PERCENT),
                 StandardCharsets.UTF_8.name());
 
@@ -327,8 +323,8 @@ public class OpenTSDBQueryService implements TSDBQueryService {
     }
 
     private String encode(String uri) throws UnsupportedEncodingException {
-        String urlEncoded = URLEncoder.encode(
-                uri, StandardCharsets.UTF_8.name());
+        String urlEncoded = URLEncoder.encode(uri,
+                StandardCharsets.UTF_8.name());
 
         return urlEncoded.replace(PERCENT, SLASH);
     }
@@ -340,15 +336,41 @@ public class OpenTSDBQueryService implements TSDBQueryService {
         } else {
             dateTime = Instant.ofEpochMilli(timestamp).toString();
         }
-        return ResourceFactory.createTypedLiteral(
-                dateTime, XSDDatatype.XSDdateTime);
+        return ResourceFactory.createTypedLiteral(dateTime,
+                XSDDatatype.XSDdateTime);
     }
 
     private String xsddateTimeToTSDBDateTime(String dateTime) {
         return ZonedDateTime.parse(dateTime, DateTimeFormatter.ISO_DATE_TIME)
-                .format(DateTimeFormatter
-                        .ofPattern("yyyy/MM/dd-HH:mm:ss")
+                .format(DateTimeFormatter.ofPattern("yyyy/MM/dd-HH:mm:ss")
                         .withZone(TimeZone.getTimeZone("UTC").toZoneId()));
+    }
+
+    @Override
+    public Observable<String> queryTimeOfLatestBySystemId(String systemId,
+            List<String> sensorsId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Observable<Model> queryLatestBySystemId(String systemId,
+            List<String> sensorsId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Observable<Model> queryBySystemId(String systemId,
+            List<String> sensorsId, String start, String end) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Observable<Response> remove(JsonArray array) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -1,6 +1,9 @@
 package ru.semiot.services.tsdbservice;
 
 import com.datastax.driver.core.*;
+
+import java.util.List;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +54,7 @@ public class TSDBClient {
 
     private static volatile TSDBClient instance = null;
 
-    Cluster cluster;
+    Cluster cluster; 
     Session session;
 
     private TSDBClient() {
@@ -122,6 +125,16 @@ public class TSDBClient {
 
     public Observable<ResultSet> executeAsync(String query) {
         ResultSetFuture rsf = session.executeAsync(query);
+
+        return Observable.from(rsf);
+    }
+
+    public Observable<ResultSet> executeAsync(List<String> queries) {
+        BatchStatement batch = new BatchStatement();
+        for (String query : queries) {
+            batch.add(new SimpleStatement(query));
+        }
+        ResultSetFuture rsf = session.executeAsync(batch);
 
         return Observable.from(rsf);
     }
