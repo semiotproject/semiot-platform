@@ -6,20 +6,17 @@
 <%@page import="java.util.Iterator"%>
 
 <%
-    String keyType = "@type";
-    String commonSchemaType = "semiot:CommonSchema";
-    String repeatableSchemaType = "semiot:RepeatableSchema";
-
     JsonObject jsonConfig = (JsonObject) session.getAttribute("jsonConfig");
     String pid = jsonConfig.getString("semiot:driverPid");
     JsonArray jsonArray = jsonConfig.getJsonArray("semiot:view");
-    Integer repeatbleMax = jsonConfig.getInt("semiot:maxRepeatableSchemas");
+    Integer repeatbleMax;
+    if (jsonConfig.containsKey("semiot:maxRepeatableSchemas")) {
+        repeatbleMax = jsonConfig.getInt("semiot:maxRepeatableSchemas");
+    } else {
+        repeatbleMax = 0;
+    }
 
     session.setAttribute("pid", pid);
-
-    int j = 0;
-
-    JsonObject repeatbleJson = null;
 %>
 
 <!DOCTYPE html>
@@ -95,7 +92,7 @@
 
             <div class="container well bs-component common-fields"></div>
 
-            <h3>
+            <h3 class="repeatable-configuration-header">
                 <span>Repeatable configuration</span>
                 <button class="btn btn-raised btn-primary btn-lg add-repeatable">Add <i class="fa fa-plus"></i></button>
             </h3>
@@ -439,6 +436,8 @@
             BLOCK_BUILDERS.common();
             if (SCHEMAS.repeatable) {
                 BLOCK_BUILDERS.repeatable();
+            } else {
+                $('.repeatable-configuration-header').hide();
             }
             addEventListeners();
         }
