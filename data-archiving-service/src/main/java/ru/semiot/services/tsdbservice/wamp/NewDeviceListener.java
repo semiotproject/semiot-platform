@@ -2,8 +2,6 @@ package ru.semiot.services.tsdbservice.wamp;
 
 import java.io.StringReader;
 import java.util.LinkedList;
-
-import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.atlas.web.auth.HttpAuthenticator;
 import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
@@ -20,20 +18,16 @@ import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ru.semiot.services.tsdbservice.ServiceConfig;
-import rx.Observer;
-
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.SSNCOM;
+import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
+import rx.Observer;
 
 public class NewDeviceListener implements Observer<String> {
 
     private static final Logger logger = LoggerFactory
             .getLogger(NewDeviceListener.class);
-    private static final ServiceConfig config = ConfigFactory
-            .create(ServiceConfig.class);
     private static final long TIMEOUT = 5000;
     private static final String VAR_TOPIC = "topic";
     private final HttpAuthenticator httpAuthenticator;
@@ -58,8 +52,8 @@ public class NewDeviceListener implements Observer<String> {
                     + "}", SSN.class, SSNCOM.class);
 
     public NewDeviceListener() {
-        httpAuthenticator = new SimpleAuthenticator(config.storeUsername(),
-                config.storePassword().toCharArray());
+        httpAuthenticator = new SimpleAuthenticator(CONFIG.storeUsername(),
+                CONFIG.storePassword().toCharArray());
         subscribeTopics(null);
     }
 
@@ -141,7 +135,7 @@ public class NewDeviceListener implements Observer<String> {
     }
 
     private QueryExecution getQEFromStoredTopics() {
-        return QueryExecutionFactory.sparqlService(config.storeUrl(),
+        return QueryExecutionFactory.sparqlService(CONFIG.storeUrl(),
                 GET_TOPICS_QUERY, httpAuthenticator);
     }
 
@@ -152,7 +146,7 @@ public class NewDeviceListener implements Observer<String> {
         if (iter.hasNext()) {
             Resource system = iter.nextResource();
             return QueryExecutionFactory.sparqlService(
-                    config.storeUrl(),
+                    CONFIG.storeUrl(),
                     GET_TOPIC_BY_URI_QUERY.replace("${SYSTEM_URI}", system.getURI()),
                     httpAuthenticator);
         } else {

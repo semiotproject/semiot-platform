@@ -1,12 +1,10 @@
 package ru.semiot.services.tsdbservice;
 
 import com.datastax.driver.core.*;
-
 import java.util.List;
-
-import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
 import ru.semiot.services.tsdbservice.model.Observation;
 import rx.Observable;
 import rx.Subscriber;
@@ -14,8 +12,6 @@ import rx.Subscriber;
 public class TSDBClient {
 
     private static final Logger logger = LoggerFactory.getLogger(TSDBClient.class);
-    private static final ServiceConfig config = ConfigFactory
-            .create(ServiceConfig.class);
     private static final String CREATE_KEYSPACE =
             "CREATE KEYSPACE IF NOT EXISTS semiot WITH replication = { "
                     + "  'class': 'SimpleStrategy', "
@@ -88,14 +84,14 @@ public class TSDBClient {
     }
 
     public void init() {
-        logger.info("Connecting to {}", config.tsdbUrl());
+        logger.info("Connecting to {}", CONFIG.tsdbUrl());
 
-        cluster = Cluster.builder().addContactPoint(config.tsdbUrl()).build();
+        cluster = Cluster.builder().addContactPoint(CONFIG.tsdbUrl()).build();
         session = cluster.connect();
 
         createTables();
 
-        logger.info("Connected to {}", config.tsdbUrl());
+        logger.info("Connected to {}", CONFIG.tsdbUrl());
     }
 
     private void createTables() {

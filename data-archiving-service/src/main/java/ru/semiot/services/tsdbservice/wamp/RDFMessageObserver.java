@@ -1,18 +1,14 @@
 package ru.semiot.services.tsdbservice.wamp;
 
-import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import ru.semiot.services.tsdbservice.ServiceConfig;
 import rx.Observer;
 
 import java.io.StringReader;
+import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
 
 public abstract class RDFMessageObserver implements Observer<String> {
-
-    private static final ServiceConfig config = ConfigFactory
-            .create(ServiceConfig.class);
 
     @Override
     public void onCompleted() {
@@ -22,7 +18,7 @@ public abstract class RDFMessageObserver implements Observer<String> {
     public void onNext(String message) {
         try {
             Model model = ModelFactory.createDefaultModel().read(
-                    new StringReader(message), null, config.wampMessageFormat());
+                    new StringReader(message), null, CONFIG.wampMessageFormat());
 
             onNext(model);
         } catch (Throwable e) {
