@@ -193,7 +193,7 @@
                 return data;
             },
             checkMaxRepeatableCount: function() {
-                if ($('.repeatable-configurations').length === MAX_REPEATABLE_COUNT) {
+                if ($('.repeatable-configurations > div').length === MAX_REPEATABLE_COUNT) {
                     $('.add-repeatable').attr('disabled', 'disabled');
                 } else {
                     $('.add-repeatable').removeAttr('disabled');
