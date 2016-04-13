@@ -2,16 +2,13 @@ package ru.semiot.services.tsdbservice;
 
 import java.io.IOException;
 import java.net.URI;
-
 import javax.ws.rs.core.UriBuilder;
-
-import org.aeonbits.owner.ConfigFactory;
 import org.eclipse.jetty.server.Server;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
 import ru.semiot.services.tsdbservice.rest.ApplicationConfig;
 import ru.semiot.services.tsdbservice.wamp.NewDeviceListener;
 import ru.semiot.services.tsdbservice.wamp.WAMPClient;
@@ -21,8 +18,6 @@ import ws.wamp.jawampa.WampClient;
 public class Launcher {
     private static final Logger logger = LoggerFactory
             .getLogger(Launcher.class);
-    private static final ServiceConfig config = ConfigFactory
-            .create(ServiceConfig.class);
 
     private static final long TIMEOUT = 5000;
 
@@ -53,17 +48,17 @@ public class Launcher {
             WAMPClient.getInstance().init()
                     .subscribe((WampClient.State newState) -> {
                         if (newState instanceof WampClient.ConnectedState) {
-                            logger.info("Connected to {}", config.wampUri());
+                            logger.info("Connected to {}", CONFIG.wampUri());
 
                             WAMPClient.getInstance()
-                                    .subscribe(config.topicsSubscriber())
+                                    .subscribe(CONFIG.topicsSubscriber())
                                     .subscribe(new NewDeviceListener());
 
                         } else if (newState instanceof WampClient.DisconnectedState) {
                             logger.info("Disconnected from {}",
-                                    config.wampUri());
+                                    CONFIG.wampUri());
                         } else if (newState instanceof WampClient.ConnectingState) {
-                            logger.debug("Connecting to {}", config.wampUri());
+                            logger.debug("Connecting to {}", CONFIG.wampUri());
                         }
                     });
 

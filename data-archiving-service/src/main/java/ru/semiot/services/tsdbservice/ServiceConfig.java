@@ -1,15 +1,18 @@
 package ru.semiot.services.tsdbservice;
 
-import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
 import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.Mutable;
 import org.apache.jena.riot.RDFLanguages;
 
 @LoadPolicy(LoadType.FIRST)
 @Sources({ "file:/semiot-platform/data-archiving-service/config.properties" })
-public interface ServiceConfig extends Config {
+public interface ServiceConfig extends Mutable {
 
+        public static final ServiceConfig CONFIG = ConfigFactory.create(ServiceConfig.class);
+    
 	@DefaultValue("ws://wamprouter:8080/ws")
 	@Key("services.wamp.uri")
 	String wampUri();
@@ -17,6 +20,14 @@ public interface ServiceConfig extends Config {
 	@DefaultValue("realm1")
 	@Key("services.wamp.realm")
 	String wampRealm();
+        
+        @DefaultValue("internal")
+	@Key("services.wamp.login")
+	String wampLogin();
+        
+        @DefaultValue("internal")
+	@Key("services.wamp.password")
+	String wampPassword();
 
 	@DefaultValue("15")
 	// seconds

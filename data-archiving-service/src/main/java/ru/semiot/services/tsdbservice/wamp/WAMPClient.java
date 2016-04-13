@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.semiot.services.tsdbservice.ServiceConfig;
+import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
 import rx.Observable;
 import rx.Subscription;
 import ws.wamp.jawampa.WampClient;
@@ -19,9 +18,7 @@ import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 public class WAMPClient implements Closeable, AutoCloseable {
 
     private static final Logger logger = LoggerFactory
-            .getLogger(WAMPClient.class);
-    private static final ServiceConfig config = ConfigFactory
-            .create(ServiceConfig.class);
+            .getLogger(WAMPClient.class);    
     private static final WAMPClient INSTANCE = new WAMPClient();
     private final HashMap<String, Subscription> subscriptions = new HashMap<>();
     private WampClient client;
@@ -35,9 +32,9 @@ public class WAMPClient implements Closeable, AutoCloseable {
 
     public Observable<WampClient.State> init() throws Exception {
         WampClientBuilder builder = new WampClientBuilder();
-        builder.withUri(config.wampUri()).withRealm(config.wampRealm())
+        builder.withUri(CONFIG.wampUri()).withRealm(CONFIG.wampRealm())
                 .withInfiniteReconnects()
-                .withReconnectInterval(config.wampReconnectInterval(),
+                .withReconnectInterval(CONFIG.wampReconnectInterval(),
                         TimeUnit.SECONDS)
                 .withConnectorProvider(new NettyWampClientConnectorProvider());
         client = builder.build();
