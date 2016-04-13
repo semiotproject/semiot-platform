@@ -162,14 +162,10 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     @Override
     public void registerObservation(Device device, Observation observation) {
         logger.info("Observation [ID={}] is being registered", device.getId());
-
-        String description = TemplateUtils.resolve(
-                observation.toTurtleString(),
-                device.getProperties(),
-                configuration);
-
-        //TODO: There's no guarantee that WAMPClient is connected.
-        WAMPClient.getInstance().publish(device.getId(), description)
+        // TODO: There's no guarantee that WAMPClient is connected.
+        WAMPClient.getInstance().publish(device.getId(),
+                observation.toObservationAsString(device.getProperties(),
+                        configuration, RDFLanguages.JSONLD))
                 .subscribe(WAMPClient.onError());
     }
 

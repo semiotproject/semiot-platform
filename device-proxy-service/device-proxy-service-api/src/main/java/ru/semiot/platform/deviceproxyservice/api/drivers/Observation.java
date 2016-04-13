@@ -1,5 +1,7 @@
 package ru.semiot.platform.deviceproxyservice.api.drivers;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -7,6 +9,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFLanguages;
 
 public abstract class Observation {
 
@@ -35,6 +42,26 @@ public abstract class Observation {
 
     public String toTurtleString() {
         return TemplateUtils.resolve(getRDFTemplate(), properties);
+    }
+    
+    public Model toObservationAsModel(Map<String, String> properties,
+            Configuration configuration) {
+        StringReader descr = new StringReader(TemplateUtils.resolve(toTurtleString(), properties,
+                configuration));
+
+        Model model = ModelFactory.createDefaultModel().read(descr, null,
+                RDFLanguages.strLangTurtle);
+
+        return model;
+    }
+
+    public String toObservationAsString(Map<String, String> properties,
+            Configuration configuration, Lang lang) {
+        StringWriter writer = new StringWriter();
+        toObservationAsModel(properties, configuration).write(writer,
+                lang.getName());
+
+        return writer.toString();
     }
 
     public boolean equalsIgnoreTimestamp(Object o) {

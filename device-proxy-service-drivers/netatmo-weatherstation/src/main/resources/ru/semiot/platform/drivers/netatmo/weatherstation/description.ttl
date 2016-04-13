@@ -15,8 +15,8 @@
 
 <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> a ssn:System, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule ;
-    ssn:hasSubSystem <${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-temperature> ;
-    ssn:hasSubSystem <${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-humidity> ;
+    ssn:hasSubSystem <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature> ;
+    ssn:hasSubSystem <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-humidity> ;
     dcterms:identifier "${ru.semiot.platform.device.id}"^^xsd:string ;
     geo:location [
 	a geo:Point ;
@@ -26,13 +26,13 @@
     ] ;
     .
 
-<${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-temperature>
+<${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature>
     a ssn:SensingDevice, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-TemperatureSensor ;
     dcterms:identifier "${ru.semiot.platform.device.id}-temperature"^^xsd:string ;
     .
 
-<${ru.semiot.platform.sensors_uri_prefix}/${ru.semiot.platform.device.id}-humidity>
+<${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-humidity>
     a ssn:SensingDevice, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-HumiditySensor ;
     dcterms:identifier "${ru.semiot.platform.device.id}-humidity"^^xsd:string ;

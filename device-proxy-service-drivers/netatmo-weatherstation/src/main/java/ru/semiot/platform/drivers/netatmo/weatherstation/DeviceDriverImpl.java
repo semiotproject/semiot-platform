@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
@@ -37,7 +37,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule"));
     ; 
 
-    private volatile DeviceManager deviceManager;
+    private volatile DeviceDriverManager deviceManager;
 
     private ScheduledExecutorService scheduler;
     private List<ScheduledFuture> handles = null;

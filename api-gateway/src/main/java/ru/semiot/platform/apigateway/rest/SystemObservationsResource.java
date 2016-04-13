@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -91,7 +92,7 @@ public class SystemObservationsResource {
                     .subscribe((rs) -> {
                         tsdbQuery.queryTimeOfLatestBySystemId(systemId,
                                 rsToList(rs)).map((result) -> {
-                                    if (result != null) {
+                                    if (StringUtils.isNotBlank(result)) {
                                         response.resume(Response
                                                 .seeOther(UriBuilder
                                                         .fromUri(root)

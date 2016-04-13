@@ -108,7 +108,7 @@ public class Launcher {
                 logger.info("Started [{}:{}]. Current state: {}",
                         bundle.getSymbolicName(), bundle.getVersion(), bundle.getState());
             }
-
+            logger.info("All bundles started!");
             framework.waitForStop(0);
             System.exit(0);
         } catch (BundleException | InterruptedException ex) {
