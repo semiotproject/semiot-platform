@@ -4,6 +4,10 @@
          id="ru.semiot.platform.deviceproxyservice.manager">
         <AD name="WAMP URI" id="ru.semiot.platform.deviceproxyservice.manager.wamp_uri"
             required="false" type="String" default="ws://wamprouter:8080/ws"/>
+        <AD name="WAMP login" id="ru.semiot.platform.deviceproxyservice.manager.wamp_login"
+            required="false" type="String" default="internal"/>
+        <AD name="WAMP password" id="ru.semiot.platform.deviceproxyservice.manager.wamp_password"
+            required="true" type="String" default="internal"/>
         <AD name="WAMP Realm" id="ru.semiot.platform.deviceproxyservice.manager.wamp_realm"
             required="false" type="String" default="realm1"/>
         <AD name="WAMP Reconnect interval" id="ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect"

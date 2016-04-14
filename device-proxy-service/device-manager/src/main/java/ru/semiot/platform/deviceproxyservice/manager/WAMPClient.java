@@ -12,6 +12,7 @@ import rx.observers.SafeSubscriber;
 import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
+import ws.wamp.jawampa.auth.client.Ticket;
 import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 public class WAMPClient implements Closeable, AutoCloseable {
@@ -43,7 +44,8 @@ public class WAMPClient implements Closeable, AutoCloseable {
     }
 
     public Observable<WampClient.State> init(
-            String wampUri, String wampRealm, int wampReconnectInterval) 
+            String wampUri, String wampRealm, int wampReconnectInterval,
+            String authId, String ticket) 
             throws Exception  {
         WampClientBuilder builder = new WampClientBuilder();
         builder.withConnectorProvider(new NettyWampClientConnectorProvider())
@@ -51,7 +53,9 @@ public class WAMPClient implements Closeable, AutoCloseable {
                 .withRealm(wampRealm)
                 .withInfiniteReconnects()
                 .withReconnectInterval(wampReconnectInterval,
-                        TimeUnit.SECONDS);
+                        TimeUnit.SECONDS)
+                .withAuthId(authId)
+                .withAuthMethod(new Ticket(ticket));
         client = builder.build();
         client.open();
         return client.statusChanged();

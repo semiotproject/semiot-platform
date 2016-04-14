@@ -5,7 +5,7 @@ from twisted.internet.defer import inlineCallbacks
 from autobahn.twisted.wamp import ApplicationSession
 from autobahn.wamp.exception import ApplicationError
 
-cnx = mysql.connector.connect(user='root', password='', host='demo.semiot.ru', database='semiot')
+cnx = mysql.connector.connect(user='root', password='', host='mysqlbase', database='semiot')
 
 query = ("SELECT role FROM credentials WHERE login=%s AND password=%s LIMIT 1")
 query_id = ("SELECT id FROM credentials WHERE login=%s AND password=%s LIMIT 1")

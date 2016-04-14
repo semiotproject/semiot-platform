@@ -7,6 +7,8 @@ public class Keys {
     public static final String WAMP_URI = "ru.semiot.platform.deviceproxyservice.manager.wamp_uri";
     public static final String WAMP_REALM = "ru.semiot.platform.deviceproxyservice.manager.wamp_realm";
     public static final String WAMP_RECONNECT = "ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect";
+    public static final String WAMP_LOGIN = "ru.semiot.platform.deviceproxyservice.manager.wamp_login";
+    public static final String WAMP_PASSWORD = "ru.semiot.platform.deviceproxyservice.manager.wamp_password";
     public static final String FUSEKI_PASSWORD = "ru.semiot.platform.deviceproxyservice.manager.fuseki_pass";
     public static final String FUSEKI_USERNAME = "ru.semiot.platform.deviceproxyservice.manager.fuseki_username";
     public static final String FUSEKI_UPDATE_URL = "ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url";

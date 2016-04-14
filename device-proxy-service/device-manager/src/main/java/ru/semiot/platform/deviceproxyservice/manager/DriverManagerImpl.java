@@ -44,7 +44,9 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
                     .getInstance()
                     .init(configuration.get(Keys.WAMP_URI),
                             configuration.get(Keys.WAMP_REALM),
-                            configuration.getAsInteger(Keys.WAMP_RECONNECT))
+                            configuration.getAsInteger(Keys.WAMP_RECONNECT),
+                            configuration.get(Keys.WAMP_LOGIN),
+                            configuration.get(Keys.WAMP_PASSWORD))
                     .subscribe(
                             (WampClient.State newState) -> {
                                 if (newState instanceof WampClient.ConnectedState) {
@@ -85,6 +87,8 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
                     configuration.put(Keys.WAMP_URI, "ws://wamprouter:8080/ws");
                     configuration.put(Keys.WAMP_REALM, "realm1");
                     configuration.put(Keys.WAMP_RECONNECT, "15");
+                    configuration.put(Keys.WAMP_LOGIN, "internal");
+                    configuration.put(Keys.WAMP_PASSWORD, "internal");
                     configuration.put(Keys.TOPIC_NEWANDOBSERVING,
                             "ru.semiot.devices.newandobserving");
                     configuration.put(Keys.TOPIC_INACTIVE,
