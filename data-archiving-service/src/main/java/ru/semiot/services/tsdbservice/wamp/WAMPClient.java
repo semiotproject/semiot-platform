@@ -13,6 +13,7 @@ import rx.Observable;
 import rx.Subscription;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
+import ws.wamp.jawampa.auth.client.Ticket;
 import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 public class WAMPClient implements Closeable, AutoCloseable {
@@ -36,7 +37,9 @@ public class WAMPClient implements Closeable, AutoCloseable {
                 .withInfiniteReconnects()
                 .withReconnectInterval(CONFIG.wampReconnectInterval(),
                         TimeUnit.SECONDS)
-                .withConnectorProvider(new NettyWampClientConnectorProvider());
+                .withConnectorProvider(new NettyWampClientConnectorProvider())
+                .withAuthId(CONFIG.wampLogin())
+                .withAuthMethod(new Ticket(CONFIG.wampPassword()));
         client = builder.build();
         client.open();
         return client.statusChanged();

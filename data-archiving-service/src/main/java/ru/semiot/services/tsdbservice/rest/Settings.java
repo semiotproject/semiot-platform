@@ -20,8 +20,12 @@ public class Settings {
         JSONObject json = new JSONObject(str);
         String pass = json.optString("services.wamp.password");
         CONFIG.setProperty("services.wamp.password", pass);
+        String prefix = json.optString("services.sensors.uri.prefix");
+        if(!prefix.endsWith("/"))
+            prefix += "/";
+        CONFIG.setProperty("services.sensors.uri.prefix", prefix);
         if(json.has("services.wamp.login")){
-            CONFIG.setProperty("services.wamp.login", pass);
+            CONFIG.setProperty("services.wamp.login", json.getString("services.wamp.login"));
         }
     }
 }

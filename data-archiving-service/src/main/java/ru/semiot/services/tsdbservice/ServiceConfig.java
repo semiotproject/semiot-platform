@@ -61,4 +61,8 @@ public interface ServiceConfig extends Mutable {
 	@DefaultValue("pw")
 	@Key("services.fuseki.store.password")
 	String storePassword();
+        
+        @DefaultValue("http://localhost/")
+	@Key("services.sensors.uri.prefix")
+	String sensorsURIPrefix();
 }

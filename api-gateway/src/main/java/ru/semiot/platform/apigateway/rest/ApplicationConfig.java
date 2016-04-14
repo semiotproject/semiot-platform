@@ -17,13 +17,10 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(ru.semiot.platform.apigateway.rest.RootResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SensorResource.class);
-        resources.add(ru.semiot.platform.apigateway.rest.SystemResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SubSystemResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SystemActuationsResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SystemObservationsResource.class);
-
-        //Providers
-        resources.add(ru.semiot.commons.restapi.ZoneDateTimeProvider.class);
+        resources.add(ru.semiot.platform.apigateway.rest.SystemResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.providers.ModelMessageBodyReader.class);
     }
     

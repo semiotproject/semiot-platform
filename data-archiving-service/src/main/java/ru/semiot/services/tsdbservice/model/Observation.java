@@ -10,10 +10,11 @@ import javax.validation.constraints.NotNull;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
 
 public class Observation {
 
-    private static final String SENSOR_URI_PREFIX = "http://localhost/sensors/";
+    private static final String SENSOR_URI_PREFIX = CONFIG.sensorsURIPrefix() + "sensors/";
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ");
 
     private final String sensorId;

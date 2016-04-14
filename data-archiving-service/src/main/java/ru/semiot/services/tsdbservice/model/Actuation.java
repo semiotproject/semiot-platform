@@ -12,10 +12,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
 
 public class Actuation {
 
-    private static final String SENSOR_URI_PREFIX = "http://localhost/systems/";
+    private static final String SENSOR_URI_PREFIX = CONFIG.sensorsURIPrefix() + "systems/";
     private final String systemId;
     private final ZonedDateTime eventTime;
     private final String type;
