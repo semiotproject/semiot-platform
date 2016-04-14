@@ -7,15 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static ru.semiot.services.analyzing.ServiceConfig.config;
 import rx.Observable;
-import ws.wamp.jawampa.ApplicationError;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
+import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 public class WAMPClient implements Closeable, AutoCloseable {
 
     private static final Logger logger = LoggerFactory
             .getLogger(WAMPClient.class);
-    private static final WAMPClient INSTANCE = new WAMPClient();
+    private static final WAMPClient INSTANCE = new WAMPClient();   
     private WampClient client;
 
     private WAMPClient() {
@@ -25,9 +25,10 @@ public class WAMPClient implements Closeable, AutoCloseable {
         return INSTANCE;
     }
 
-    public Observable<WampClient.Status> init() throws ApplicationError {
+    public Observable<WampClient.State> init() throws Exception {
         WampClientBuilder builder = new WampClientBuilder();
-        builder.withUri(config.wampUri())
+        builder.withConnectorProvider(new NettyWampClientConnectorProvider())
+                .withUri(config.wampUri())
                 .withRealm(config.wampRealm())
                 .withInfiniteReconnects()
                 .withReconnectInterval(config.wampReconnectInterval(),

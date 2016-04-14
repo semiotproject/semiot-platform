@@ -1,14 +1,14 @@
 package ru.semiot.platform.drivers.netatmo.temperature;
 
-import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStationObservation;
-import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStation;
-import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStationFactory;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Test;
+import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStation;
+import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStationFactory;
+import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStationObservation;
 
 public class WeatherStationFactoryTest {
 
@@ -60,7 +60,7 @@ public class WeatherStationFactoryTest {
         WeatherStationFactory wsFactory = new WeatherStationFactory(DRIVER_PID);
 
         List<WeatherStationObservation> actual = wsFactory.parseObservations(
-                new JSONArray(JSON_DEVICES));
+                new JSONArray(JSON_DEVICES), false);
 
         List<WeatherStationObservation> expected = new ArrayList<>();
         WeatherStationObservation one = new WeatherStationObservation(

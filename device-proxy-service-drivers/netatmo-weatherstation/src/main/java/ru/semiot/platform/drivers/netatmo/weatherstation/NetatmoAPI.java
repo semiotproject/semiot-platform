@@ -40,6 +40,8 @@ public class NetatmoAPI {
     private static final String LONGITUDE_SOUTH_WEST_KEY = "lon_sw";
     private static final String ERROR_KEY = "error";
     private static final String ERROR_INVALID_GRANT = "invalid grant";
+    private static final String ERROR_INVALID_ACCESS_TOKEN = "Invalid access token";
+    private static final String ERROR_ACCESS_TOKEN_EXPIRED = "Access token expired";
     private static final String BODY_KEY = "body";
 
     private final String client_app_id;
@@ -139,6 +141,7 @@ public class NetatmoAPI {
             String lat_sw, String lon_sw) 
             throws JSONException {
         if(isEmpty(lat_ne, lon_ne, lat_sw, lon_sw)) {
+            logger.warn("Empty area values: lat_ne: {}, lon_ne: {}, lat_sw: {}, lon_sw: {}", lat_ne, lon_ne, lat_sw, lon_sw);
             return null;
         }
         
@@ -161,7 +164,7 @@ public class NetatmoAPI {
                 return new JSONObject(EntityUtils.toString(response.getEntity()))
                         .getJSONArray(BODY_KEY);
             } else {
-                if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+                if (statusCode == HttpStatus.SC_BAD_REQUEST || statusCode == HttpStatus.SC_FORBIDDEN) {
                     logger.warn(
                             "Failed to \"getpublicdata\"! URL: {}, Status: {}, Message: {}.", 
                             uri, response.getStatusLine(), EntityUtils.toString(response.getEntity()));
@@ -169,7 +172,9 @@ public class NetatmoAPI {
                         JSONObject msg = new JSONObject(
                                 EntityUtils.toString(response.getEntity()));
 
-                        if (msg.optString(ERROR_KEY).equals(ERROR_INVALID_GRANT)) {
+                        if (msg.optString(ERROR_KEY).equals(ERROR_INVALID_GRANT) 
+                                || msg.optString(ERROR_KEY).contains(ERROR_INVALID_ACCESS_TOKEN)
+                                || msg.optString(ERROR_KEY).contains(ERROR_ACCESS_TOKEN_EXPIRED)) {
                             logger.debug("Looks like access_token expired. Refreshing.");
                             
                             if(_authenticate()) {
@@ -182,6 +187,10 @@ public class NetatmoAPI {
                     } catch (JSONException ex) {
                         logger.warn(ex.getMessage(), ex);
                     }
+                }
+                else{
+                    logger.warn("Failed to \"getpublicdata\"! Unrecognized response code. URL: {}, Status: {}, Message: {}.", 
+                            uri, response.getStatusLine(), EntityUtils.toString(response.getEntity()));
                 }
             }
         } catch (IOException | URISyntaxException ex) {

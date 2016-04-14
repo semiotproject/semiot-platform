@@ -61,7 +61,7 @@ public class WeatherStationFactory {
         return false;
     }
 
-    private WeatherStationObservation findObservation(JSONObject device, String deviceId, String type)
+    private WeatherStationObservation findObservation(JSONObject device, String deviceId, String type, String tmstmp)
             throws JSONException {
         JSONObject obj = device.getJSONObject(MEASURES_KEY);
 
@@ -78,7 +78,8 @@ public class WeatherStationFactory {
                     String value = String.valueOf(obj.getJSONObject(sensorId)
                             .getJSONObject(RES_KEY).getJSONArray(timestamp)
                             .getDouble(index));
-
+                    if(tmstmp!=null && !tmstmp.isEmpty())
+                        timestamp = tmstmp;
                     return new WeatherStationObservation(
                             deviceId, timestamp, value, type);
                 }
@@ -121,9 +122,14 @@ public class WeatherStationFactory {
         return stations;
     }
 
-    public List<WeatherStationObservation> parseObservations(JSONArray devices) {
+    public List<WeatherStationObservation> parseObservations(JSONArray devices, boolean appendCurTimestamp) {
         List<WeatherStationObservation> observations = new ArrayList<>();
-
+        String timestamp = null;
+        if(appendCurTimestamp){
+            timestamp = String.valueOf(System.currentTimeMillis());
+            timestamp = timestamp.substring(0, timestamp.length()-3);
+        }
+        
         for (int i = 0; i < devices.length(); i++) {
             try {
                 JSONObject device = devices.getJSONObject(i);
@@ -131,10 +137,10 @@ public class WeatherStationFactory {
                 String id = hash(driverName, device.getString(ID_KEY));
 
                 WeatherStationObservation temperature = findObservation(
-                        device, id, WeatherStationObservation.TEMPERATURE_TYPE);
+                        device, id, WeatherStationObservation.TEMPERATURE_TYPE, timestamp);
 
                 WeatherStationObservation humidity = findObservation(
-                        device, id, WeatherStationObservation.HUMIDITY_TYPE);
+                        device, id, WeatherStationObservation.HUMIDITY_TYPE, timestamp);
 
                 if (temperature != null && humidity != null) {
                     observations.add(temperature);

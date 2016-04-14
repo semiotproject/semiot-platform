@@ -123,6 +123,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         List<Configuration> conf = new ArrayList<>();
         for (int i : counts) {
             Configuration cfg = getAreaConfiguration(i);
+            cfg.put(Keys.ONLY_NEW_OBS, configuration.get(Keys.ONLY_NEW_OBS));
             conf.add(cfg);
         }
         return conf;
@@ -240,6 +241,13 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             config.put(Keys.PASSWORD, configuration.get(Keys.PASSWORD));
             config.put(Keys.POLLING_START_PAUSE, configuration.get(Keys.POLLING_START_PAUSE));
             config.put(Keys.POLLING_INTERVAL, configuration.get(Keys.POLLING_INTERVAL));
+            if (configuration.get(Keys.ONLY_NEW_OBS).equalsIgnoreCase("true")
+                    || configuration.get(Keys.ONLY_NEW_OBS).equalsIgnoreCase("false")) {
+                config.put(Keys.ONLY_NEW_OBS, configuration.get(Keys.ONLY_NEW_OBS));
+            }
+            else{
+                throw new java.lang.NullPointerException();
+            }
         }
         catch (java.lang.NullPointerException ex) {
             logger.error("Bad common configuration! Can not extract fields");

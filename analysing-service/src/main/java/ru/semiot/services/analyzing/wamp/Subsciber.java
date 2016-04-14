@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.ServiceConfig;
 import rx.Subscription;
-import ws.wamp.jawampa.ApplicationError;
 
 @ApplicationScoped
 @Named
@@ -44,7 +43,7 @@ public class Subsciber {
         try {
             wampClient.init();
             listTopics = new HashMap<>();
-        } catch (ApplicationError ex) {
+        } catch (Exception ex) {
             logger.error("Something went wrong! " + ex.getMessage());
         }
     }

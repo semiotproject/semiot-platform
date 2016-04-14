@@ -95,7 +95,7 @@ public class DefaultEventsDataBase implements EventsDataBase {
             JSONArray arr = new JSONArray();
             List<Events> list = em.createNamedQuery("Events.findByTime", Events.class).setParameter("st_time", new Date(start)).setParameter("end_time", new Date (end)).setParameter("id", q).getResultList();
             if(list == null)
-                return null;
+                return arr;
             for (Events e : list) {
                 arr.put(new JSONObject(e.toString()));
             }
