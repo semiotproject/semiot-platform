@@ -12,7 +12,6 @@ import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.AsyncContext;
@@ -27,7 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.semiot.platform.apigateway.OSGiApiService;
+import ru.semiot.platform.apigateway.beans.impl.OSGiApiService;
 import rx.Observable;
 
 @WebServlet(urlPatterns = "/config/ConfigurationDriver", asyncSupported = true)

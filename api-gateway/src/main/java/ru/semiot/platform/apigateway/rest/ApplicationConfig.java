@@ -14,17 +14,17 @@ public class ApplicationConfig extends Application {
         return resources;
     }
 
-    /**
-     * Do not modify addRestResourceClasses() method.
-     * It is automatically populated with
-     * all resources defined in the project.
-     * If required, comment out calling this method in getClasses().
-     */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(ru.semiot.platform.apigateway.rest.ObservationsResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.RootResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SensorResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SystemResource.class);
+        resources.add(ru.semiot.platform.apigateway.rest.SubSystemResource.class);
+        resources.add(ru.semiot.platform.apigateway.rest.SystemActuationsResource.class);
+        resources.add(ru.semiot.platform.apigateway.rest.SystemObservationsResource.class);
+
+        //Providers
+        resources.add(ru.semiot.commons.restapi.ZoneDateTimeProvider.class);
+        resources.add(ru.semiot.platform.apigateway.rest.providers.ModelMessageBodyReader.class);
     }
     
 }

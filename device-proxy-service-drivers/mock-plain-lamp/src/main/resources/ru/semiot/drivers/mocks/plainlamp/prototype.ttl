@@ -1,0 +1,50 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
+@prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
+@prefix qudt-quantity-ext: <http://w3id.org/qudt/vocab/quantity/ext#> .
+@prefix qudt-unit: <http://qudt.org/vocab/unit#> .
+@prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
+@prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
+@prefix san: <https://www.irit.fr/recherches/MELODI/ontologies/SAN#> .
+@prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/support_actuators/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
+
+:PlainLamp a ssn:System, proto:Prototype ;
+  rdfs:label "A plain lamp"^^xsd:string ;
+  ssn:hasSubSystem :PlainLamp-Actuator ;
+  semiot:hasOperation :PlainLamp-Shine ;
+  semiot:hasOperation :PlainLamp-Idle ;
+  semiot:supportedCommand :PlainLamp-Command-Switch-Operation .
+
+:PlainLamp-Command-Switch-Operation a semiot:SwitchOperationCommand ;
+  semiot:supportedOperation :PlainLamp-Shine ;
+  semiot:supportedOperation :PlainLamp-Idle .
+
+:PlainLamp-Shine a semiot:ActuationOperation ;
+  dul:involvesAgent :PlainLamp-Actuator .
+
+:PlainLamp-Idle a semiot:IdleOperation .
+
+:PlainLamp-Actuator a san:ActuatingDevice, proto:Prototype ;
+  san:actsOn qudt-quantity:LuminousFlux ;
+  san:actsOn qudt-quantity-ext:CorrelatedColorTemperature ;
+  san:hasActuatingCapability [
+    a san:ActuatingCapability ;
+    ssn:forProperty qudt-quantity:LuminousFlux ;
+    san:hasActuatingProperty [
+      a san:ActuatingProperty, semiot:FixedValueOfActuatingProperty ;
+      dul:hasDataValue "850"^^xsd:integer ;
+      dul:isClassifiedBy qudt-unit:Lumen
+    ] ;
+  ] ;
+  san:hasActuatingCapability [
+    a san:ActuatingCapability ;
+    ssn:forProperty qudt-quantity-ext:CorrelatedColorTemperature ;
+    san:hasActuatingProperty [
+      a san:ActuatingProperty, semiot:FixedValueOfActuatingProperty ;
+      dul:hasDataValue "4000"^^xsd:integer ;
+      dul:isClassifiedBy qudt-unit:Kelvin
+    ] ;
+  ] ;
+.

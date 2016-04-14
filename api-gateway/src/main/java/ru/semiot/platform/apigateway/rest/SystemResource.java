@@ -1,79 +1,76 @@
 package ru.semiot.platform.apigateway.rest;
 
-import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.utils.JsonUtils;
+import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+
 import org.aeonbits.owner.ConfigFactory;
-import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.commons.namespaces.SSN;
-import ru.semiot.platform.apigateway.ContextProvider;
-import ru.semiot.platform.apigateway.SPARQLQueryService;
+
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.utils.JsonUtils;
+
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
+import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.VOID;
+import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
-import ru.semiot.platform.apigateway.TSDBQueryService;
+import ru.semiot.platform.apigateway.beans.TSDBQueryService;
+import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
+import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
-import static ru.semiot.platform.apigateway.rest.ResourceHelper.*;
 
 @Path("/systems")
 @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
 @Stateless
 public class SystemResource {
 
-    private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
-    private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
-    private static final String QUERY_GET_ALL_SYSTEMS
-            = "SELECT DISTINCT ?uri ?id ?prototype {"
+    private static final ServerConfig config = ConfigFactory
+            .create(ServerConfig.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(SystemResource.class);
+    private static final String QUERY_GET_ALL_SYSTEMS = "SELECT DISTINCT ?uri ?id ?prototype {"
             + " ?uri a ssn:System, proto:Individual ;"
             + "     dcterms:identifier ?id ;"
-            + "     proto:hasPrototype ?prototype ."
-            + "}";
-    private static final String QUERY_GET_SYSTEM_PROTOTYPES
-            = "SELECT DISTINCT ?prototype {"
+            + "     proto:hasPrototype ?prototype ." + "}";
+    private static final String QUERY_GET_SYSTEM_PROTOTYPES = "SELECT DISTINCT ?prototype {"
             + " ?uri a ssn:System, proto:Individual ;"
-            + "     proto:hasPrototype ?prototype ."
-            + "}";
-    private static final String QUERY_DESCRIBE_SYSTEM
-            = "CONSTRUCT {"
-            + "  ?system ?p ?o ."
-            + "  ?o ?o_p ?o_o ."
-            + "} WHERE {"
+            + "     proto:hasPrototype ?prototype ." + "}";
+    private static final String QUERY_DESCRIBE_SYSTEM = "CONSTRUCT {"
+            + "  ?system ?p ?o ." + "  ?o ?o_p ?o_o ." + "} WHERE {"
             + "  ?system ?p ?o ;"
             + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
-            + "  OPTIONAL {"
-            + "    ?o ?o_p ?o_o ."
-            + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"
-            + "  }"
+            + "  OPTIONAL {" + "    ?o ?o_p ?o_o ."
+            + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))" + "  }"
             + "}";
 
     private static final String VAR_URI = "uri";
@@ -85,13 +82,10 @@ public class SystemResource {
 
     @Inject
     private SPARQLQueryService sparqlQuery;
-
     @Inject
     private TSDBQueryService tsdbQuery;
-
     @Inject
     private ContextProvider contextProvider;
-
     @Context
     private UriInfo uriInfo;
 
@@ -99,17 +93,19 @@ public class SystemResource {
     public void listSystems(@Suspended final AsyncResponse response)
             throws JsonLdError, IOException {
         URI root = uriInfo.getRequestUri();
-        final Model model = contextProvider.getRDFModel(
-                ContextProvider.SYSTEM_COLLECTION, root);
-        final Map<String, Object> frame = contextProvider.getFrame(
-                ContextProvider.SYSTEM_COLLECTION, root);
+        final Model model = contextProvider
+                .getRDFModel(ContextProvider.SYSTEM_COLLECTION, root);
+        final Map<String, Object> frame = contextProvider
+                .getFrame(ContextProvider.SYSTEM_COLLECTION, root);
 
-        Observable<Void> prototypes = sparqlQuery.select(QUERY_GET_SYSTEM_PROTOTYPES)
-                .map((ResultSet rs) -> {
+        Observable<Void> prototypes = sparqlQuery
+                .select(QUERY_GET_SYSTEM_PROTOTYPES).map((ResultSet rs) -> {
                     while (rs.hasNext()) {
-                        Resource prototype = rs.next().getResource(VAR_PROTOTYPE);
-                        Resource prototypeResource = ResourceUtils.createResourceFromClass(
-                                root, prototype.getLocalName());
+                        Resource prototype = rs.next()
+                                .getResource(VAR_PROTOTYPE);
+                        Resource prototypeResource = ResourceUtils
+                                .createResourceFromClass(root,
+                                        prototype.getLocalName());
                         Resource collection = model.listResourcesWithProperty(
                                 RDF.type, Hydra.Collection).next();
 
@@ -131,8 +127,9 @@ public class SystemResource {
                         Resource collection = model.listResourcesWithProperty(
                                 RDF.type, Hydra.Collection).next();
                         model.add(collection, Hydra.member, system);
-                        model.add(system, RDF.type, ResourceUtils.createResourceFromClass(
-                                        root, prototype.getLocalName()));
+                        model.add(system, RDF.type,
+                                ResourceUtils.createResourceFromClass(root,
+                                        prototype.getLocalName()));
                     }
 
                     try {
@@ -150,109 +147,47 @@ public class SystemResource {
 
     @GET
     @Path("{id}")
-    public void getSystem(
-            @Suspended final AsyncResponse response,
+    public void getSystem(@Suspended final AsyncResponse response,
             @PathParam("id") String id) throws URISyntaxException, IOException {
         URI root = uriInfo.getRequestUri();
         Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_SINGLE,
                 MapBuilder.newMap()
-                .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
-                .put(ContextProvider.VAR_SYSTEM_ID, id)
-                .build());
-        Map<String, Object> frame = contextProvider.getFrame(
-                ContextProvider.SYSTEM_SINGLE, root);
+                        .put(ContextProvider.VAR_ROOT_URL,
+                                URIUtils.extractRootURL(root))
+                        .put(ContextProvider.VAR_SYSTEM_ID, id).build());
+        Map<String, Object> frame = contextProvider
+                .getFrame(ContextProvider.SYSTEM_SINGLE, root);
 
         sparqlQuery.describe(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id))
                 .map((Model result) -> {
                     model.add(result);
                     try {
-                        Resource system = RDFUtils.listResourcesWithProperty(
-                                model, RDF.type, SSN.System, Proto.Individual)
-                        .get(FIRST);
-                        Resource prototype = model.listObjectsOfProperty(
-                                system, Proto.hasPrototype).next().asResource();
-                        Resource prototypeResource = ResourceUtils
-                        .createResourceFromClass(root, prototype.getLocalName());
-                        model.add(system, RDF.type, prototypeResource);
+                        List<Resource> list = RDFUtils
+                                .listResourcesWithProperty(model, RDF.type,
+                                        SSN.System, Proto.Individual);
+                        if (!list.isEmpty()) {
+                            Resource system = RDFUtils
+                                    .listResourcesWithProperty(model, RDF.type,
+                                            SSN.System, Proto.Individual)
+                                    .get(FIRST);
+                            Resource prototype = model
+                                    .listObjectsOfProperty(system,
+                                            Proto.hasPrototype)
+                                    .next().asResource();
+                            Resource prototypeResource = ResourceUtils
+                                    .createResourceFromClass(root,
+                                            prototype.getLocalName());
+                            model.add(system, RDF.type, prototypeResource);
 
-                        return JsonUtils.toPrettyString(
-                                RDFUtils.toJsonLdCompact(model, frame));
-                    } catch (JsonLdError | IOException ex) {
+                            return JsonUtils.toPrettyString(
+                                    RDFUtils.toJsonLdCompact(model, frame));
+                        } else {
+                            throw new WebApplicationException(
+                                    Response.Status.NOT_FOUND);
+                        }
+                    } catch (Exception ex) {
                         throw Exceptions.propagate(ex);
                     }
                 }).subscribe(resume(response));
     }
-
-    @GET
-    @Path("{id}/observations")
-    public void observations(@Suspended final AsyncResponse response,
-            @PathParam("id") String systemId,
-            @QueryParam("start") String start,
-            @QueryParam("end") String end)
-            throws IOException {
-        URI root = uriInfo.getRequestUri();
-        Map params = MapBuilder.newMap()
-                .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
-                .put(ContextProvider.VAR_WAMP_URL, config.wampUri())
-                .put(ContextProvider.VAR_SYSTEM_ID, systemId)
-                .build();
-        if (Strings.isNullOrEmpty(start)) {
-            tsdbQuery.queryTimeOfLatestBySystemId(systemId).subscribe((result) -> {
-                if (result != null) {
-                    response.resume(Response.seeOther(UriBuilder.fromUri(root)
-                            .queryParam("start", result)
-                            .build())
-                            .build());
-                } else {
-                    try {
-                        Map<String, Object> frame = contextProvider.getFrame(
-                                ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, root);
-                        params.put(ContextProvider.VAR_QUERY_PARAMS, "?noparams");
-                        Model model = contextProvider.getRDFModel(
-                                ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, params);
-                        Resource view = RDFUtils.subjectWithProperty(
-                                model, RDF.type, Hydra.PartialCollectionView);
-                        model.remove(view, null, null);
-
-                        response.resume(JsonUtils.toPrettyString(
-                                RDFUtils.toJsonLdCompact(model, frame)));
-                    } catch (Throwable ex) {
-                        response.resume(ex);
-                    }
-                }
-            }, resumeOnError(response));
-        } else {
-            Map<String, Object> frame = contextProvider.getFrame(
-                    ContextProvider.SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION, root);
-            
-            String queryParams = "?start=" + start;
-            if(!Strings.isNullOrEmpty(end)) {
-                queryParams += "&end=" + end;
-            }
-            params.put(ContextProvider.VAR_QUERY_PARAMS, queryParams);
-            
-            Model model = contextProvider.getRDFModel(
-                    ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, params);
-            tsdbQuery.queryBySystemId(systemId, start, end).map((result) -> {
-                model.add(result);
-                Resource collection = model.listSubjectsWithProperty(
-                        RDF.type, Hydra.PartialCollectionView).next();
-                ResIterator iter = model.listSubjectsWithProperty(RDF.type, SSN.Observaton);
-                while (iter.hasNext()) {
-                    Resource obs = iter.next();
-                    model.add(collection, Hydra.member, obs);
-                }
-                try {
-                    return JsonUtils.toPrettyString(
-                            RDFUtils.toJsonLdCompact(model, frame));
-                } catch (JsonLdError | IOException ex) {
-                    throw Exceptions.propagate(ex);
-                }
-            }).map((json) -> {
-                return Response.ok(json)
-                        .build();
-            }).subscribe(resume(response));
-        }
-    }
-
 }

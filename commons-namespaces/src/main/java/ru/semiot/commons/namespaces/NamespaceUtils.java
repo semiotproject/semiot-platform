@@ -1,6 +1,8 @@
 package ru.semiot.commons.namespaces;
 
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +18,9 @@ public class NamespaceUtils {
     private static final String FIELD_PREFIX = "PREFIX";
     private static final String FIELD_URI = "URI";
     private static final String FIELD_NS = "NS";
+    private static final String GRID = "#";
+    private static final String SLASH = "/";
+    private static final String PROTOCOL_DELIMITER = "://";
 
     private static StringBuilder _toSPARQLPrologue(Class... namespaces) {
         StringBuilder builder = new StringBuilder();
@@ -66,7 +71,7 @@ public class NamespaceUtils {
 
     /**
      * Generates prologue for SPARQL queries.
-     *
+     * <p>
      * {@code namespaces} must have a public static field named {@code uri} or
      * {@code ns} (ignoring case) which is {@code String} containing the uri of
      * the namespace.
@@ -80,6 +85,29 @@ public class NamespaceUtils {
 
     public static String newSPARQLQuery(String query, Class... namespaces) {
         return _toSPARQLPrologue(namespaces).append(query).toString();
+    }
+
+    public static String extractLocalName(String uri) {
+        return extractLocalName(URI.create(uri));
+    }
+
+    public static String extractLocalName(URI uri) {
+        String uriString = uri.toASCIIString()
+                .replace(uri.getScheme() + PROTOCOL_DELIMITER + uri.getHost(), "");
+        int index;
+        if (uriString.contains(GRID)) {
+            index = uriString.indexOf(GRID) + 1;
+        } else if (uriString.contains(SLASH)) {
+            index = uriString.lastIndexOf(SLASH) + 1;
+        } else {
+            return null;
+        }
+
+        if (uriString.length() > index) {
+            return uriString.substring(index);
+        } else {
+            return null;
+        }
     }
 
 }

@@ -7,7 +7,7 @@ wamprouter:
 dataarchivingservice:
   image: docker.semiot.ru/data-archiving-service
   links:
-    - opentsdb
+    - tsdb
     - wamprouter
     - deviceproxyservice
   ports:
@@ -15,15 +15,13 @@ dataarchivingservice:
   volumes:
     - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
-
-opentsdb:
-  image: docker.semiot.ru/opentsdb
-  links:
-    - hbase
+  
+tsdb:
+  image: cassandra:3.3
   ports:
-    - "4242:4242"
+    - "9042:9042"
   volumes:
-    - /etc/opentsdb:/etc/opentsdb
+    - /semiot-platform/tsdb:/var/lib/cassandra
   restart: always
 
 deviceproxyservice:
@@ -42,24 +40,10 @@ deviceproxyservice:
     - /semiot-platform/device-proxy-service/proxy-logs:/root/semiot-platform/device-proxy-service/proxy-logs
   restart: always
 
-hbase:
-  image: docker.semiot.ru/hbase
-  ports:
-    - "60000:60000"
-    - "60010:60010"
-    - "60020:60020"
-    - "60030:60030"
-    - "2181:2181"
-  volumes:
-    - /semiot-platform/hbase/logs/:/opt/hbase/logs/
-    - /semiot-platform/hbase/data/:/etc/hbase
-  restart: always
-
 apigateway:
   image: docker.semiot.ru/api-gateway
   links:
     - wamprouter
-    - opentsdb
     - deviceproxyservice
     - dataarchivingservice
     - mysqlbase
@@ -75,6 +59,7 @@ frontend:
   links:
     - wamprouter
     - deviceproxyservice
+    - webui
     - apigateway
   ports:
     - "80:80"

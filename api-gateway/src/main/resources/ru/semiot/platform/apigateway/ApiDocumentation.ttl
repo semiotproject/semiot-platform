@@ -3,8 +3,10 @@
 @prefix hydra: <http://www.w3.org/ns/hydra/core#> .
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix san: <https://www.irit.fr/recherches/MELODI/ontologies/SAN#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
 apidoc:EntryPoint-Sensors a hydra:Link ;
@@ -64,14 +66,43 @@ apidoc:observations a hydra:Link ;
         hydra:returns hydra:Collection
     ] .
 
+apidoc:actuations a hydra:Link ;
+    rdfs:domain ssn:System ;
+    rdfs:range [
+        a hydra:Collection, sh:Shape ;
+        sh:property [
+            sh:predicate hydra:member ;
+            sh:class semiot:Actuation
+        ]
+    ] ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns hydra:Collection
+    ] ;
+    hydra:supportedOperation [
+        a hydra:Operation, semiot:SubmitCommandOperation ;
+        hydra:method "POST" ;
+        hydra:returns semiot:Actuation ;
+        hydra:expects semiot:Command ;
+    ] .
+
 apidoc:ApiDocumentation a hydra:ApiDocumentation ;
-    hydra:supportedClass apidoc:observations, apidoc:EntryPoint, ssn:SensingDevice, ssn:System .
+    hydra:supportedClass apidoc:observations, apidoc:actuations, apidoc:EntryPoint,
+    ssn:SensingDevice, san:ActuatingDevice, ssn:System .
 
 ssn:SensingDevice a hydra:Class ;
     hydra:supportedOperation [
         a hydra:Operation ;
         hydra:method "GET" ;
         hydra:returns ssn:SensingDevice
+    ] .
+
+san:ActuatingDevice a hydra:Class ;
+    hydra:supportedOperation [
+        a hydra:Operation ;
+        hydra:method "GET" ;
+        hydra:returns san:ActuatingDevice
     ] .
 
 ssn:System a hydra:Class ;

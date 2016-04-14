@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -16,6 +17,50 @@ import org.slf4j.LoggerFactory;
 public class Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
+    private static final String BUNDLES_PATH = "/bundles/";
+    private static final String BUNDLE_NAME_PREFIX = "file://" + BUNDLES_PATH;
+    private static final String[] LOCAL_BUNDLES = new String[]{
+            //Apache Felix bundles and their dependencies
+            "org.apache.felix.configadmin-1.8.8.jar",
+            "org.apache.felix.log-1.0.1.jar",
+            "org.apache.felix.metatype-1.1.2.jar",
+            "org.osgi.compendium-1.4.0.jar",
+            "org.apache.felix.webconsole-4.2.12-all.jar",
+            "org.apache.felix.http.servlet-api-1.1.2.jar",
+            "org.apache.felix.http.api-3.0.0.jar",
+            "org.apache.felix.http.jetty-3.1.0.jar",
+            "org.apache.felix.eventadmin-1.4.4.jar",
+            "org.apache.felix.dependencymanager-4.1.0.jar",
+            "org.liveSense.fragment.sun.misc-1.0.5.jar",
+            "org.apache.servicemix.bundles.json-20140107_1.jar",
+            "jersey-all-2.22.2.jar",
+            "org.apache.felix.http.whiteboard-3.0.0.jar",
+            "publisher-5.3.1.jar",
+
+            //Device Proxy Service bundles
+            "device-proxy-service-api-1.0-SNAPSHOT.jar",
+            "device-proxy-service-manager-1.0-SNAPSHOT.jar",
+            "rs-proxy-service-1.0.0-SNAPSHOT.jar",
+            "configurator-1.0.0.jar",
+
+            //Device Proxy Service dependencies
+            "slf4j-api-1.7.21.jar",
+                "logback-core-1.1.7.jar",
+                "logback-classic-1.1.7.jar",
+            "jena-osgi-3.0.0.jar",
+                "jackson-core-2.6.6.jar",
+                "jackson-databind-2.6.6.jar",
+                "jackson-annotations-2.6.6.jar",
+                "jsonld-java-0.8.2.jar",
+                "httpcore-osgi-4.4.4.jar",
+                "httpclient-osgi-4.5.1.jar",
+                "jcl-over-slf4j-1.7.21.jar",
+                "commons-cli-1.3.1.jar",
+                "commons-csv-1.2.jar",
+                "commons-lang3-3.4.jar",
+                "log4j-over-slf4j-1.7.21.jar",
+                "libthrift-0.9.3.jar"
+    };
 
     private static Framework framework = null;
 
@@ -32,10 +77,10 @@ public class Launcher {
             public void run() {
                 try {
                     if (framework != null) {
-                        System.out.println("Framework stoping");
+                        System.out.println("Framework stopping");
                         framework.stop();
                         framework.waitForStop(0);
-                        System.out.println("Framework stoped");
+                        System.out.println("Framework stopped");
                     }
                 } catch (BundleException | InterruptedException ex) {
                     logger.error("Error stopping framework: ", ex);
@@ -45,55 +90,16 @@ public class Launcher {
 
         try {
             framework = frameworkFactory.newFramework(config);
-            // framework.init();
             framework.start();
 
             BundleContext context = framework.getBundleContext();
 
             List<Bundle> bundles = new ArrayList<>();
 
-            //Apache Felix bundles
-            bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.configadmin-1.8.8.jar?raw=true"));
-            bundles.add(context.installBundle(
-                    "https://raw.githubusercontent.com/semiotproject/semiot-platform/bundles/felix-bundles/org.apache.felix.log-1.0.1.jar"));
-            bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.metatype-1.1.2.jar?raw=true"));
-            bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.osgi.compendium-1.4.0.jar?raw=true"));
-            bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.webconsole-4.2.12-all.jar?raw=true"));
-            bundles.add(context.installBundle(
-                    "https://raw.githubusercontent.com/semiotproject/semiot-platform/bundles/felix-bundles/org.apache.felix.http.servlet-api-1.1.2.jar"));
-            bundles.add(context.installBundle(
-                    "https://raw.githubusercontent.com/semiotproject/semiot-platform/bundles/felix-bundles/org.apache.felix.http.api-3.0.0.jar"));
-            bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.http.jetty-3.1.0.jar?raw=true"));
-            bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.eventadmin-1.4.4.jar?raw=true"));
-            bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/org.apache.felix.dependencymanager-4.1.0.jar?raw=true"));
-            bundles.add(context.installBundle(
-                    "http://central.maven.org/maven2/com/github/livesense/org.liveSense.fragment.sun.misc/1.0.5/org.liveSense.fragment.sun.misc-1.0.5.jar"));
-            bundles.add(context.installBundle(
-                    "http://central.maven.org/maven2/org/apache/servicemix/bundles/org.apache.servicemix.bundles.json/20140107_1/org.apache.servicemix.bundles.json-20140107_1.jar"));
-            bundles.add(context.installBundle(
-                    "https://github.com/semiotproject/semiot-platform/blob/bundles/felix-bundles/jersey-all-2.22.1.jar?raw=true"));
-
-            //Device Proxy Service bundles
-            bundles.add(context.installBundle(
-                    "device-proxy-service-api-1.0-SNAPSHOT.jar",
-                    Launcher.class.getResourceAsStream("/bundles/device-proxy-service-api-1.0-SNAPSHOT.jar")));
-            bundles.add(context.installBundle(
-                    "device-proxy-service-manager-1.0-SNAPSHOT.jar",
-                    Launcher.class.getResourceAsStream("/bundles/device-proxy-service-manager-1.0-SNAPSHOT.jar")));
-            bundles.add(context.installBundle(
-                    "rs-proxy-service-1.0.0-SNAPSHOT.jar",
-                    Launcher.class.getResourceAsStream("/bundles/rs-proxy-service-1.0.0-SNAPSHOT.jar")));
-            bundles.add(context.installBundle(
-                    "configurator-1.0.0.jar",
-                    Launcher.class.getResourceAsStream("/bundles/configurator-1.0.0.jar")));
-            logger.info("Installed all bundles!");
+            for(String bundleName : LOCAL_BUNDLES) {
+                bundles.add(loadAndInstallBundle(context, bundleName));
+            }
+            logger.info("Loaded and installed all local bundles!");
 
             logger.info("Starting all of them...");
             for (Bundle bundle : bundles) {
@@ -102,13 +108,19 @@ public class Launcher {
                 logger.info("Started [{}:{}]. Current state: {}",
                         bundle.getSymbolicName(), bundle.getVersion(), bundle.getState());
             }
-
+            logger.info("All bundles started!");
             framework.waitForStop(0);
             System.exit(0);
         } catch (BundleException | InterruptedException ex) {
             logger.error(ex.getMessage(), ex);
             System.exit(0);
         }
+    }
+
+    private static Bundle loadAndInstallBundle(BundleContext context, String name)
+            throws BundleException {
+        return context.installBundle(BUNDLE_NAME_PREFIX + name,
+                Launcher.class.getResourceAsStream(BUNDLES_PATH + name));
     }
 
 }

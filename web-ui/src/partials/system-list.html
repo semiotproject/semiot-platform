@@ -1,0 +1,45 @@
+<h2>SemIoT Platform</h2>
+<section ng-class="{preloader: isLoading}">
+    <ol class="breadcrumb">
+        <li class="active">Systems</li>
+    </ol>
+    <pagination
+        ng-model="pagination.currentPage"
+        items-per-page="pagination.itemsPerPage"
+        total-items="pagination.totalItems"
+        max-size="pagination.maxSize"
+        boundary-links="true"
+        num-pages="pagination.numPages"
+        ng-change="setPagination()">
+    </pagination>
+    <div class="table-responsive system-list">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <label>№</label>
+                    </th>
+                    <th>
+                        <input type="text" ng-change="setPagination()" ng-model="search.name" class="form-control" placeholder="Name"/>
+                    </th>
+                    <th>
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-show="systems.length === 0">
+                    <td>No systems registered</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr ng-repeat="system in systems | filter: filterFunction" ng-click="showSingle(system)">
+                    <td>{{ system.index }}</td>
+                    <td><a href="{{ '#/systems/' + system.uri }}">{{ system.name }}</a></td>
+                    <td>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

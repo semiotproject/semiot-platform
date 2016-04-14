@@ -23,104 +23,113 @@ import org.apache.jena.rdf.model.Literal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.semiot.platform.apigateway.ExternalQueryService;
-import ru.semiot.platform.apigateway.OSGiApiService;
-import ru.semiot.platform.apigateway.SPARQLQueryService;
+import ru.semiot.platform.apigateway.beans.TSDBQueryService;
+import ru.semiot.platform.apigateway.beans.impl.ExternalQueryService;
+import ru.semiot.platform.apigateway.beans.impl.OSGiApiService;
+import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import rx.Observable;
 
 @WebServlet(urlPatterns = "/config/DriversInstalled", asyncSupported = true)
 public class DriversInstalledHandler extends HttpServlet {
 
-	public static final String queryIdSystemsForDriver = "SELECT DISTINCT ?id "
-			+ "WHERE { " + "GRAPH <urn:semiot:graphs:private> {"
-			+ "?system  semiot:hasDriver <urn:semiot:drivers:${DRIVER}> } "
-			+ "?system  dcterms:identifier ?id. }";
+    public static final String queryIdSystemsForDriver = "SELECT DISTINCT "
+            + "?system_id ?sensor_id  " + "WHERE { "
+            + "GRAPH <urn:semiot:graphs:private> { "
+            + "?system  semiot:hasDriver "
+            + "<urn:semiot:drivers:ru.semiot.platform.drivers.netatmo-weatherstation> } "
+            + "?system  dcterms:identifier ?system_id; "
+            + "ssn:hasSubSystem ?sensor. "
+            + "?sensor dcterms:identifier ?sensor_id. }";
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(DriversInstalledHandler.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(DriversInstalledHandler.class);
 
-	@Inject
-	OSGiApiService service;
+    @Inject
+    OSGiApiService service;
 
-	@Inject
-	SPARQLQueryService query;
+    @Inject
+    SPARQLQueryService query;
 
-	@Inject
-	ExternalQueryService externalService;
+    @Inject
+    TSDBQueryService tsdbQuery;
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		final AsyncContext ctx = req.startAsync();
+    @Inject
+    ExternalQueryService externalService;
 
-		Observable<JsonArray> jsonArray = service.getBundlesJsonArray();
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        final AsyncContext ctx = req.startAsync();
 
-		jsonArray.subscribe((jsArray) -> {
-			ctx.getRequest().setAttribute("jsonArray", jsArray);
-		}, (Throwable e) -> {
-			logger.warn(e.getMessage(), e);
-		}, () -> {
-			ctx.dispatch("/configuration/DriversInstalled");
-		});
+        Observable<JsonArray> jsonArray = service.getBundlesJsonArray();
 
-	}
+        jsonArray.subscribe((jsArray) -> {
+            ctx.getRequest().setAttribute("jsonArray", jsArray);
+        }, (Throwable e) -> {
+            logger.warn(e.getMessage(), e);
+        }, () -> {
+            ctx.dispatch("/configuration/DriversInstalled");
+        });
 
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		HashMap<String, String> parameters = getRequestParameters(request);
-		String pid = parameters.get("id_bundle");
-		if (StringUtils.isNotBlank(pid)) {
-			if (request.getParameter("uninstall") != null) {
-				final AsyncContext ctx = request.startAsync();
-				Observable<String> unistall = service.sendPostUninstall(pid);
-				unistall.map((__) -> {
-					Observable<JsonArray> jsonArray = service
-							.getBundlesJsonArray();
-					JsonArray jsArray = jsonArray.toBlocking().single();
-					ctx.getRequest().setAttribute("jsonArray", jsArray);
-					return jsArray;
-				}).subscribe(ConfigHelper.dispatch(ctx,
-						"/configuration/DriversInstalled"));
-			} else if (request
-					.getParameter("uninstallWithDeleteData") != null) {
-				final AsyncContext ctx = request.startAsync();
-				Observable<String> unistall = service.sendPostUninstall(pid);
-				unistall.map((__) -> {
-					Observable<ResultSet> obsSystemsRS = query.select(
-							queryIdSystemsForDriver.replace("${DRIVER}", pid));
-					ResultSet systemsRS = obsSystemsRS.toBlocking().single();
-					JsonArrayBuilder jArrBuilder = Json.createArrayBuilder();
-					while (systemsRS.hasNext()) {
-						QuerySolution qs = systemsRS.next();
-						Literal id = qs.getLiteral("id");
-						jArrBuilder.add(id.toString());
-					}
-					JsonObject metrics = Json.createObjectBuilder().add(
-							"metrics", jArrBuilder).build();
-					externalService.sendRsRemoveFromTsdb(metrics).subscribe();
-					externalService.sendRsRemoveFromFuseki(pid).subscribe();
-					Observable<JsonArray> jsonArray = service
-							.getBundlesJsonArray();
-					JsonArray jsArray = jsonArray.toBlocking().single();
-					ctx.getRequest().setAttribute("jsonArray", jsArray);
-					return jsArray;
-				}).subscribe(ConfigHelper.dispatch(ctx,
-						"/configuration/DriversInstalled"));
-			}
-		}
-	}
+    }
 
-	private static HashMap<String, String> getRequestParameters(
-			HttpServletRequest request) {
-		HashMap<String, String> parameters = new HashMap<String, String>();
-		Enumeration _enum = request.getParameterNames();
-		while (_enum.hasMoreElements()) {
-			String key = (String) _enum.nextElement();
-			String value = request.getParameter(key);
-			// request.get
-			parameters.put(key, value);
-		}
-		return parameters;
-	}
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        HashMap<String, String> parameters = getRequestParameters(request);
+        String pid = parameters.get("id_bundle");
+        if (StringUtils.isNotBlank(pid)) {
+            if (request.getParameter("uninstall") != null) {
+                final AsyncContext ctx = request.startAsync();
+                Observable<String> unistall = service.sendPostUninstall(pid);
+                unistall.map((__) -> {
+                    Observable<JsonArray> jsonArray = service
+                            .getBundlesJsonArray();
+                    JsonArray jsArray = jsonArray.toBlocking().single();
+                    ctx.getRequest().setAttribute("jsonArray", jsArray);
+                    return jsArray;
+                }).subscribe(ConfigHelper.dispatch(ctx,
+                        "/configuration/DriversInstalled"));
+            } else if (request
+                    .getParameter("uninstallWithDeleteData") != null) {
+                final AsyncContext ctx = request.startAsync();
+                Observable<String> unistall = service.sendPostUninstall(pid);
+                unistall.map((__) -> {
+                    Observable<ResultSet> obsSystemsRS = query.select(
+                            queryIdSystemsForDriver.replace("${DRIVER}", pid));
+                    ResultSet systemsRS = obsSystemsRS.toBlocking().single();
+                    JsonArrayBuilder jArrBuilder = Json.createArrayBuilder();
+                    while (systemsRS.hasNext()) {
+                        QuerySolution qs = systemsRS.next();
+                        Literal system_id = qs.getLiteral("system_id");
+                        Literal sensor_id = qs.getLiteral("sensor_id");
+                        JsonObject object = Json.createObjectBuilder()
+                                .add("system_id", system_id.toString())
+                                .add("sensor_id", sensor_id.toString()).build();
+                        jArrBuilder.add(object);
+                    }
+                    tsdbQuery.remove(jArrBuilder.build()).subscribe();
+                    externalService.sendRsRemoveFromFuseki(pid).subscribe();
+                    Observable<JsonArray> jsonArray = service
+                            .getBundlesJsonArray();
+                    JsonArray jsArray = jsonArray.toBlocking().single();
+                    ctx.getRequest().setAttribute("jsonArray", jsArray);
+                    return jsArray;
+                }).subscribe(ConfigHelper.dispatch(ctx,
+                        "/configuration/DriversInstalled"));
+            }
+        }
+    }
 
+    private static HashMap<String, String> getRequestParameters(
+            HttpServletRequest request) {
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        Enumeration _enum = request.getParameterNames();
+        while (_enum.hasMoreElements()) {
+            String key = (String) _enum.nextElement();
+            String value = request.getParameter(key);
+            // request.get
+            parameters.put(key, value);
+        }
+        return parameters;
+    }
 }

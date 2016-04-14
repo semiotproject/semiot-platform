@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
@@ -37,14 +37,14 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
             URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#NetatmoWeatherStationOutdoorModule"));
     ; 
 
-    private volatile DeviceManager deviceManager;
+    private volatile DeviceDriverManager deviceManager;
 
     private ScheduledExecutorService scheduler;
     private List<ScheduledFuture> handles = null;
     private List<Configuration> configurations;
     private NetatmoAPI netAtmoAPI;
     private List<Integer> countsRepeatableProperties;
-
+    
     public void start() {
         logger.info("{} started!", driverName);
         deviceManager.registerDriver(info);
@@ -118,7 +118,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         }
     }
 
-    private List<Configuration> getConfigurations(List<Integer> counts) throws ConfigurationException {
+    private List<Configuration> getConfigurations(List <Integer> counts) throws ConfigurationException {
         logger.debug("Try to get repeatable configuration for each puller");
         List<Configuration> conf = new ArrayList<>();
         for (int i : counts) {
@@ -183,18 +183,18 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         logger.debug("Try to start puller!");
         logger.debug("Config is " + config.toString());
         ScheduledPuller puller = new ScheduledPuller(this, config, netAtmoAPI);
-
+        
         logger.debug("Try to schedule polling. Starts in {}min with interval {}min with configuration [{}]",
                      configuration.get(Keys.POLLING_START_PAUSE),
                      configuration.get(Keys.POLLING_INTERVAL),
                      config.toString());
-
+        
         ScheduledFuture handle = this.scheduler.scheduleAtFixedRate(
                 puller,
                 configuration.getAsLong(Keys.POLLING_START_PAUSE),
                 configuration.getAsLong(Keys.POLLING_INTERVAL),
                 TimeUnit.MINUTES);
-
+        
         logger.debug("Puller started!");
         return handle;
     }
@@ -212,15 +212,15 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
         return deviceId + "-" + type;
     }
 
-    private List<Integer> getCountsRepeatableProperties(String propPrefix) throws ConfigurationException {
+    private List <Integer> getCountsRepeatableProperties (String propPrefix) throws ConfigurationException {
         logger.debug("Try to get count of repeatable property \"{}\"", propPrefix);
-        List<Integer> counts = new ArrayList<>();
+        List <Integer> counts = new ArrayList<>();
         int index;
-
+        
         for (String key : configuration.keySet()) {
             if (key.contains(propPrefix) && !counts.contains(
-                    index = Integer.parseInt(key.substring(0, key.indexOf("." + propPrefix))))) {
-                counts.add(index);
+                    index = Integer.parseInt(key.substring(0, key.indexOf("." + propPrefix))))) {                
+                counts.add(index);                
             }
         }
         if (counts.isEmpty()) {
