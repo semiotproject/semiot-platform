@@ -10,18 +10,16 @@ public class ApplicationConfig extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> resources = new java.util.HashSet<>();
-        addRestResourceClasses(resources);
-        return resources;
-    }
-
-    private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(ru.semiot.platform.apigateway.rest.RootResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SensorResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SubSystemResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SystemActuationsResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SystemObservationsResource.class);
         resources.add(ru.semiot.platform.apigateway.rest.SystemResource.class);
+        
+        //Providers
         resources.add(ru.semiot.platform.apigateway.rest.providers.ModelMessageBodyReader.class);
+        resources.add(ru.semiot.commons.restapi.ZoneDateTimeProvider.class);
+        return resources;
     }
-    
 }
