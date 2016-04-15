@@ -1,17 +1,34 @@
+<%@page import="java.util.HashMap"%>
+<%@page import="javax.json.JsonArray"%>
+<%@page import="javax.json.JsonObject"%>
+<%@page import="java.util.Iterator"%>
+<%@page import="ru.semiot.platform.apigateway.config.BundleConstants"%>
+
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+    response.setHeader("Expires", "0");
+
+    JsonObject jsonDomain = (JsonObject) request.getAttribute("jsonDomain");
+    boolean managerIsConfigurated = (Boolean) request.getAttribute(
+            "mngrIsConfigurated");
+%>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SemIoT Platform | New Driver</title>
+    <title>SemIoT Platform | System Settings</title>
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/css/common.css">
-    <link rel="stylesheet" href="/static/css/setting.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/settings.css">
 </head>
 <body>
     <div class="navbar navbar-default">
@@ -59,29 +76,26 @@
             <div class="col-md-3"></div>
             <div class="col-md-6">
                 <div class="well bs-component">
-                    <h3>New driver bundle</h3>
-                    <form action="${pageContext.request.contextPath}/UploadDriverHandler" method="post" enctype="multipart/form-data">
-                        <div class="form-group is-empty is-fileinput">
-                            <input type="file" id="inputFile4" multiple="">
-                            <div class="input-group">
-                              <input type="text"
-                                    readonly=""
+                    <h3>System Settings</h3>
+                    <form action="${pageContext.request.contextPath}/config/ConfigurationDriver" method="post">
+                        <div class="form-group is-empty">
+                            <label for="inputEmail" class="col-md-2 control-label"><%=jsonDomain.get("name")%></label>
+                            <div class="col-md-10">
+                                <input
                                     class="form-control"
-                                    placeholder="Select .jar or .war file"
-                                    name="bundlefile"
-                                    accept="jar|war"
+                                    type="text"
+                                    id="txtfld1"
+                                    name=<%=BundleConstants.managerDomain%>
+                                    value=<%=jsonDomain.get("value")%>
                                 />
-                                <span class="input-group-btn input-group-sm">
-                                  <button type="button" class="btn btn-fab btn-fab-mini">
-                                    <i class="material-icons">attach_file</i>
-                                  </button>
-                                </span>
                             </div>
-                          <span class="material-input"></span>
+                            <span class="material-input"></span>
                         </div>
                         <div style="text-align: center;">
-                            <button class="btn btn-lg btn-warning btn-raised" type="submit">Upload <i class="fa fa-cloud-upload"></i></button>
+                            <button class="btn btn-lg btn-primary btn-raised" type="submit">Save <i class="fa fa-save"></i></button>
                         </div>
+                        <input type="hidden" name="configure" value="Save" />
+                        <input type="hidden" name="pid" id="pid" value=<%=BundleConstants.managerPid%> />
                     </form>
                 </div>
             </div>

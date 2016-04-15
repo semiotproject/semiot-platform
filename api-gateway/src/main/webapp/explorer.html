@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html ng-app="semiotApp">
 <head>
-    <meta charset="UTF-8">
-    <title>SemIoT Platform | Configuration</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SemIoT Platform | Explorer</title>
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/css/common.css">
-    <link rel="stylesheet" href="/static/css/index.css">
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/css/lib/datetimepicker.css">
+    <link rel="stylesheet" type="text/css" href="/css/explorer.css">
 </head>
 <body>
 
@@ -27,7 +30,7 @@
                 <li>
                     <a href="/explorer">Explorer</a>
                 </li>
-                <li class="dropdown active">
+                <li class="dropdown">
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -54,15 +57,19 @@
         </div>
     </div>
     <div class="container">
-        <div class="main-navigation">
-            <a href="/config/DriversInstalled" class="btn btn-raised btn-success">Installed <i class="fa fa-check-circle"></i></a>
-            <a href="/config/AvailableDrivers" class="btn btn-raised btn-info">Available <i class="fa fa-database"></i></a>
-            <a href="/config/UploadDriver" class="btn btn-raised btn-warning">New <i class="fa fa-cloud-upload"></i></a>
-        </div>
+        <div ng-view class="app-wrapper"></div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="http://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
+    <script src="/static/js/lib/jquery.js"></script>
+    <script src="/static/js/lib/angular.js"></script>
+    <script src="/static/js/lib/moment.js"></script>
+    <script src="/static/js/lib/bootstrap.min.js"></script>
+    <script src="/static/js/lib/datetimepicker.js"></script>
+    <script src="/static/js/lib/highstock.js"></script>
+    <script src="/static/js/lib/highcharts-ng.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/js/material.min.js"></script>
     <script>$.material.init();</script>
+
+    <script src="/static/js/explorer/index.js"></script>
 </body>
 </html>

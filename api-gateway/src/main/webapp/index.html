@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-<html ng-app="semiotApp">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>SemIoT Platform | Explorer</title>
+    <meta charset="UTF-8">
+    <title>SemIoT Platform</title>
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-
-    <link rel="stylesheet" href="/static/css/common.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/lib/datetimepicker.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/explorer.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
 
@@ -57,19 +54,21 @@
         </div>
     </div>
     <div class="container">
-        <div ng-view class="app-wrapper"></div>
+        <div class="main-navigation">
+            <a href="/explorer" class="btn btn-raised btn-success">Explorer <i class="fa fa-search"></i></a>
+            <a href="/config" class="btn btn-raised btn-info">Configuration <i class="fa fa-cogs"></i></a>
+        </div>
     </div>
-    <script src="/static/js/lib/jquery.js"></script>
-    <script src="/static/js/lib/angular.js"></script>
-    <script src="/static/js/lib/moment.js"></script>
-    <script src="/static/js/lib/bootstrap.min.js"></script>
-    <script src="/static/js/lib/datetimepicker.js"></script>
-    <script src="/static/js/lib/highstock.js"></script>
-    <script src="/static/js/lib/highcharts-ng.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/js/material.min.js"></script>
+    <footer>
+        <div class="container">
+            <div class="left">&copy; <a href="http://semiot.ru/">SemIoT Project</a>&nbsp;2014-2016</div>
+            <div class="right">SemIoT Platform v __PLATFORM_VERSION__</div>
+        </div>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="http://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
     <script>$.material.init();</script>
-
-    <script src="/static/js/explorer/index.js"></script>
 </body>
 </html>
