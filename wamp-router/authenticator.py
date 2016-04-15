@@ -9,7 +9,8 @@ query = ("SELECT role FROM credentials WHERE login=%s AND password=%s LIMIT 1")
 query_id = ("SELECT id FROM credentials WHERE login=%s AND password=%s LIMIT 1")
 
 def checkCredential(user, passw):
-	cursor = mysql.connector.connect(user='root', password='', host='mysqlbase', database='semiot').cursor()
+	ctx = mysql.connector.connect(user='root', password='', host='mysqlbase', database='semiot')
+	cursor = ctx.cursor()
 	cursor.execute(query,(user,passw))
 	result = cursor.fetchone()
 	if(result is not None):
