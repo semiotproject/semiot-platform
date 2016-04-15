@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import javax.json.JsonArray;
+import javax.json.JsonObject;
 import javax.ws.rs.core.Response;
 
 import org.apache.jena.rdf.model.Model;
@@ -28,4 +29,6 @@ public interface TSDBQueryService {
 
     public Observable<Model> queryActuationsByRange(String systemId,
             ZonedDateTime start, ZonedDateTime end);
+    
+    public Observable<Response> sendSettingsAsPost(JsonObject json);
 }

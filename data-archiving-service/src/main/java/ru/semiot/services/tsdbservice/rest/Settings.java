@@ -13,19 +13,19 @@ import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
  */
 @Path("/settings")
 public class Settings {
+    private static final String DOMAIN = "ru.semiot.platform.domain";
+    private static final String WAMP_PASS = "ru.semiot.platform.wamp_password";
+    private static final String WAMP_LOGIN = "ru.semiot.platform.wamp_login";
         
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public void setSettings(String str){
         JSONObject json = new JSONObject(str);
-        String pass = json.optString("services.wamp.password");
-        CONFIG.setProperty("services.wamp.password", pass);
-        String prefix = json.optString("services.sensors.uri.prefix");
+        CONFIG.setProperty(WAMP_LOGIN, json.optString(WAMP_LOGIN));
+        String prefix = json.optString(DOMAIN);
         if(!prefix.endsWith("/"))
             prefix += "/";
-        CONFIG.setProperty("services.sensors.uri.prefix", prefix);
-        if(json.has("services.wamp.login")){
-            CONFIG.setProperty("services.wamp.login", json.getString("services.wamp.login"));
-        }
+        CONFIG.setProperty(DOMAIN, prefix);
+        CONFIG.setProperty(WAMP_PASS, json.optString(WAMP_PASS));
     }
 }

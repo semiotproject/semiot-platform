@@ -52,7 +52,7 @@ public class Launcher {
         }
         try {
 
-            CONFIG.addPropertyChangeListener("services.wamp.password",
+            CONFIG.addPropertyChangeListener("ru.semiot.platform.wamp_password",
                                              new TransactionalPropertyChangeListenerImpl());
 
             URI uri = UriBuilder.fromUri("http://0.0.0.0/").port(8787).build();
@@ -84,14 +84,11 @@ public class Launcher {
     private class TransactionalPropertyChangeListenerImpl implements TransactionalPropertyChangeListener {
 
         @Override
-        public void beforePropertyChange(PropertyChangeEvent event) throws RollbackOperationException, RollbackBatchException {
-            System.out.println("Hello");
+        public void beforePropertyChange(PropertyChangeEvent event) throws RollbackOperationException, RollbackBatchException {            
         }
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            System.out.println("Good buy");
-
             try {
                 WAMPClient.getInstance().init()
                         .subscribe((WampClient.State newState) -> {

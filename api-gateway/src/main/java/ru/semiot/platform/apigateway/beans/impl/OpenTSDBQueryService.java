@@ -17,6 +17,8 @@ import javax.ejb.Singleton;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.enterprise.inject.Alternative;
 import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -61,7 +63,8 @@ public class OpenTSDBQueryService implements TSDBQueryService {
     private static final String PARAM_END = "end";
     private static final String PARAM_METRICS = "m";
     private static final String PARAM_TIMESERIES = "timeseries";
-    private static final String PARAM_RESOLVE = "resolve";
+    private static final String PARAM_RESOLVE = "resolve";    
+    private static final String QUERY_SETTINGS = "/settings";
 
     @javax.annotation.Resource
     ManagedExecutorService mes;
@@ -371,6 +374,15 @@ public class OpenTSDBQueryService implements TSDBQueryService {
     public Observable<Response> remove(JsonArray array) {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    @Override
+    public Observable<Response> sendSettingsAsPost(JsonObject json) {
+        return Rx.newClient(RxObservableInvoker.class, mes)
+                .target(UriBuilder.fromPath(config.tsdbEndpoint())
+                        .path(QUERY_SETTINGS))
+                .request().rx().post(Entity.entity(json.toString(),
+                                                   MediaType.APPLICATION_JSON));
     }
 
 }

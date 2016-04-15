@@ -94,6 +94,8 @@
                                 List<Credentials> list = (List<Credentials>) request.getAttribute("credentials");
                                 if (list != null && !list.isEmpty())
                                     for (Credentials user : list) {
+										if(user.getRole().equals("internal"))
+											continue;
                             %>
                                         <tr>
                                             <td>

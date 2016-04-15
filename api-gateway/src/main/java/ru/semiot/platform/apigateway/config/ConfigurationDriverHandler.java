@@ -23,10 +23,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.semiot.platform.apigateway.beans.TSDBQueryService;
 
 import ru.semiot.platform.apigateway.beans.impl.OSGiApiService;
+import ru.semiot.platform.apigateway.utils.DataBase;
 import rx.Observable;
 
 @WebServlet(urlPatterns = "/config/ConfigurationDriver", asyncSupported = true)
@@ -39,7 +42,13 @@ public class ConfigurationDriverHandler extends HttpServlet {
 
 	@Inject
 	OSGiApiService service;
-
+        
+        @Inject
+        TSDBQueryService tsdb;
+        
+        @Inject
+        DataBase db;
+        
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
@@ -116,7 +125,29 @@ public class ConfigurationDriverHandler extends HttpServlet {
 				session.removeAttribute("filename");
 				post = service.sendPostUploadFile(is,
 						filename, pid, parameters);
-			} else if (request.getParameter("configure") != null) {
+			} else if (request.getParameter("configure") != null) {                                
+                                parameters.put("propertylist", 
+                                               parameters.get("propertylist")
+                                                       .concat(",")
+                                                       .concat(BundleConstants.wampLogin)
+                                                       .concat(",")
+                                                       .concat(BundleConstants.wampPassword));
+                                String domain = parameters.get(BundleConstants.managerDomain);
+                                String role = "internal";
+                                String login = RandomStringUtils.randomAlphanumeric(12);
+                                String pass = RandomStringUtils.randomAlphanumeric(12);                                
+                                db.addUser(0, login, pass, role);
+                                
+                                JsonObject json = Json.createObjectBuilder()
+                                        .add(BundleConstants.managerDomain, domain)
+                                        .add(BundleConstants.wampLogin, login)
+                                        .add(BundleConstants.wampPassword, pass)
+                                        .build();
+                                
+                                tsdb.sendSettingsAsPost(json).subscribe();
+                                
+                                parameters.put(BundleConstants.wampLogin, login);
+                                parameters.put(BundleConstants.wampPassword, pass);
 				post = service.sendPostConfigStart(pid,
 						parameters);
 			}
@@ -149,5 +180,5 @@ public class ConfigurationDriverHandler extends HttpServlet {
 		}
 		return parameters;
 	}
-
+        
 }

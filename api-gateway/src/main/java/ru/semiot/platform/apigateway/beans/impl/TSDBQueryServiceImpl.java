@@ -10,6 +10,7 @@ import javax.ejb.Singleton;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.enterprise.inject.Default;
 import javax.json.JsonArray;
+import javax.json.JsonObject;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -51,6 +52,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
     private static final String PARAM_SENSOR_ID = "sensor_id";
     private static final String PARAM_START = "start";
     private static final String PARAM_END = "end";
+    private static final String QUERY_SETTINGS = "/settings";
 
     @javax.annotation.Resource
     ManagedExecutorService mes;
@@ -201,5 +203,14 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
                 // .build()));
             }
         }));
+    }
+    
+    @Override
+    public Observable<Response> sendSettingsAsPost(JsonObject json) {
+        return Rx.newClient(RxObservableInvoker.class, mes)
+                .target(UriBuilder.fromPath(config.tsdbEndpoint())
+                        .path(QUERY_SETTINGS))
+                .request().rx().post(Entity.entity(json.toString(),
+                                                   MediaType.APPLICATION_JSON));
     }
 }
