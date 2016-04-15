@@ -1,3 +1,15 @@
+### Desired pre-requests
+node.js version >= 4
+npm version >= 3
+
+#### How to upgrade to latest npm
+```
+sudo npm i -g npm
+```
+
+#### How to install latest node.js
+Use [n](https://github.com/tj/n)
+
 ### Installation
 
 ```
@@ -24,9 +36,6 @@ npm run build
 ```
 npm run serve
 ```
-
-### Building Docker image
-We use private DockerHub instead of [https://docs.docker.com/registry/](https://docs.docker.com/registry/), and `Dockerfile` is not standalone. То build Docker image, you must first build webapp using the above commands to `dist`(default) directory.
 
 ### Troubleshooting
 
