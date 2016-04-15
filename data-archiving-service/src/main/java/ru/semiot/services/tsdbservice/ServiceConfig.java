@@ -22,11 +22,11 @@ public interface ServiceConfig extends Mutable {
 	String wampRealm();
         
         @DefaultValue("internal")
-	@Key("services.wamp.login")
+	@Key("ru.semiot.platform.wamp_login")
 	String wampLogin();
         
         @DefaultValue("internal")
-	@Key("services.wamp.password")
+	@Key("ru.semiot.platform.wamp_password")
 	String wampPassword();
 
 	@DefaultValue("15")
@@ -63,6 +63,6 @@ public interface ServiceConfig extends Mutable {
 	String storePassword();
         
         @DefaultValue("http://localhost/")
-	@Key("services.sensors.uri.prefix")
+	@Key("ru.semiot.platform.domain")
 	String sensorsURIPrefix();
 }

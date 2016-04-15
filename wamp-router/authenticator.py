@@ -5,13 +5,11 @@ from twisted.internet.defer import inlineCallbacks
 from autobahn.twisted.wamp import ApplicationSession
 from autobahn.wamp.exception import ApplicationError
 
-cnx = mysql.connector.connect(user='root', password='', host='mysqlbase', database='semiot')
-
 query = ("SELECT role FROM credentials WHERE login=%s AND password=%s LIMIT 1")
 query_id = ("SELECT id FROM credentials WHERE login=%s AND password=%s LIMIT 1")
 
 def checkCredential(user, passw):
-	cursor = cnx.cursor()
+	cursor = mysql.connector.connect(user='root', password='', host='mysqlbase', database='semiot').cursor()
 	cursor.execute(query,(user,passw))
 	result = cursor.fetchone()
 	if(result is not None):

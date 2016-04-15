@@ -30,7 +30,7 @@ public interface ServerConfig extends Config {
     String wampRealm();
 
     @Key("services.tsdb.url")
-    @DefaultValue("http://tsdb:8787")
+    @DefaultValue("http://dataarchivingservice:8787")
     String tsdbEndpoint();
 
     @Key("services.tsdb.actuators.path")
