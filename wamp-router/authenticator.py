@@ -25,11 +25,12 @@ class AuthenticatorSession(ApplicationSession):
 	def onJoin(self, details):
 
 		def authenticate(realm, authid, details):
-			ticket = details['ticket']
-			print("WAMP-Ticket custom authenticator invoked: realm='{}', authid='{}', ticket='{}'".format(realm, authid, ticket))
+			ticket = details['ticket']			
 
 			role = checkCredential(authid, ticket)
-
+			
+			print("WAMP-Ticket custom authenticator invoked: realm='{}', authid='{}', ticket='{}', role='{}'".format(realm, authid, ticket, role))
+			
 			if(role == "internal"):
 				print("Authorization for authid='{}', ticket='{}' was success! Role is 'internal'".format(authid, ticket))
 				return u"internal"
