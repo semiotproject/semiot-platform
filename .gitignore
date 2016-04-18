@@ -11,9 +11,6 @@ web-ui/npm-debug.log
 web-ui/dist
 web-ui/bower_components
 web-ui/node_modules
-api-gateway/src/main/webapp/css
-api-gateway/src/main/webapp/js
-api-gateway/src/main/webapp/fonts
-api-gateway/src/main/webapp/partials
+api-gateway/src/main/webapp
 api-gateway/src/main/websrc/bower_components
 api-gateway/src/main/websrc/node_modules
