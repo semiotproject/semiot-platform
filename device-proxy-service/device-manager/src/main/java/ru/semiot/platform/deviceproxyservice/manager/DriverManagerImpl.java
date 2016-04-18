@@ -52,7 +52,9 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
                                 if (newState instanceof WampClient.ConnectedState) {
                                     logger.info("Connected to {}", configuration.get(Keys.WAMP_URI));
                                 } else if (newState instanceof WampClient.DisconnectedState) {
-                                    logger.info("Disconnected from {}", configuration.get(Keys.WAMP_URI));
+                                    logger.info("Disconnected from {}. Reason: {}",
+                                            configuration.get(Keys.WAMP_URI),
+                                            ((WampClient.DisconnectedState) newState).disconnectReason());
                                 } else if (newState instanceof WampClient.ConnectingState) {
                                     logger.info("Connecting to {}", configuration.get(Keys.WAMP_URI));
                                 }
