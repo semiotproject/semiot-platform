@@ -62,13 +62,13 @@
                     <h3>New driver bundle</h3>
                     <form action="${pageContext.request.contextPath}/UploadDriverHandler" method="post" enctype="multipart/form-data">
                         <div class="form-group is-empty is-fileinput">
-                            <input type="file" id="inputFile4" multiple="">
+                            <input type="file" id="bundlefile" multiple="">
                             <div class="input-group">
                               <input type="text"
                                     readonly=""
                                     class="form-control"
                                     placeholder="Select .jar or .war file"
-                                    name="bundlefile"
+                                    name="placeholder"
                                     accept="jar|war"
                                 />
                                 <span class="input-group-btn input-group-sm">
