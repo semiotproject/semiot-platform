@@ -9,7 +9,7 @@
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
 @prefix san: <https://www.irit.fr/recherches/MELODI/ontologies/SAN#> .
-@prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/support_actuators/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
+@prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
 
 <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> a ssn:System, proto:Individual ;
     proto:hasPrototype ws:PlainLamp ;

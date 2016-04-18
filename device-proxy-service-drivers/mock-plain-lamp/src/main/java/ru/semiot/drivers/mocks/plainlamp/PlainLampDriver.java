@@ -31,8 +31,8 @@ public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
     private final DriverInformation info = new DriverInformation(
             Activator.DRIVER_PID,
             URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/" +
-                    "support_actuators/device-proxy-service-drivers/mock-plain-lamp/" +
-                    "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#"));
+                    "master/device-proxy-service-drivers/mock-plain-lamp/" +
+                    "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#PlainLamp"));
     private Map<String, PlainLamp> devices = new HashMap<>();
 
     private volatile DeviceDriverManager manager;
