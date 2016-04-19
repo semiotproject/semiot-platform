@@ -91,6 +91,8 @@ public class NetatmoAPI {
             }
         } catch (IOException | JSONException ex) {
             logger.warn(ex.getMessage(), ex);
+        } catch (Throwable ex) {
+            logger.error(ex.getMessage(), ex);
         }
 
         return false;
@@ -121,6 +123,8 @@ public class NetatmoAPI {
             }
         } catch (IOException | JSONException ex) {
             logger.warn(ex.getMessage(), ex);
+        } catch (Throwable ex) {
+            logger.error(ex.getMessage(), ex);
         }
 
         return false;
@@ -195,6 +199,8 @@ public class NetatmoAPI {
             }
         } catch (IOException | URISyntaxException ex) {
             logger.warn(ex.getMessage(), ex);
+        } catch (Throwable ex) {
+            logger.error(ex.getMessage(), ex);
         }
 
         return null;

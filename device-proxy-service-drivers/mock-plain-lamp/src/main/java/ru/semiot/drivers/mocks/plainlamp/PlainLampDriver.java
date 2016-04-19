@@ -1,10 +1,8 @@
 package ru.semiot.drivers.mocks.plainlamp;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.RDFLanguages;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -14,7 +12,6 @@ import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.platform.deviceproxyservice.api.drivers.*;
 
-import java.io.StringReader;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.Dictionary;

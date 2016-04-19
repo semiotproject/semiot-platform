@@ -60,16 +60,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>jawampa.mvn-repo</id>
-            <url>https://raw.github.com/Matthias247/jawampa/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
     <build>
         <plugins>
             <plugin>

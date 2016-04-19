@@ -30,7 +30,7 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(PlainLampDriver.class)
                 .add(createServiceDependency()
                         .setService(DeviceDriverManager.class)
-                        .setRequired(true)));
-//                .add(createConfigurationDependency().setPid(DRIVER_PID)));
+                        .setRequired(true))
+                .add(createConfigurationDependency().setPid(DRIVER_PID)));
     }
 }
