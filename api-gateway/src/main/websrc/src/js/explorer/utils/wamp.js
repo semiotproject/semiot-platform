@@ -5,9 +5,14 @@ import autobahn from 'autobahn';
 export default function(CONFIG) {
 
     let _session;
+    let _connection = new autobahn.Connection({
+        url: CONFIG.URLS.messageBus,
+        realm: 'realm1'
+    });
 
     // hash `topic`:`autobahn.Subscribtion`
     let _subscriptions = {};
+    let _deferredSubscriptions = [];
 
     // lasy initialisation
     const checkSession = (callback) => {
@@ -15,18 +20,31 @@ export default function(CONFIG) {
             callback(_session);
             return;
         }
-        console.log('initialising WAMP session...');
-        let connection = new autobahn.Connection({
-            url: CONFIG.URLS.messageBus,
-            realm: 'realm1'
+        $.get(CONFIG.URLS.currentUser).done((user) => {
+            console.log('initialising WAMP session...');
+            let connection = new autobahn.Connection({
+                url: CONFIG.URLS.messageBus,
+                realm: 'realm1',
+                authmethods: ["ticket"],
+                authid: user.username,
+                onchallenge: (session, method, extra) => {
+                    if (method === "ticket") {
+                        console.info(`authorising on WAMP wit ticket method`);
+                        return user.password;
+                    }
+                    console.error(`unknown WAMP authentication method '${method}'`);
+                }
+            });
+            connection.onopen = function(session) {
+                if (!_session) {
+                     _session = session;
+                }
+                callback(_session);
+            };
+            connection.open();
+        }).fail(() => {
+            console.error('unable to get current user; do nothing with WAMP');
         });
-        connection.onopen = function(session) {
-            if (!_session) {
-                 _session = session;
-            }
-            callback(_session);
-        };
-        connection.open();
     };
 
     const instance = {

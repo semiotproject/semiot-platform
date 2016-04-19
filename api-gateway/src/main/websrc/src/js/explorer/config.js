@@ -10,8 +10,9 @@ export default {
     COOKIE_NAME: "ru.semiot",
     VERSION: `@VERSION`,
     URLS: {
-        messageBus: "ws://" + hostname + ":8080/ws",
-        tripleStore: "http://" + hostname + ":3030/ds/query",
+        currentUser: `http://${hostname}/user`,
+        messageBus: `ws://${hostname}:8080/ws`,
+        tripleStore: `http://${hostname}:3030/ds/query`,
         tsdb: {
             // archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}`,
             archiveQuantity: `${TSDB_BASE_URL}systems/{0}/observations?sensor_id={1}&start={2}`,
