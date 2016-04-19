@@ -2,9 +2,9 @@
 
 // change it to target hostname when develop
 const DEFAULT_HOSTNAME = "demo.semiot.ru";
-const hostname = location.hostname;
+const hostname = DEFAULT_HOSTNAME; // location.hostname;
 
-const TSDB_BASE_URL = `http://${hostname}:4242/api/query`;
+const TSDB_BASE_URL = `http://${hostname}/`;
 
 export default {
     COOKIE_NAME: "ru.semiot",
@@ -14,7 +14,7 @@ export default {
         tripleStore: "http://" + hostname + ":3030/ds/query",
         tsdb: {
             // archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}`,
-            archiveQuantity: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{property={3}}`,
+            archiveQuantity: `${TSDB_BASE_URL}systems/{0}/observations?sensor_id={1}&start={2}`,
             archiveEnum: `${TSDB_BASE_URL}?start={0}&end={1}&m=sum:{2}{enum_value=*}`,
             last: `${TSDB_BASE_URL}/last/{0}`
         },

@@ -46,7 +46,7 @@ $(document).on("ready", function() {
                 });
             };
             connection.onclose = function (reason, details) {
-                logger.append("connection closed: reason: " + reason + ", " + "details: " + details.message);
+                // logger.append("connection closed: reason: " + reason + ", " + "details: " + details.message);
             };
             connection.open();
         }

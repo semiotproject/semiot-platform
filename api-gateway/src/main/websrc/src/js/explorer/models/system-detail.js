@@ -35,8 +35,8 @@ export default function(
         fetchSystemTopic(uri, callback) {
             return sparqlUtils.executeQuery(CONFIG.SPARQL.queries.getSystemTopic.format(uri), callback);
         }
-        fetchArchiveObservations(metric, range, type) {
-            return tsdbUtils.getArchiveObservations(metric, range, type);
+        fetchArchiveObservations(system, sensor, range) {
+            return tsdbUtils.getArchiveObservations(system, sensor, range);
         }
         fetchArchiveStates(metric, range) {
             return tsdbUtils.getArchiveStates(metric, range);

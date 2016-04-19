@@ -2,6 +2,11 @@
 
 import N3 from "n3";
 
+// fixme
+function parseIdFromURI(uri) {
+    return uri.substring(uri.lastIndexOf('/') + 1);
+}
+
 export default function(
     $scope,
     $routeParams,
@@ -152,12 +157,17 @@ export default function(
                 defer.resolve();
             });
         } else {
-            systemDetail.fetchArchiveObservations($scope.topic, sensor.range, sensor.sensorType).then((result) => {
-                sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result.data);
+            systemDetail.fetchArchiveObservations(
+                parseIdFromURI(decodeURIComponent($routeParams.system_uri)),
+                parseIdFromURI(sensor.uri),
+                sensor.range
+            ).then((result) => {
+                sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result);
                 defer.resolve();
             }, () => {
                 console.error(`failed to load archive observations for some reason...`);
-                sensor.chartConfig.series[0].data = [];
+                console.log(chartUtils.parseObservationChartData());
+                sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData();
                 defer.resolve();
             });
         }
