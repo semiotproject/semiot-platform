@@ -62,7 +62,7 @@
                     <h3>New driver bundle</h3>
                     <form action="${pageContext.request.contextPath}/UploadDriverHandler" method="post" enctype="multipart/form-data">
                         <div class="form-group is-empty is-fileinput">
-                            <input type="file" id="bundlefile" multiple="">
+                            <input type="file" name="bundlefile" multiple="">
                             <div class="input-group">
                               <input type="text"
                                     readonly=""
