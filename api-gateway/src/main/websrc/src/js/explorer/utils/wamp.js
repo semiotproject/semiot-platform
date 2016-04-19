@@ -5,14 +5,9 @@ import autobahn from 'autobahn';
 export default function(CONFIG) {
 
     let _session;
-    let _connection = new autobahn.Connection({
-        url: CONFIG.URLS.messageBus,
-        realm: 'realm1'
-    });
 
     // hash `topic`:`autobahn.Subscribtion`
     let _subscriptions = {};
-    let _deferredSubscriptions = [];
 
     // lasy initialisation
     const checkSession = (callback) => {
@@ -21,6 +16,7 @@ export default function(CONFIG) {
             return;
         }
         $.get(CONFIG.URLS.currentUser).done((user) => {
+            user = JSON.parse(user);
             console.log('initialising WAMP session...');
             let connection = new autobahn.Connection({
                 url: CONFIG.URLS.messageBus,
