@@ -162,12 +162,11 @@ export default function(
                 parseIdFromURI(sensor.uri),
                 sensor.range
             ).then((result) => {
-                sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result);
+                sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData(result.data);
                 defer.resolve();
             }, () => {
                 console.error(`failed to load archive observations for some reason...`);
-                console.log(chartUtils.parseObservationChartData());
-                sensor.chartConfig.series[0].data = chartUtils.parseObservationChartData();
+                sensor.chartConfig.series[0].data = [];
                 defer.resolve();
             });
         }
