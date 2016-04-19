@@ -69,11 +69,12 @@ public class ObservationListener extends RDFMessageObserver {
                             featureOfInterest = featureOfInterestResource
                                     .getURI();
                         }
-                        TSDBClient.getInstance().write(
-                                new Observation(sensorUri.substring(
-                                        sensorUri.lastIndexOf("/") + 1),
-                                        system_id, timestamp, property,
-                                        featureOfInterest, value));
+                        TSDBClient.getInstance()
+                                .write(new Observation(system_id,
+                                        sensorUri.substring(
+                                                sensorUri.lastIndexOf("/") + 1),
+                                        timestamp, property, featureOfInterest,
+                                        value));
                     } else {
                         logger.warn("Required properties not found!");
                     }
