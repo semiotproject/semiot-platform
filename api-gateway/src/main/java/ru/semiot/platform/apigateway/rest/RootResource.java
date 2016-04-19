@@ -44,10 +44,14 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
 import static ru.semiot.platform.apigateway.beans.impl.ContextProvider.API_DOCUMENTATION;
 import static ru.semiot.platform.apigateway.beans.impl.ContextProvider.ENTRYPOINT;
+import ru.semiot.platform.apigateway.utils.Credentials;
+import ru.semiot.platform.apigateway.utils.DataBase;
 
 @Path("/")
 @Stateless
@@ -97,6 +101,9 @@ public class RootResource {
     @Inject
     private ContextProvider contextProvider;
 
+    @Inject
+    private DataBase db;
+    
     @GET
     @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public String entrypoint() throws JsonLdError, IOException, URISyntaxException {
@@ -215,4 +222,28 @@ public class RootResource {
         return resultPrototypes;
     }
 
+    @GET
+    @Path("/logout")
+    public void getContext(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws Exception {
+        resp.setHeader("Cache-Control", "no-cache, no-store");
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("Expires", new java.util.Date().toString());
+        if (req.getSession(false) != null) {
+            req.getSession(false).invalidate();// remove session.
+        }
+        req.logout();
+        resp.sendRedirect("/");
+    }
+
+    @GET
+    @Path("/user")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getUserData (@Context HttpServletRequest req, @Context HttpServletResponse resp) throws Exception {
+        Credentials c = db.getUser(req.getRemoteUser());
+        if(c != null){
+            resp.getWriter().write("{\"username\": \"" + c.getLogin() + "\", \"password\": \"" + c.getPassword() + "\"}");
+            resp.getWriter().flush();
+            resp.getWriter().close();
+        }        
+    }
 }

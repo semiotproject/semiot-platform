@@ -38,7 +38,7 @@ public class DataBase {
 
     public boolean isUniqueLogin(String login, int id) {
         try {
-            return ((Credentials)em.createNamedQuery("Credentials.findByLogin").setParameter("login", login).getSingleResult()).getId()==id;
+            return getUser(login).getId()==id;
         }
         catch (Exception ex) {
             return true;
@@ -78,5 +78,14 @@ public class DataBase {
 
     public List<Credentials> getAllUsers() {
         return em.createNamedQuery("Credentials.findAll").getResultList();
+    }
+    
+    public Credentials getUser(String login){
+        try {
+            return ((Credentials)em.createNamedQuery("Credentials.findByLogin").setParameter("login", login).getSingleResult());
+        }
+        catch (Exception ex) {
+            return null;
+        }
     }
 }

@@ -57,7 +57,7 @@ public class AdminPanelHandler extends HttpServlet {
             Credentials c;
             for (int i = 0; i < ids.length; i++) {
 
-                c = new Credentials(Integer.parseInt(ids[i]), logins[i], passwords[i], (i == 0) ? "admin" : roles[i - 1]);
+                c = new Credentials(Integer.parseInt(ids[i]), logins[i], passwords[i], (i == 0) ? "admin" : roles[i]);
                 if (c.getLogin().isEmpty() || c.getLogin().contains(" ") || !db.isUniqueLogin(c.getLogin(), c.getId())) {
                     if (credentials.contains(c)) {
                         newList.add(credentials.get(credentials.indexOf(c)));
