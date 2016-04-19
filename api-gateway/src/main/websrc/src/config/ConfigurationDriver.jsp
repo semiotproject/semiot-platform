@@ -74,7 +74,7 @@
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown"><%=request.getRemoteUser()%>
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/config/AdminPanel?logout">Logout</a></li>
+                        <li><a href="/logout">Logout</a></li>
                     </ul>
                 </li>
             </ul>

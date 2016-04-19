@@ -21,7 +21,7 @@
 </div>
 <script>
     function logout(){
-        $.ajax({url: "${pageContext.request.contextPath}/config/AdminPanel?logout",
+        $.ajax({url: "${pageContext.request.contextPath}/logout",
             type: 'GET',
             success: function(){
                 window.location.replace("/");
