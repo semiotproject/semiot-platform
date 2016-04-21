@@ -21,174 +21,171 @@ import java.net.URI;
 
 public class DirectoryService {
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(DirectoryService.class);
-    private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
-    private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
-    private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
+  private static final Logger logger = LoggerFactory.getLogger(DirectoryService.class);
+  private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
+  private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
+  private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
 
+  // @formatter:off
     protected static final String QUERY_DELETE_ALL_DATA_DRIVER = NamespaceUtils.newSPARQLQuery(
     		"DELETE { "
-    			+ "?system ?x1 ?y1. "
-    			+ "?sensor ?x2 ?y2. "
-    			+ "?loc ?x3 ?y3. "
-    			+ "GRAPH <urn:semiot:graphs:private>{?system ?x4 ?y4. "
-    				+ "?wamp ?x5 ?y5} } "
-    			+ "WHERE { "
-    				+ "GRAPH <urn:semiot:graphs:private> {"
-    					+ "?system semiot:hasDriver <urn:semiot:drivers:${PID}>} . "
-    				+ "{ ?system  ssn:hasSubSystem  ?sensor . "
-    					+ "?system ?x1 ?y1. ?sensor ?x2 ?y2 } "
-    				+ "UNION { ?system geo:location ?loc. ?loc ?x3 ?y3 } "
-    				+ "UNION { "
-    					+ "GRAPH <urn:semiot:graphs:private> { "
-    						+ "?system ssncom:hasCommunicationEndpoint  ?wamp . "
-    						+ "?system ?x4 ?y4. ?wamp ?x5 ?y5} } }", 
-    		SSN.class, SSNCOM.class, SEMIOT.class, GEO.class);
-    
-    protected static final String QUERY_UPDATE_STATE_SYSTEM = NamespaceUtils.newSPARQLQuery(
-            "DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
-            + "INSERT { <${URI_SYSTEM}> saref:hasState <${STATE}> } "
-            + "WHERE { <${URI_SYSTEM}> saref:hasState ?x }",
-            SAREF.class);
-    private static final String GET_SYSTEM_URI = NamespaceUtils.newSPARQLQuery(
-            "SELECT ?uri {?uri a ssn:System} LIMIT 1", SSN.class);
-    private static final String GET_DRIVER_PID_BY_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
-            "SELECT ?pid {" +
-                    "?system dcterms:identifier \"${SYSTEM_ID}\" ." +
-                    "GRAPH <urn:semiot:graphs:private> {" +
-                    "?system semiot:hasDriver ?pid" +
-                    "}} LIMIT 1", DCTerms.class, SEMIOT.class);
+    		+ "?system ?x1 ?y1. ?sensor ?x2 ?y2. "
+    		+ "?prototype ?x3 ?y3. ?mc ?x4 ?y4. "
+    		+ "?mp ?x5 ?y5. ?value ?x6 ?y6. ?loc ?x7 ?y7.  "
+    		+ "GRAPH <urn:semiot:graphs:private>{"
+    		  + "?system ?x8 ?y8. ?wamp ?x9 ?y9} }"
+    		+ "  WHERE { "
+    		  + "GRAPH <urn:semiot:graphs:private> {"
+    		    + "?system semiot:hasDriver <urn:semiot:drivers:${PID}>} . "
+    		  + "{ ?system  ssn:hasSubSystem  ?sensor . "
+    		    + "?sensor proto:hasPrototype ?prototype . "
+    		    + "?prototype ssn:hasMeasurementCapability ?mc . "
+    		    + "?mc ssn:hasMeasurementProperty ?mp . "
+    		    + "?mp ssn:hasValue ?value . "
+    		    + "?system ?x1 ?y1. ?sensor ?x2 ?y2. ?prototype ?x3 ?y3. "
+    		    + "?mc ?x4 ?y4. ?mp ?x5 ?y5. ?value ?x6 ?y6 } "
+    		  + "UNION { ?system geo:location ?loc. ?loc ?x7 ?y7 } "
+    		  + "UNION { "
+    		    + "GRAPH <urn:semiot:graphs:private> { "
+    		      + "?system ssncom:hasCommunicationEndpoint  ?wamp . "
+    		      + "?system ?x8 ?y8. ?wamp ?x9 ?y9} } }", 
+    		SSN.class, SSNCOM.class, SEMIOT.class, GEO.class, Proto.class);
+    // @formatter:on
 
-    private final RDFStore store;
+  protected static final String QUERY_UPDATE_STATE_SYSTEM =
+      NamespaceUtils.newSPARQLQuery("DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
+          + "INSERT { <${URI_SYSTEM}> saref:hasState <${STATE}> } "
+          + "WHERE { <${URI_SYSTEM}> saref:hasState ?x }", SAREF.class);
+  private static final String GET_SYSTEM_URI =
+      NamespaceUtils.newSPARQLQuery("SELECT ?uri {?uri a ssn:System} LIMIT 1", SSN.class);
+  private static final String GET_DRIVER_PID_BY_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
+      "SELECT ?pid {" + "?system dcterms:identifier \"${SYSTEM_ID}\" ."
+          + "GRAPH <urn:semiot:graphs:private> {" + "?system semiot:hasDriver ?pid" + "}} LIMIT 1",
+      DCTerms.class, SEMIOT.class);
 
-    public DirectoryService(RDFStore store) {
-        this.store = store;
-    }
+  private final RDFStore store;
 
-    public void inactiveDevice(String message) {
-        String request = null;
-        try {
-            Model description = ModelFactory.createDefaultModel().read(
-                    new StringReader(message), null, RDFLanguages.TURTLE.getName());
+  public DirectoryService(RDFStore store) {
+    this.store = store;
+  }
 
-            if (!description.isEmpty()) {
-                logger.info("Update " + message);
+  public void inactiveDevice(String message) {
+    String request = null;
+    try {
+      Model description = ModelFactory.createDefaultModel().read(new StringReader(message), null,
+          RDFLanguages.TURTLE.getName());
 
-                QueryExecution qe = QueryExecutionFactory.create(
-                        GET_SYSTEM_URI,
-                        description);
-                ResultSet systems = qe.execSelect();
+      if (!description.isEmpty()) {
+        logger.info("Update " + message);
 
-                while (systems.hasNext()) {
-                    QuerySolution qs = systems.next();
-                    String uriSystem = qs.getResource("uri_system").getURI();
-                    String state = qs.getResource("state").getURI();
-                    request = QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
-                            .replace("${STATE}", state);
-                    if (uriSystem != null && state != null) {
-                        store.update(request);
-                    }
-                }
-            } else {
-                logger.warn("Received an empty message or in a wrong format!");
-            }
-        } catch (RiotException ex) {
-            logger.warn(ex.getMessage(), ex);
-        } catch (Exception ex) {
-            logger.info("Exception with string: " + ((request != null && !request.isEmpty()) ? request : "request message is empty"));
-            logger.error(ex.getMessage(), ex);
+        QueryExecution qe = QueryExecutionFactory.create(GET_SYSTEM_URI, description);
+        ResultSet systems = qe.execSelect();
+
+        while (systems.hasNext()) {
+          QuerySolution qs = systems.next();
+          String uriSystem = qs.getResource("uri_system").getURI();
+          String state = qs.getResource("state").getURI();
+          request = QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
+              .replace("${STATE}", state);
+          if (uriSystem != null && state != null) {
+            store.update(request);
+          }
         }
+      } else {
+        logger.warn("Received an empty message or in a wrong format!");
+      }
+    } catch (RiotException ex) {
+      logger.warn(ex.getMessage(), ex);
+    } catch (Exception ex) {
+      logger.info("Exception with string: "
+          + ((request != null && !request.isEmpty()) ? request : "request message is empty"));
+      logger.error(ex.getMessage(), ex);
     }
+  }
 
-    public void addDevicePrototype(URI uri) {
-        try {
-            Model model = RDFDataMgr.loadModel(uri.toASCIIString(), RDFLanguages.TURTLE);
+  public void addDevicePrototype(URI uri) {
+    try {
+      Model model = RDFDataMgr.loadModel(uri.toASCIIString(), RDFLanguages.TURTLE);
 
-            store.save(model);
-        } catch (Throwable ex) {
-            logger.error(ex.getMessage(), ex);
-        }
+      store.save(model);
+    } catch (Throwable ex) {
+      logger.error(ex.getMessage(), ex);
     }
+  }
 
-    /**
-     * Doesn't check whether device already exists.
-     *
-     * @param deviceDescription
-     * @return true if the given device successfully added.
-     */
-    public boolean addNewDevice(DriverInformation info, Device device, String deviceDescription) {
-        try {
-            Model description = ModelFactory.createDefaultModel().read(
-                    new StringReader(deviceDescription), null,
-                    RDFLanguages.TURTLE.getName());
+  /**
+   * Doesn't check whether device already exists.
+   *
+   * @param deviceDescription
+   * @return true if the given device successfully added.
+   */
+  public boolean addNewDevice(DriverInformation info, Device device, String deviceDescription) {
+    try {
+      Model description = ModelFactory.createDefaultModel()
+          .read(new StringReader(deviceDescription), null, RDFLanguages.TURTLE.getName());
 
-            if (!description.isEmpty()) {
-                ResultSet qr = QueryExecutionFactory.create(
-                        GET_SYSTEM_URI,
-                        description).execSelect();
+      if (!description.isEmpty()) {
+        ResultSet qr = QueryExecutionFactory.create(GET_SYSTEM_URI, description).execSelect();
 
-                if (qr.hasNext()) {
-                    Resource system = qr.next().getResource(Vars.URI);
+        if (qr.hasNext()) {
+          Resource system = qr.next().getResource(Vars.URI);
 
-                    //Given uri is not a blank node
-                    if (system.isURIResource()) {
-                        store.save(description);
+          // Given uri is not a blank node
+          if (system.isURIResource()) {
+            store.save(description);
 
-                        //Add ssncom:hasCommunicationEndpoint to a private graph
-                        Resource wampResource = ResourceFactory.createResource(system.getURI() + "/wamp");
-                        Model privateDeviceInfo = ModelFactory
-                                .createDefaultModel()
-                                .add(system, SSNCOM.hasCommunicationEndpoint, wampResource)
-                                .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
-                                .add(wampResource, SSNCOM.topic,
-                                        ResourceFactory.createPlainLiteral(device.getId()))
-                                .add(wampResource, SSNCOM.protocol, WAMP)
-                                .add(system, SEMIOT.hasDriver, 
-                                		ResourceFactory.createResource(
-                                				TEMPLATE_DRIVER_URN.replace("${PID}", info.getId())));
+            // Add ssncom:hasCommunicationEndpoint to a private graph
+            Resource wampResource = ResourceFactory.createResource(system.getURI() + "/wamp");
+            Model privateDeviceInfo =
+                ModelFactory.createDefaultModel()
+                    .add(system, SSNCOM.hasCommunicationEndpoint, wampResource)
+                    .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
+                    .add(wampResource, SSNCOM.topic,
+                        ResourceFactory.createPlainLiteral(device.getId()))
+                    .add(wampResource, SSNCOM.protocol, WAMP)
+                    .add(system, SEMIOT.hasDriver, ResourceFactory
+                        .createResource(TEMPLATE_DRIVER_URN.replace("${PID}", info.getId())));
 
-                        store.save(GRAPH_PRIVATE, privateDeviceInfo);
+            store.save(GRAPH_PRIVATE, privateDeviceInfo);
 
-                        return true;
-                    } else {
-                        logger.error("Device [{}] doesn't have URI!",
-                                device.getId());
-                    }
-                } else {
-                    logger.error("Can't find a system!");
-                }
-            } else {
-                logger.warn("Received an empty message or in a wrong format!");
-            }
-        } catch (RiotException ex) {
-            logger.warn(ex.getMessage(), ex);
-        } catch (Throwable ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-
-        return false;
-    }
-    
-    public void removeDataOfDriver(String pid) {
-    	store.update(QUERY_DELETE_ALL_DATA_DRIVER.replace("${PID}", pid));
-    }
-
-    public String findDriverPidByDeviceId(String deviceId) {
-        String query = GET_DRIVER_PID_BY_SYSTEM_ID.replace("${SYSTEM_ID}", deviceId);
-        ResultSet resultSet = store.select(query);
-        if(resultSet.hasNext()) {
-            QuerySolution qs = resultSet.next();
-            Resource pid = qs.getResource("pid");
-            String driverUri = pid.getURI();
-            return driverUri.replace("urn:semiot:drivers:", "");
+            return true;
+          } else {
+            logger.error("Device [{}] doesn't have URI!", device.getId());
+          }
         } else {
-            return null;
+          logger.error("Can't find a system!");
         }
+      } else {
+        logger.warn("Received an empty message or in a wrong format!");
+      }
+    } catch (RiotException ex) {
+      logger.warn(ex.getMessage(), ex);
+    } catch (Throwable ex) {
+      logger.error(ex.getMessage(), ex);
     }
 
-    private static abstract class Vars {
+    return false;
+  }
 
-        public static final String URI = "uri";
+  public void removeDataOfDriver(String pid) {
+    store.update(QUERY_DELETE_ALL_DATA_DRIVER.replace("${PID}", pid));
+  }
+
+  public String findDriverPidByDeviceId(String deviceId) {
+    String query = GET_DRIVER_PID_BY_SYSTEM_ID.replace("${SYSTEM_ID}", deviceId);
+    ResultSet resultSet = store.select(query);
+    if (resultSet.hasNext()) {
+      QuerySolution qs = resultSet.next();
+      Resource pid = qs.getResource("pid");
+      String driverUri = pid.getURI();
+      return driverUri.replace("urn:semiot:drivers:", "");
+    } else {
+      return null;
     }
+  }
+
+  private static abstract class Vars {
+
+    public static final String URI = "uri";
+  }
 }

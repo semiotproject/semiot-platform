@@ -148,7 +148,7 @@ public class SystemResource {
     @GET
     @Path("{id}")
     public void getSystem(@Suspended final AsyncResponse response,
-            @PathParam("id") String id) throws URISyntaxException, IOException {
+                          @PathParam("id") String id) throws URISyntaxException, IOException {
         URI root = uriInfo.getRequestUri();
         Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_SINGLE,
                 MapBuilder.newMap()

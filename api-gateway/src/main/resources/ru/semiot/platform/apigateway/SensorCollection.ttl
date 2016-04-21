@@ -7,5 +7,5 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
-<${ROOT_URL}/systems> a hydra:Collection, void:Dataset ;
+<${ROOT_URL}/sensors> a hydra:Collection, void:Dataset ;
     void:classPartition [ void:class ssn:SensingDevice ] .

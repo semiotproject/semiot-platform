@@ -2,6 +2,7 @@ package ru.semiot.platform.apigateway.rest;
 
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
+
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
@@ -10,6 +11,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.VOID;
 import ru.semiot.commons.restapi.MediaType;
@@ -28,6 +30,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
@@ -104,17 +107,13 @@ public class SensorResource {
             }
 
             try {
-                return JsonUtils.toPrettyString(
-                        RDFUtils.toJsonLdCompact(model, frame));
+                return JsonUtils.toPrettyString(RDFUtils.toJsonLdCompact(model, frame));
             } catch (JsonLdError | IOException ex) {
                 throw Exceptions.propagate(ex);
             }
-
         });
 
-        Observable.zip(sensors, prototypes, (a, b) -> {
-            return a;
-        }).subscribe(resume(response));
+        Observable.zip(sensors, prototypes, (a, b) -> a).subscribe(resume(response));
     }
 
 }

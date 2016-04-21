@@ -24,7 +24,7 @@ public class Observation {
     private final String value;
     private final Resource featureOfInterest;
 
-    public Observation(@NotNull String sensorId, @NotNull String system_id,
+    public Observation(@NotNull String system_id, @NotNull String sensorId,
                        @NotNull String eventTime, @NotNull String property,
                        String featureOfInterest, @NotNull String value) {
         this.sensorId = sensorId;

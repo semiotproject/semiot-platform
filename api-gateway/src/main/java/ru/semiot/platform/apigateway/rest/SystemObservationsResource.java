@@ -1,11 +1,24 @@
 package ru.semiot.platform.apigateway.rest;
 
-import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
-import static ru.semiot.commons.restapi.AsyncResponseHelper.resumeOnError;
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.utils.JsonUtils;
+
+import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.ext.com.google.common.base.Strings;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,19 +35,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.aeonbits.owner.ConfigFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.ext.com.google.common.base.Strings;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
-
-import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.utils.JsonUtils;
-
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.restapi.MediaType;
@@ -47,12 +47,16 @@ import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.exceptions.Exceptions;
 
+import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
+import static ru.semiot.commons.restapi.AsyncResponseHelper.resumeOnError;
+
 @Path("/systems/{system_id}/observations")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
 public class SystemObservationsResource {
 
     private static final ServerConfig config = ConfigFactory
             .create(ServerConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemObservationsResource.class);
     private static final String QUERY_GET_SYSTEM_SENSORS = "SELECT DISTINCT ?sensor_id {"
             + " ?uri a ssn:System ;"
             + "     dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ;"
@@ -70,9 +74,10 @@ public class SystemObservationsResource {
     UriInfo uriInfo;
 
     @GET
-    public void observations(@Suspended final AsyncResponse response,
-                             @PathParam("system_id") String systemId,
-                             @QueryParam("start") String start, @QueryParam("end") String end)
+    public void observations(
+            @Suspended final AsyncResponse response, @PathParam("system_id") String systemId,
+            @QueryParam("sensor_id") List<String> listSensorId,
+            @QueryParam("start") String start, @QueryParam("end") String end)
             throws IOException {
         if (Strings.isNullOrEmpty(systemId)) {
             response.resume(Response.status(Response.Status.NOT_FOUND).build());
@@ -85,40 +90,45 @@ public class SystemObservationsResource {
                 .put(ContextProvider.VAR_WAMP_URL, rootUrl + config.wampPublicPath())
                 .put(ContextProvider.VAR_SYSTEM_ID, systemId).build();
         if (Strings.isNullOrEmpty(start)) {
-            sparqlQuery.select(QUERY_GET_SYSTEM_SENSORS.replace("${SYSTEM_ID}", systemId))
-                    .subscribe((rs) -> {
-                        tsdbQuery.queryTimeOfLatestBySystemId(systemId, rsToList(rs)).map((result) -> {
-                            if (StringUtils.isNotBlank(result)) {
-                                UriBuilder uriBuilder = UriBuilder.fromUri(root)
-                                        .queryParam("start", result);
-                                response.resume(Response.seeOther(uriBuilder.build()).build());
-                            } else {
-                                try {
-                                    Map<String, Object> frame = contextProvider.getFrame(
-                                            ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION,
-                                            rootUrl);
-                                    params.put(ContextProvider.VAR_QUERY_PARAMS, "?noparams");
-                                    Model model = contextProvider.getRDFModel(
-                                            ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION,
-                                            params);
-                                    Resource view = RDFUtils.subjectWithProperty(model, RDF.type,
-                                            Hydra.PartialCollectionView);
-                                    model.remove(view, null, null);
+            tsdbQuery.queryTimeOfLatestBySystemId(
+                    systemId, getListSensorsId(systemId, listSensorId)).subscribe((result) -> {
+                if (StringUtils.isNotBlank(result)) {
+                    UriBuilder uriBuilder = UriBuilder.fromUri(root).queryParam("start", result);
+                    response.resume(Response.seeOther(uriBuilder.build()).build());
+                } else {
+                    try {
+                        Map<String, Object> frame = contextProvider
+                                .getFrame(
+                                        ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION,
+                                        root);
+                        params.put(ContextProvider.VAR_QUERY_PARAMS,
+                                "?noparams");
+                        Model model = contextProvider.getRDFModel(
+                                ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION,
+                                params);
+                        Resource view = RDFUtils.subjectWithProperty(
+                                model, RDF.type,
+                                Hydra.PartialCollectionView);
+                        model.remove(view, null, null);
 
-                                    response.resume(JsonUtils.toPrettyString(
-                                            RDFUtils.toJsonLdCompact(model, frame)));
-                                } catch (Throwable ex) {
-                                    response.resume(ex);
-                                }
-                            }
-                            return new String();
-                        }).toBlocking().single();
-                    }, resumeOnError(response));
+                        response.resume(JsonUtils.toPrettyString(
+                                RDFUtils.toJsonLdCompact(model,
+                                        frame)));
+                    } catch (Throwable ex) {
+                        response.resume(ex);
+                    }
+                }
+            }, resumeOnError(response));
         } else {
             Map<String, Object> frame = contextProvider.getFrame(
-                    ContextProvider.SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION, rootUrl);
+                    ContextProvider.SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION,
+                    root);
 
-            String queryParams = "?start=" + start;
+            String queryParams = "?";
+            if (listSensorId != null && !listSensorId.isEmpty()) {
+                queryParams += "sensor_id=" + StringUtils.join(listSensorId, ',') + "&";
+            }
+            queryParams += "start=" + start;
             if (!Strings.isNullOrEmpty(end)) {
                 queryParams += "&end=" + end;
             }
@@ -127,26 +137,39 @@ public class SystemObservationsResource {
             Model model = contextProvider.getRDFModel(
                     ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, params);
 
-            sparqlQuery.select(QUERY_GET_SYSTEM_SENSORS.replace("${SYSTEM_ID}", systemId)).map((rs) -> {
-                return tsdbQuery.queryBySystemId(systemId, rsToList(rs), start, end).map((result) -> {
-                    model.add(result);
-                    Resource collection = model.listSubjectsWithProperty(
-                            RDF.type,
-                            Hydra.PartialCollectionView).next();
-                    ResIterator iter = model.listSubjectsWithProperty(RDF.type, SSN.Observaton);
-                    while (iter.hasNext()) {
-                        Resource obs = iter.next();
-                        model.add(collection, Hydra.member,
-                                obs);
-                    }
-                    try {
-                        return JsonUtils.toPrettyString(RDFUtils
-                                .toJsonLdCompact(model, frame));
-                    } catch (JsonLdError | IOException ex) {
-                        throw Exceptions.propagate(ex);
-                    }
-                }).map((json) -> Response.ok(json).build()).toBlocking().single();
+            tsdbQuery.queryBySystemId(systemId,
+                    getListSensorsId(systemId, listSensorId), start, end).map((result) -> {
+                model.add(result);
+                Resource collection = model.listSubjectsWithProperty(
+                        RDF.type, Hydra.PartialCollectionView).next();
+                ResIterator iter = model.listSubjectsWithProperty(
+                        RDF.type, SSN.Observaton);
+                while (iter.hasNext()) {
+                    Resource obs = iter.next();
+                    model.add(collection, Hydra.member, obs);
+                }
+                try {
+                    return JsonUtils.toPrettyString(
+                            RDFUtils.toJsonLdCompact(model, frame));
+                } catch (JsonLdError | IOException ex) {
+                    throw Exceptions.propagate(ex);
+                }
+            }).map((json) -> {
+                return Response.ok(json).build();
             }).subscribe(resume(response));
+        }
+    }
+
+    private List<String> getListSensorsId(String systemId,
+                                          List<String> sensorsId) {
+        if (sensorsId == null || sensorsId.isEmpty()) {
+            return rsToList(
+                    sparqlQuery
+                            .select(QUERY_GET_SYSTEM_SENSORS
+                                    .replace("${SYSTEM_ID}", systemId))
+                            .toBlocking().single());
+        } else {
+            return sensorsId;
         }
     }
 

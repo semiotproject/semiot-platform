@@ -2,21 +2,21 @@ package ru.semiot.platform.apigateway.rest;
 
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
+
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.commons.namespaces.Proto;
-import ru.semiot.commons.restapi.MediaType;
-import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
-import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
-import ru.semiot.platform.apigateway.utils.RDFUtils;
-import rx.exceptions.Exceptions;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -27,12 +27,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
 
-import static ru.semiot.commons.restapi.AsyncResponseHelper.*;
+import ru.semiot.commons.namespaces.Proto;
+import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.commons.restapi.MediaType;
+import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
+import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
+import ru.semiot.platform.apigateway.utils.RDFUtils;
+import ru.semiot.platform.apigateway.utils.URIUtils;
+import rx.exceptions.Exceptions;
+
+import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
 
 @Path("/systems/{system_id}/subsystems")
 @Stateless
@@ -67,6 +74,7 @@ public class SubSystemResource {
                              @PathParam("subsystem_id") String subsystemId)
             throws IOException {
         URI root = uriInfo.getRequestUri();
+        String rootUrl = URIUtils.extractRootURL(root);
         Model model = contextProvider.getRDFModel(
                 ContextProvider.SUBSYSTEM_SINGLE, root);
         Map<String, Object> frame = contextProvider.getFrame(
@@ -85,6 +93,19 @@ public class SubSystemResource {
                         Resource prototypeResource = ResourceUtils
                                 .createResourceFromClass(root, prototype.getLocalName());
                         model.add(subsystem, RDF.type, prototypeResource);
+
+                        ResIterator sdIterator = model.listSubjectsWithProperty(
+                                RDF.type, SSN.SensingDevice);
+                        if (sdIterator.hasNext()) {
+                            //The subsystem is a sensing device
+                            Resource sensingDevice = sdIterator.next();
+                            model.add(sensingDevice,
+                                    ResourceFactory.createProperty(rootUrl + "/doc#observations"),
+                                    ResourceFactory.createResource(UriBuilder.fromUri(root)
+                                            .replacePath("/systems/{system_id}/observations")
+                                            .queryParam("sensor_id", subsystemId)
+                                            .build(systemId).toASCIIString()));
+                        }
 
                         return JsonUtils.toPrettyString(
                                 RDFUtils.toJsonLdCompact(model, frame));
