@@ -2,6 +2,7 @@ package ru.semiot.platform.apigateway.rest;
 
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.rdf.model.Model;
@@ -10,6 +11,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.restapi.MediaType;
@@ -31,6 +33,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
 import java.io.IOException;
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -63,9 +66,10 @@ public class SystemActuationsResource {
                            @QueryParam("start") ZonedDateTime start,
                            @QueryParam("end") ZonedDateTime end) {
         URI root = uriInfo.getRequestUri();
+        String rootURL = URIUtils.extractRootURL(root);
         Map params = MapBuilder.newMap()
-                .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
-                .put(ContextProvider.VAR_WAMP_URL, config.wampUri())
+                .put(ContextProvider.VAR_ROOT_URL, rootURL)
+                .put(ContextProvider.VAR_WAMP_URL, rootURL + config.wampPublicPath())
                 .put(ContextProvider.VAR_SYSTEM_ID, systemId)
                 .build();
         if (Strings.isNullOrEmpty(systemId)) {
@@ -82,7 +86,7 @@ public class SystemActuationsResource {
                 } else {
                     try {
                         Map<String, Object> frame = contextProvider.getFrame(
-                                ContextProvider.SYSTEM_ACTUATIONS_COLLECTION, root);
+                                ContextProvider.SYSTEM_ACTUATIONS_COLLECTION, rootURL);
                         params.put(ContextProvider.VAR_QUERY_PARAMS, "?noparams");
                         Model model = contextProvider.getRDFModel(
                                 ContextProvider.SYSTEM_ACTUATIONS_COLLECTION, params);
@@ -109,7 +113,7 @@ public class SystemActuationsResource {
             tsdb.queryActuationsByRange(systemId, start, end).subscribe((result) -> {
                 try {
                     Map<String, Object> frame = contextProvider.getFrame(
-                            ContextProvider.SYSTEM_ACTUATIONS_PARTIAL_COLLECTION, root);
+                            ContextProvider.SYSTEM_ACTUATIONS_PARTIAL_COLLECTION, rootURL);
                     model.add(result);
                     Resource collection = model.listSubjectsWithProperty(
                             RDF.type, Hydra.PartialCollectionView).next();

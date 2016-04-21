@@ -4,6 +4,7 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -14,6 +15,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.SHACL;
@@ -38,18 +40,21 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
 import static ru.semiot.platform.apigateway.beans.impl.ContextProvider.API_DOCUMENTATION;
 import static ru.semiot.platform.apigateway.beans.impl.ContextProvider.ENTRYPOINT;
+
 import ru.semiot.platform.apigateway.utils.Credentials;
 import ru.semiot.platform.apigateway.utils.DataBase;
 
@@ -103,7 +108,7 @@ public class RootResource {
 
     @Inject
     private DataBase db;
-    
+
     @GET
     @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public String entrypoint() throws JsonLdError, IOException, URISyntaxException {
@@ -134,20 +139,20 @@ public class RootResource {
     @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
     public void documentation(@Suspended final AsyncResponse response)
             throws JsonLdError, IOException {
-        URI root = uriInfo.getRequestUri();
+        String rootURL = URIUtils.extractRootURL(uriInfo.getRequestUri());
         Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION,
                 MapBuilder.newMap()
-                        .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
-                        .put(ContextProvider.VAR_WAMP_URL, config.wampUri())
+                        .put(ContextProvider.VAR_ROOT_URL, rootURL)
+                        .put(ContextProvider.VAR_WAMP_URL, rootURL + config.wampPublicPath())
                         .build());
-        Map<String, Object> frame = contextProvider.getFrame(API_DOCUMENTATION, root);
+        Map<String, Object> frame = contextProvider.getFrame(API_DOCUMENTATION, rootURL);
 
         Observable<List<Resource>> systems = query.select(QUERY_SYSTEM_PROTOTYPES)
                 .map((ResultSet rs) -> defineResourceIndividual(
-                        apiDoc, root, "EntryPoint-Systems", rs, SSN.System));
+                        apiDoc, rootURL, "EntryPoint-Systems", rs, SSN.System));
         Observable<List<Resource>> sensors = query.select(QUERY_SENSOR_PROTOTYPES)
                 .map((ResultSet rs) -> defineResourceIndividual(
-                        apiDoc, root, "EntryPoint-Sensors", rs, SSN.SensingDevice));
+                        apiDoc, rootURL, "EntryPoint-Sensors", rs, SSN.SensingDevice));
 
         Observable.zip(systems, sensors, (rsSystems, rsSensors) -> {
             List<Resource> rs = new ArrayList<>(rsSystems);
@@ -164,7 +169,7 @@ public class RootResource {
                     QuerySolution qs = rs.next();
                     Resource prototype = qs.getResource(VAR_PROTOTYPE);
                     Resource prototypeResource = ResourceUtils.createResourceFromClass(
-                            root, prototype.getLocalName());
+                            rootURL, prototype.getLocalName());
                     Property property = ResourceFactory.createProperty(
                             qs.getResource(VAR_PROPERTY).getURI());
 
@@ -181,13 +186,13 @@ public class RootResource {
         }).subscribe(resume(response));
     }
 
-    private List<Resource> defineResourceIndividual(Model model, URI root, String collectionName,
+    private List<Resource> defineResourceIndividual(Model model, String rootURL, String collectionName,
                                                     ResultSet rs, Resource... classes) {
         List<Resource> resultPrototypes = new ArrayList<>();
         final Resource apiDocResource = model.listResourcesWithProperty(
                 RDF.type, Hydra.ApiDocumentation).next();
         final Resource collection = ResourceFactory.createResource(
-                URIUtils.extractRootURL(root) + "/doc#" + collectionName);
+                rootURL + "/doc#" + collectionName);
 
         //Find the restriction on hydra:member of the given collection
         ResultSet results = query.select(model, QUERY_COLLECTION_MEMBER
@@ -201,7 +206,7 @@ public class RootResource {
             final Resource prototype = rs.next().getResource(VAR_PROTOTYPE);
             resultPrototypes.add(prototype);
             final Resource prototypeResource = ResourceUtils.createResourceFromClass(
-                    root, prototype.getLocalName());
+                    rootURL, prototype.getLocalName());
 
             //Define in hydra:supportedClass
             model.add(apiDocResource,
@@ -238,12 +243,12 @@ public class RootResource {
     @GET
     @Path("/user")
     @Produces(MediaType.APPLICATION_JSON)
-    public void getUserData (@Context HttpServletRequest req, @Context HttpServletResponse resp) throws Exception {
+    public void getUserData(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws Exception {
         Credentials c = db.getUser(req.getRemoteUser());
-        if(c != null){
+        if (c != null) {
             resp.getWriter().write("{\"username\": \"" + c.getLogin() + "\", \"password\": \"" + c.getPassword() + "\"}");
             resp.getWriter().flush();
             resp.getWriter().close();
-        }        
+        }
     }
 }

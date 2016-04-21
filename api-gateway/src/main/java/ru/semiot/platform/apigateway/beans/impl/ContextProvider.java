@@ -1,14 +1,17 @@
 package ru.semiot.platform.apigateway.beans.impl;
 
 import com.github.jsonldjava.utils.JsonUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
@@ -17,6 +20,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 
@@ -93,8 +97,13 @@ public class ContextProvider {
 
     public Map<String, Object> getFrame(String name, URI root)
             throws IOException {
+        return getFrame(name, URIUtils.extractRootURL(root));
+    }
+
+    public Map<String, Object> getFrame(String name, String rootURL)
+            throws IOException {
         String str = frames.get(name).replace(VAR_ROOT_URL,
-                URIUtils.extractRootURL(root));
+                rootURL);
 
         return (Map<String, Object>) JsonUtils.fromString(str);
     }

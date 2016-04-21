@@ -7,6 +7,7 @@ import org.glassfish.jersey.client.rx.Rx;
 import org.glassfish.jersey.client.rx.rxjava.RxObservableInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
@@ -20,6 +21,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+
 import java.net.URI;
 
 @Singleton

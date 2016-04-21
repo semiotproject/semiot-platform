@@ -29,6 +29,10 @@ public interface ServerConfig extends Config {
     @Key("services.wamp.realm")
     String wampRealm();
 
+    @DefaultValue("/wamp")
+    @Key("services.wamp.public.path")
+    String wampPublicPath();
+
     @Key("services.tsdb.url")
     @DefaultValue("http://dataarchivingservice:8787")
     String tsdbEndpoint();

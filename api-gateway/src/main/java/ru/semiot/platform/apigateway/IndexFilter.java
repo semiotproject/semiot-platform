@@ -1,6 +1,7 @@
 package ru.semiot.platform.apigateway;
 
 import java.io.IOException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -9,6 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
+
 import ru.semiot.platform.apigateway.utils.URIUtils;
 
 @WebFilter(urlPatterns = {"/*"}, asyncSupported = true)
@@ -31,7 +33,8 @@ public class IndexFilter implements Filter {
         hsr.setHeader("Access-Control-Allow-Origin", "*");
         hsr.setHeader("Access-Control-Allow-Credentials", "true");
         hsr.setHeader("Access-Control-Allow-Methods", "POST, GET, HEAD, OPTIONS");
-        hsr.setHeader("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+        hsr.setHeader("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, " +
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
         chain.doFilter(request, hsr);
     }
