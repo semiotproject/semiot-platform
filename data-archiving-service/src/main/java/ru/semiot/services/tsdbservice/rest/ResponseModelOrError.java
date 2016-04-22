@@ -4,25 +4,26 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFLanguages;
 import rx.Subscriber;
 
-import javax.ws.rs.container.AsyncResponse;
 import java.io.StringWriter;
+
+import javax.ws.rs.container.AsyncResponse;
 
 public class ResponseModelOrError extends ResponseOrError<Model> {
 
-    private ResponseModelOrError(AsyncResponse response) {
-        super(response);
-    }
+  private ResponseModelOrError(AsyncResponse response) {
+    super(response);
+  }
 
-    public static Subscriber<Model> responseModelOrError(
-            AsyncResponse response) {
-        return new ResponseModelOrError(response);
-    }
+  public static Subscriber<Model> responseModelOrError(
+      AsyncResponse response) {
+    return new ResponseModelOrError(response);
+  }
 
-    @Override
-    public void onNext(Model model) {
-        StringWriter writer = new StringWriter();
-        model.write(writer, RDFLanguages.strLangJSONLD);
+  @Override
+  public void onNext(Model model) {
+    StringWriter writer = new StringWriter();
+    model.write(writer, RDFLanguages.strLangJSONLD);
 
-        response.resume(writer.toString());
-    }
+    response.resume(writer.toString());
+  }
 }

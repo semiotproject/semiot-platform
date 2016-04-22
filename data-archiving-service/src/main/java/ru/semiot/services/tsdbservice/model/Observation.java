@@ -1,16 +1,21 @@
 package ru.semiot.services.tsdbservice.model;
 
+import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
+
 import org.apache.jena.datatypes.xsd.XSDDatatype;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import ru.semiot.commons.namespaces.QUDT;
 import ru.semiot.commons.namespaces.SSN;
 
-import javax.validation.constraints.NotNull;
-import java.time.*;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
+
+import javax.validation.constraints.NotNull;
 
 public class Observation {
 
