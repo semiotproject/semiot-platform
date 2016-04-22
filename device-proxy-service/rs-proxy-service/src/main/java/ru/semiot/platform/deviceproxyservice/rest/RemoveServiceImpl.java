@@ -11,13 +11,13 @@ import javax.ws.rs.core.MediaType;
 @Path("remove")
 public class RemoveServiceImpl {
 
-	private DeviceDriverManager manager;
+  private DeviceDriverManager manager;
 
-	@DELETE
-	@Path("fuseki/{pid}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String fuseki(@PathParam("pid") String pid) {
-		manager.removeDataOfDriverFromFuseki(pid);
-		return "Deleted data from fuseki. Driver pid = " + pid;
-	}
+  @DELETE
+  @Path("fuseki/{pid}")
+  @Produces(MediaType.TEXT_PLAIN)
+  public String fuseki(@PathParam("pid") String pid) {
+    manager.removeDataOfDriverFromFuseki(pid);
+    return "Deleted data from fuseki. Driver pid = " + pid;
+  }
 }

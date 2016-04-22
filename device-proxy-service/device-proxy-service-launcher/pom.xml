@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ru.semiot.platform</groupId>
         <artifactId>device-proxy-service-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    
+
     <artifactId>device-proxy-service-launcher</artifactId>
     <packaging>jar</packaging>
-    
+
     <name>Device Proxy Service Launcher</name>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -40,7 +42,8 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>ru.semiot.platform.deviceproxyservice.launcher.Launcher</mainClass>
+                            <mainClass>ru.semiot.platform.deviceproxyservice.launcher.Launcher
+                            </mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -82,7 +85,7 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>        
-    </build> 
+        </plugins>
+    </build>
 
 </project>

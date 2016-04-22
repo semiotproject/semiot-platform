@@ -4,7 +4,11 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RiotException;
@@ -12,7 +16,13 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.commons.namespaces.*;
+import ru.semiot.commons.namespaces.GEO;
+import ru.semiot.commons.namespaces.NamespaceUtils;
+import ru.semiot.commons.namespaces.Proto;
+import ru.semiot.commons.namespaces.SAREF;
+import ru.semiot.commons.namespaces.SEMIOT;
+import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.commons.namespaces.SSNCOM;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
@@ -26,31 +36,31 @@ public class DirectoryService {
   private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
   private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
 
-  // @formatter:off
-    protected static final String QUERY_DELETE_ALL_DATA_DRIVER = NamespaceUtils.newSPARQLQuery(
-    		"DELETE { "
-    		+ "?system ?x1 ?y1. ?sensor ?x2 ?y2. "
-    		+ "?prototype ?x3 ?y3. ?mc ?x4 ?y4. "
-    		+ "?mp ?x5 ?y5. ?value ?x6 ?y6. ?loc ?x7 ?y7.  "
-    		+ "GRAPH <urn:semiot:graphs:private>{"
-    		  + "?system ?x8 ?y8. ?wamp ?x9 ?y9} }"
-    		+ "  WHERE { "
-    		  + "GRAPH <urn:semiot:graphs:private> {"
-    		    + "?system semiot:hasDriver <urn:semiot:drivers:${PID}>} . "
-    		  + "{ ?system  ssn:hasSubSystem  ?sensor . "
-    		    + "?sensor proto:hasPrototype ?prototype . "
-    		    + "?prototype ssn:hasMeasurementCapability ?mc . "
-    		    + "?mc ssn:hasMeasurementProperty ?mp . "
-    		    + "?mp ssn:hasValue ?value . "
-    		    + "?system ?x1 ?y1. ?sensor ?x2 ?y2. ?prototype ?x3 ?y3. "
-    		    + "?mc ?x4 ?y4. ?mp ?x5 ?y5. ?value ?x6 ?y6 } "
-    		  + "UNION { ?system geo:location ?loc. ?loc ?x7 ?y7 } "
-    		  + "UNION { "
-    		    + "GRAPH <urn:semiot:graphs:private> { "
-    		      + "?system ssncom:hasCommunicationEndpoint  ?wamp . "
-    		      + "?system ?x8 ?y8. ?wamp ?x9 ?y9} } }", 
-    		SSN.class, SSNCOM.class, SEMIOT.class, GEO.class, Proto.class);
-    // @formatter:on
+  protected static final String QUERY_DELETE_ALL_DATA_DRIVER = NamespaceUtils.newSPARQLQuery(
+      // @formatter:off
+      "DELETE { "
+      + "?system ?x1 ?y1. ?sensor ?x2 ?y2. "
+      + "?prototype ?x3 ?y3. ?mc ?x4 ?y4. "
+      + "?mp ?x5 ?y5. ?value ?x6 ?y6. ?loc ?x7 ?y7.  "
+      + "GRAPH <urn:semiot:graphs:private>{"
+        + "?system ?x8 ?y8. ?wamp ?x9 ?y9} }"
+      + "  WHERE { "
+        + "GRAPH <urn:semiot:graphs:private> {"
+          + "?system semiot:hasDriver <urn:semiot:drivers:${PID}>} . "
+        + "{ ?system  ssn:hasSubSystem  ?sensor . "
+          + "?sensor proto:hasPrototype ?prototype . "
+          + "?prototype ssn:hasMeasurementCapability ?mc . "
+          + "?mc ssn:hasMeasurementProperty ?mp . "
+          + "?mp ssn:hasValue ?value . "
+          + "?system ?x1 ?y1. ?sensor ?x2 ?y2. ?prototype ?x3 ?y3. "
+          + "?mc ?x4 ?y4. ?mp ?x5 ?y5. ?value ?x6 ?y6 } "
+        + "UNION { ?system geo:location ?loc. ?loc ?x7 ?y7 } "
+        + "UNION { "
+          + "GRAPH <urn:semiot:graphs:private> { "
+            + "?system ssncom:hasCommunicationEndpoint  ?wamp . "
+            + "?system ?x8 ?y8. ?wamp ?x9 ?y9} } }",
+      // @formatter:on
+      SSN.class, SSNCOM.class, SEMIOT.class, GEO.class, Proto.class);
 
   protected static final String QUERY_UPDATE_STATE_SYSTEM =
       NamespaceUtils.newSPARQLQuery("DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
@@ -116,7 +126,6 @@ public class DirectoryService {
   /**
    * Doesn't check whether device already exists.
    *
-   * @param deviceDescription
    * @return true if the given device successfully added.
    */
   public boolean addNewDevice(DriverInformation info, Device device, String deviceDescription) {

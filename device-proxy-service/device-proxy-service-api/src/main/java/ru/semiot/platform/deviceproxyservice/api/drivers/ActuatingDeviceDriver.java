@@ -4,7 +4,7 @@ import org.apache.jena.rdf.model.Model;
 
 public interface ActuatingDeviceDriver extends DeviceDriver {
 
-    public CommandExecutionResult executeCommand(Model command)
-            throws CommandExecutionException;
+  public CommandExecutionResult executeCommand(Model command)
+      throws CommandExecutionException;
 
 }

@@ -10,23 +10,29 @@
             required="true" type="String" default="internal"/>
         <AD name="WAMP Realm" id="ru.semiot.platform.deviceproxyservice.manager.wamp_realm"
             required="false" type="String" default="realm1"/>
-        <AD name="WAMP Reconnect interval" id="ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect"
+        <AD name="WAMP Reconnect interval"
+            id="ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect"
             required="false" type="Integer" default="15"/>
-        <AD name="Topic new and observing" id="ru.semiot.platform.deviceproxyservice.manager.topic_newandobserving"
+        <AD name="Topic new and observing"
+            id="ru.semiot.platform.deviceproxyservice.manager.topic_newandobserving"
             required="false" type="String" default="ru.semiot.devices.newandobserving"/>
         <AD name="Topic inactive" id="ru.semiot.platform.deviceproxyservice.manager.topic_inactive"
-                    required="false" type="String" default="ru.semiot.devices.turnoff"/>
+            required="false" type="String" default="ru.semiot.devices.turnoff"/>
         <AD name="Fuseki password" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_pass"
-                    required="false" type="String" default="pw"/>
-        <AD name="Fuseki username" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_username"
-                    required="false" type="String" default="admin"/>
-        <AD name="Fuseki update url" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url"
-                    required="false" type="String" default="http://localhost:3030/ds/update"/>
-        <AD name="Fuseki query url" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url"
-                    required="false" type="String" default="http://localhost:3030/ds/query"/>
-        <AD name="Fuseki store url" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url"
-                    required="false" type="String" default="http://localhost:3030/ds/data"/>
-        
+            required="false" type="String" default="pw"/>
+        <AD name="Fuseki username"
+            id="ru.semiot.platform.deviceproxyservice.manager.fuseki_username"
+            required="false" type="String" default="admin"/>
+        <AD name="Fuseki update url"
+            id="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url"
+            required="false" type="String" default="http://localhost:3030/ds/update"/>
+        <AD name="Fuseki query url"
+            id="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url"
+            required="false" type="String" default="http://localhost:3030/ds/query"/>
+        <AD name="Fuseki store url"
+            id="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url"
+            required="false" type="String" default="http://localhost:3030/ds/data"/>
+
         <AD name="Domain" id="ru.semiot.platform.domain"
             required="true" type="String" default="http://localhost"/>
         <AD name="System URL Path" id="ru.semiot.platform.systems_path"
@@ -34,7 +40,7 @@
         <AD name="Sensor URL Path" id="ru.semiot.platform.subsystem_path"
             required="false" type="String" default="subsystems"/>
     </OCD>
-    
+
     <Designate pid="ru.semiot.platform.deviceproxyservice.manager">
         <Object ocdref="ru.semiot.platform.deviceproxyservice.manager"/>
     </Designate>

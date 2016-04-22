@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ru.semiot.platform</groupId>
@@ -9,7 +11,7 @@
 
     <artifactId>device-proxy-service-api</artifactId>
     <version>1.0-SNAPSHOT</version>
-    
+
     <packaging>bundle</packaging>
 
     <name>Device Proxy Service API</name>
@@ -77,8 +79,9 @@
                         </Import-Package>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
-                        <Bundle-Activator />
-                        <Export-Package>ru.semiot.platform.deviceproxyservice.api.drivers</Export-Package>
+                        <Bundle-Activator/>
+                        <Export-Package>ru.semiot.platform.deviceproxyservice.api.drivers
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -102,7 +105,9 @@
                                     <type>${project.packaging}</type>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../device-proxy-service-launcher/src/main/resources/bundles/</outputDirectory>
+                            <outputDirectory>
+                                ../device-proxy-service-launcher/src/main/resources/bundles/
+                            </outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

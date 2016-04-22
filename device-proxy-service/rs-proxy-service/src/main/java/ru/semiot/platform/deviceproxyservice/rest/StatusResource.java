@@ -7,9 +7,9 @@ import javax.ws.rs.Produces;
 @Path("status")
 public class StatusResource {
 
-    @GET
-    @Produces("text/plain")
-    public String getStatus() {
-        return "active";
-    }
+  @GET
+  @Produces("text/plain")
+  public String getStatus() {
+    return "active";
+  }
 }
