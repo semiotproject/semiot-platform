@@ -75,7 +75,7 @@
         <div class="main-wrapper">
             <h3>Installed drivers</h3>
             <%
-            if (jsonBundles.size() <= BundleConstants.countDefaultBundles) {
+            if (jsonBundles.size() <= BundleConstants.COUNT_DEFAULT_BUNDLES) {
             %>
                 <p>No installed drivers found; check out one of <a href="/config/AvailableDrivers">available drivers</a></p>
             <%
@@ -103,7 +103,7 @@
                                     for (int i = 0; i < jsonBundles.size(); i++) {
                                         JsonObject obj = jsonBundles.getJsonObject(i);
                                         int id = obj.getInt("id");
-                                        if (id >= BundleConstants.countDefaultBundles) {
+                                        if (id >= BundleConstants.COUNT_DEFAULT_BUNDLES) {
                                             String symbName = obj.getString("symbolicName");
                                 %>
                                             <tr>

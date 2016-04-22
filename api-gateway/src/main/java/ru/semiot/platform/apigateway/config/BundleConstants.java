@@ -1,12 +1,13 @@
 package ru.semiot.platform.apigateway.config;
 
 public class BundleConstants {
-    public static final int countDefaultBundles = 36;
+  public static final int COUNT_DEFAULT_BUNDLES = 36;
 
-    public static final String managerDomain = "ru.semiot.platform.domain";
-    public static final String managerApi = "ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager";
-    public static final String managerPid = "ru.semiot.platform.deviceproxyservice.manager";
-    public static final String wampLogin = "ru.semiot.platform.wamp_login";
-    public static final String wampPassword = "ru.semiot.platform.wamp_password";
+  public static final String MANAGER_DOMAIN = "ru.semiot.platform.domain";
+  public static final String MANAGER_API =
+      "ru.semiot.platform.deviceproxyservice.api.drivers.DeviceManager";
+  public static final String MANAGER_PID = "ru.semiot.platform.deviceproxyservice.manager";
+  public static final String WAMP_LOGIN = "ru.semiot.platform.wamp_login";
+  public static final String WAMP_PASSWORD = "ru.semiot.platform.wamp_password";
 
 }

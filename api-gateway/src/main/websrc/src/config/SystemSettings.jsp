@@ -85,7 +85,7 @@
                                     class="form-control"
                                     type="text"
                                     id="txtfld1"
-                                    name=<%=BundleConstants.managerDomain%>
+                                    name=<%=BundleConstants.MANAGER_DOMAIN%>
                                     value=<%=jsonDomain.get("value")%>
                                 />
                             </div>
@@ -95,7 +95,7 @@
                             <button class="btn btn-lg btn-primary btn-raised" type="submit">Save <i class="fa fa-save"></i></button>
                         </div>
                         <input type="hidden" name="configure" value="Save" />
-                        <input type="hidden" name="pid" id="pid" value=<%=BundleConstants.managerPid%> />
+                        <input type="hidden" name="pid" id="pid" value=<%=BundleConstants.MANAGER_PID%> />
                     </form>
                 </div>
             </div>

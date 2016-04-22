@@ -1,5 +1,12 @@
 package ru.semiot.platform.apigateway.beans.impl;
 
+import org.aeonbits.owner.ConfigFactory;
+import org.glassfish.jersey.client.rx.Rx;
+import org.glassfish.jersey.client.rx.rxjava.RxObservableInvoker;
+import ru.semiot.platform.apigateway.ServerConfig;
+import rx.Observable;
+import rx.exceptions.Exceptions;
+
 import java.io.InputStream;
 import java.io.StringReader;
 
@@ -10,14 +17,6 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.ws.rs.core.Response;
-
-import org.aeonbits.owner.ConfigFactory;
-import org.glassfish.jersey.client.rx.Rx;
-import org.glassfish.jersey.client.rx.rxjava.RxObservableInvoker;
-
-import ru.semiot.platform.apigateway.ServerConfig;
-import rx.Observable;
-import rx.exceptions.Exceptions;
 
 @Singleton
 public class ExternalQueryService {
@@ -35,7 +34,7 @@ public class ExternalQueryService {
 
     return get.map((response) -> {
       try (JsonReader reader =
-          Json.createReader(new StringReader(response.readEntity(String.class)))) {
+               Json.createReader(new StringReader(response.readEntity(String.class)))) {
         JsonObject jsonObject = reader.readObject();
         return jsonObject.getJsonObject("drivers").getJsonArray("driver");
       } catch (Exception e) {
