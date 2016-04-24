@@ -8,24 +8,24 @@ import java.io.IOException;
 
 public class PlainLamp extends Device {
 
-    private static final String TEMPLATE_PATH = "/ru/semiot/drivers/mocks/plainlamp/description.ttl";
-    private static String DESCRIPTION_TEMPLATE;
+  private static final String TEMPLATE_PATH = "/ru/semiot/drivers/mocks/plainlamp/description.ttl";
+  private static String DESCRIPTION_TEMPLATE;
 
-    static {
-        try {
-            DESCRIPTION_TEMPLATE = IOUtils.toString(PlainLamp.class
-                    .getResourceAsStream(TEMPLATE_PATH));
-        } catch (IOException ex) {
-            LoggerFactory.getLogger(PlainLamp.class)
-                    .error(ex.getMessage(), ex);
-        }
+  static {
+    try {
+      DESCRIPTION_TEMPLATE = IOUtils.toString(PlainLamp.class
+          .getResourceAsStream(TEMPLATE_PATH));
+    } catch (IOException ex) {
+      LoggerFactory.getLogger(PlainLamp.class)
+          .error(ex.getMessage(), ex);
     }
+  }
 
-    public PlainLamp(String id) {
-        super(id);
-    }
+  public PlainLamp(String id) {
+    super(id);
+  }
 
-    public String getRDFTemplate() {
-        return DESCRIPTION_TEMPLATE;
-    }
+  public String getRDFTemplate() {
+    return DESCRIPTION_TEMPLATE;
+  }
 }
