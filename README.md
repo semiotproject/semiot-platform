@@ -1,6 +1,6 @@
 # SemIoT Platform
 
-A Semantic Internet of Things Platform heavily relay on OWL ontologies (SSN, DUL, etc.) for device, observation, actuation descriptions.
+A Semantic Internet of Things Platform heavily relying on OWL ontologies (SSN, DUL, etc.) for device, observation, actuation descriptions.
 
 Features:
   * Uses an OSGi framework ([Apache Felix](http://felix.apache.org/)) for managing device drivers,
