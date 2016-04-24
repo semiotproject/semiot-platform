@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
 import ru.semiot.platform.apigateway.beans.TSDBQueryService;
@@ -101,7 +102,7 @@ public class SystemObservationsResource {
                 model, RDF.type, Hydra.PartialCollectionView);
             model.remove(view, null, null);
 
-            response.resume(JsonUtils.toPrettyString(RDFUtils.toJsonLdCompact(model, frame)));
+            response.resume(JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame)));
           } catch (Throwable ex) {
             response.resume(ex);
           }
@@ -135,7 +136,7 @@ public class SystemObservationsResource {
           model.add(collection, Hydra.member, obs);
         }
         try {
-          return JsonUtils.toPrettyString(RDFUtils.toJsonLdCompact(model, frame));
+          return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
         } catch (JsonLdError | IOException ex) {
           throw Exceptions.propagate(ex);
         }

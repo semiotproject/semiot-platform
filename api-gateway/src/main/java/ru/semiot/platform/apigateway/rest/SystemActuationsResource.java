@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.SEMIOT;
+import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
 import ru.semiot.platform.apigateway.beans.TSDBQueryService;
@@ -97,7 +98,7 @@ public class SystemActuationsResource {
                 model, RDF.type, Hydra.PartialCollectionView);
             model.removeAll(view, null, null);
 
-            response.resume(JsonUtils.toPrettyString(RDFUtils.toJsonLdCompact(model, frame)));
+            response.resume(JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame)));
           } catch (Throwable ex) {
             resumeOnError(response, ex);
           }
@@ -125,7 +126,7 @@ public class SystemActuationsResource {
             model.add(collection, Hydra.member, obs);
           }
 
-          response.resume(JsonUtils.toPrettyString(RDFUtils.toJsonLdCompact(model, frame)));
+          response.resume(JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame)));
         } catch (Throwable e) {
           resumeOnError(response, e);
         }
@@ -150,7 +151,7 @@ public class SystemActuationsResource {
       } else {
         dps.executeCommand(systemId, command).map((actuation) -> {
           try {
-            return Response.ok(RDFUtils.toJsonLdCompact(actuation, frame)).build();
+            return Response.ok(ModelJsonLdUtils.toJsonLdCompact(actuation, frame)).build();
           } catch (JsonLdError | IOException ex) {
             throw Exceptions.propagate(ex);
           }

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
 import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
@@ -105,8 +106,7 @@ public class SubSystemResource {
                       .build(systemId).toASCIIString()));
             }
 
-            return JsonUtils.toPrettyString(
-                RDFUtils.toJsonLdCompact(model, frame));
+            return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
           } catch (JsonLdError | IOException ex) {
             throw Exceptions.propagate(ex);
           }

@@ -19,6 +19,9 @@ public abstract class Observation {
 
   private final Map<String, String> properties = new HashMap<>();
 
+  /**
+   * @param timestamp number of seconds since the Unix Epoch
+   */
   public Observation(String deviceId, String timestamp) {
     properties.put(DeviceProperties.DEVICE_ID, deviceId);
     properties.put(DeviceProperties.OBSERVATION_TIMESTAMP, timestamp);
@@ -45,21 +48,20 @@ public abstract class Observation {
   }
 
   public Model toObservationAsModel(Map<String, String> properties,
-                                    Configuration configuration) {
-    StringReader descr = new StringReader(TemplateUtils.resolve(toTurtleString(), properties,
-        configuration));
+      Configuration configuration) {
+    StringReader descr = new StringReader(
+        TemplateUtils.resolve(toTurtleString(), properties, configuration));
 
-    Model model = ModelFactory.createDefaultModel().read(descr, null,
-        RDFLanguages.strLangTurtle);
+    Model model = ModelFactory.createDefaultModel().read(descr, null, RDFLanguages.strLangTurtle);
 
     return model;
   }
 
-  public String toObservationAsString(Map<String, String> properties,
-                                      Configuration configuration, Lang lang) {
+  public String toObservationAsString(Map<String, String> properties, Configuration configuration,
+      Lang lang) {
     StringWriter writer = new StringWriter();
-    toObservationAsModel(properties, configuration).write(writer,
-        lang.getName());
+
+    toObservationAsModel(properties, configuration).write(writer, lang.getName());
 
     return writer.toString();
   }

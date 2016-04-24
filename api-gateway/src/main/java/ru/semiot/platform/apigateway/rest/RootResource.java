@@ -22,6 +22,7 @@ import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.SHACL;
 import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
@@ -112,7 +113,7 @@ public class RootResource {
     Model entrypoint = contextProvider.getRDFModel(ENTRYPOINT, root);
     Map<String, Object> frame = contextProvider.getFrame(ENTRYPOINT, root);
 
-    Object entrypointObj = RDFUtils.toJsonLd(entrypoint);
+    Object entrypointObj = ModelJsonLdUtils.toJsonLd(entrypoint);
 
     return JsonUtils.toString(JsonLdProcessor.frame(entrypointObj, frame, new JsonLdOptions()));
   }
@@ -174,7 +175,7 @@ public class RootResource {
       return apiDoc;
     }).lastOrDefault(apiDoc).map((__) -> {
       try {
-        return JsonUtils.toString(RDFUtils.toJsonLdCompact(apiDoc, frame));
+        return JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(apiDoc, frame));
       } catch (JsonLdError | IOException e) {
         throw Exceptions.propagate(e);
       }
@@ -182,8 +183,7 @@ public class RootResource {
   }
 
   private List<Resource> defineResourceIndividual(Model model, String rootURL,
-                                                  String collectionName, ResultSet rs,
-                                                  Resource... classes) {
+      String collectionName, ResultSet rs, Resource... classes) {
     List<Resource> resultPrototypes = new ArrayList<>();
     final Resource apiDocResource = model.listResourcesWithProperty(
         RDF.type, Hydra.ApiDocumentation).next();

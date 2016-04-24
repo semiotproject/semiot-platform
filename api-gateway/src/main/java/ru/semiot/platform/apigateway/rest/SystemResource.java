@@ -17,6 +17,7 @@ import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.VOID;
+import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
 import ru.semiot.platform.apigateway.beans.TSDBQueryService;
@@ -126,7 +127,7 @@ public class SystemResource {
       }
 
       try {
-        return JsonUtils.toPrettyString(RDFUtils.toJsonLdCompact(model, frame));
+        return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
       } catch (IOException | JsonLdError e) {
         throw Exceptions.propagate(e);
       }
@@ -160,7 +161,7 @@ public class SystemResource {
               root, prototype.getLocalName());
           model.add(system, RDF.type, prototypeResource);
 
-          return JsonUtils.toPrettyString(RDFUtils.toJsonLdCompact(model, frame));
+          return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
         } else {
           throw new WebApplicationException(Response.Status.NOT_FOUND);
         }

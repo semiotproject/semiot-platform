@@ -1,0 +1,13 @@
+{
+  "@context": {
+    "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "qudt": "http://qudt.org/schema/qudt#",
+    "qudt-quantity": "http://qudt.org/vocab/quantity#",
+    "ssn:isProducedBy": {"@type": "@id"},
+    "ssn:observedBy": {"@type": "@id"},
+    "ssn:observedProperty": {"@type": "@id"},
+    "ssn:observationResultTime": {"@type": "xsd:dateTime"}
+  },
+  "@type": "ssn:Observation"
+}

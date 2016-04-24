@@ -1,0 +1,20 @@
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/schema/qudt#> .
+@prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
+@prefix qudt-quantity-ext: <http://w3id.org/qudt/vocab/quantity/ext#> .
+
+[
+    a ssn:Observation ;
+    ssn:observedProperty qudt-quantity-ext:RelativeHumidity ;
+    ssn:observedBy <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-humidity> ;
+    ssn:observationResultTime "${ru.semiot.platform.observation.datetime}"^^xsd:dateTime ;
+    ssn:observationResult [
+        a ssn:SensorOutput ;
+        ssn:isProducedBy <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-humidity> ;
+        ssn:hasValue [
+            a qudt:QuantityValue ;
+            qudt:quantityValue "${ru.semiot.drivers.netatmo.observation.value}"^^xsd:double ;
+        ] ;
+    ] ;
+] .

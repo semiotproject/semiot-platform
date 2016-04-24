@@ -14,10 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.VOID;
+import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
 import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
-import ru.semiot.platform.apigateway.utils.RDFUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
 
@@ -105,7 +105,7 @@ public class SensorResource {
       }
 
       try {
-        return JsonUtils.toPrettyString(RDFUtils.toJsonLdCompact(model, frame));
+        return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
       } catch (JsonLdError | IOException ex) {
         throw Exceptions.propagate(ex);
       }

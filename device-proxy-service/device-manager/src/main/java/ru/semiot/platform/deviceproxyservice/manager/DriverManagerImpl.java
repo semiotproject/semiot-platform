@@ -1,5 +1,7 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.utils.JsonUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFLanguages;
 import org.osgi.framework.BundleContext;
@@ -9,6 +11,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.platform.deviceproxyservice.api.drivers.ActuatingDeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionException;
 import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionResult;
@@ -26,9 +29,11 @@ import java.util.Dictionary;
 
 public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
-  private static final Logger logger = LoggerFactory.getLogger(
-      DriverManagerImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(DriverManagerImpl.class);
+  private static final String OBSERVATION_FRAME_PATH = "/ru/semiot/platform/deviceproxyservice/" +
+      "manager/Observation-frame.jsonld";
   private final Configuration configuration = new Configuration();
+  private final Object observationFrame;
 
   //Injected by Dependency Manager
   private BundleContext bundleContext;
@@ -36,7 +41,15 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   private DirectoryService directoryService;
 
   public DriverManagerImpl() {
+    Object frame = null;
+    try {
+      frame = JsonUtils.fromInputStream(
+          this.getClass().getResourceAsStream(OBSERVATION_FRAME_PATH));
+    } catch (Throwable e) {
+      logger.error(e.getMessage(), e);
+    }
 
+    this.observationFrame = frame;
   }
 
   public void start() {
@@ -45,7 +58,6 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       directoryService = new DirectoryService(new RDFStore(configuration));
 
       logger.debug("Directory service is ready");
-
 
       WAMPClient
           .getInstance()
@@ -154,8 +166,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       /**
        * Resolve common variables, e.g. platform's domain name.
        */
-      final String description = TemplateUtils.resolve(
-          device.toTurtleString(), configuration);
+      final String description = TemplateUtils.resolve(device.toTurtleString(), configuration);
 
       boolean isAdded = directoryService.addNewDevice(info, device, description);
 
@@ -174,12 +185,17 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
   @Override
   public void registerObservation(Device device, Observation observation) {
-    logger.info("Observation [ID={}] is being registered", device.getId());
+    logger.info("Observation [Device ID={}] is being registered", device.getId());
     // TODO: There's no guarantee that WAMPClient is connected.
-    WAMPClient.getInstance().publish(device.getId(),
-        observation.toObservationAsString(device.getProperties(),
-            configuration, RDFLanguages.JSONLD))
-        .subscribe(WAMPClient.onError());
+    Model model = observation.toObservationAsModel(device.getProperties(), configuration);
+    try {
+      WAMPClient.getInstance().publish(
+          device.getId(),
+          JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
+          .subscribe(WAMPClient.onError());
+    } catch (JsonLdError | IOException ex) {
+      logger.error(ex.getMessage(), ex);
+    }
   }
 
   @Override

@@ -51,7 +51,7 @@ public class Launcher {
       "jackson-core-2.6.6.jar",
       "jackson-databind-2.6.6.jar",
       "jackson-annotations-2.6.6.jar",
-      "jsonld-java-0.8.2.jar",
+      "jsonld-java-a124ac1951.jar",
       "httpcore-osgi-4.4.4.jar",
       "httpclient-osgi-4.5.1.jar",
       "jcl-over-slf4j-1.7.21.jar",
