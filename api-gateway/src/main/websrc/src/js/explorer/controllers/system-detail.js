@@ -12,15 +12,14 @@ export default function(
     $routeParams,
     $q,
     $interval,
-    systemDetail,
-    machineToolStates,
     commonUtils,
     wampUtils,
     chartUtils,
-    rdfUtils,
     CONFIG
 ) {
 
+    /*
+    // TP BE REFACTORED
     function getLastHourRange() {
         // time difference between server and client
         // FIXME
@@ -264,5 +263,5 @@ export default function(
         });
     };
 
-    $scope.init(decodeURIComponent($routeParams.system_uri));
+    $scope.init(decodeURIComponent($routeParams.system_uri));*/
 }

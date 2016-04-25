@@ -1,7 +1,8 @@
 "use strict";
 
-export default function($scope, systemList, commonUtils, CONFIG) {
+export default function($scope, systemAPI) {
     $scope.isLoading = true;
+    $scope.totalSystems = [];
     $scope.systems = [];
     $scope.search = {
         name: ""
@@ -14,27 +15,29 @@ export default function($scope, systemList, commonUtils, CONFIG) {
         maxSize: 4
     };
 
-    $scope.setPagination = function() {
-        let total_systems = systemList.getSystems().filter(function(s) {
+    $scope.setPagination = function(totalSystems) {
+        $scope.totalSystems = totalSystems.filter(function(s) {
             return !$scope.search.name || s.name.toLowerCase().indexOf($scope.search.name.toLowerCase()) > -1;
         });
-        console.log(total_systems);
-        $scope.systems = total_systems.slice(
+        $scope.systems = $scope.totalSystems.slice(
             ($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage,
             ($scope.pagination.currentPage) * $scope.pagination.itemsPerPage
         );
-        $scope.pagination.totalItems = total_systems.length;
+        $scope.pagination.totalItems = $scope.totalSystems.length;
     };
-    $scope.removeSystem = function(uri) {
-        systemList.removeSystem(uri);
+
+    $scope.handleNewSystem = (message) => {
+        console.info('new system registered: ', message);
+        //
     };
-    systemList.on('systemsUpdate', function(data) {
-        $scope.setPagination();
-    });
-    systemList.fetchSystems().then(function(data) {
-        $scope.isLoading = false;
-        $scope.setPagination();
-        systemList.subscribe();
-    });
+
+    $scope.init = () => {
+        systemAPI.loadSystems().then((res) => {
+            systemAPI.subscribeForNewSystems($scope.handleNewSystem.bind($scope));
+            $scope.setPagination();
+        });
+    };
+
+    $scope.init();
 
 }
