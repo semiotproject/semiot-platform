@@ -1,5 +1,12 @@
 package ru.semiot.platform.deviceproxyservice.api.drivers;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFLanguages;
+
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +39,30 @@ public abstract class Device {
 
   public String toTurtleString() {
     return TemplateUtils.resolve(getRDFTemplate(), properties);
+  }
+  
+  public Model toDescriptionAsModel(Configuration configuration) {
+    StringReader descr = new StringReader(TemplateUtils.resolve(toTurtleString(), configuration));
+
+    Model model = ModelFactory.createDefaultModel().read(descr, null, RDFLanguages.strLangTurtle);
+
+    return model;
+  }
+
+  public String toDescriptionAsString(Configuration configuration, Lang lang) {
+    StringWriter writer = new StringWriter();
+
+    toDescriptionAsModel(configuration).write(writer, lang.getName());
+
+    return writer.toString();
+  }
+
+  public String toDescriptionAsString(Model model, Lang lang) {
+    StringWriter writer = new StringWriter();
+
+    model.write(writer, lang.getName());
+
+    return writer.toString();
   }
 
   @Override

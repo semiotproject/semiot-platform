@@ -20,7 +20,6 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
-import ru.semiot.platform.deviceproxyservice.api.drivers.TemplateUtils;
 import ws.wamp.jawampa.WampClient;
 
 import java.io.IOException;
@@ -166,15 +165,16 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       /**
        * Resolve common variables, e.g. platform's domain name.
        */
-      final String description = TemplateUtils.resolve(device.toTurtleString(), configuration);
+      final Model description = device.toDescriptionAsModel(configuration);
 
       boolean isAdded = directoryService.addNewDevice(info, device, description);
 
       if (isAdded) {
         logger.info("Device [{}] was registered!", device.getId());
-        WAMPClient.getInstance().publish(
-            getConfiguration().get(Keys.TOPIC_NEWANDOBSERVING),
-            description).subscribe(WAMPClient.onError());
+        WAMPClient.getInstance()
+            .publish(getConfiguration().get(Keys.TOPIC_NEWANDOBSERVING),
+                device.toDescriptionAsString(description, RDFLanguages.JSONLD))
+            .subscribe(WAMPClient.onError());
       } else {
         logger.warn("Device [{}] was not added in database!");
       }
@@ -189,9 +189,9 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     // TODO: There's no guarantee that WAMPClient is connected.
     Model model = observation.toObservationAsModel(device.getProperties(), configuration);
     try {
-      WAMPClient.getInstance().publish(
-          device.getId(),
-          JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
+      WAMPClient.getInstance()
+          .publish(device.getId(),
+              JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
           .subscribe(WAMPClient.onError());
     } catch (JsonLdError | IOException ex) {
       logger.error(ex.getMessage(), ex);
