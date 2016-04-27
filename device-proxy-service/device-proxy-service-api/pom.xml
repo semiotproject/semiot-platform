@@ -31,6 +31,12 @@
             <artifactId>jena-osgi</artifactId>
             <version>3.0.0</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.jsonldjava</groupId>
+                    <artifactId>jsonld-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Compile dependencies -->
@@ -72,10 +78,11 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            org.apache.jena.*,
+                            org.apache.jena.rdf.model,
+                            org.apache.jena.riot,
                             org.apache.felix.dm;version="[4.1,5)",
                             org.osgi.framework;version="[1.8,2)",
-                            org.slf4j.*
+                            org.slf4j
                         </Import-Package>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>

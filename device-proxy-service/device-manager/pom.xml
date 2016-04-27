@@ -124,6 +124,7 @@
                             com.fasterxml.jackson.databind.node,
                             com.github.jsonldjava.core,
                             com.github.jsonldjava.utils,
+                            org.apache.commons.lang3,
                             org.apache.http,
                             org.apache.http.client.methods,
                             org.apache.http.client.cache,

@@ -29,10 +29,13 @@ import java.util.Dictionary;
 public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(DriverManagerImpl.class);
-  private static final String OBSERVATION_FRAME_PATH = "/ru/semiot/platform/deviceproxyservice/" +
-      "manager/Observation-frame.jsonld";
+  private static final String FRAME_PATH_PREFIX = "/ru/semiot/platform/deviceproxyservice/manager/";
+  private static final String OBSERVATION_FRAME_PATH = FRAME_PATH_PREFIX +
+      "Observation-frame.jsonld";
+  private static final String SYSTEM_FRAME_PATH = FRAME_PATH_PREFIX + "System-frame.jsonld";
   private final Configuration configuration = new Configuration();
   private final Object observationFrame;
+  private final Object systemFrame;
 
   //Injected by Dependency Manager
   private BundleContext bundleContext;
@@ -40,6 +43,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   private DirectoryService directoryService;
 
   public DriverManagerImpl() {
+    //Loading JSONLD frame for observations
     Object frame = null;
     try {
       frame = JsonUtils.fromInputStream(
@@ -47,8 +51,16 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     } catch (Throwable e) {
       logger.error(e.getMessage(), e);
     }
-
     this.observationFrame = frame;
+
+    //Loadin JSONLD frame for systems
+    try {
+      frame = JsonUtils.fromInputStream(
+          this.getClass().getResourceAsStream(SYSTEM_FRAME_PATH));
+    } catch (Throwable e) {
+      logger.error(e.getMessage(), e);
+    }
+    this.systemFrame = frame;
   }
 
   public void start() {
@@ -170,11 +182,16 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       boolean isAdded = directoryService.addNewDevice(info, device, description);
 
       if (isAdded) {
-        logger.info("Device [{}] was registered!", device.getId());
-        WAMPClient.getInstance()
-            .publish(getConfiguration().get(Keys.TOPIC_NEWANDOBSERVING),
-                device.toDescriptionAsString(description, RDFLanguages.JSONLD))
-            .subscribe(WAMPClient.onError());
+        try {
+          logger.info("Device [{}] was registered!", device.getId());
+          String message = JsonUtils.toString(
+              ModelJsonLdUtils.toJsonLdCompact(description, systemFrame));
+          WAMPClient.getInstance().publish(
+              getConfiguration().get(Keys.TOPIC_NEWANDOBSERVING), message)
+              .subscribe(WAMPClient.onError());
+        } catch (JsonLdError | IOException ex) {
+          logger.error(ex.getMessage(), ex);
+        }
       } else {
         logger.warn("Device [{}] was not added in database!");
       }
