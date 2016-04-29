@@ -7,7 +7,7 @@
             <thead>
                 <tr>
                     <th>
-                        <label>№</label>
+                        <label>{{ systems.length }}</label>
                     </th>
                     <th>
                         <div class="form-group is-empty">
@@ -36,7 +36,7 @@
                 </tr>
                 <tr ng-repeat="system in systems | filter: filterFunction" ng-click="showSingle(system)">
                     <td>{{ system.index }}</td>
-                    <td><a href="{{ '#/systems/' + system.uri }}">{{ system.name }}</a></td>
+                    <td><a href="{{ '/systems/' + system.id }}">{{ system.name }}</a></td>
                     <td>
                     </td>
                 </tr>

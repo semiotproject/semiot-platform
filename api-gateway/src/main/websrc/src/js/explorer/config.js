@@ -4,13 +4,14 @@ const HTTP_PROTOCOL = location.protocol;
 const WS_PROTOCOL = HTTP_PROTOCOL === 'https:' ? 'wss:' : 'ws:';
 
 // change it to target BASE_HOSTNAME when develop
-const BASE_HOSTNAME = location.hostname;
+const BASE_HOSTNAME = DEFAULT_HOSTNAME; // location.hostname;
 
 const BASE_URL = `${HTTP_PROTOCOL}//${BASE_HOSTNAME}`;
 
 export default {
     VERSION: `@VERSION`,
     URLS: {
+        base: BASE_URL,
         currentUser: `${BASE_URL}/user`,
         messageBus: `ws://${BASE_HOSTNAME}:8080/ws`,
         tripleStore: `${BASE_URL}:3030/ds/query`,
@@ -32,6 +33,7 @@ export default {
     },
     TOPICS: {
         "device_registered": 'ru.semiot.devices.newandobserving',
+        "new_observation": 'fixme',
         "device_turned_off": 'ru.semiot.devices.turnoff',
         "device_remove": 'ru.semiot.devices.remove'
     },

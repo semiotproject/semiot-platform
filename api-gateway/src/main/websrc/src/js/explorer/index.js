@@ -54,6 +54,8 @@ app.factory('WAMP', require('./services/wamp'));
 
 // api
 app.factory('systemAPI', require('./hypermedia-api/systems'));
+app.factory('sensorAPI', require('./hypermedia-api/sensors'));
+app.factory('observationAPI', require('./hypermedia-api/observations'));
 
 // controllers
 app.controller('SystemListCtrl', require('./controllers/system-list'));

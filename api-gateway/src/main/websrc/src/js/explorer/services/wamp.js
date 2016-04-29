@@ -16,7 +16,12 @@ export default function(CONFIG) {
             return;
         }
         $.get(CONFIG.URLS.currentUser).done((user) => {
-            user = JSON.parse(user);
+            // user = JSON.parse(user);
+            // remove this in production
+            user = {
+                username: "root",
+                password: "root"
+            };
             console.log('initialising WAMP session...');
             let connection = new autobahn.Connection({
                 url: CONFIG.URLS.messageBus,
