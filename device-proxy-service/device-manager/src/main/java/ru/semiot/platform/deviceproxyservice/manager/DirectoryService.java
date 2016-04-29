@@ -128,11 +128,8 @@ public class DirectoryService {
    *
    * @return true if the given device successfully added.
    */
-  public boolean addNewDevice(DriverInformation info, Device device, String deviceDescription) {
+  public boolean addNewDevice(DriverInformation info, Device device, Model description) {
     try {
-      Model description = ModelFactory.createDefaultModel()
-          .read(new StringReader(deviceDescription), null, RDFLanguages.TURTLE.getName());
-
       if (!description.isEmpty()) {
         ResultSet qr = QueryExecutionFactory.create(GET_SYSTEM_URI, description).execSelect();
 

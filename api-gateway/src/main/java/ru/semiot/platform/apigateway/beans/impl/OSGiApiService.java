@@ -4,6 +4,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.util.Collections;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -152,18 +153,20 @@ public class OSGiApiService {
                                                Map<String, String> parameters) {
     return Observable.create(o -> {
       try {
+        postConfigureStart(pid, parameters);
+        
         // загрузка файла
         InputStreamBody bin = new InputStreamBody(inputStream,
             filename);
-        StringBody action = new StringBody("install");
 
         MultipartEntity reqEntity = new MultipartEntity();
         reqEntity.addPart("bundlefile", bin);
-        reqEntity.addPart("action", action);
+        reqEntity.addPart("action", new StringBody("install"));
+        reqEntity.addPart("bundlestart", new StringBody("start"));
+        reqEntity.addPart("bundlestartlevel", new StringBody("1"));
         postHttpClientQuery(URL_BUNDLES, reqEntity, Collections
             .list(new BasicHeader("Accept", "application/json")));
 
-        postConfigureStart(pid, parameters);
         o.onNext("");
       } catch (Exception e) {
         throw Exceptions.propagate(e);
@@ -196,13 +199,13 @@ public class OSGiApiService {
     postHttpClientQuery(URL_CONFIG_MGR + pid,
         new UrlEncodedFormEntity(toListNameValue(parameters)), headers);
 
-    // Запуск бандла
+    /* Запуск бандла
     postHttpClientQuery(URL_BUNDLES + "/" + pid,
         new UrlEncodedFormEntity(Collections.list(new BasicNameValuePair("action", "start"))),
-        headers);
+        headers); */
   }
 
-  private String postHttpClientQuery(String path, HttpEntity entity,
+  private void postHttpClientQuery(String path, HttpEntity entity,
                                      List<Header> headers) throws IOException {
     HttpClient httpclient = new DefaultHttpClient();
     HttpPost httppost = new HttpPost(UriBuilder
@@ -214,11 +217,13 @@ public class OSGiApiService {
     // httppost.addHeader("Content-Type",
     // "application/x-www-form-urlencoded");
     httppost.setEntity(entity);
-    String respStatus = httpclient.execute(httppost).getStatusLine()
-        .toString();
-    logger.info(respStatus);
-
-    return respStatus;
+    HttpResponse response = httpclient.execute(httppost);
+    if (response.getStatusLine().getStatusCode() != 200
+        && response.getStatusLine().getStatusCode() != 302) {
+      logger.debug("Path: {}", path);
+      logger.debug("Entity: {}", entity.toString());
+      logger.debug(response.getStatusLine().toString());
+    }
   }
 
   private List<NameValuePair> toListNameValue(Map<String, String> parameters) {

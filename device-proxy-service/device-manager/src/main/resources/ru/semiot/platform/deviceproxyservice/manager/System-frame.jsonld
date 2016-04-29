@@ -1,0 +1,18 @@
+{
+  "@context": {
+    "proto:hasPrototype": {"@type": "@id"},
+    "ssn:hasSubSystem": {"@type": "@id"},
+    "qudt": "http://qudt.org/schema/qudt#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "qudt-unit": "http://qudt.org/vocab/unit#",
+    "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
+    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+    "qudt-quantity": "http://qudt.org/vocab/quantity#",
+    "proto": "http://w3id.org/semiot/ontologies/proto#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
+    "ws": "https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#"
+  },
+  "@type": "ssn:System"
+}

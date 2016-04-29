@@ -69,7 +69,7 @@ public class NewDeviceListener implements Observer<String> {
   public void onNext(String message) {
     try {
       Model description = ModelFactory.createDefaultModel().read(
-          new StringReader(message), null, RDFLanguages.TURTLE.getName());
+          new StringReader(message), null, RDFLanguages.strLangJSONLD);
       if (description != null && !description.isEmpty()) {
         subscribeTopics(description);
       } else {
