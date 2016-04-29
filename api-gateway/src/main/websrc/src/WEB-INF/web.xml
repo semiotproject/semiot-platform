@@ -136,9 +136,7 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Common</web-resource-name>
-            <url-pattern>/explorer</url-pattern>
-            <url-pattern>/index</url-pattern>
-            <url-pattern>/config/AdminPanel?logout</url-pattern>
+            <url-pattern>/*</url-pattern>
             <http-method>GET</http-method>
         </web-resource-collection>
         <auth-constraint>

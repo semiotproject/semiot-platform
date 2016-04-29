@@ -30,7 +30,6 @@ import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.Credentials;
 import ru.semiot.platform.apigateway.utils.DataBase;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
-import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
@@ -246,6 +245,9 @@ public class RootResource {
           "{\"username\": \"" + c.getLogin() + "\", \"password\": \"" + c.getPassword() + "\"}");
       resp.getWriter().flush();
       resp.getWriter().close();
+    }
+    else{
+      resp.sendError(401);//Forbidden
     }
   }
 }
