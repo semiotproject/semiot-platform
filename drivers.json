@@ -27,6 +27,11 @@
         "pid": "ru.semiot.drivers.mocks.plainlamp"
       },
       {
+        "name": "Mercury 201.6 (over SemIoT Device)",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_mercury270/lastSuccessfulBuild/artifact/mercury270/target/mercury270-1.0.jar",
+        "pid": "ru.semiot.drivers.mercury270"
+      },
+      {
         "name": "Simulator",
         "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_simulator_build/lastSuccessfulBuild/artifact/device-proxy-service-drivers/simulator/target/simulator-1.0-SNAPSHOT.jar",
         "pid": "ru.semiot.platform.drivers.simulator"
