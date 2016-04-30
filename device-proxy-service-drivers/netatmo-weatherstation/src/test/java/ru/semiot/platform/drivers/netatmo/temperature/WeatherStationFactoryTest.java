@@ -1,14 +1,16 @@
 package ru.semiot.platform.drivers.netatmo.temperature;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.assertArrayEquals;
+
 import org.json.JSONArray;
 import org.json.JSONException;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStation;
 import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStationFactory;
 import ru.semiot.platform.drivers.netatmo.weatherstation.WeatherStationObservation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WeatherStationFactoryTest {
 
@@ -65,16 +67,16 @@ public class WeatherStationFactoryTest {
         List<WeatherStationObservation> expected = new ArrayList<>();
         WeatherStationObservation one = new WeatherStationObservation(
                 wsFactory.hash(DRIVER_PID, "70:ee:50:06:0f:12"),
-                "1452115809", "-18.4", WeatherStationObservation.TEMPERATURE_TYPE);
+                "1452115809", "1452115790-temperature", "-18.4", WeatherStationObservation.TEMPERATURE_TYPE);
         WeatherStationObservation two = new WeatherStationObservation(
                 wsFactory.hash(DRIVER_PID, "70:ee:50:06:0f:12"),
-                "1452115809", "71.0", WeatherStationObservation.HUMIDITY_TYPE);
+                "1452115809", "1452115809-humidity", "71.0", WeatherStationObservation.HUMIDITY_TYPE);
         WeatherStationObservation three = new WeatherStationObservation(
                 wsFactory.hash(DRIVER_PID, "70:ee:50:03:df:36"),
-                "1452115790", "-18.9", WeatherStationObservation.TEMPERATURE_TYPE);
+                "1452115790", "1452115790-temperature", "-18.9", WeatherStationObservation.TEMPERATURE_TYPE);
         WeatherStationObservation four = new WeatherStationObservation(
                 wsFactory.hash(DRIVER_PID, "70:ee:50:03:df:36"),
-                "1452115790", "68.0", WeatherStationObservation.HUMIDITY_TYPE);
+                "1452115790", "1452115790-humidity", "68.0", WeatherStationObservation.HUMIDITY_TYPE);
         
         expected.add(one);
         expected.add(two);
