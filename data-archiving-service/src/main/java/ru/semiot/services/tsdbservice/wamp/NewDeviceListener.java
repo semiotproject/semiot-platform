@@ -9,6 +9,7 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -31,23 +32,28 @@ public class NewDeviceListener implements Observer<String> {
   private static final Logger logger = LoggerFactory
       .getLogger(NewDeviceListener.class);
   private static final long TIMEOUT = 5000;
-  private static final String VAR_TOPIC = "topic";
+  private static final String VAR_OBSERVATIONS_TOPIC = "obs_topic";
+  private static final String VAR_COMMANDRESULTS_TOPIC = "commres_topic";
   private final HttpAuthenticator httpAuthenticator;
   private final WAMPClient wampClient = WAMPClient.getInstance();
   private final LinkedList<String> listTopics = new LinkedList<>();
 
   private static final Query GET_TOPICS_QUERY = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
-      "SELECT ?topic { "
+      "SELECT ?obs_topic ?commres_topic { "
           + "GRAPH <urn:semiot:graphs:private> {"
           + " ?x ssncom:hasCommunicationEndpoint ?e ."
-          + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?topic ."
+          + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
+          + " ?xx ssncom:hasCommunicationEndpoint ?ee ."
+          + " ?ee ssncom:protocol \"WAMP\"; ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
           + "}"
           + "}", SSN.class, SSNCOM.class));
   private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils.newSPARQLQuery(
-      "SELECT ?topic { "
+      "SELECT ?obs_topic ?commres_topic { "
           + "GRAPH <urn:semiot:graphs:private> {"
           + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
-          + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?topic ."
+          + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
+          + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?ee ."
+          + " ?ee ssncom:protocol \"WAMP\"; ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
           + "}"
           + "}", SSN.class, SSNCOM.class);
 
@@ -110,18 +116,21 @@ public class NewDeviceListener implements Observer<String> {
       }
     }
     while (topics != null && topics.hasNext()) {
-      String topicName = topics.next().get(VAR_TOPIC).asLiteral().getString();
-      if (StringUtils.isNotBlank(topicName)) {
-        if (!listTopics.contains(topicName)) {
-          listTopics.add(topicName);
+      QuerySolution qs = topics.next();
+      String topicObsName = qs.get(VAR_OBSERVATIONS_TOPIC).asLiteral().getString();
+      String topicCommResName = qs.get(VAR_COMMANDRESULTS_TOPIC).asLiteral().getString();
+      if (StringUtils.isNotBlank(topicObsName) && StringUtils.isNotBlank(topicCommResName)) {
+        if (!listTopics.contains(topicObsName) && !listTopics.contains(topicCommResName)) {
+          listTopics.add(topicObsName);
+          listTopics.add(topicCommResName);
           //Subscribe to observations
-          wampClient.addSubscription(topicName, wampClient.subscribe(topicName)
-              .subscribe(new ObservationListener(topicName)));
+          wampClient.addSubscription(topicObsName, wampClient.subscribe(topicObsName)
+              .subscribe(new ObservationListener(topicObsName)));
           //Subscribe to commands
-          wampClient.addSubscription(topicName, wampClient.subscribe(topicName)
+          wampClient.addSubscription(topicCommResName, wampClient.subscribe(topicCommResName)
               .subscribe(new ActuationListener()));
         } else {
-          logger.debug("Topic {} is already known", topicName);
+          logger.debug("Topics {} and {} is already known", topicObsName, topicCommResName);
         }
       } else {
         logger.warn("Name topic is a blank string!");

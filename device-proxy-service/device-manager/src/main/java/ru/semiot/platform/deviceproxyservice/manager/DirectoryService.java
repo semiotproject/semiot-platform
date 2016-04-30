@@ -171,7 +171,7 @@ public class DirectoryService {
                 .create(GET_SENSOR.replace("${URI_SYSTEM}", system.getURI()), description)
                 .execSelect();
             if (sensors.hasNext()) {
-              QuerySolution qs = qr.next();
+              QuerySolution qs = sensors.next();
               Resource sensor = qs.getResource(Vars.URI_SENSOR);
               String sensorId = qs.getLiteral(Vars.ID_SENSOR).getString();
               Resource sensorWampResource =
