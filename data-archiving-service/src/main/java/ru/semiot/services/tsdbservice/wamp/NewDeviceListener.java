@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFLanguages;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,28 +35,31 @@ public class NewDeviceListener implements Observer<String> {
   private static final long TIMEOUT = 5000;
   private static final String VAR_OBSERVATIONS_TOPIC = "obs_topic";
   private static final String VAR_COMMANDRESULTS_TOPIC = "commres_topic";
+  private static final String VAR_SYSTEM_ID = "system_id";
   private final HttpAuthenticator httpAuthenticator;
   private final WAMPClient wampClient = WAMPClient.getInstance();
   private final LinkedList<String> listTopics = new LinkedList<>();
 
   private static final Query GET_TOPICS_QUERY = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
-      "SELECT ?obs_topic ?commres_topic { "
+      "SELECT ?system_id ?obs_topic ?commres_topic { "
+          + "?x dcterms:identifier ?system_id. "
           + "GRAPH <urn:semiot:graphs:private> {"
           + " ?x ssncom:hasCommunicationEndpoint ?e ."
           + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
-          + " ?xx ssncom:hasCommunicationEndpoint ?ee ."
+          + " ?x ssncom:hasCommunicationEndpoint ?ee ."
           + " ?ee ssncom:protocol \"WAMP\"; ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
           + "}"
-          + "}", SSN.class, SSNCOM.class));
+          + "}", SSN.class, SSNCOM.class, DCTerms.class));
   private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils.newSPARQLQuery(
-      "SELECT ?obs_topic ?commres_topic { "
+      "SELECT ?system_id ?obs_topic ?commres_topic { "
+          + "<${SYSTEM_URI}> dcterms:identifier ?system_id. "
           + "GRAPH <urn:semiot:graphs:private> {"
           + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
           + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
           + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?ee ."
           + " ?ee ssncom:protocol \"WAMP\"; ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
           + "}"
-          + "}", SSN.class, SSNCOM.class);
+          + "}", SSN.class, SSNCOM.class, DCTerms.class);
 
   public NewDeviceListener() {
     httpAuthenticator = new SimpleAuthenticator(CONFIG.storeUsername(),
@@ -119,13 +123,15 @@ public class NewDeviceListener implements Observer<String> {
       QuerySolution qs = topics.next();
       String topicObsName = qs.get(VAR_OBSERVATIONS_TOPIC).asLiteral().getString();
       String topicCommResName = qs.get(VAR_COMMANDRESULTS_TOPIC).asLiteral().getString();
-      if (StringUtils.isNotBlank(topicObsName) && StringUtils.isNotBlank(topicCommResName)) {
+      String systemId = qs.get(VAR_SYSTEM_ID).asLiteral().getString();
+      if (StringUtils.isNotBlank(topicObsName) && StringUtils.isNotBlank(topicCommResName)
+          && StringUtils.isNotBlank(systemId)) {
         if (!listTopics.contains(topicObsName) && !listTopics.contains(topicCommResName)) {
           listTopics.add(topicObsName);
           listTopics.add(topicCommResName);
           //Subscribe to observations
           wampClient.addSubscription(topicObsName, wampClient.subscribe(topicObsName)
-              .subscribe(new ObservationListener(topicObsName)));
+              .subscribe(new ObservationListener(systemId)));
           //Subscribe to commands
           wampClient.addSubscription(topicCommResName, wampClient.subscribe(topicCommResName)
               .subscribe(new ActuationListener()));

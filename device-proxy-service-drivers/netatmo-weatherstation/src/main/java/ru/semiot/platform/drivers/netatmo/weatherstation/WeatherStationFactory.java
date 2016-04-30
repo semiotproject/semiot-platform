@@ -133,13 +133,13 @@ public class WeatherStationFactory {
 
         String id = hash(driverName, device.getString(ID_KEY));
 
-        WeatherStationObservation temperature =
-            findObservation(device, id, WeatherStationObservation.TEMPERATURE_TYPE,
-                WeatherStationObservation.TEMPERATURE_TEMPLATE_SENSOR.replace("${SYSTEM_ID}", id),
-                timestamp);
+        WeatherStationObservation temperature = findObservation(device, id,
+            WeatherStationObservation.TEMPERATURE_TEMPLATE_SENSOR.replace("${SYSTEM_ID}", id),
+            WeatherStationObservation.TEMPERATURE_TYPE, timestamp);
 
-        WeatherStationObservation humidity =
-            findObservation(device, id, WeatherStationObservation.HUMIDITY_TEMPLATE_SENSOR.replace("${SYSTEM_ID}", id), WeatherStationObservation.HUMIDITY_TYPE, timestamp);
+        WeatherStationObservation humidity = findObservation(device, id,
+            WeatherStationObservation.HUMIDITY_TEMPLATE_SENSOR.replace("${SYSTEM_ID}", id),
+            WeatherStationObservation.HUMIDITY_TYPE, timestamp);
 
         if (temperature != null && humidity != null) {
           observations.add(temperature);
