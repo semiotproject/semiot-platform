@@ -35,6 +35,9 @@ public class DirectoryService {
   private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
   private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
   private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
+  private static final String TOPIC_SENSOR_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
+  private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations";
+  private static final String TOPIC_ACTUATIONS = "${SYSTEM_ID}.commandresults";
 
   protected static final String QUERY_DELETE_ALL_DATA_DRIVER = NamespaceUtils.newSPARQLQuery(
       // @formatter:off
@@ -68,6 +71,10 @@ public class DirectoryService {
           + "WHERE { <${URI_SYSTEM}> saref:hasState ?x }", SAREF.class);
   private static final String GET_SYSTEM_URI =
       NamespaceUtils.newSPARQLQuery("SELECT ?uri {?uri a ssn:System} LIMIT 1", SSN.class);
+  private static final String GET_SENSOR = NamespaceUtils.newSPARQLQuery(
+      "SELECT ?sensor_uri ?sensor_id {<${URI_SYSTEM}> ssn:hasSubSystem ?sensor_uri. "
+          + "?sensor_uri a ssn:SensingDevice. ?sensor_uri dcterms:identifier ?sensor_id}",
+      SSN.class, DCTerms.class);
   private static final String GET_DRIVER_PID_BY_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
       "SELECT ?pid {" + "?system dcterms:identifier \"${SYSTEM_ID}\" ."
           + "GRAPH <urn:semiot:graphs:private> {" + "?system semiot:hasDriver ?pid" + "}} LIMIT 1",
@@ -141,17 +148,39 @@ public class DirectoryService {
             store.save(description);
 
             // Add ssncom:hasCommunicationEndpoint to a private graph
-            Resource wampResource = ResourceFactory.createResource(system.getURI() + "/wamp");
-            Model privateDeviceInfo =
-                ModelFactory.createDefaultModel()
-                    .add(system, SSNCOM.hasCommunicationEndpoint, wampResource)
-                    .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
-                    .add(wampResource, SSNCOM.topic,
-                        ResourceFactory.createPlainLiteral(device.getId()))
-                    .add(wampResource, SSNCOM.protocol, WAMP)
-                    .add(system, SEMIOT.hasDriver, ResourceFactory
-                        .createResource(TEMPLATE_DRIVER_URN.replace("${PID}", info.getId())));
+            Model privateDeviceInfo = ModelFactory.createDefaultModel();
+            
+            Resource wampResourceObs =
+                ResourceFactory.createResource(system.getURI() + "/observations/wamp");
+            addWampForResource(privateDeviceInfo, system, wampResourceObs,
+                TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId()));
+            privateDeviceInfo.add(wampResourceObs, SSNCOM.provide,
+                ResourceFactory.createPlainLiteral("observations"));
 
+            Resource wampResourceCommRes =
+                ResourceFactory.createResource(system.getURI() + "/commandresults/wamp");
+            addWampForResource(privateDeviceInfo, system, wampResourceCommRes,
+                TOPIC_ACTUATIONS.replace("${SYSTEM_ID}", device.getId()));
+            privateDeviceInfo.add(wampResourceCommRes, SSNCOM.provide,
+                ResourceFactory.createPlainLiteral("commandresults"));
+
+            privateDeviceInfo.add(system, SEMIOT.hasDriver, ResourceFactory
+                .createResource(TEMPLATE_DRIVER_URN.replace("${PID}", info.getId())));
+
+            ResultSet sensors = QueryExecutionFactory
+                .create(GET_SENSOR.replace("${URI_SYSTEM}", system.getURI()), description)
+                .execSelect();
+            if (sensors.hasNext()) {
+              QuerySolution qs = qr.next();
+              Resource sensor = qs.getResource(Vars.URI_SENSOR);
+              String sensorId = qs.getLiteral(Vars.ID_SENSOR).getString();
+              Resource sensorWampResource =
+                  ResourceFactory.createResource(sensor.getURI() + "/wamp");
+              addWampForResource(privateDeviceInfo, sensor, sensorWampResource,
+                  TOPIC_SENSOR_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
+                      .replace("${SENSOR_ID}", sensorId));
+            }
+            
             store.save(GRAPH_PRIVATE, privateDeviceInfo);
 
             return true;
@@ -172,6 +201,14 @@ public class DirectoryService {
 
     return false;
   }
+  
+  private void addWampForResource(Model model, Resource res, Resource wampResource, String topic) {
+    model.add(res, SSNCOM.hasCommunicationEndpoint, wampResource)
+    .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
+    .add(wampResource, SSNCOM.topic,
+        ResourceFactory.createPlainLiteral(topic))
+    .add(wampResource, SSNCOM.protocol, WAMP);
+  }
 
   public void removeDataOfDriver(String pid) {
     store.update(QUERY_DELETE_ALL_DATA_DRIVER.replace("${PID}", pid));
@@ -191,7 +228,8 @@ public class DirectoryService {
   }
 
   private static abstract class Vars {
-
     public static final String URI = "uri";
+    public static final String URI_SENSOR = "sensor_uri";
+    public static final String ID_SENSOR = "sensor_id";
   }
 }

@@ -40,14 +40,14 @@ public class NewDeviceListener implements Observer<String> {
       "SELECT ?topic { "
           + "GRAPH <urn:semiot:graphs:private> {"
           + " ?x ssncom:hasCommunicationEndpoint ?e ."
-          + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
+          + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?topic ."
           + "}"
           + "}", SSN.class, SSNCOM.class));
   private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils.newSPARQLQuery(
       "SELECT ?topic { "
           + "GRAPH <urn:semiot:graphs:private> {"
           + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
-          + " ?e ssncom:protocol \"WAMP\"; ssncom:topic ?topic ."
+          + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?topic ."
           + "}"
           + "}", SSN.class, SSNCOM.class);
 

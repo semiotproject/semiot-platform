@@ -22,8 +22,9 @@ public abstract class Observation {
   /**
    * @param timestamp number of seconds since the Unix Epoch
    */
-  public Observation(String deviceId, String timestamp) {
+  public Observation(String deviceId, String sensorId, String timestamp) {
     properties.put(DeviceProperties.DEVICE_ID, deviceId);
+    properties.put(DeviceProperties.SENSOR_ID, sensorId);
     properties.put(DeviceProperties.OBSERVATION_TIMESTAMP, timestamp);
 
     //Timestamp to ISO 8601 date and time
