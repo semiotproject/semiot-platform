@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Subscription;
+import ws.wamp.jawampa.SubscriptionFlags;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
 import ws.wamp.jawampa.auth.client.Ticket;
@@ -50,6 +51,11 @@ public class WAMPClient implements Closeable, AutoCloseable {
   public Observable<String> subscribe(String topic) {
     logger.info("Subscribed to {} topic", topic);
     return client.makeSubscription(topic, String.class);
+  }
+  
+  public Observable<String> subscribe(String topic, SubscriptionFlags flag) {
+    logger.info("Subscribed to {} topic", topic);
+    return client.makeSubscription(topic, flag, String.class);
   }
 
   @Override

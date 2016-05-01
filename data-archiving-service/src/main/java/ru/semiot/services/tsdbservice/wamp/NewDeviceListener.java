@@ -24,6 +24,7 @@ import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.SSNCOM;
 import rx.Observer;
+import ws.wamp.jawampa.SubscriptionFlags;
 
 import java.io.StringReader;
 import java.util.LinkedList;
@@ -130,8 +131,9 @@ public class NewDeviceListener implements Observer<String> {
           listTopics.add(topicObsName);
           listTopics.add(topicCommResName);
           //Subscribe to observations
-          wampClient.addSubscription(topicObsName, wampClient.subscribe(topicObsName)
-              .subscribe(new ObservationListener(systemId)));
+          wampClient.addSubscription(topicObsName,
+              wampClient.subscribe(topicObsName, SubscriptionFlags.Prefix)
+                  .subscribe(new ObservationListener(systemId)));
           //Subscribe to commands
           wampClient.addSubscription(topicCommResName, wampClient.subscribe(topicCommResName)
               .subscribe(new ActuationListener()));
