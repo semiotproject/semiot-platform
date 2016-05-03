@@ -6,6 +6,7 @@ import static ru.semiot.commons.restapi.AsyncResponseHelper.resumeOnError;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
 import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.query.QuerySolution;
@@ -60,6 +61,8 @@ public class SystemObservationsResource {
       + "     ssn:hasSubSystem ?sensor ."
       + " ?sensor dcterms:identifier ?sensor_id }";
   private static final String VAR_SENSOR_ID = "sensor_id";
+  private static final String TOPIC_SENSOR_TEMPLATE = "${SYSTEM_ID}.observations.${SENSOR_ID}";
+  private static final String TOPIC_SYSTEM_TEMPLATE = "${SYSTEM_ID}.observations";
 
   @Inject
   private SPARQLQueryService sparqlQuery;
@@ -72,19 +75,29 @@ public class SystemObservationsResource {
 
   @GET
   public void observations(@Suspended final AsyncResponse response,
-      @PathParam("system_id") String systemId, @QueryParam("sensor_id") List<String> listSensorId,
+      @PathParam("system_id") String systemId, @QueryParam("sensor_id") String sensorId,
       @QueryParam("start") String start, @QueryParam("end") String end)
       throws IOException {
     if (Strings.isNullOrEmpty(systemId)) {
       response.resume(Response.status(Response.Status.NOT_FOUND).build());
     }
-
+    
     URI root = uriInfo.getRequestUri();
     String rootUrl = URIUtils.extractRootURL(root);
     Map params = MapBuilder.newMap()
         .put(ContextProvider.VAR_ROOT_URL, rootUrl)
         .put(ContextProvider.VAR_WAMP_URL, rootUrl + config.wampPublicPath())
         .put(ContextProvider.VAR_SYSTEM_ID, systemId).build();
+    List<String> listSensorId;
+    if (sensorId == null) {
+      listSensorId = null;
+      params.put(ContextProvider.VAR_TOPIC_NAME,
+          TOPIC_SYSTEM_TEMPLATE.replace("${SYSTEM_ID}", systemId));
+    } else {
+      listSensorId = Collections.list(sensorId);
+      params.put(ContextProvider.VAR_TOPIC_NAME, TOPIC_SENSOR_TEMPLATE
+          .replace("${SYSTEM_ID}", systemId).replace("${SENSOR_ID}", sensorId));
+    }
     if (Strings.isNullOrEmpty(start)) {
       tsdbQuery.queryTimeOfLatestBySystemId(
           systemId, getListSensorsId(systemId, listSensorId)).subscribe((result) -> {
