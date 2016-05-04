@@ -126,6 +126,7 @@
                             com.github.jsonldjava.utils,
                             org.apache.commons.lang3,
                             org.apache.http,
+                            org.apache.http.conn,
                             org.apache.http.client.methods,
                             org.apache.http.client.cache,
                             org.apache.jena.*,
