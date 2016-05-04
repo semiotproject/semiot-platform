@@ -287,33 +287,37 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   private void connectToDataStore() {
     try {
       URI fullUri = new URI(configuration.get(Keys.FUSEKI_STORE_URL));
-      URIBuilder uri = new URIBuilder();
-      uri.setHost(fullUri.getHost());
-      uri.setPort(fullUri.getPort());
-
-      HttpClient client = new DefaultHttpClient();
+      URIBuilder uri =
+          new URIBuilder().setScheme("http").setHost(fullUri.getHost()).setPort(fullUri.getPort());
       HttpGet request = new HttpGet(uri.build());
 
       while (true) {
         try {
+          HttpClient client = new DefaultHttpClient();
           HttpResponse resp = client.execute(request);
           if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             logger.info("Connected to {}", uri.build());
             break;
+          } else {
+            sleep();
           }
         } catch (HttpHostConnectException ex) {
-          logger.warn("Can`t connect to the triplestore! Retry in {}ms", TIMEOUT);
-          try {
-            Thread.sleep(TIMEOUT);
-          } catch (InterruptedException ex1) {
-            logger.error("Something went wrong with error:\n" + ex1.getMessage());
-          }
+          sleep();
         } catch (IOException ex) {
           logger.error("Something went wrong with error:\n" + ex.getMessage());
         }
       }
     } catch (URISyntaxException ex) {
       logger.error("The storeURL is WRONG!!!");
+    }
+  }
+  
+  void sleep() {
+    logger.warn("Can`t connect to the triplestore! Retry in {}ms", TIMEOUT);
+    try {
+      Thread.sleep(TIMEOUT);
+    } catch (InterruptedException ex1) {
+      logger.error("Something went wrong with error:\n" + ex1.getMessage());
     }
   }
 

@@ -7,7 +7,7 @@ ENV FUSEKI_HOME /fuseki
 ENV FUSEKI_BASE /fuseki/base
 
 WORKDIR /
-RUN dnf install -y java-1.8.0-openjdk-headless wget unzip which && dnf clean all
+RUN dnf install -y java-1.8.0-openjdk-headless nss-3.23.0 wget unzip which && dnf clean all
 
 RUN mkdir -p $FUSEKI_BASE
 WORKDIR $FUSEKI_HOME
