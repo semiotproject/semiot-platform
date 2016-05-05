@@ -17,6 +17,7 @@ RUN unzip $FUSEKI_ARCHIVE_NAME.zip && rm $FUSEKI_ARCHIVE_NAME.zip
 RUN mv $FUSEKI_ARCHIVE_NAME/* . && rm -rf $FUSEKI_ARCHIVE_NAME
 ADD shiro.ini $FUSEKI_BASE/
 ADD config.ttl $FUSEKI_BASE/
+ADD log4j.properties $FUSEKI_BASE/
 ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
 
 CMD rm -f /fuseki/fuseki-db/tdb.lock
