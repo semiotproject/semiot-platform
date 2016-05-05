@@ -35,13 +35,32 @@ export default function(CONFIG, $http, $q, WAMP) {
 
             return defer.promise;
         },
-        subscribeForNewObservations(sensor, callback) {
-            WAMP.subscribe([{
-                topic: getWAMPTopicFromSensor(sensor),
+        loadWAMPTopic(observationsURI) {
+            const defer = $q.defer();
+
+            $http.get(`${observationsURI}`).success((res) => {
+                try {
+                    const subscriptionOperation = res['hydra-filter:viewOf']['hydra:operation'];
+                    defer.resolve({
+                        endpoint: subscriptionOperation['hydra-pubsub:endpoint']['@value'],
+                        topic:  subscriptionOperation['hydra-pubsub:topic']
+                    });
+                } catch(e) {
+                    console.error(`failed to parse observation list: error = `, e);
+                    defer.resolve(null);
+                }
+            });
+
+            return defer.promise;
+        },
+        subscribeForNewObservations(endpoint, topic, callback) {
+            WAMP.subscribe({
+                topic: topic,
+                endpoint: endpoint,
                 callback: (msg) => {
                     callback(extractObservationFromWAMPMessage(JSON.parse(msg[0])));
                 }
-            }]);
+            });
             /*
             setInterval(() => {
                 const msg = {

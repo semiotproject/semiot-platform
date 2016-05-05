@@ -2,11 +2,11 @@
 
 export default function($routeProvider, $locationProvider) {
     $routeProvider
-        .when('/', {
+        .when('/systems', {
             templateUrl: '/partials/system-list.html',
             controller: 'SystemListCtrl'
         })
-        .when('/:system_id*', {
+        .when('/systems/:system_id*', {
             templateUrl: '/partials/system-detail.html',
             controller: 'SystemDetailCtrl'
         });

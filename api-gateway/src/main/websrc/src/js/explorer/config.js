@@ -13,7 +13,7 @@ export default {
     URLS: {
         base: BASE_URL,
         currentUser: `${BASE_URL}/user`,
-        messageBus: `ws://${BASE_HOSTNAME}:8080/ws`,
+        messageBus: `${WS_PROTOCOL}//${BASE_HOSTNAME}/wamp`,
         tripleStore: `${BASE_URL}:3030/ds/query`,
         tsdb: {
             // archiveQuantity: `${BASE_URL}?start={0}&end={1}&m=sum:{2}`,

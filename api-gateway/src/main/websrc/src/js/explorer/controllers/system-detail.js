@@ -323,9 +323,9 @@ export default function(
             console.log(chartUtils.observationsToSerie(obs));
         });
     };
-    $scope.subscribe = function(sensor) {
-        observationAPI.subscribeForNewObservations(sensor, (msg) => {
-            console.info(`received new observation for sensor ${sensor.label}: `, msg);
+    $scope.subscribe = function(endpoint, topic, sensor) {
+        observationAPI.subscribeForNewObservations(endpoint, topic, (msg) => {
+            console.info(`received new observation for endpoint ${endpoint}, topic ${topic}: `, msg);
             sensor.chartConfig.series[0].data.push(chartUtils.observationsToChartPoint(msg));
 
             // why view is not updating without $apply()?
@@ -346,7 +346,10 @@ export default function(
 
                     $scope.initChart(sensor);
                     $scope.fillChart(sensor);
-                    $scope.subscribe(sensor);
+                    observationAPI.loadWAMPTopic(sensor.observationsURI).then((res) => {
+                        console.info(`loaded WAMP topic: `, res);
+                        $scope.subscribe(res.endpoint, res.topic, sensor);
+                    });
 
                     $scope.sensors.push(sensor);
                 });

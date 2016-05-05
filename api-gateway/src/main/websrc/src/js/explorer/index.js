@@ -53,9 +53,10 @@ app.factory('chartUtils', require('./utils/chart'));
 app.factory('WAMP', require('./services/wamp'));
 
 // api
-app.factory('systemAPI', require('./hypermedia-api/systems'));
-app.factory('sensorAPI', require('./hypermedia-api/sensors'));
-app.factory('observationAPI', require('./hypermedia-api/observations'));
+app.factory('systemAPI', require('./api/systems'));
+app.factory('sensorAPI', require('./api/sensors'));
+app.factory('observationAPI', require('./api/observations'));
+app.factory('currentUser', require('./api/user'));
 
 // controllers
 app.controller('SystemListCtrl', require('./controllers/system-list'));

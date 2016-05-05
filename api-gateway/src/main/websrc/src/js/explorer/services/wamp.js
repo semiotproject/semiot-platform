@@ -2,20 +2,24 @@
 
 import autobahn from 'autobahn';
 
-export default function(CONFIG) {
+export default function(CONFIG, currentUser) {
 
-    let _session;
+    // `endpoint` : { `topic`:`autobahn.Subscribtion` }
+    let _sessions = {};
 
     // hash `topic`:`autobahn.Subscribtion`
-    let _subscriptions = {};
+    // let _subscriptions = {};
 
     // lasy initialisation
-    const checkSession = (callback) => {
-        if (_session) {
-            callback(_session);
+    const checkSession = (endpoint, callback) => {
+        console.info(`checking WAMP session for endpoint ${endpoint}`);
+        if (_sessions[endpoint]) {
+            console.info(`session for endpoint ${endpoint} already exists; reusing`);
+            callback(_sessions[endpoint]);
             return;
         }
-        $.get(CONFIG.URLS.currentUser).done((user) => {
+        console.info(`not found opened session for endpoint ${endpoint}; connecting..`);
+        currentUser.getCurrentUser().then((user) => {
             // user = JSON.parse(user);
             // remove this in production
             user = {
@@ -24,7 +28,7 @@ export default function(CONFIG) {
             };
             console.log('initialising WAMP session...');
             let connection = new autobahn.Connection({
-                url: CONFIG.URLS.messageBus,
+                url: endpoint,
                 realm: 'realm1',
                 authmethods: ["ticket"],
                 authid: user.username,
@@ -37,32 +41,31 @@ export default function(CONFIG) {
                 }
             });
             connection.onopen = function(session) {
-                if (!_session) {
-                     _session = session;
+                if (!_sessions[endpoint]) {
+                    _sessions[endpoint] = session;
+                } else {
+                    console.warn(`session opened, but another session for endpoint ${endpoint} already registered; possible race run?`);
                 }
-                callback(_session);
+                callback(_sessions[endpoint]);
             };
             connection.open();
-        }).fail(() => {
-            console.error('unable to get current user; do nothing with WAMP');
         });
     };
 
     const instance = {
-        subscribe(listeners) {
-            checkSession((s) => {
-                listeners.forEach(function(listener) {
-                    if (!listener.topic) {
-                        throw new Error('WAMP topic is required');
-                    }
-                    console.log(`subscribing to ${listener.topic}..`);
-                    _session.subscribe(listener.topic, listener.callback).then((subscr) => {
-                        _subscriptions[listener.topic] = subscr;
-                    });
+        subscribe({ topic, endpoint = CONFIG.URLS.messageBus, callback }) {
+            checkSession(endpoint, (s) => {
+                if (!topic) {
+                    throw new Error('WAMP topic is required');
+                }
+                console.info(`subscribing to ${topic}..`);
+                s.subscribe(topic, callback).then((subscr) => {
+                    console.info(`subscription to ${topic} created`);
                 });
             });
         },
         unsubscribe(topic) {
+            /*
             checkSession((s) => {
                 if (!_subscriptions[topic]) {
                     console.warn(`not found subscriptions for topic ${topic}`);
@@ -71,6 +74,7 @@ export default function(CONFIG) {
                 console.log(`unsubscribing from ${topic}..`);
                 s.unsubscribe(_subscriptions[topic]);
             });
+            */
         }
     };
 
