@@ -80,6 +80,7 @@
                         <Import-Package>
                             org.apache.jena.rdf.model,
                             org.apache.jena.riot,
+                            org.apache.jena.vocabulary,
                             org.apache.felix.dm;version="[4.1,5)",
                             org.osgi.framework;version="[1.8,2)",
                             org.slf4j
