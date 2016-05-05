@@ -13,16 +13,9 @@ import ru.semiot.services.tsdbservice.TSDBClient;
 import ru.semiot.services.tsdbservice.model.Observation;
 import rx.Observable;
 
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
@@ -34,9 +27,7 @@ public class Observations {
 
   private static final Logger logger = LoggerFactory
       .getLogger(Observations.class);
-  public static final String DELETE_OBSERVATION = "DELETE FROM "
-      + "semiot.observation WHERE system_id = '${SYSTEM_ID}' "
-      + "AND sensor_id = '${SENSOR_ID}';";
+  
   public static final String GET_LATEST_OBSERVATION = "SELECT * FROM semiot.observation "
       + "WHERE system_id = '${SYSTEM_ID}' AND sensor_id IN (${SENSOR_IDS}) LIMIT 1";
   public static final String GET_OBSERVATIONS_BY_START_END =
@@ -46,9 +37,6 @@ public class Observations {
   public static final String GET_OBSERVATIONS_BY_START = "SELECT * FROM semiot.observation WHERE "
       + "event_time >= '${START}' AND system_id = '${SYSTEM_ID}' AND sensor_id IN (${SENSOR_IDS});";
   public static final String SENSOR_ID = "'${SENSOR_ID}'";
-
-  private static final String JSON_SYSTEM_ID = "system_id";
-  private static final String JSON_SENSOR_ID = "sensor_id";
 
   @GET
   @Path("test")
@@ -149,27 +137,5 @@ public class Observations {
       return observations;
     }).subscribe(responseModelOrError(response));
   }
-
-
-  @POST
-  @Path("/remove")
-  public void removeMetric(@Suspended final AsyncResponse response, String message) {
-    StringReader reader = new StringReader(message);
-    JsonReader js = Json.createReader(reader);
-    JsonArray jArray = js.readArray();
-
-    List<String> queries = new ArrayList<String>();
-    for (int i = 0; i < jArray.size(); i++) {
-      JsonObject val = jArray.getJsonObject(i);
-      String system_id = val.getString(JSON_SYSTEM_ID);
-      String sensor_id = val.getString(JSON_SENSOR_ID);
-      queries.add(DELETE_OBSERVATION
-          .replace("${SYSTEM_ID}", system_id)
-          .replace("${SENSOR_ID}", sensor_id));
-    }
-    Observable<ResultSet> rs = TSDBClient.getInstance().executeAsync(queries);
-
-    rs.map((result) -> result.toString())
-        .subscribe(responseStringOrError(response));
-  }
+  
 }

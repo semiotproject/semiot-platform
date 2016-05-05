@@ -46,7 +46,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
   private static final String QUERY_OBSERVATIONS = "/observations";
   private static final String QUERY_OBSERVATIONS_LATEST = "/observations/latest";
   private static final String QUERY_TIME_OBSERVATIONS_LATEST = "/observations/latest/time";
-  private static final String QUERY_REMOVE = "/observations/remove";
+  private static final String QUERY_REMOVE = "/remove";
   private static final String PARAM_SYSTEM_ID = "system_id";
   private static final String PARAM_SENSOR_ID = "sensor_id";
   private static final String PARAM_START = "start";
@@ -119,6 +119,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
     });
   }
 
+  @Override
   public Observable<Response> remove(JsonArray jsonArray) {
     return Rx.newClient(RxObservableInvoker.class, mes)
         .target(UriBuilder.fromPath(config.tsdbEndpoint())
@@ -164,6 +165,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
     }));
   }
 
+  @Override
   public Observable<Model> queryActuationsByRange(String systemId,
                                                   ZonedDateTime start, ZonedDateTime end) {
     UriBuilder uriBuilder = UriBuilder.fromPath(config.tsdbEndpoint())
