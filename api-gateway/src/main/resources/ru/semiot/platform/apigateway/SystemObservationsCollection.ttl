@@ -20,7 +20,7 @@
         hydra-pubsub:publishes ssn:Observation ;
         hydra-pubsub:protocol hydra-pubsub:WAMP ;
         hydra-pubsub:endpoint "${WAMP_URL}"^^xsd:anyURI ;
-        hydra-pubsub:topic "${SYSTEM_ID}"^^xsd:string
+        hydra-pubsub:topic "${TOPIC_NAME}"^^xsd:string
     ] ;
     hydra-filter:viewTemplate [
         a   hydra-filter:ViewTemplate ;

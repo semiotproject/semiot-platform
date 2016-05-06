@@ -10,4 +10,4 @@ ADD standalone.xml /opt/jboss/wildfly/standalone/configuration/
 ADD module.xml /opt/jboss/wildfly/modules/system/layers/base/mysql/mysql-connector-java/main/
 ADD $MYSQL_CONNECTOR /opt/jboss/wildfly/modules/system/layers/base/mysql/mysql-connector-java/main/
 
-ADD target/api-gateway.war /opt/jboss/wildfly/standalone/deployments/api-gateway.war
+ADD target/api-gateway-1.0-SNAPSHOT/ /opt/jboss/wildfly/standalone/deployments/api-gateway-1.0-SNAPSHOT.war/

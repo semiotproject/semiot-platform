@@ -53,6 +53,7 @@ public class ContextProvider {
   public static final String VAR_SUBSYSTEM_ID = "${SUBSYSTEM_ID}";
   public static final String VAR_WAMP_URL = "${WAMP_URL}";
   public static final String VAR_QUERY_PARAMS = "${QUERY_PARAMS}";
+  public static final String VAR_TOPIC_NAME = "${TOPIC_NAME}";
 
   public ContextProvider() {
   }
