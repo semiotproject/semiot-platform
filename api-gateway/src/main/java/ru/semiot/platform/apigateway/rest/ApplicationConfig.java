@@ -14,7 +14,7 @@ public class ApplicationConfig extends Application {
     resources.add(ru.semiot.platform.apigateway.rest.RootResource.class);
     resources.add(ru.semiot.platform.apigateway.rest.SensorResource.class);
     resources.add(ru.semiot.platform.apigateway.rest.SubSystemResource.class);
-    resources.add(ru.semiot.platform.apigateway.rest.SystemActuationsResource.class);
+    resources.add(SystemCommandResultsResource.class);
     resources.add(ru.semiot.platform.apigateway.rest.SystemObservationsResource.class);
     resources.add(ru.semiot.platform.apigateway.rest.SystemResource.class);
 

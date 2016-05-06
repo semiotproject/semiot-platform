@@ -11,9 +11,7 @@ public abstract class TemplateUtils {
     return VAR_LEFT + key + VAR_RIGTH;
   }
 
-  public static final String resolve(String template,
-                                     Map<String, String>... maps) {
-
+  public static final String resolve(String template, Map<String, String>... maps) {
     String result = new String(template);
 
     for (Map<String, String> variables : maps) {

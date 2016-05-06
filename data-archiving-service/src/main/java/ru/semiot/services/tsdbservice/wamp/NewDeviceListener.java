@@ -46,9 +46,11 @@ public class NewDeviceListener implements Observer<String> {
           + "?x dcterms:identifier ?system_id. "
           + "GRAPH <urn:semiot:graphs:private> {"
           + " ?x ssncom:hasCommunicationEndpoint ?e ."
-          + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
+          + " ?e ssncom:protocol \"WAMP\"; "
+          + "   ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
           + " ?x ssncom:hasCommunicationEndpoint ?ee ."
-          + " ?ee ssncom:protocol \"WAMP\"; ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
+          + " ?ee ssncom:protocol \"WAMP\";"
+          + "   ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
           + "}"
           + "}", SSN.class, SSNCOM.class, DCTerms.class));
   private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils.newSPARQLQuery(
@@ -56,15 +58,17 @@ public class NewDeviceListener implements Observer<String> {
           + "<${SYSTEM_URI}> dcterms:identifier ?system_id. "
           + "GRAPH <urn:semiot:graphs:private> {"
           + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
-          + " ?e ssncom:protocol \"WAMP\"; ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
+          + " ?e ssncom:protocol \"WAMP\"; "
+          + "   ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
           + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?ee ."
-          + " ?ee ssncom:protocol \"WAMP\"; ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
+          + " ?ee ssncom:protocol \"WAMP\"; "
+          + "   ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
           + "}"
           + "}", SSN.class, SSNCOM.class, DCTerms.class);
 
   public NewDeviceListener() {
-    httpAuthenticator = new SimpleAuthenticator(CONFIG.storeUsername(),
-        CONFIG.storePassword().toCharArray());
+    httpAuthenticator = new SimpleAuthenticator(
+        CONFIG.storeUsername(), CONFIG.storePassword().toCharArray());
     subscribeTopics(null);
   }
 
@@ -134,9 +138,9 @@ public class NewDeviceListener implements Observer<String> {
           wampClient.addSubscription(topicObsName,
               wampClient.subscribe(topicObsName, SubscriptionFlags.Prefix)
                   .subscribe(new ObservationListener(systemId)));
-          //Subscribe to commands
+          //Subscribe to command results
           wampClient.addSubscription(topicCommResName, wampClient.subscribe(topicCommResName)
-              .subscribe(new ActuationListener()));
+              .subscribe(new CommandResultListener()));
         } else {
           logger.debug("Topics {} and {} is already known", topicObsName, topicCommResName);
         }

@@ -3,7 +3,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 [
-    a semiot:Actuation ;
-    dul:hasEventTime "${ru.semiot.platform.actuation.datetime}"^^xsd:dateTime ;
+    a semiot:CommandResult ;
+    dul:hasEventTime "${ru.semiot.platform.commandresult.datetime}"^^xsd:dateTime ;
     dul:involvesAgent <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
 ] .

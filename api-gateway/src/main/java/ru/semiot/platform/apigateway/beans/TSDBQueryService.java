@@ -23,10 +23,10 @@ public interface TSDBQueryService {
 
   public Observable<Response> remove(JsonArray array);
 
-  public Observable<ZonedDateTime> queryDateTimeOfLatestActuation(
+  public Observable<ZonedDateTime> queryDateTimeOfLatestCommandResult(
       String systemId);
 
-  public Observable<Model> queryActuationsByRange(String systemId,
+  public Observable<Model> queryCommandResultsByRange(String systemId,
                                                   ZonedDateTime start, ZonedDateTime end);
 
   public Observable<Response> sendSettingsAsPost(JsonObject json);

@@ -14,6 +14,11 @@
         "@type": "xsd:integer",
         "rdfs:label": "Number of lamps",
         "dtype:defaultValue": 1
+      },
+      "ru.semiot.drivers.mocks.plainlamp.switchOnOffInterval": {
+        "@type": "xsd:integer",
+        "rdfs:label": "Switch On/Off Interval (sec)",
+        "dtype:defaultValue": 60
       }
     }
   ]

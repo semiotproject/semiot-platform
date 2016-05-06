@@ -12,10 +12,11 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
-import ru.semiot.platform.deviceproxyservice.api.drivers.ActuatingDeviceDriver;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Command;
 import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionException;
-import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionResult;
+import ru.semiot.platform.deviceproxyservice.api.drivers.CommandResult;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
+import ru.semiot.platform.deviceproxyservice.api.drivers.ControllableDeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceProperties;
@@ -35,7 +36,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       "Observation-frame.jsonld";
   private static final String SYSTEM_FRAME_PATH = FRAME_PATH_PREFIX + "System-frame.jsonld";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
-  private static final String TOPIC_ACTUATIONS = "${SYSTEM_ID}.commandresults";
+  private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults";
   private final Configuration configuration = new Configuration();
   private final Object observationFrame;
   private final Object systemFrame;
@@ -56,7 +57,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     }
     this.observationFrame = frame;
 
-    //Loadin JSONLD frame for systems
+    //Loading JSONLD frame for systems
     try {
       frame = JsonUtils.fromInputStream(
           this.getClass().getResourceAsStream(SYSTEM_FRAME_PATH));
@@ -211,7 +212,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     try {
       WAMPClient.getInstance()
           .publish(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
-              .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
+                  .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
               JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
           .subscribe(WAMPClient.onError());
     } catch (JsonLdError | IOException ex) {
@@ -225,33 +226,33 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   }
 
   @Override
-  public void registerCommand(CommandExecutionResult result) {
+  public void registerCommand(Device device, CommandResult result) {
     //TODO: There's no guarantee that WAMPClient is connected?
     WAMPClient.getInstance()
-        .publish(TOPIC_ACTUATIONS.replace("${SYSTEM_ID}", result.getDevice().getId()),
-            result.toActuationAsString(configuration, RDFLanguages.JSONLD))
+        .publish(
+            TOPIC_COMMANDRESULT.replace("${SYSTEM_ID}", device.getId()),
+            result.toRDFAsString(configuration, RDFLanguages.JSONLD))
         .subscribe(WAMPClient.onError());
   }
 
   @Override
-  public Model executeCommand(String deviceId, Model command)
-      throws CommandExecutionException {
+  public Model executeCommand(String deviceId, Model command) throws CommandExecutionException {
     try {
       String pid = directoryService.findDriverPidByDeviceId(deviceId);
 
       if (pid != null) {
         try {
           Collection services = bundleContext.getServiceReferences(
-              ActuatingDeviceDriver.class, "(service.pid=" + pid + ")");
+              ControllableDeviceDriver.class, "(service.pid=" + pid + ")");
           if (!services.isEmpty()) {
-            logger.info("Driver [{}] found!", pid);
-            ServiceReference<ActuatingDeviceDriver> reference =
+            logger.debug("Driver [{}] found!", pid);
+            ServiceReference<ControllableDeviceDriver> reference =
                 (ServiceReference) services.iterator().next();
-            ActuatingDeviceDriver driver = bundleContext.getService(reference);
+            ControllableDeviceDriver driver = bundleContext.getService(reference);
 
-            CommandExecutionResult result = driver.executeCommand(command);
+            CommandResult result = driver.executeCommand(new Command(command));
 
-            return result.toActuationAsModel(configuration);
+            return result.toRDFAsModel(configuration);
           } else {
             throw CommandExecutionException.driverNotFound();
           }

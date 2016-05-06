@@ -8,7 +8,6 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DCTerms;
-import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.NamespaceUtils;
@@ -52,37 +51,31 @@ public class ObservationListener extends RDFMessageObserver {
   @Override
   public void onNext(Model description) {
     try {
-      if (isObservation(description)) {
-        ResultSet metrics = query(description, METRICS_QUERY);
-        while (metrics.hasNext()) {
-          QuerySolution qs = metrics.next();
-          String timestamp = qs.getLiteral(TIMESTAMP).getString();
-          String sensorUri = qs.getResource(SENSOR_URI).getURI();
-          Resource featureOfInterestResource = qs.getResource(FEATURE_OF_INTEREST);
-          String value = qs.getLiteral(VALUE).getString();
-          String property = qs.getResource(PROPERTY).getURI();
-          if (StringUtils.isNotBlank(value)
-              && StringUtils.isNotBlank(property)
-              && StringUtils.isNotBlank(timestamp)
-              && StringUtils.isNoneBlank(sensorUri)) {
-            String featureOfInterest = null;
-            if (featureOfInterestResource != null) {
-              featureOfInterest = featureOfInterestResource.getURI();
-            }
-            TSDBClient.getInstance().write(new Observation(system_id,
-                sensorUri.substring(sensorUri.lastIndexOf("/") + 1),
-                timestamp, property, featureOfInterest, value));
-          } else {
-            logger.warn("Required properties not found!");
+      ResultSet metrics = query(description, METRICS_QUERY);
+      while (metrics.hasNext()) {
+        QuerySolution qs = metrics.next();
+        String timestamp = qs.getLiteral(TIMESTAMP).getString();
+        String sensorUri = qs.getResource(SENSOR_URI).getURI();
+        Resource featureOfInterestResource = qs.getResource(FEATURE_OF_INTEREST);
+        String value = qs.getLiteral(VALUE).getString();
+        String property = qs.getResource(PROPERTY).getURI();
+        if (StringUtils.isNotBlank(value)
+            && StringUtils.isNotBlank(property)
+            && StringUtils.isNotBlank(timestamp)
+            && StringUtils.isNoneBlank(sensorUri)) {
+          String featureOfInterest = null;
+          if (featureOfInterestResource != null) {
+            featureOfInterest = featureOfInterestResource.getURI();
           }
+          TSDBClient.getInstance().write(new Observation(system_id,
+              sensorUri.substring(sensorUri.lastIndexOf("/") + 1),
+              timestamp, property, featureOfInterest, value));
+        } else {
+          logger.warn("Required properties not found!");
         }
       }
     } catch (Throwable ex) {
       logger.error(ex.getMessage(), ex);
     }
-  }
-
-  private boolean isObservation(Model model) {
-    return !model.isEmpty() && model.contains(null, RDF.type, SSN.Observaton);
   }
 }

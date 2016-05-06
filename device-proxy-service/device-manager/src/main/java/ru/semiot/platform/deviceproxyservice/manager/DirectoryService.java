@@ -37,7 +37,7 @@ public class DirectoryService {
   private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
   private static final String TOPIC_SENSOR_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations";
-  private static final String TOPIC_ACTUATIONS = "${SYSTEM_ID}.commandresults";
+  private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults";
 
   protected static final String QUERY_DELETE_ALL_DATA_DRIVER = NamespaceUtils.newSPARQLQuery(
       // @formatter:off
@@ -160,7 +160,7 @@ public class DirectoryService {
             Resource wampResourceCommRes =
                 ResourceFactory.createResource(system.getURI() + "/commandresults/wamp");
             addWampForResource(privateDeviceInfo, system, wampResourceCommRes,
-                TOPIC_ACTUATIONS.replace("${SYSTEM_ID}", device.getId()));
+                TOPIC_COMMANDRESULT.replace("${SYSTEM_ID}", device.getId()));
             privateDeviceInfo.add(wampResourceCommRes, SSNCOM.provide,
                 ResourceFactory.createPlainLiteral("commandresults"));
 

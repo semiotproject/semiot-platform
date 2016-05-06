@@ -15,15 +15,14 @@ import ru.semiot.commons.namespaces.DUL;
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.services.tsdbservice.TSDBClient;
-import ru.semiot.services.tsdbservice.model.Actuation;
+import ru.semiot.services.tsdbservice.model.CommandResult;
 
-public class ActuationListener extends RDFMessageObserver {
+public class CommandResultListener extends RDFMessageObserver {
 
-  private static final Logger logger = LoggerFactory
-      .getLogger(ActuationListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(CommandResultListener.class);
   private static final Query GET_INFORMATION = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
       "SELECT ?uri ?datetime ?type {" +
-          "?actuation semiot:hasValue ?command ;" +
+          "?actuation semiot:isResultOf ?command ;" +
           "dul:hasEventTime ?datetime ;" +
           "dul:involvesAgent ?uri ." +
           "?command a ?type . " +
@@ -40,37 +39,34 @@ public class ActuationListener extends RDFMessageObserver {
   @Override
   public void onNext(Model model) {
     try {
-      if (isActuation(model)) {
-        ResultSet rsActuations = query(model, GET_INFORMATION);
-        if (rsActuations.hasNext()) {
-          QuerySolution qsActuations = rsActuations.next();
+      ResultSet rsCommandResults = query(model, GET_INFORMATION);
+      if (rsCommandResults.hasNext()) {
+        QuerySolution qsCommandResults = rsCommandResults.next();
 
-          Resource deviceUri = qsActuations.getResource("uri");
-          Literal dateTime = qsActuations.getLiteral("datetime");
-          Resource type = qsActuations.getResource("type");
+        Resource deviceUri = qsCommandResults.getResource("uri");
+        Literal dateTime = qsCommandResults.getLiteral("datetime");
+        Resource type = qsCommandResults.getResource("type");
 
-          ResultSet rsProps = query(model, GET_PROPERTIES);
+        ResultSet rsProps = query(model, GET_PROPERTIES);
 
-          Actuation actuation = new Actuation(
-              NamespaceUtils.extractLocalName(deviceUri.getURI()),
-              dateTime.getLexicalForm(),
-              type.getURI());
+        CommandResult commandResult = new CommandResult(
+            NamespaceUtils.extractLocalName(deviceUri.getURI()),
+            dateTime.getLexicalForm(),
+            type.getURI());
 
-          while (rsProps.hasNext()) {
-            QuerySolution qsProps = rsProps.next();
-            actuation.addProperty(
-                ResourceFactory.createProperty(qsProps.getResource("uri").getURI()),
-                qsProps.get("value"));
-          }
-
-          String query = actuation.toInsertQuery();
-
-          TSDBClient.getInstance().executeAsync(query).subscribe(TSDBClient.onError());
-
-          logger.debug("Query: {}", query);
-        } else {
-          logger.warn("Required properties not found!");
+        while (rsProps.hasNext()) {
+          QuerySolution qsProps = rsProps.next();
+          commandResult.addProperty(ResourceFactory.createProperty(
+              qsProps.getResource("uri").getURI()), qsProps.get("value"));
         }
+
+        String query = commandResult.toInsertQuery();
+
+        TSDBClient.getInstance().executeAsync(query).subscribe(TSDBClient.onError());
+
+        logger.debug("Query: {}", query);
+      } else {
+        logger.warn("Required properties not found!");
       }
     } catch (Throwable e) {
       logger.error(e.getMessage(), e);
@@ -80,9 +76,5 @@ public class ActuationListener extends RDFMessageObserver {
   @Override
   public void onError(Throwable e) {
     logger.error(e.getMessage(), e);
-  }
-
-  private boolean isActuation(Model model) {
-    return !model.isEmpty() && model.contains(null, RDF.type, SEMIOT.Actuation);
   }
 }

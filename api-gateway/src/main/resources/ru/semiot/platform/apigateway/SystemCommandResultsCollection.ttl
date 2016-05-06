@@ -11,22 +11,22 @@
 @prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
-<${ROOT_URL}/systems/${SYSTEM_ID}/actuations${QUERY_PARAMS}> a hydra:PartialCollectionView, void:Dataset ;
-    hydra-filter:viewOf <${ROOT_URL}/systems/${SYSTEM_ID}/actuations> ;
+<${ROOT_URL}/systems/${SYSTEM_ID}/commandResults${QUERY_PARAMS}> a hydra:PartialCollectionView, void:Dataset ;
+    hydra-filter:viewOf <${ROOT_URL}/systems/${SYSTEM_ID}/commandResults> ;
 .
 
-<${ROOT_URL}/systems/${SYSTEM_ID}/actuations> a hydra:Collection, void:Dataset ;
-    void:classPartition [ void:class semiot:Actuation ] ;
+<${ROOT_URL}/systems/${SYSTEM_ID}/commandResults> a hydra:Collection, void:Dataset ;
+    void:classPartition [ void:class semiot:CommandResult ] ;
     hydra:operation [
         a hydra-pubsub:SubscribeOperation ;
-        hydra-pubsub:publishes semiot:Actuation ;
+        hydra-pubsub:publishes semiot:CommandResult ;
         hydra-pubsub:protocol hydra-pubsub:WAMP ;
         hydra-pubsub:endpoint "${WAMP_URL}"^^xsd:anyURI ;
         hydra-pubsub:topic "${SYSTEM_ID}.commandresults"^^xsd:string
     ] ;
     hydra-filter:viewTemplate [
         a   hydra-filter:ViewTemplate ;
-        hydra:template "/systems/${SYSTEM_ID}/actuations{?start,end}" ;
+        hydra:template "/systems/${SYSTEM_ID}/commandResults{?start,end}" ;
         hydra:mapping [
             a hydra-filter:DirectMapping ;
             hydra:variable "start" ;

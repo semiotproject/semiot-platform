@@ -45,8 +45,8 @@ public class TSDBClient {
           "value text," +
           "datatype text" +
           ");";
-  private static final String CREATE_ACTUATION_TABLE =
-      "CREATE TABLE IF NOT EXISTS semiot.actuation (" +
+  private static final String CREATE_COMMANDRESULT_TABLE =
+      "CREATE TABLE IF NOT EXISTS semiot.commandresult (" +
           "  system_id text," +
           "  event_time timestamp," +
           "  command_type text," +
@@ -107,7 +107,7 @@ public class TSDBClient {
     session.execute(CREATE_OBSERVATION_TABLE);
     session.execute(CREATE_COMMAND_PARAMETER_TYPE);
     session.execute(CREATE_COMMAND_PROPERTY_TYPE);
-    session.execute(CREATE_ACTUATION_TABLE);
+    session.execute(CREATE_COMMANDRESULT_TABLE);
     logger.info("Created types and tables!");
   }
 

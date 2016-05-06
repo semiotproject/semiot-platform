@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-public class Actuation {
+public class CommandResult {
 
   private static final String SENSOR_URI_PREFIX = CONFIG.sensorsURIPrefix() + "systems/";
   private final String systemId;
@@ -30,7 +30,7 @@ public class Actuation {
   private final String type;
   private final List<CommandProperty> properties = new ArrayList<>();
 
-  public Actuation(@NotNull String systemId, @NotNull String eventTime,
+  public CommandResult(@NotNull String systemId, @NotNull String eventTime,
       @NotNull String type) {
     this.systemId = systemId;
     this.eventTime = ZonedDateTime.parse(eventTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
@@ -62,7 +62,7 @@ public class Actuation {
 
   public String toInsertQuery() {
     if (properties.isEmpty()) {
-      return String.format("INSERT INTO semiot.actuation " +
+      return String.format("INSERT INTO semiot.commandresult " +
           "(system_id, event_time, command_type) " +
           "VALUES ('%s', '%s', '%s')", systemId, eventTime, type);
     } else {
@@ -73,7 +73,7 @@ public class Actuation {
       builder.deleteCharAt(builder.length() - 1);
       builder.append("]");
 
-      return String.format("INSERT INTO semiot.actuation " +
+      return String.format("INSERT INTO semiot.commandresult " +
               "(system_id, event_time, command_properties, command_type)" +
               "VALUES ('%s', '%s', %s, '%s')",
           systemId, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
@@ -83,18 +83,19 @@ public class Actuation {
 
   public Model toRDF() {
     Model model = ModelFactory.createDefaultModel();
-    Resource actuation = ResourceFactory.createResource();
-    Resource actuationValue = ResourceFactory.createResource();
+    Resource commandResult = ResourceFactory.createResource();
+    Resource command = ResourceFactory.createResource();
     Resource system = ResourceFactory.createResource(SENSOR_URI_PREFIX + systemId);
 
-    model.add(actuation, RDF.type, SEMIOT.Actuation)
-        .add(actuation, SEMIOT.hasValue, actuationValue)
-        .add(actuation, DUL.hasEventTime, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-        .add(actuation, DUL.involvesAgent, system);
+    model.add(commandResult, RDF.type, SEMIOT.CommandResult)
+        .add(commandResult, SEMIOT.isResultOf, command)
+        .add(commandResult, DUL.hasEventTime,
+            eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+        .add(commandResult, DUL.involvesAgent, system);
 
-    model.add(actuationValue, RDF.type, SEMIOT.Command)
-        .add(actuationValue, RDF.type, ResourceFactory.createResource(type))
-        .add(actuationValue, DUL.involvesAgent, system);
+    model.add(command, RDF.type, SEMIOT.Command)
+        .add(command, RDF.type, ResourceFactory.createResource(type))
+        .add(command, DUL.involvesAgent, system);
 
     //TODO: for command parameters
     //for (Property property : properties) {
@@ -105,7 +106,7 @@ public class Actuation {
     //}
 
     for (CommandProperty property : properties) {
-      model.add(actuationValue, property.property, property.value);
+      model.add(command, property.property, property.value);
     }
 
     return model;

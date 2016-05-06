@@ -9,4 +9,4 @@
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
 <${ROOT_URL}/systems/${SYSTEM_ID}> apidoc:observations <${ROOT_URL}/systems/${SYSTEM_ID}/observations> .
-<${ROOT_URL}/systems/${SYSTEM_ID}> apidoc:actuations <${ROOT_URL}/systems/${SYSTEM_ID}/actuations> .
+<${ROOT_URL}/systems/${SYSTEM_ID}> apidoc:commandResults <${ROOT_URL}/systems/${SYSTEM_ID}/commandResults> .

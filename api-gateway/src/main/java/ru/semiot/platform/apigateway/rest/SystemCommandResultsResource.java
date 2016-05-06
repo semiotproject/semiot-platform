@@ -48,12 +48,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-@Path("/systems/{system_id}/actuations")
+@Path("/systems/{system_id}/commandResults")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
 @Stateless
-public class SystemActuationsResource {
+public class SystemCommandResultsResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(SystemActuationsResource.class);
+  private static final Logger logger = LoggerFactory.getLogger(SystemCommandResultsResource.class);
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
 
   @Inject
@@ -66,9 +66,10 @@ public class SystemActuationsResource {
   UriInfo uriInfo;
 
   @GET
-  public void actuations(@Suspended AsyncResponse response, @PathParam("system_id") String systemId,
-                         @QueryParam("start") ZonedDateTime start,
-                         @QueryParam("end") ZonedDateTime end) {
+  public void getCommandResults(@Suspended AsyncResponse response,
+      @PathParam("system_id") String systemId,
+      @QueryParam("start") ZonedDateTime start,
+      @QueryParam("end") ZonedDateTime end) {
     URI root = uriInfo.getRequestUri();
     String rootURL = URIUtils.extractRootURL(root);
     Map params = MapBuilder.newMap()
@@ -81,7 +82,7 @@ public class SystemActuationsResource {
     }
 
     if (start == null) {
-      tsdb.queryDateTimeOfLatestActuation(systemId).subscribe((dateTime) -> {
+      tsdb.queryDateTimeOfLatestCommandResult(systemId).subscribe((dateTime) -> {
         if (dateTime != null) {
           response.resume(Response.seeOther(UriBuilder.fromUri(root)
               .queryParam("start", dateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
@@ -90,15 +91,16 @@ public class SystemActuationsResource {
         } else {
           try {
             Map<String, Object> frame = contextProvider.getFrame(
-                ContextProvider.SYSTEM_ACTUATIONS_COLLECTION, rootURL);
+                ContextProvider.SYSTEM_COMMANDRESULTS_COLLECTION, rootURL);
             params.put(ContextProvider.VAR_QUERY_PARAMS, "?noparams");
             Model model = contextProvider.getRDFModel(
-                ContextProvider.SYSTEM_ACTUATIONS_COLLECTION, params);
+                ContextProvider.SYSTEM_COMMANDRESULTS_COLLECTION, params);
             Resource view = RDFUtils.subjectWithProperty(
                 model, RDF.type, Hydra.PartialCollectionView);
             model.removeAll(view, null, null);
 
-            response.resume(JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame)));
+            response.resume(JsonUtils.toPrettyString(
+                ModelJsonLdUtils.toJsonLdCompact(model, frame)));
           } catch (Throwable ex) {
             resumeOnError(response, ex);
           }
@@ -112,15 +114,15 @@ public class SystemActuationsResource {
       params.put(ContextProvider.VAR_QUERY_PARAMS, queryParams);
 
       Model model = contextProvider.getRDFModel(
-          ContextProvider.SYSTEM_ACTUATIONS_COLLECTION, params);
-      tsdb.queryActuationsByRange(systemId, start, end).subscribe((result) -> {
+          ContextProvider.SYSTEM_COMMANDRESULTS_COLLECTION, params);
+      tsdb.queryCommandResultsByRange(systemId, start, end).subscribe((result) -> {
         try {
           Map<String, Object> frame = contextProvider.getFrame(
-              ContextProvider.SYSTEM_ACTUATIONS_PARTIAL_COLLECTION, rootURL);
+              ContextProvider.SYSTEM_COMMANDRESULTS_PARTIAL_COLLECTION, rootURL);
           model.add(result);
           Resource collection = model.listSubjectsWithProperty(
               RDF.type, Hydra.PartialCollectionView).next();
-          ResIterator iter = model.listSubjectsWithProperty(RDF.type, SEMIOT.Actuation);
+          ResIterator iter = model.listSubjectsWithProperty(RDF.type, SEMIOT.CommandResult);
           while (iter.hasNext()) {
             Resource obs = iter.next();
             model.add(collection, Hydra.member, obs);
@@ -137,10 +139,10 @@ public class SystemActuationsResource {
   @POST
   @Consumes({MediaType.APPLICATION_LD_JSON, MediaType.TEXT_TURTLE})
   public void executeCommand(@Suspended AsyncResponse response,
-                             @PathParam("system_id") String systemId, Model command) {
+      @PathParam("system_id") String systemId, Model command) {
     try {
       URI root = uriInfo.getRequestUri();
-      Map<String, Object> frame = contextProvider.getFrame(ContextProvider.ACTUATION, root);
+      Map<String, Object> frame = contextProvider.getFrame(ContextProvider.COMMANDRESULT, root);
 
       if (Strings.isNullOrEmpty(systemId)) {
         response.resume(Response.status(Response.Status.NOT_FOUND).build());
@@ -149,9 +151,9 @@ public class SystemActuationsResource {
       if (command == null || command.isEmpty()) {
         response.resume(Response.status(Response.Status.BAD_REQUEST).build());
       } else {
-        dps.executeCommand(systemId, command).map((actuation) -> {
+        dps.executeCommand(systemId, command).map((commandResult) -> {
           try {
-            return Response.ok(ModelJsonLdUtils.toJsonLdCompact(actuation, frame)).build();
+            return Response.ok(ModelJsonLdUtils.toJsonLdCompact(commandResult, frame)).build();
           } catch (JsonLdError | IOException ex) {
             throw Exceptions.propagate(ex);
           }

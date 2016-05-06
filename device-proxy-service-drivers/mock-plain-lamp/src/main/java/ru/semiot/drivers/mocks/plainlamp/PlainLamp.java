@@ -10,19 +10,26 @@ public class PlainLamp extends Device {
 
   private static final String TEMPLATE_PATH = "/ru/semiot/drivers/mocks/plainlamp/description.ttl";
   private static String DESCRIPTION_TEMPLATE;
+  private boolean isOn = false;
 
   static {
     try {
-      DESCRIPTION_TEMPLATE = IOUtils.toString(PlainLamp.class
-          .getResourceAsStream(TEMPLATE_PATH));
+      DESCRIPTION_TEMPLATE = IOUtils.toString(PlainLamp.class.getResourceAsStream(TEMPLATE_PATH));
     } catch (IOException ex) {
-      LoggerFactory.getLogger(PlainLamp.class)
-          .error(ex.getMessage(), ex);
+      LoggerFactory.getLogger(PlainLamp.class).error(ex.getMessage(), ex);
     }
   }
 
   public PlainLamp(String id) {
     super(id);
+  }
+
+  public boolean getIsOn() {
+    return isOn;
+  }
+
+  public void setIsOn(boolean isOn) {
+    this.isOn = isOn;
   }
 
   public String getRDFTemplate() {

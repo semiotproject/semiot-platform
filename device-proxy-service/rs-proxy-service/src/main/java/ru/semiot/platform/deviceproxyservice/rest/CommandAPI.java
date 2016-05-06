@@ -38,23 +38,20 @@ public class CommandAPI {
 
       StringReader reader = new StringReader(command);
 
-      Model actuation = manager.executeCommand(systemId,
-          ModelFactory.createDefaultModel()
-              .read(reader, null, RDFLanguages.strLangTurtle));
+      Model commandResult = manager.executeCommand(systemId,
+          ModelFactory.createDefaultModel().read(reader, null, RDFLanguages.strLangTurtle));
 
       StringWriter writer = new StringWriter();
-      actuation.write(writer, RDFLanguages.strLangJSONLD);
+      commandResult.write(writer, RDFLanguages.strLangJSONLD);
 
       return Response.ok(writer.toString(), "application/ld+json").build();
     } catch (CommandExecutionException cex) {
       logger.debug(cex.getMessage(), cex);
 
       if (cex.isNotFound()) {
-        return Response.status(Response.Status.NOT_FOUND)
-            .entity(cex.getMessage()).build();
+        return Response.status(Response.Status.NOT_FOUND).entity(cex.getMessage()).build();
       } else if (cex.isBadCommand()) {
-        return Response.status(Response.Status.BAD_REQUEST)
-            .entity(cex.getMessage()).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(cex.getMessage()).build();
       } else {
         logger.warn(cex.getMessage(), cex);
 

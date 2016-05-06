@@ -128,13 +128,13 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
   }
 
   @Override
-  public Observable<ZonedDateTime> queryDateTimeOfLatestActuation(
+  public Observable<ZonedDateTime> queryDateTimeOfLatestCommandResult(
       String systemId) {
     URI uri = UriBuilder.fromPath(config.tsdbEndpoint())
-        .path(config.tsdbActuatorsLatestPath())
+        .path(config.tsdbCommandResultsLatestPath())
         .queryParam("system_id", systemId).build();
 
-    logger.debug("queryDateTimeOfLatestActuation: URL {}", uri);
+    logger.debug("queryDateTimeOfLatestCommandResult: URL {}", uri);
 
     Observable<Response> result = Rx.newClient(RxObservableInvoker.class, mes)
         .target(uri).request().rx().get();
@@ -164,10 +164,10 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
     }));
   }
 
-  public Observable<Model> queryActuationsByRange(String systemId,
+  public Observable<Model> queryCommandResultsByRange(String systemId,
                                                   ZonedDateTime start, ZonedDateTime end) {
     UriBuilder uriBuilder = UriBuilder.fromPath(config.tsdbEndpoint())
-        .path(config.tsdbActuatorsPath())
+        .path(config.tsdbCommandResultsPath())
         .queryParam("system_id", systemId).queryParam("start",
             start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
     if (end != null) {
@@ -176,7 +176,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
     }
     URI uri = uriBuilder.build();
 
-    logger.debug("queryActuationsByRange: URL {}", uri);
+    logger.debug("queryCommandResultsByRange: URL {}", uri);
 
     Observable<Response> result = Rx
         .newClient(RxObservableInvoker.class, mes).target(uri).request()

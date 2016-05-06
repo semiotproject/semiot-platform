@@ -285,12 +285,12 @@ public class OpenTSDBQueryService implements TSDBQueryService {
   }
 
   @Override
-  public Observable<ZonedDateTime> queryDateTimeOfLatestActuation(String systemId) {
+  public Observable<ZonedDateTime> queryDateTimeOfLatestCommandResult(String systemId) {
     return null;
   }
 
   @Override
-  public Observable<Model> queryActuationsByRange(String systemId, ZonedDateTime start, ZonedDateTime end) {
+  public Observable<Model> queryCommandResultsByRange(String systemId, ZonedDateTime start, ZonedDateTime end) {
     return null;
   }
 
