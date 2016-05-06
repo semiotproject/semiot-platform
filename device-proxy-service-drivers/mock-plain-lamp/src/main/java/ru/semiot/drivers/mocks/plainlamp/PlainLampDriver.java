@@ -60,24 +60,28 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
         manager.registerDevice(info, lamp);
 
         executor.scheduleAtFixedRate(() -> {
-          PlainLamp l = lamps.get(lamp_id);
-          Command command = new Command(l.getId(), Command.TYPE_SWITCHPROCESSCOMMAND);
+          try {
+            PlainLamp l = lamps.get(lamp_id);
+            Command command = new Command(l.getId(), Command.TYPE_SWITCHPROCESSCOMMAND);
 
-          synchronized (l) {
-            if (l.getIsOn()) {
-              l.setIsOn(false);
+            synchronized (l) {
+              if (l.getIsOn()) {
+                l.setIsOn(false);
 
-              command.addProperty(Command.PROP_TARGETPROCESS, PROCESS_IDLE);
-              logger.debug("[ID={}] Switched off!", l.getId());
-            } else {
-              l.setIsOn(true);
+                command.addProperty(Command.PROP_TARGETPROCESS, PROCESS_IDLE);
+                logger.debug("[ID={}] Switched off!", l.getId());
+              } else {
+                l.setIsOn(true);
 
-              command.addProperty(Command.PROP_TARGETPROCESS, PROCESS_SHINE);
-              logger.debug("[ID={}] Switched on!", l.getId());
+                command.addProperty(Command.PROP_TARGETPROCESS, PROCESS_SHINE);
+                logger.debug("[ID={}] Switched on!", l.getId());
+              }
             }
-          }
 
-          manager.registerCommand(l, new CommandResult(command, ZonedDateTime.now()));
+            manager.registerCommand(l, new CommandResult(command, ZonedDateTime.now()));
+          } catch (Throwable e) {
+            logger.error(e.getMessage(), e);
+          }
         }, random.nextInt(switchOnOffInterval), switchOnOffInterval, TimeUnit.SECONDS);
       }
     } catch (Throwable e) {

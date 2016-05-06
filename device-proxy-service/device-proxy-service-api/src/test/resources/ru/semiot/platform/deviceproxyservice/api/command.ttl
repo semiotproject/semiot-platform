@@ -1,0 +1,4 @@
+[ a <http://w3id.org/semiot/ontologies/semiot#Command>, <http://w3id.org/semiot/ontologies/semiot#SwitchProcessCommand> ;
+    <http://w3id.org/semiot/ontologies/semiot#targetProcess> <https://example.com/prototype.ttl#PlainLamp-Idle> ;
+    <http://www.loa-cnr.it/ontologies/DUL.owl#involvesAgent> <http://localhost/systems/1231231231231230> ;
+] .

@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,8 @@ import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.services.tsdbservice.TSDBClient;
 import ru.semiot.services.tsdbservice.model.CommandResult;
+
+import java.io.StringWriter;
 
 public class CommandResultListener extends RDFMessageObserver {
 
@@ -70,6 +73,10 @@ public class CommandResultListener extends RDFMessageObserver {
       }
     } catch (Throwable e) {
       logger.error(e.getMessage(), e);
+
+      StringWriter writer = new StringWriter();
+      model.write(writer, RDFLanguages.TURTLE.getName());
+      logger.debug("Received command result: {}", writer.toString());
     }
   }
 

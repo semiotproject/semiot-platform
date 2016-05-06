@@ -91,9 +91,7 @@ public class Command {
     Resource commandResource = ResourceFactory.createResource();
 
     model.add(commandResource, RDF.type, SEMIOT.Command)
-        .add(commandResource, RDF.type, TYPE_SWITCHPROCESSCOMMAND)
-        .add(commandResource, DUL.involvesAgent, ResourceFactory.createResource(
-            configuration.get(Keys.PLATFORM_SYSTEMS_URI_PREFIX + deviceId)));
+        .add(commandResource, RDF.type, type);
 
     for (String uri : properties.keySet()) {
       model.add(commandResource, ResourceFactory.createProperty(uri), properties.get(uri));
