@@ -21,7 +21,6 @@ ADD config.ttl $FUSEKI_BASE/
 ADD log4j.properties $FUSEKI_BASE/
 ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
 ADD content $FUSEKI_HOME/content
-RUN ls -al $FUSEKI_HOME/content/
 
 CMD rm -f $FUSEKI_HOME/fuseki-db/tdb.lock
 CMD if [ -e $FUSEKI_HOME/app/shiro.ini ] then rm $FUSEKI_BASE/shiro.ini cp $FUSEKI_HOME/app/shiro.ini $FUSEKI_BASE/shiro.ini fi
