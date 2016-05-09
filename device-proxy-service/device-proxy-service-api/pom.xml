@@ -90,6 +90,7 @@
                     <instructions>
                         <Import-Package>
                             org.apache.jena.datatypes,
+                            org.apache.jena.datatypes.xsd,
                             org.apache.jena.rdf.model,
                             org.apache.jena.riot,
                             org.apache.jena.vocabulary,

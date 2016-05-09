@@ -7,44 +7,58 @@
 @prefix qudt-unit: <http://qudt.org/vocab/unit#> .
 @prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
 @prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
-@prefix san: <https://www.irit.fr/recherches/MELODI/ontologies/SAN#> .
 @prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
 
 :PlainLamp a ssn:System, proto:Prototype ;
   rdfs:label "A plain lamp"^^xsd:string ;
   ssn:hasSubSystem :PlainLamp-Actuator ;
-  semiot:hasOperation :PlainLamp-Shine ;
-  semiot:hasOperation :PlainLamp-Idle ;
-  semiot:supportedCommand :PlainLamp-Command-Switch-Operation .
+  ssn:implements :PlainLamp-Shine, :PlainLamp-Idle, :PlainLamp-Command-Switch-Operation .
 
 :PlainLamp-Command-Switch-Operation a semiot:SwitchOperationCommand ;
-  semiot:supportedOperation :PlainLamp-Shine ;
-  semiot:supportedOperation :PlainLamp-Idle .
+  semiot:isSupportedBy :PlainLamp-Shine, :PlainLamp-Idle .
 
 :PlainLamp-Shine a semiot:ActuationOperation ;
-  dul:involvesAgent :PlainLamp-Actuator .
+  semiot:supports :PlainLamp-Command-Switch-Operation ;
+  dul:involvesAgent :PlainLamp-Actuator ;
+  dul:hasParameter :PlainLamp-Shine-Lumen ;
+  dul:hasParameter :PlainLamp-Shine-Color .
 
-:PlainLamp-Idle a semiot:IdleOperation .
+:PlainLamp-Shine-Lumen a dul:Parameter, semiot:PropertyMappingParameter ;
+  semiot:isConsumedBy :PlainLamp-Actuator ;
+  ssn:forProperty qudt-quantity:LuminousFlux ;
+  dul:hasParameterDataValue "890"^^xsd:integer ;
+  dul:isClassifiedBy qudt-unit:Lumen .
 
-:PlainLamp-Actuator a san:ActuatingDevice, proto:Prototype ;
-  san:actsOn qudt-quantity:LuminousFlux ;
-  san:actsOn qudt-quantity-ext:CorrelatedColorTemperature ;
-  san:hasActuatingCapability [
-    a san:ActuatingCapability ;
+:PlainLamp-Shine-Color a dul:Parameter, semiot:PropertyMappingParameter ;
+  semiot:isConsumedBy :PlainLamp-Actuator ;
+  ssn:forProperty qudt-quantity-ex:CorrelatedColorTemperature ;
+  dul:hasParameterDataValue "4000"^^xsd:integer ;
+  dul:isClassifiedBy qudt-unit:Kelvin .
+
+:PlainLamp-Idle a semiot:IdleOperation ;
+  semiot:supports :PlainLamp-Command-Switch-Operation .
+
+:PlainLamp-Actuator a semiot:ActuatingDevice, proto:Prototype ;
+  semiot:actsOn qudt-quantity:LuminousFlux ;
+  semiot:actsOn qudt-quantity-ext:CorrelatedColorTemperature ;
+  semiot:hasActuatingCapability [
+    a semiot:ActuatingCapability ;
     ssn:forProperty qudt-quantity:LuminousFlux ;
-    san:hasActuatingProperty [
-      a san:ActuatingProperty, semiot:FixedValueOfActuatingProperty ;
-      dul:hasDataValue "850"^^xsd:integer ;
-      dul:isClassifiedBy qudt-unit:Lumen
+    semiot:hasActuatingProperty [
+      a semiot:ActuatingProperty, semiot:ActuatingValueRange ;
+      dul:hasDataValue "0"^^xsd:integer ;
+      dul:hasDataValue "890"^xsd:integer ;
+      dul:isClassifiedBy qudt-unit:Lumen ;
     ] ;
   ] ;
-  san:hasActuatingCapability [
-    a san:ActuatingCapability ;
-    ssn:forProperty qudt-quantity-ext:CorrelatedColorTemperature ;
-    san:hasActuatingProperty [
-      a san:ActuatingProperty, semiot:FixedValueOfActuatingProperty ;
-      dul:hasDataValue "4000"^^xsd:integer ;
-      dul:isClassifiedBy qudt-unit:Kelvin
+  semiot:hasActuatingCapability [
+    a semiot:ActuatingCapability ;
+    semiot:forProperty qudt-quantity-ex:CorrelatedColorTemperature ;
+    semiot:hasActuatingProperty [
+      a semiot:ActuatingProperty, semiot:ActuatingValueRange ;
+      dul:hasDataValue "2700"^^xsd:integer ;
+      dul:hasDataValue "6500"^xsd:integer ;
+      dul:isClassifiedBy qudt-unit:Kelvin ;
     ] ;
   ] ;
 .

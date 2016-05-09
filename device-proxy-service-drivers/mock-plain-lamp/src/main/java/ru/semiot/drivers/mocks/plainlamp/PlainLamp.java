@@ -11,6 +11,8 @@ public class PlainLamp extends Device {
   private static final String TEMPLATE_PATH = "/ru/semiot/drivers/mocks/plainlamp/description.ttl";
   private static String DESCRIPTION_TEMPLATE;
   private boolean isOn = false;
+  private int lumen = 890;
+  private int kelvin = 4000;
 
   static {
     try {
@@ -30,6 +32,22 @@ public class PlainLamp extends Device {
 
   public void setIsOn(boolean isOn) {
     this.isOn = isOn;
+  }
+
+  public int getKelvin() {
+    return kelvin;
+  }
+
+  public int getLumen() {
+    return lumen;
+  }
+
+  public void setLumen(int lumen) {
+    this.lumen = lumen;
+  }
+
+  public void setKelvin(int kelvin) {
+    this.kelvin = kelvin;
   }
 
   public String getRDFTemplate() {

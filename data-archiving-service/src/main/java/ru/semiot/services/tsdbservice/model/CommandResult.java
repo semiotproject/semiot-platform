@@ -18,7 +18,9 @@ import ru.semiot.commons.namespaces.SEMIOT;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -29,6 +31,7 @@ public class CommandResult {
   private final ZonedDateTime eventTime;
   private final String type;
   private final List<CommandProperty> properties = new ArrayList<>();
+  private final Map<Resource, RDFNode> parameters = new HashMap<>();
 
   public CommandResult(@NotNull String systemId, @NotNull String eventTime,
       @NotNull String type) {
@@ -60,24 +63,45 @@ public class CommandResult {
     }
   }
 
+  public void addParameter(Resource parameter, RDFNode value) {
+    parameters.put(parameter, value);
+  }
+
   public String toInsertQuery() {
     if (properties.isEmpty()) {
       return String.format("INSERT INTO semiot.commandresult " +
           "(system_id, event_time, command_type) " +
           "VALUES ('%s', '%s', '%s')", systemId, eventTime, type);
     } else {
-      StringBuilder builder = new StringBuilder("[");
+      StringBuilder builderProps = new StringBuilder("[");
       for (CommandProperty p : properties) {
-        builder.append(p.toCQLValue()).append(",");
+        builderProps.append(p.toCQLValue()).append(",");
       }
-      builder.deleteCharAt(builder.length() - 1);
-      builder.append("]");
+      builderProps.deleteCharAt(builderProps.length() - 1);
+      builderProps.append("]");
 
-      return String.format("INSERT INTO semiot.commandresult " +
-              "(system_id, event_time, command_properties, command_type)" +
-              "VALUES ('%s', '%s', %s, '%s')",
-          systemId, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
-          builder.toString(), type);
+      if (parameters.isEmpty()) {
+        return String.format("INSERT INTO semiot.commandresult " +
+                "(system_id, event_time, command_properties, command_type)" +
+                "VALUES ('%s', '%s', %s, '%s')",
+            systemId, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+            builderProps.toString(), type);
+      } else {
+        StringBuilder builderParams = new StringBuilder("[");
+        for (Resource parameter : parameters.keySet()) {
+          builderParams.append("{").append("for_parameter:'").append(parameter.getURI())
+              .append("',value:'").append(parameters.get(parameter).asLiteral().getLexicalForm())
+              .append("'},");
+        }
+        builderParams.deleteCharAt(builderParams.length() - 1);
+        builderParams.append("]");
+
+        return String.format("INSERT INTO semiot.commandresult " +
+                "(system_id, event_time, command_properties, command_parameters, command_type)" +
+                "VALUES ('%s', '%s', %s, %s, '%s')",
+            systemId, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME), builderProps.toString(),
+            builderParams.toString(), type);
+      }
     }
   }
 
@@ -97,13 +121,12 @@ public class CommandResult {
         .add(command, RDF.type, ResourceFactory.createResource(type))
         .add(command, DUL.involvesAgent, system);
 
-    //TODO: for command parameters
-    //for (Property property : properties) {
-    //  Resource propertyResource = ResourceFactory.createResource();
-    //  model.add(actuationValue, SEMIOT.hasProcessParameterValue, propertyResource)
-    //      .add(propertyResource, SEMIOT.forProperty, property.property)
-    //      .add(propertyResource, DUL.hasParameterDataValue, property.value);
-    //}
+    for (Resource parameter : parameters.keySet()) {
+      Resource parameterResource = ResourceFactory.createResource();
+      model.add(command, DUL.hasParameter, parameterResource)
+          .add(parameterResource, SEMIOT.forParameter, parameter)
+          .add(parameterResource, DUL.hasParameterDataValue, parameters.get(parameter));
+    }
 
     for (CommandProperty property : properties) {
       model.add(command, property.property, property.value);

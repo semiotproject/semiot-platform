@@ -35,9 +35,15 @@ public class CommandResultListener extends RDFMessageObserver {
       "SELECT ?uri ?value {" +
           "?command a semiot:Command ;" +
           "  ?uri ?value ." +
-          "FILTER(?uri != rdf:type " +
-          "  && ?uri != dul:involvesAgent)" +
+          "FILTER(?uri != rdf:type && ?uri != dul:involvesAgent && ?uri != dul:hasParameter)" +
           "}", SEMIOT.class, DUL.class, RDF.class));
+  private static final Query GET_PARAMETERS = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
+      "SELECT ?uri ?value {" +
+          "?command a semiot:Command ;" +
+          " dul:hasParameter ?parameter ." +
+          "?parameter semiot:forParameter ?uri ;" +
+          " dul:hasParameterDataValue ?value ." +
+          "}", DUL.class, SEMIOT.class));
 
   @Override
   public void onNext(Model model) {
@@ -61,6 +67,13 @@ public class CommandResultListener extends RDFMessageObserver {
           QuerySolution qsProps = rsProps.next();
           commandResult.addProperty(ResourceFactory.createProperty(
               qsProps.getResource("uri").getURI()), qsProps.get("value"));
+        }
+
+        ResultSet rsParams = query(model, GET_PARAMETERS);
+
+        while (rsParams.hasNext()) {
+          QuerySolution qsParams = rsParams.next();
+          commandResult.addParameter(qsParams.getResource("uri"), qsParams.getLiteral("value"));
         }
 
         String query = commandResult.toInsertQuery();

@@ -1,5 +1,6 @@
 package ru.semiot.platform.deviceproxyservice.api.drivers;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -38,7 +39,7 @@ public class Command {
   }
 
   public Command(Model command) {
-    Resource commandResource = command.listSubjectsWithProperty(RDF.type).next();
+    Resource commandResource = command.listSubjectsWithProperty(RDF.type, SEMIOT.Command).next();
     List<RDFNode> types = ModelUtils.objectsOfProperty(command, RDF.type, SEMIOT.Command);
     if (!types.isEmpty()) {
       this.type = types.get(0).asResource();
@@ -55,8 +56,9 @@ public class Command {
           properties.put(property.getURI(), stmt.getObject());
         } else {
           Resource parameter = (Resource) command
-              .listObjectsOfProperty(property, SEMIOT.forParameter).next();
-          RDFNode value = command.listObjectsOfProperty(property, DUL.hasParameterDataValue).next();
+              .listObjectsOfProperty((Resource) stmt.getObject(), SEMIOT.forParameter).next();
+          RDFNode value = command
+              .listObjectsOfProperty((Resource) stmt.getObject(), DUL.hasParameterDataValue).next();
           parameters.put(parameter.getURI(), new CommandParameter(parameter, value));
         }
       }
@@ -75,6 +77,16 @@ public class Command {
 
   public void addProperty(String uri, String value) {
     properties.put(uri, ResourceUtils.toRDFNode(value));
+  }
+
+  public void addParameter(String uri, String value) {
+    parameters.put(uri, new CommandParameter(uri, value));
+  }
+
+  public void addParameter(String uri, int value) {
+    parameters.put(uri, new CommandParameter(
+        uri,
+        ResourceFactory.createTypedLiteral(Integer.toString(value), XSDDatatype.XSDinteger)));
   }
 
   public String getPropertyValue(String uri) {
@@ -110,6 +122,14 @@ public class Command {
   private class CommandParameter {
     private final Resource parameter;
     private final Literal value;
+
+    public CommandParameter(String parameter, String value) {
+      this(ResourceFactory.createResource(parameter), ResourceUtils.toRDFNode(value).asLiteral());
+    }
+
+    public CommandParameter(String parameter, RDFNode value) {
+      this(ResourceFactory.createResource(parameter), value);
+    }
 
     public CommandParameter(Resource parameter, RDFNode value) {
       this.parameter = parameter;

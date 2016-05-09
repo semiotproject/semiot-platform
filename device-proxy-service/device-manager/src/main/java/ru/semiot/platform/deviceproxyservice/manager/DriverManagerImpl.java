@@ -10,7 +10,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFLanguages;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -43,6 +42,8 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   private static final String FRAME_PATH_PREFIX = "/ru/semiot/platform/deviceproxyservice/manager/";
   private static final String OBSERVATION_FRAME_PATH =
       FRAME_PATH_PREFIX + "Observation-frame.jsonld";
+  private static final String COMMANDRESULT_FRAME_PATH =
+      FRAME_PATH_PREFIX + "CommandResult-frame.jsonld";
   private static final String SYSTEM_FRAME_PATH = FRAME_PATH_PREFIX + "System-frame.jsonld";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
   private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults";
@@ -50,6 +51,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   private final Configuration configuration = new Configuration();
   private final Object observationFrame;
   private final Object systemFrame;
+  private final Object commandResultFrame;
 
   //Injected by Dependency Manager
   private BundleContext bundleContext;
@@ -67,7 +69,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     }
     this.observationFrame = frame;
 
-    //Loadin JSONLD frame for systems
+    //Loading JSONLD frame for systems
     try {
       frame = JsonUtils.fromInputStream(
           this.getClass().getResourceAsStream(SYSTEM_FRAME_PATH));
@@ -75,6 +77,14 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       logger.error(e.getMessage(), e);
     }
     this.systemFrame = frame;
+
+    try {
+      frame = JsonUtils.fromInputStream(
+          this.getClass().getResourceAsStream(COMMANDRESULT_FRAME_PATH));
+    } catch (Throwable e) {
+      logger.error(e.getMessage(), e);
+    }
+    this.commandResultFrame = frame;
   }
 
   public void start() {
@@ -220,7 +230,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
                   .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
               JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
           .subscribe(WAMPClient.onError());
-    } catch (JsonLdError | IOException ex) {
+    } catch (Throwable ex) {
       logger.error(ex.getMessage(), ex);
     }
   }
@@ -232,12 +242,16 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
   @Override
   public void registerCommand(Device device, CommandResult result) {
-    //TODO: There's no guarantee that WAMPClient is connected?
-    WAMPClient.getInstance()
-        .publish(
-            TOPIC_COMMANDRESULT.replace("${SYSTEM_ID}", device.getId()),
-            result.toRDFAsString(configuration, RDFLanguages.JSONLD))
-        .subscribe(WAMPClient.onError());
+    try {
+      Model model = result.toRDFAsModel(configuration);
+      //TODO: There's no guarantee that WAMPClient is connected?
+      WAMPClient.getInstance()
+          .publish(TOPIC_COMMANDRESULT.replace("${SYSTEM_ID}", device.getId()),
+              JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, commandResultFrame)))
+          .subscribe(WAMPClient.onError());
+    } catch (Throwable e) {
+      logger.error(e.getMessage(), e);
+    }
   }
 
   @Override

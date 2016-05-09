@@ -5,5 +5,5 @@
     "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
     "semiot": "http://w3id.org/semiot/ontologies/semiot#"
   },
-  "@type": "semiot:Command"
+  "@type": "semiot:CommandResult"
 }

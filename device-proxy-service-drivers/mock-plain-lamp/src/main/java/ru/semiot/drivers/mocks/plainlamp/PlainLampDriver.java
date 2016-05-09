@@ -31,6 +31,8 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
           + "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#";
   private static final String PROCESS_IDLE = PROTOTYPE_URI_PREFIX + "PlainLamp-Idle";
   private static final String PROCESS_SHINE = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine";
+  private static final String PARAM_SHINE_LUMEN = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Lumen";
+  private static final String PARAM_SHINE_COLOR = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Color";
   private static final String DRIVER_NAME = "Plain Lamp (Mock) Driver";
   private static final String DEVICE_ID_PREFIX = "123123123123123";
 
@@ -74,6 +76,8 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
                 l.setIsOn(true);
 
                 command.addProperty(Command.PROP_TARGETPROCESS, PROCESS_SHINE);
+                command.addParameter(PARAM_SHINE_LUMEN, 890);
+                command.addParameter(PARAM_SHINE_COLOR, 4000);
                 logger.debug("[ID={}] Switched on!", l.getId());
               }
             }
