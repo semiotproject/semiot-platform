@@ -81,12 +81,14 @@ public class SystemObservationsResource {
     if (Strings.isNullOrEmpty(systemId)) {
       response.resume(Response.status(Response.Status.NOT_FOUND).build());
     }
-    
+
     URI root = uriInfo.getRequestUri();
     String rootUrl = URIUtils.extractRootURL(root);
     Map params = MapBuilder.newMap()
         .put(ContextProvider.VAR_ROOT_URL, rootUrl)
-        .put(ContextProvider.VAR_WAMP_URL, rootUrl + config.wampPublicPath())
+        .put(ContextProvider.VAR_WAMP_URL, UriBuilder
+            .fromUri(rootUrl + config.wampPublicPath())
+            .scheme(config.wampProtocolScheme()).build())
         .put(ContextProvider.VAR_SYSTEM_ID, systemId).build();
     List<String> listSensorId;
     if (sensorId == null) {

@@ -7,6 +7,7 @@ ENV FUSEKI_HOME /fuseki
 ENV FUSEKI_BASE /fuseki/base
 
 WORKDIR /
+RUN echo "fastestmirror=true" >> /etc/dnf/dnf.conf
 RUN dnf install -y java-1.8.0-openjdk-headless nss-3.23.0 wget unzip which && dnf clean all
 
 RUN mkdir -p $FUSEKI_BASE
@@ -19,7 +20,9 @@ ADD shiro.ini $FUSEKI_BASE/
 ADD config.ttl $FUSEKI_BASE/
 ADD log4j.properties $FUSEKI_BASE/
 ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
+ADD content $FUSEKI_HOME/content
+RUN ls -al $FUSEKI_HOME/content/
 
-CMD rm -f /fuseki/fuseki-db/tdb.lock
-CMD if [ -e $FUSEKI_HOME/app/shiro.ini ] then rm $FUSEKI_BASE/shiro.ini cp /fuseki/app/shiro.ini $FUSEKI_BASE/shiro.ini fi
+CMD rm -f $FUSEKI_HOME/fuseki-db/tdb.lock
+CMD if [ -e $FUSEKI_HOME/app/shiro.ini ] then rm $FUSEKI_BASE/shiro.ini cp $FUSEKI_HOME/app/shiro.ini $FUSEKI_BASE/shiro.ini fi
 CMD ./fuseki-server --config=base/config.ttl

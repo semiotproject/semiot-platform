@@ -53,18 +53,17 @@ spatial:SpatialIndexLucene  rdfs:subClassOf  spatial:SpatialIndex .
         tdb:dataset <#tdbDataset> ;
     ];
     ja:content [
-        # TODO: Moved into the image
         #ja:externalContent <http://purl.oclc.org/NET/ssnx/ssn#> ;
-        ja:externalContent <http://purl.org/NET/ssnext/electricmeters#> ;
-        ja:externalContent <http://purl.org/NET/ssnext/heatmeters#> ;
-        ja:externalContent <http://purl.org/NET/ssnext/machinetools#> ;
-        ja:externalContent <http://qudt.org/1.1/vocab/unit#> ;
-        ja:externalContent <http://qudt.org/1.1/vocab/quantity#> ;
-        ja:externalContent <http://www.qudt.org/qudt/owl/1.0.0/qudt.owl> ;
+        #ja:externalContent <http://purl.org/NET/ssnext/electricmeters#> ;
+        #ja:externalContent <http://purl.org/NET/ssnext/heatmeters#> ;
+        #ja:externalContent <http://purl.org/NET/ssnext/machinetools#> ;
+        ja:externalContent <file:////fuseki/content/qudt-unit.owl> ;
+        ja:externalContent <file:////fuseki/content/qudt-quantity.owl> ;
+        ja:externalContent <file:////fuseki/content/qudt.owl> ;
         #ja:externalContent <http://ontology.tno.nl/saref.ttl> ;
         #ja:externalContent <http://dublincore.org/2012/06/14/dcterms.ttl> ;
         #ja:externalContent <http://www.w3.org/2003/01/geo/wgs84_pos#> ;
-        ja:externalContent <http://w3id.org/qudt/vocab/quantity/ext#> ;
+        ja:externalContent <file:////fuseki/content/qudt-quantity-ext.owl> ;
         #ja:externalContent <http://www.loa-cnr.it/ontologies/DUL.owl#> ;
     ];
     ja:reasoner [
