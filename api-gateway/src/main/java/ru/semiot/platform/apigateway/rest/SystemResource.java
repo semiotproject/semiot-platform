@@ -7,10 +7,12 @@ import com.github.jsonldjava.utils.JsonUtils;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
@@ -57,10 +59,12 @@ public class SystemResource {
       .create(ServerConfig.class);
   private static final Logger logger = LoggerFactory
       .getLogger(SystemResource.class);
-  private static final String QUERY_GET_ALL_SYSTEMS = "SELECT DISTINCT ?uri ?id ?prototype {"
+  private static final String QUERY_GET_ALL_SYSTEMS = "SELECT DISTINCT ?uri ?id ?prototype ?prototype_label {"
       + " ?uri a ssn:System, proto:Individual ;"
       + "     dcterms:identifier ?id ;"
-      + "     proto:hasPrototype ?prototype ." + "}";
+      + "     proto:hasPrototype ?prototype ."
+      + " ?prototype rdfs:label ?prototype_label ."
+      + "}";
   private static final String QUERY_GET_SYSTEM_PROTOTYPES = "SELECT DISTINCT ?prototype {"
       + " ?uri a ssn:System, proto:Individual ;"
       + "     proto:hasPrototype ?prototype ." + "}";
@@ -73,7 +77,9 @@ public class SystemResource {
       + "}";
 
   private static final String VAR_URI = "uri";
+  private static final String VAR_ID = "id";
   private static final String VAR_PROTOTYPE = "prototype";
+  private static final String VAR_PROTOTYPE_LABEL = "prototype_label";
   private static final int FIRST = 0;
 
   public SystemResource() {
@@ -117,11 +123,14 @@ public class SystemResource {
       while (rs.hasNext()) {
         QuerySolution qs = rs.next();
         Resource system = qs.getResource(VAR_URI);
+        Literal system_id = qs.getLiteral(VAR_ID);
         Resource prototype = qs.getResource(VAR_PROTOTYPE);
+        Literal prototype_label = qs.getLiteral(VAR_PROTOTYPE_LABEL);
 
         Resource collection = model.listResourcesWithProperty(
             RDF.type, Hydra.Collection).next();
         model.add(collection, Hydra.member, system);
+        model.add(system, RDFS.label, prototype_label.getString() + " / " + system_id.getString());
         model.add(system, RDF.type, ResourceUtils.createResourceFromClass(root,
             prototype.getLocalName()));
       }
