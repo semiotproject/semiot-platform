@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
@@ -55,35 +56,37 @@ import javax.ws.rs.core.UriInfo;
 @Stateless
 public class SystemResource {
 
-  private static final ServerConfig config = ConfigFactory
-      .create(ServerConfig.class);
-  private static final Logger logger = LoggerFactory
-      .getLogger(SystemResource.class);
-  private static final String QUERY_GET_ALL_SYSTEMS = "SELECT DISTINCT ?uri ?id ?prototype ?prototype_label {"
+  private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
+  private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
+  private static final String QUERY_GET_ALL_SYSTEMS = "SELECT DISTINCT ?uri ?id ?label ?prototype {"
       + " ?uri a ssn:System, proto:Individual ;"
       + "     dcterms:identifier ?id ;"
       + "     proto:hasPrototype ?prototype ."
-      + " ?prototype rdfs:label ?prototype_label ."
+      + " OPTIONAL { ?uri rdfs:label ?label }"
       + "}";
   private static final String QUERY_GET_SYSTEM_PROTOTYPES = "SELECT DISTINCT ?prototype {"
       + " ?uri a ssn:System, proto:Individual ;"
-      + "     proto:hasPrototype ?prototype ." + "}";
+      + "     proto:hasPrototype ?prototype ."
+      + "}";
   private static final String QUERY_DESCRIBE_SYSTEM = "CONSTRUCT {"
-      + "  ?system ?p ?o ." + "  ?o ?o_p ?o_o ." + "} WHERE {"
+      + "  ?system ?p ?o ."
+      + "  ?o ?o_p ?o_o ."
+      + "} WHERE {"
       + "  ?system ?p ?o ;"
       + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
-      + "  OPTIONAL {" + "    ?o ?o_p ?o_o ."
-      + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))" + "  }"
+      + "  OPTIONAL {"
+      + "    ?o ?o_p ?o_o ."
+      + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"
+      + "  }"
       + "}";
 
   private static final String VAR_URI = "uri";
   private static final String VAR_ID = "id";
+  private static final String VAR_LABEL = "label";
   private static final String VAR_PROTOTYPE = "prototype";
-  private static final String VAR_PROTOTYPE_LABEL = "prototype_label";
   private static final int FIRST = 0;
 
-  public SystemResource() {
-  }
+  public SystemResource() {}
 
   @Inject
   private SPARQLQueryService sparqlQuery;
@@ -123,16 +126,19 @@ public class SystemResource {
       while (rs.hasNext()) {
         QuerySolution qs = rs.next();
         Resource system = qs.getResource(VAR_URI);
-        Literal system_id = qs.getLiteral(VAR_ID);
+        Literal systemId = qs.getLiteral(VAR_ID);
+        Literal systemLabel = qs.getLiteral(VAR_LABEL);
         Resource prototype = qs.getResource(VAR_PROTOTYPE);
-        Literal prototype_label = qs.getLiteral(VAR_PROTOTYPE_LABEL);
 
         Resource collection = model.listResourcesWithProperty(
             RDF.type, Hydra.Collection).next();
         model.add(collection, Hydra.member, system);
-        model.add(system, RDFS.label, prototype_label.getString() + " / " + system_id.getString());
+        model.add(system, DCTerms.identifier, systemId);
         model.add(system, RDF.type, ResourceUtils.createResourceFromClass(root,
             prototype.getLocalName()));
+        if (systemLabel != null) {
+          model.add(system, RDFS.label, systemLabel);
+        }
       }
 
       try {
