@@ -32,7 +32,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>systems</servlet-name>
-        <url-pattern>/systems</url-pattern>
+        <url-pattern>/explorer</url-pattern>
     </servlet-mapping>
 
     <servlet>
