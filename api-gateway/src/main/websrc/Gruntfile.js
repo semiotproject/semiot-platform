@@ -33,8 +33,8 @@ module.exports = function (grunt) {
                 }
             },
             index: {
-                src: BUILD_CONFIG.src_dir + "js/explorer/index.js",
-                dest: BUILD_CONFIG.dist_dir + "js/explorer/index.js",
+                src: BUILD_CONFIG.src_dir + "js/systems/index.js",
+                dest: BUILD_CONFIG.dist_dir + "js/systems/index.js",
                 options: {
                     browserifyOptions: {
                         debug: true
