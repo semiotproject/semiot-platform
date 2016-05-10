@@ -28,7 +28,7 @@
 
     <servlet>
         <servlet-name>systems</servlet-name>
-        <jsp-file>/explorer.html</jsp-file>
+        <jsp-file>/systems.html</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>systems</servlet-name>
