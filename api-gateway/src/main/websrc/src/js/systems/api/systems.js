@@ -1,18 +1,19 @@
 export default function(CONFIG, $http, $q, WAMP) {
 
-    function getSystemName(id) {
-        return `this name would be asked from prototype / ${id}`;
+    function extractSystemNameFromAPIMessage(msg) {
+        return msg['rdfs:label'] ? msg['rdfs:label']['@value'] : msg['@id'];
     }
 
     function getIdFromURI(uri) {
         return uri.substring(uri.lastIndexOf('/') + 1);
     }
 
-    function extractSystemFromWAMPMessage(msg) {
+    function extractSystemFromAPIMessage(msg, index = -1) {
         return {
+            index,
             uri: msg['@id'],
             id: msg['dcterms:identifier'],
-            name: msg['@id']
+            name: extractSystemNameFromAPIMessage(msg)
         };
     }
 
@@ -25,12 +26,7 @@ export default function(CONFIG, $http, $q, WAMP) {
                 try {
                     defer.resolve(res['hydra:member'].map((s, index) => {
                         const id = getIdFromURI(s['@id']);
-                        return {
-                            index: index,
-                            uri: s['@id'],
-                            id: id,
-                            name: s['rdfs:label'] || s['@id']
-                        };
+                        return extractSystemFromAPIMessage(s, index);
                     }));
                 } catch(e) {
                     console.error(`unable to parse systems: e = `, e);
@@ -41,7 +37,7 @@ export default function(CONFIG, $http, $q, WAMP) {
             return defer.promise;
         },
         loadSystem(uri) {
-            console.info(`loading systems ${uri}`);
+            console.info(`loading system ${uri}`);
             const defer = $q.defer();
 
             $http.get(uri).success((res) => {
@@ -51,7 +47,7 @@ export default function(CONFIG, $http, $q, WAMP) {
                         {
                             uri: res['@id'],
                             id: id,
-                            name: getSystemName(id),
+                            name: extractSystemNameFromAPIMessage(res),
                             sensors: res['ssn:hasSubSystem'].map((s) => {
                                 return {
                                     uri: s['@id']
@@ -71,7 +67,7 @@ export default function(CONFIG, $http, $q, WAMP) {
             WAMP.subscribe({
                 topic: CONFIG.TOPICS['device_registered'],
                 callback: (msg) => {
-                    callback(extractSystemFromWAMPMessage(JSON.parse(msg[0])));
+                    callback(extractSystemFromAPIMessage(JSON.parse(msg[0])));
                 }
             });
             /*
@@ -117,7 +113,7 @@ export default function(CONFIG, $http, $q, WAMP) {
                         "ws":"https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#"
                     }
                 };
-                callback(extractSystemFromWAMPMessage(msg));
+                callback(extractSystemFromAPIMessage(msg));
             }, 1000);
             */
         },
