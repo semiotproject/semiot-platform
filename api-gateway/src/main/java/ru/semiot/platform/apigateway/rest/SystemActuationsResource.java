@@ -49,12 +49,15 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/systems/{system_id}/actuations")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
 @Stateless
-public class SystemActuationsResource {
+public class SystemActuationsResource extends AbstractSystemResource {
 
   private static final Logger logger = LoggerFactory.getLogger(SystemActuationsResource.class);
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
+
+  public SystemActuationsResource() {
+    super();
+  }
 
   @Inject
   ContextProvider contextProvider;
@@ -66,6 +69,7 @@ public class SystemActuationsResource {
   UriInfo uriInfo;
 
   @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
   public void actuations(@Suspended AsyncResponse response, @PathParam("system_id") String systemId,
                          @QueryParam("start") ZonedDateTime start,
                          @QueryParam("end") ZonedDateTime end) {
@@ -136,6 +140,7 @@ public class SystemActuationsResource {
 
   @POST
   @Consumes({MediaType.APPLICATION_LD_JSON, MediaType.TEXT_TURTLE})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
   public void executeCommand(@Suspended AsyncResponse response,
                              @PathParam("system_id") String systemId, Model command) {
     try {

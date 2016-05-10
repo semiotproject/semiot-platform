@@ -5,6 +5,7 @@ import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
 import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
@@ -40,6 +41,7 @@ import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.servlet.ServletException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -52,9 +54,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/systems")
-@Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
 @Stateless
-public class SystemResource {
+public class SystemResource extends AbstractSystemResource {
 
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
   private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
@@ -86,7 +87,9 @@ public class SystemResource {
   private static final String VAR_PROTOTYPE = "prototype";
   private static final int FIRST = 0;
 
-  public SystemResource() {}
+  public SystemResource() {
+    super();
+  }
 
   @Inject
   private SPARQLQueryService sparqlQuery;
@@ -98,6 +101,7 @@ public class SystemResource {
   private UriInfo uriInfo;
 
   @GET
+  @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
   public void listSystems(@Suspended final AsyncResponse response)
       throws JsonLdError, IOException {
     URI root = uriInfo.getRequestUri();
@@ -153,6 +157,7 @@ public class SystemResource {
 
   @GET
   @Path("{id}")
+  @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
   public void getSystem(@Suspended final AsyncResponse response, @PathParam("id") String id)
       throws URISyntaxException, IOException {
     URI root = uriInfo.getRequestUri();

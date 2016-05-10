@@ -42,7 +42,7 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/systems/{system_id}/subsystems")
 @Stateless
-public class SubSystemResource {
+public class SubSystemResource extends AbstractSystemResource {
 
   private static final Logger logger = LoggerFactory.getLogger(SubSystemResource.class);
   private static final String QUERY_DESCRIBE_SUBSYSTEM
@@ -57,6 +57,10 @@ public class SubSystemResource {
       + "  FILTER isBlank(?o)"
       + " }"
       + "}";
+
+  public SubSystemResource() {
+    super();
+  }
 
   @Inject
   private ContextProvider contextProvider;
