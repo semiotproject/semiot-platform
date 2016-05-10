@@ -12,7 +12,7 @@ export default function(CONFIG, $http, $q, WAMP) {
         return {
             uri: msg['@id'],
             id: msg['dcterms:identifier'],
-            name: getSystemName(msg['dcterms:identifier'])
+            name: msg['@id']
         };
     }
 
@@ -29,7 +29,7 @@ export default function(CONFIG, $http, $q, WAMP) {
                             index: index,
                             uri: s['@id'],
                             id: id,
-                            name: getSystemName(id)
+                            name: s['rdfs:label'] || s['@id']
                         };
                     }));
                 } catch(e) {
@@ -123,7 +123,7 @@ export default function(CONFIG, $http, $q, WAMP) {
         },
         unsubscribeFromNewSystems() {
             console.info(`unsubscribing from new systems..`);
-            WAMP.unsubscribe(getWAMPTopicFromSensor(sensor));
+            // WAMP.unsubscribe(getWAMPTopicFromSensor(sensor));
         }
     };
 }

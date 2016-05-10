@@ -20,12 +20,12 @@ export default function(CONFIG, currentUser) {
         }
         console.info(`not found opened session for endpoint ${endpoint}; connecting..`);
         currentUser.getCurrentUser().then((user) => {
-            // user = JSON.parse(user);
+            user = JSON.parse(user);
             // remove this in production
-            user = {
-                username: "root",
-                password: "root"
-            };
+            // user = {
+            //     username: "root",
+            //     password: "root"
+            // };
             console.log('initialising WAMP session...');
             let connection = new autobahn.Connection({
                 url: endpoint,

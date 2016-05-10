@@ -140,7 +140,7 @@ public class RootResource {
     Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION,
         MapBuilder.newMap()
             .put(ContextProvider.VAR_ROOT_URL, rootURL)
-            .put(ContextProvider.VAR_WAMP_URL, rootURL + config.wampPublicPath())
+            .put(ContextProvider.VAR_WAMP_URL, UriBuilder.fromUri(rootUrl + config.wampPublicPath()).scheme("ws"))
             .build());
     Map<String, Object> frame = contextProvider.getFrame(API_DOCUMENTATION, rootURL);
 
