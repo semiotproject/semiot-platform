@@ -19,8 +19,8 @@ export default function(CONFIG, currentUser) {
             return;
         }
         console.info(`not found opened session for endpoint ${endpoint}; connecting..`);
-        currentUser.getCurrentUser().then((user) => {
-            user = JSON.parse(user);
+        currentUser.getCurrentUser().then((res) => {
+            user = res.data;
             // remove this in production
             // user = {
             //     username: "root",
