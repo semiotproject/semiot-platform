@@ -83,7 +83,7 @@ public class SystemObservationsResource {
     String rootUrl = URIUtils.extractRootURL(root);
     Map params = MapBuilder.newMap()
         .put(ContextProvider.VAR_ROOT_URL, rootUrl)
-        .put(ContextProvider.VAR_WAMP_URL, UriBuilder.fromUri(rootUrl + config.wampPublicPath()).scheme("ws"))
+        .put(ContextProvider.VAR_WAMP_URL, rootUrl + config.wampPublicPath())
         .put(ContextProvider.VAR_SYSTEM_ID, systemId).build();
     if (Strings.isNullOrEmpty(start)) {
       tsdbQuery.queryTimeOfLatestBySystemId(
