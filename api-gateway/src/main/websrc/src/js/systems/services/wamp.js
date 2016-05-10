@@ -20,7 +20,7 @@ export default function(CONFIG, currentUser) {
         }
         console.info(`not found opened session for endpoint ${endpoint}; connecting..`);
         currentUser.getCurrentUser().then((res) => {
-            user = res.data;
+            const user = res.data;
             // remove this in production
             // user = {
             //     username: "root",
