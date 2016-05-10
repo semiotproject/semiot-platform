@@ -1,8 +1,10 @@
 "use strict";
 
-export default function($scope, systemList, commonUtils, CONFIG) {
+export default function($scope, systemAPI) {
     $scope.isLoading = true;
-    $scope.systems = [];
+    $scope.totalSystems = [];
+    $scope.filteredSystems = [];
+    $scope.viewableSystems = [];
     $scope.search = {
         name: ""
     };
@@ -15,26 +17,35 @@ export default function($scope, systemList, commonUtils, CONFIG) {
     };
 
     $scope.setPagination = function() {
-        let total_systems = systemList.getSystems().filter(function(s) {
+        $scope.filteredSystems = $scope.totalSystems.filter(function(s) {
             return !$scope.search.name || s.name.toLowerCase().indexOf($scope.search.name.toLowerCase()) > -1;
         });
-        console.log(total_systems);
-        $scope.systems = total_systems.slice(
+        $scope.systems = $scope.filteredSystems.slice(
             ($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage,
             ($scope.pagination.currentPage) * $scope.pagination.itemsPerPage
         );
-        $scope.pagination.totalItems = total_systems.length;
+        $scope.pagination.totalItems = $scope.filteredSystems.length;
     };
-    $scope.removeSystem = function(uri) {
-        systemList.removeSystem(uri);
+
+    $scope.handleNewSystem = (system) => {
+        console.info('new system registered: ', system);
+        system.index = $scope.totalSystems.length;
+        $scope.totalSystems.push(system);
+        $scope.setPagination();
+
+        // why view is not updating without $apply()?
+        $scope.$apply();
     };
-    systemList.on('systemsUpdate', function(data) {
-        $scope.setPagination();
-    });
-    systemList.fetchSystems().then(function(data) {
-        $scope.isLoading = false;
-        $scope.setPagination();
-        systemList.subscribe();
-    });
+
+    $scope.init = () => {
+        systemAPI.loadSystems().then((res) => {
+            $scope.totalSystems = res;
+            systemAPI.subscribeForNewSystems($scope.handleNewSystem.bind($scope));
+            $scope.setPagination();
+            $scope.isLoading = false;
+        });
+    };
+
+    $scope.init();
 
 }

@@ -35,7 +35,7 @@
     "grunt-contrib-watch": "~0.6.1"
   },
   "dependencies": {
-    "angular": "~1.4.7",
+    "angular": "1.4.7",
     "angular-route": "~1.4.7",
     "angular-ui-bootstrap": "~0.13.4",
     "autobahn": "0.9",

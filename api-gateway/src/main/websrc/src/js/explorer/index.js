@@ -47,37 +47,19 @@ app.constant("CONFIG", require('./config'));
 
 // utils
 app.factory('commonUtils', require('./utils/common'));
-app.factory('wampUtils', require('./utils/wamp'));
-app.factory('rdfUtils', require('./utils/rdf'));
-app.factory('sparqlUtils', require('./utils/sparql'));
-app.factory('tsdbUtils', require('./utils/tsdb'));
 app.factory('chartUtils', require('./utils/chart'));
-app.factory('analyzeQueriesUtils', require('./utils/analyze-queries'));
 
 // services
-app.factory('loginService', require('./services/login-service'));
+app.factory('WAMP', require('./services/wamp'));
 
-// models
-app.factory('systemList', require('./models/system-list'));
-app.factory('systemDetail', require('./models/system-detail'));
-app.factory('machineToolStates', require('./models/machine-tool-states'));
+// api
+app.factory('systemAPI', require('./api/systems'));
+app.factory('sensorAPI', require('./api/sensors'));
+app.factory('observationAPI', require('./api/observations'));
+app.factory('currentUser', require('./api/user'));
 
 // controllers
-app.controller('LoginCtrl', require('./controllers/login'));
-app.controller('QueryListCtrl', require('./controllers/query-list'));
 app.controller('SystemListCtrl', require('./controllers/system-list'));
 app.controller('SystemDetailCtrl', require('./controllers/system-detail'));
-app.controller('QueryDetailCtrl', require('./controllers/query-detail'));
-app.controller('NewQueryCtrl', require('./controllers/new-query'));
 
 app.config(require('./routing'));
-
-// redirect to login page if unauthorized
-app.run(['$rootScope', '$location', 'loginService', 'wampUtils', function($rootScope, $location, loginService, wampUtils) {
-    $rootScope.$on('$routeChangeStart', function (event, next) {
-        if (!loginService.isLogged()) {
-            // $location.path('/login');
-        }
-
-    });
-}]);

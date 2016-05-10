@@ -1,7 +1,7 @@
 <section>
     <ol class="breadcrumb">
-        <li><a href="#/systems">Systems</a></li>
-        <li class="active">{{ title }}</li>
+        <li><a href="/systems">Systems</a></li>
+        <li class="active">{{ system.name }}</li>
     </ol>
     <div id="single-system-wrapper" ng-class="{preloader: isLoading}">
         <div ng-repeat="sensor in sensors" class="sensor-view">
@@ -51,13 +51,13 @@
             </div>
             <highchart ng-if="sensor.chartConfig.series[0].data.length > 0" config="sensor.chartConfig"></highchart>
             <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['archive']" class="empty-sensor-chart">
-                <span>{{ sensor.title }}</span>
+                <span>{{ sensor.label }}</span>
                 <br>
                 <span>No observations found for this period</span>
             </div>
             <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['real-time']" class="empty-sensor-chart">
 
-                <span>{{ sensor.title }}</span>
+                <span>{{ sensor.label }}</span>
                 <br>
                 <span>Waiting for the first observation..</span>
             </div>
