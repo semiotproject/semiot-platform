@@ -245,6 +245,17 @@ export default function(CONFIG, commonUtils) {
                 return [];
             }
         },
+        observationsToSerie(data) {
+            return data.map(this.observationsToChartPoint.bind(this)).sort((a, b) => {
+                return a[0] > b[0] ? 1 : -1;
+            });
+        },
+        observationsToChartPoint(obs) {
+            return [
+                obs.timestamp,
+                obs.value
+            ];
+        },
         parseStateChartData(data) {
             let values = [];
 
