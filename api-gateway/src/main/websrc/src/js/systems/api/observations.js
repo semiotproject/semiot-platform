@@ -19,7 +19,12 @@ export default function(CONFIG, $http, $q, WAMP) {
             const start = moment(range[0]).format('YYYY-MM-DDTHH:mm:ss');
             const end = moment(range[1]).format('YYYY-MM-DDTHH:mm:ss');
 
-            $http.get(`${observationsURI}&start=${start}&end=${end}`).success((res) => {
+            $http({
+                url: `${observationsURI}&start=${start}&end=${end}`,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).success((res) => {
                 try {
                     defer.resolve(res['hydra:member'].map((obs) => {
                         return {
@@ -38,7 +43,12 @@ export default function(CONFIG, $http, $q, WAMP) {
         loadWAMPTopic(observationsURI) {
             const defer = $q.defer();
 
-            $http.get(`${observationsURI}`).success((res) => {
+            $http({
+                url: `${observationsURI}`,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).success((res) => {
                 try {
                     const subscriptionOperation = res['hydra-filter:viewOf']['hydra:operation'];
                     defer.resolve({

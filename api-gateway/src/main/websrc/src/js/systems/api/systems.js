@@ -22,7 +22,12 @@ export default function(CONFIG, $http, $q, WAMP) {
             console.info('loading systems list');
             const defer = $q.defer();
 
-            $http.get(CONFIG.URLS.systems.list).success((res) => {
+            $http({
+                url: CONFIG.URLS.systems.list,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).success((res) => {
                 try {
                     defer.resolve(res['hydra:member'].map((s, index) => {
                         const id = getIdFromURI(s['@id']);
@@ -40,7 +45,12 @@ export default function(CONFIG, $http, $q, WAMP) {
             console.info(`loading system ${uri}`);
             const defer = $q.defer();
 
-            $http.get(uri).success((res) => {
+            $http({
+                url: uri,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).success((res) => {
                 try {
                     const id = getIdFromURI(res['@id']);
                     defer.resolve(

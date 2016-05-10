@@ -9,7 +9,12 @@ export default function(CONFIG, $http, $q) {
             console.info(`loading sensor ${uri}`);
             const defer = $q.defer();
 
-            $http.get(uri).success((res) => {
+            $http({
+                url: uri,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).success((res) => {
                 defer.resolve({
                     uri: res['@id'],
                     id: res['dcterms:identifier'],
