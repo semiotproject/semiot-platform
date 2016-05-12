@@ -323,9 +323,9 @@ export default function(
             console.log(chartUtils.observationsToSerie(obs));
         });
     };
-    $scope.subscribe = function(endpoint, topic, sensor) {
-        observationAPI.subscribeForNewObservations(endpoint, topic, (msg) => {
-            console.info(`received new observation for endpoint ${endpoint}, topic ${topic}: `, msg);
+    $scope.subscribe = function(sensor) {
+        observationAPI.subscribeForNewObservations(sensor.endpoint, sensor.topic, (msg) => {
+            console.info(`received new observation for endpoint ${sensor.endpoint}, topic ${sensor.topic}: `, msg);
             sensor.chartConfig.series[0].data.push(chartUtils.observationsToChartPoint(msg));
 
             // why view is not updating without $apply()?
@@ -348,7 +348,9 @@ export default function(
                     $scope.fillChart(sensor);
                     observationAPI.loadWAMPTopic(sensor.observationsURI).then((res) => {
                         console.info(`loaded WAMP topic: `, res);
-                        $scope.subscribe(res.endpoint, res.topic, sensor);
+                        sensor.endpoint = res.endpoint;
+                        sensor.topic = res.topic;
+                        $scope.subscribe(sensor);
                     });
 
                     $scope.sensors.push(sensor);
