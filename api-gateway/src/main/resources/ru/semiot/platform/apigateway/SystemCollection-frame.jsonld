@@ -20,7 +20,8 @@
         "ssn:observes": {"@type": "@id"},
         "ssn:hasSubSystem": {"@type": "@id"},
         "proto:hasPrototype": {"@type": "@id"},
-        "void:class": {"@type": "@id"}
+        "void:class": {"@type": "@id"},
+        "hydra:member": {"@container": "@set"}
     },
     "@type": "hydra:Collection",
     "hydra:member": {}
