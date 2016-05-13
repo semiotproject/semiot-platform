@@ -55,7 +55,7 @@
 
 :PlainLamp-Shine-Color a dul:Parameter, semiot:PropertyMappingParameter ;
   dul:associatedWith :PlainLamp-Actuator ;
-  ssn:forProperty qudt-quantity-ex:CorrelatedColorTemperature .
+  ssn:forProperty qudt-quantity-ext:CorrelatedColorTemperature .
 
 :PlainLamp-Actuator a semiot:ActuatingDevice, proto:Prototype ;
   semiot:actsOn qudt-quantity:LuminousFlux ;
