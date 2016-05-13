@@ -27,11 +27,11 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>explorer</servlet-name>
-        <jsp-file>/explorer.html</jsp-file>
+        <servlet-name>systems</servlet-name>
+        <jsp-file>/systems.html</jsp-file>
     </servlet>
     <servlet-mapping>
-        <servlet-name>explorer</servlet-name>
+        <servlet-name>systems</servlet-name>
         <url-pattern>/explorer</url-pattern>
     </servlet-mapping>
 

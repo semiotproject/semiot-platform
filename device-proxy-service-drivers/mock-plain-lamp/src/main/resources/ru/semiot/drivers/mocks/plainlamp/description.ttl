@@ -8,6 +8,7 @@
 @prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
 
 <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> a ssn:System, proto:Individual ;
+    rdfs:label "Plain lamp / ${ru.semiot.platform.device.id}"@en ;
     proto:hasPrototype ws:PlainLamp ;
     ssn:hasSubSystem <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-actuator> ;
     dcterms:identifier "${ru.semiot.platform.device.id}"^^xsd:string ;

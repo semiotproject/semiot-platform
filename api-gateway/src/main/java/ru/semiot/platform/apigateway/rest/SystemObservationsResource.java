@@ -50,8 +50,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/systems/{system_id}/observations")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
-public class SystemObservationsResource {
+public class SystemObservationsResource extends AbstractSystemResource {
 
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
   private static final Logger logger = LoggerFactory.getLogger(SystemObservationsResource.class);
@@ -64,6 +63,10 @@ public class SystemObservationsResource {
   private static final String TOPIC_SENSOR_TEMPLATE = "${SYSTEM_ID}.observations.${SENSOR_ID}";
   private static final String TOPIC_SYSTEM_TEMPLATE = "${SYSTEM_ID}.observations";
 
+  public SystemObservationsResource() {
+    super();
+  }
+
   @Inject
   private SPARQLQueryService sparqlQuery;
   @Inject
@@ -74,6 +77,7 @@ public class SystemObservationsResource {
   UriInfo uriInfo;
 
   @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
   public void observations(@Suspended final AsyncResponse response,
       @PathParam("system_id") String systemId, @QueryParam("sensor_id") String sensorId,
       @QueryParam("start") String start, @QueryParam("end") String end)

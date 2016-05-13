@@ -43,7 +43,7 @@
             </div>
             <ul class="nav navbar-nav">
                 <li>
-                    <a href="/explorer">Explorer</a>
+                    <a href="/systems">Explorer</a>
                 </li>
                 <li class="dropdown active">
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration

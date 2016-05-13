@@ -49,12 +49,15 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/systems/{system_id}/commandResults")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
 @Stateless
 public class SystemCommandResultsResource {
 
   private static final Logger logger = LoggerFactory.getLogger(SystemCommandResultsResource.class);
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
+
+  public SystemCommandResultsResource() {
+    super();
+  }
 
   @Inject
   ContextProvider contextProvider;
@@ -66,6 +69,7 @@ public class SystemCommandResultsResource {
   UriInfo uriInfo;
 
   @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
   public void getCommandResults(@Suspended AsyncResponse response,
       @PathParam("system_id") String systemId,
       @QueryParam("start") ZonedDateTime start,
@@ -140,6 +144,7 @@ public class SystemCommandResultsResource {
 
   @POST
   @Consumes({MediaType.APPLICATION_LD_JSON, MediaType.TEXT_TURTLE})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
   public void executeCommand(@Suspended AsyncResponse response,
       @PathParam("system_id") String systemId, Model command) {
     try {

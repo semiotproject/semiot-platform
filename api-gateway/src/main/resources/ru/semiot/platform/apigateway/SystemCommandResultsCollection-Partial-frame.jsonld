@@ -22,7 +22,8 @@
     "ssn:isProducedBy": {"@type": "@id"},
     "ssn:observedBy": {"@type": "@id"},
     "ssn:observedProperty": {"@type": "@id"},
-    "ssn:observationResultTime": {"@type": "xsd:dateTime"}
+    "ssn:observationResultTime": {"@type": "xsd:dateTime"},
+    "hydra:member": {"@container": "@set"}
   },
   "@type": "hydra:PartialCollectionView"
 }

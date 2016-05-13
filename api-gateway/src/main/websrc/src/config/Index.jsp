@@ -36,7 +36,7 @@
     <h1>SemIoT Platform</h1>
     <b>Navigation:</b>
     <ul class="nav nav-pills nav-justified">
-        <a href="/explorer">Go to Explorer</a> |
+        <a href="/systems">Go to Explorer</a> |
         <a href="/config">Go to Configuration</a>
     </ul>
 </div>
