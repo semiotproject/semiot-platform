@@ -66,7 +66,7 @@
     semiot:hasActuatingProperty [
       a semiot:ActuatingProperty, semiot:ActuatingValueRange ;
       dul:hasDataValue "0"^^xsd:integer ;
-      dul:hasDataValue "890"^xsd:integer ;
+      dul:hasDataValue "890"^^xsd:integer ;
       dul:isClassifiedBy qudt-unit:Lumen ;
     ] ;
   ] ;
@@ -76,7 +76,7 @@
     semiot:hasActuatingProperty [
       a semiot:ActuatingProperty, semiot:ActuatingValueRange ;
       dul:hasDataValue "2700"^^xsd:integer ;
-      dul:hasDataValue "6500"^xsd:integer ;
+      dul:hasDataValue "6500"^^xsd:integer ;
       dul:isClassifiedBy qudt-unit:Kelvin ;
     ] ;
   ] ;
