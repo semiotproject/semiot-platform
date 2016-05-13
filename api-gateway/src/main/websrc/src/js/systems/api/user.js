@@ -3,7 +3,7 @@ export default function(CONFIG, $http, $q) {
     let currentUser = null;
 
     function renderUsername(user) {
-        document.querySelector('.username').text = user;
+        document.querySelector('.username').innerHTML = user;
     }
 
     return {
