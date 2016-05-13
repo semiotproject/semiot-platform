@@ -37,8 +37,10 @@
             required="true" type="String" default="http://localhost"/>
         <AD name="System URL Path" id="ru.semiot.platform.systems_path"
             required="false" type="String" default="systems"/>
-        <AD name="Sensor URL Path" id="ru.semiot.platform.subsystem_path"
+        <AD name="Subsystem URL Path" id="ru.semiot.platform.subsystem_path"
             required="false" type="String" default="subsystems"/>
+        <AD name="Process URL Path" id="ru.semiot.platform.process_path"
+            required="false" type="String" default="processes"/>
     </OCD>
 
     <Designate pid="ru.semiot.platform.deviceproxyservice.manager">

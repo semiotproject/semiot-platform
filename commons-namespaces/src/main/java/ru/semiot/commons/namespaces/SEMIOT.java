@@ -10,10 +10,11 @@ public class SEMIOT extends Namespace {
   public static final Resource Command = resource(URI, "Command");
   public static final Resource CommandResult = resource(URI, "CommandResult");
 
-  public static final Property hasProcessParameterValue = property(URI, "hasProcessParameterValue");
-  public static final Property targetProcess = property(URI, "targetProcess");
+  public static final Property forProcess = property(URI, "forProcess");
   public static final Property forParameter = property(URI, "forParameter");
   public static final Property isResultOf = property(URI, "isResultOf");
+  public static final Property supportedProcess = property(URI, "supportedProcess");
+  public static final Property supportedCommand = property(URI, "supportedCommand");
 
   //TODO: Remove?
   public static final Property hasDriver = property(URI, "hasDriver");

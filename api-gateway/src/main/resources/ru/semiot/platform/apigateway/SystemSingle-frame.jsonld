@@ -3,7 +3,6 @@
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "ssn": "http://purl.oclc.org/NET/ssnx/ssn#",
-        "san": "https://www.irit.fr/recherches/MELODI/ontologies/SAN#",
         "void": "http://rdfs.org/ns/void#",
         "dcterms": "http://purl.org/dc/terms/",
         "qudt-quantity" : "http://qudt.org/vocab/quantity#",
@@ -12,6 +11,7 @@
         "proto": "http://w3id.org/semiot/ontologies/proto#",
         "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
         "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+        "semiot": "http://w3id.org/semiot/ontologies/semiot#",
         "apidoc": "${ROOT_URL}/doc#",
 
         "ssn:hasValue": {"@type": "@id"},

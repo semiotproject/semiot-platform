@@ -12,7 +12,6 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
@@ -65,11 +64,6 @@ public class RootResource {
       + "	?device a proto:Individual, ssn:System ;"
       + "    	proto:hasPrototype ?prototype ."
       + "}";
-  private static final String QUERY_SENSOR_PROTOTYPES
-      = "SELECT DISTINCT ?prototype {"
-      + " ?device a proto:Individual, ssn:SensingDevice ;"
-      + "         proto:hasPrototype ?prototype ."
-      + "}";
   private static final String QUERY_COLLECTION_MEMBER
       = "SELECT ?uri {"
       + " <${COLLECTION_URI}> rdfs:range ?shape ."
@@ -82,8 +76,16 @@ public class RootResource {
       + "     proto:hasPrototype <${PROTOTYPE_URI}> ;"
       + "     proto:hasPrototype ?prototype ;"
       + "     ?property ?value ."
-      + " FILTER(?property NOT IN (rdf:type, proto:hasPrototype))"
+      + " FILTER(isLiteral(?value))"
       + "}";
+  private static final String QUERY_SUPPORTED_PROCESSES
+      = "SELECT DISTINCT ?prototype ?process {"
+      + " ?device a proto:Individual ;"
+      + "   proto:hasPrototype <${PROTOTYPE_URI}> ;"
+      + "   proto:hasPrototype ?prototype ;"
+      + "   semiot:supportedProcess ?process ."
+      + "}";
+  private static final String LINK_SYSTEMS = "systems";
   private static final String VAR_PROTOTYPE = "prototype";
   private static final String VAR_PROPERTY = "property";
   private static final String VAR_URI = "uri";
@@ -136,26 +138,20 @@ public class RootResource {
   public void documentation(@Suspended final AsyncResponse response)
       throws JsonLdError, IOException {
     String rootURL = URIUtils.extractRootURL(uriInfo.getRequestUri());
-    Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION,
-        MapBuilder.newMap()
-            .put(ContextProvider.VAR_ROOT_URL, rootURL)
-            .put(ContextProvider.VAR_WAMP_URL, rootURL + config.wampPublicPath())
-            .build());
+    Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION, MapBuilder.newMap()
+        .put(ContextProvider.VAR_ROOT_URL, rootURL)
+        .put(ContextProvider.VAR_WAMP_URL, rootURL + config.wampPublicPath())
+        .build());
     Map<String, Object> frame = contextProvider.getFrame(API_DOCUMENTATION, rootURL);
 
     Observable<List<Resource>> systems = query.select(QUERY_SYSTEM_PROTOTYPES)
-        .map((ResultSet rs) -> defineResourceIndividual(
-            apiDoc, rootURL, "EntryPoint-Systems", rs, SSN.System));
-    Observable<List<Resource>> sensors = query.select(QUERY_SENSOR_PROTOTYPES)
-        .map((ResultSet rs) -> defineResourceIndividual(
-            apiDoc, rootURL, "EntryPoint-Sensors", rs, SSN.SensingDevice));
+        .map((ResultSet rs) ->
+            defineResourceIndividual(apiDoc, rootURL, LINK_SYSTEMS, rs, SSN.System));
 
-    Observable.zip(systems, sensors, (rsSystems, rsSensors) -> {
-      List<Resource> rs = new ArrayList<>(rsSystems);
-      rs.addAll(rsSensors);
+    Observable supportedProperty = systems.map((prototypes) -> {
       List<Observable<ResultSet>> obs = new ArrayList<>();
-      rs.stream().forEach((prototype) -> obs.add(query.select(QUERY_INDIVIDUAL_PROPERTIES
-          .replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+      prototypes.stream().forEach((prototype) -> obs.add(query.select(
+          QUERY_INDIVIDUAL_PROPERTIES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
 
       return Observable.merge(obs).toBlocking().toIterable();
     }).map((Iterable<ResultSet> iter) -> {
@@ -165,14 +161,31 @@ public class RootResource {
           Resource prototype = qs.getResource(VAR_PROTOTYPE);
           Resource prototypeResource = ResourceUtils.createResourceFromClass(
               rootURL, prototype.getLocalName());
-          Property property = ResourceFactory.createProperty(
-              qs.getResource(VAR_PROPERTY).getURI());
-
-          apiDoc.add(prototypeResource, Hydra.supportedProperty, property);
+          Resource property = ResourceFactory.createResource();
+          apiDoc.add(prototypeResource, Hydra.supportedProperty, property)
+              .add(property, Hydra.property,
+                  ResourceFactory.createProperty(qs.getResource(VAR_PROPERTY).getURI()));
         }
       });
       return apiDoc;
-    }).lastOrDefault(apiDoc).map((__) -> {
+    });
+
+    Observable supportedProcess = systems.map((prototypes) -> {
+      List<Observable<ResultSet>> obs = new ArrayList<>();
+      prototypes.stream().forEach((prototype) -> obs.add(query.select(
+          QUERY_SUPPORTED_PROCESSES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+
+      return Observable.merge(obs).toBlocking().toIterable();
+    }).map((Iterable<ResultSet> iter) -> {
+      iter.forEach((ResultSet rs) -> {
+        while(rs.hasNext()) {
+          QuerySolution qs = rs.next();
+        }
+      });
+      return apiDoc;
+    });
+
+    Observable.zip(supportedProperty, supportedProcess, (a, b) -> {
       try {
         return JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(apiDoc, frame));
       } catch (JsonLdError | IOException e) {
@@ -245,8 +258,7 @@ public class RootResource {
           "{\"username\": \"" + c.getLogin() + "\", \"password\": \"" + c.getPassword() + "\"}");
       resp.getWriter().flush();
       resp.getWriter().close();
-    }
-    else{
+    } else {
       resp.sendError(401);//Forbidden
     }
   }

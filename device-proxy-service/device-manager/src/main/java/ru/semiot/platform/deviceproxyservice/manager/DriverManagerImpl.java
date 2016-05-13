@@ -155,6 +155,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
           configuration.put(Keys.PLATFORM_DOMAIN, "http://localhost");
           configuration.put(Keys.PLATFORM_SYSTEMS_PATH, "systems");
           configuration.put(Keys.PLATFORM_SUBSYSTEM_PATH, "subsystems");
+          configuration.put(Keys.PLATFORM_PROCESS_PATH, "processes");
 
           configuration.putAll(dictionary);
 

@@ -1,4 +1,4 @@
-@prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#> .
+@prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/release-1.0.7/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#> .
 @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
 @prefix qudt: <http://qudt.org/schema/qudt#> .
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
@@ -13,7 +13,18 @@
     rdfs:seeAlso "http://shop.netatmo.com/eur_en/netatmo-weather-station-400.html"^^xsd:anyURI ;
     ssn:hasSubSystem :NetatmoWeatherStationOutdoorModule-TemperatureSensor ;
     ssn:hasSubSystem :NetatmoWeatherStationOutdoorModule-HumiditySensor ;
+    semiot:supportedProcess :NetatmoWeatherStationOutdoorModule-Sense-Temperature, :NetatmoWeatherStationOutdoorModule-Sense-Humidity ;
     .
+
+:NetatmoWeatherStationOutdoorModule-Sense-Temperature a semiot:SensingProcess ;
+    semiot:triggers [ a ssn:Sensing ;
+        ssn:implementedBy :NetatmoWeatherStationOutdoorModule-TemperatureSensor ;
+    ] .
+
+:NetatmoWeatherStationOutdoorModule-Sense-Humidity a semiot:SensingProcess ;
+    semiot:triggers [ a ssn:Sensing ;
+        ssn:implementedBy :NetatmoWeatherStationOutdoorModule-HumiditySensor ;
+    ] .
 
 :NetatmoWeatherStationOutdoorModule-TemperatureSensor a ssn:SensingDevice, proto:Prototype ;
     ssn:observes qudt-quantity:ThermodynamicTemperature ;
