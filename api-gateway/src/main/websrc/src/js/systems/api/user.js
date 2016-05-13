@@ -14,7 +14,7 @@ export default function(CONFIG, $http, $q) {
 
                 // defer.resolve({ data: { username: "root", password: "root" } });
                 $http({
-                    url: CONFIG.URLS.systems.list
+                    url: CONFIG.URLS.currentUser
                 }).success((res) => {
                     console.info(`loaded current user: `, res);
                     currentUser = {
