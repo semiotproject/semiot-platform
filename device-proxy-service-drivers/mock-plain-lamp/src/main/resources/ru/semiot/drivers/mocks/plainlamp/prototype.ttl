@@ -72,7 +72,7 @@
   ] ;
   semiot:hasActuatingCapability [
     a semiot:ActuatingCapability ;
-    semiot:forProperty qudt-quantity-ex:CorrelatedColorTemperature ;
+    semiot:forProperty qudt-quantity-ext:CorrelatedColorTemperature ;
     semiot:hasActuatingProperty [
       a semiot:ActuatingProperty, semiot:ActuatingValueRange ;
       dul:hasDataValue "2700"^^xsd:integer ;
