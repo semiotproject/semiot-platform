@@ -19,7 +19,8 @@
         "ssn:observes": {"@type": "@id"},
         "ssn:hasSubSystem": {"@type": "@id"},
         "proto:hasPrototype": {"@type": "@id"},
-        "apidoc:observations": {"@type": "@id"}
+        "apidoc:observations": {"@type": "@id"},
+        "apidoc:commandResults": {"@type": "@id"}
     },
     "@type": "ssn:System"
 }

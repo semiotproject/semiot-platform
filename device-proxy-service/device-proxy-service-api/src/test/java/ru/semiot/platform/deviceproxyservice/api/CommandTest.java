@@ -1,5 +1,6 @@
 package ru.semiot.platform.deviceproxyservice.api;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
@@ -25,6 +26,7 @@ public class CommandTest {
         this.getClass().getResourceAsStream("/ru/semiot/platform/deviceproxyservice/api/command.ttl"),
         null,
         RDFLanguages.strLangTurtle);
+
     expected.write(writer1, RDFLanguages.strLangTurtle);
     System.out.println("Expected:");
     System.out.println(writer1.toString());
@@ -44,5 +46,25 @@ public class CommandTest {
     System.out.println(writer3.toString());
 
     assertTrue(difference.isEmpty());
+  }
+
+  @Test
+  public void getCommandType() {
+    StringWriter writer1 = new StringWriter();
+    Configuration configuration = new Configuration();
+    configuration.put(Keys.PLATFORM_SYSTEMS_URI_PREFIX, "http://localhost/systems/");
+
+    Model expected = ModelFactory.createDefaultModel().read(
+        this.getClass().getResourceAsStream("/ru/semiot/platform/deviceproxyservice/api/command.ttl"),
+        null,
+        RDFLanguages.strLangTurtle);
+
+    expected.write(writer1, RDFLanguages.strLangTurtle);
+    System.out.println("Command:");
+    System.out.println(writer1.toString());
+    Command command = new Command(expected);
+
+    assertEquals("http://w3id.org/semiot/ontologies/semiot#StartCommand", command.getCommandType());
+
   }
 }

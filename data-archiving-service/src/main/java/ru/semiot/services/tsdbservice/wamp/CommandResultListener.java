@@ -24,18 +24,20 @@ public class CommandResultListener extends RDFMessageObserver {
 
   private static final Logger logger = LoggerFactory.getLogger(CommandResultListener.class);
   private static final Query GET_INFORMATION = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
-      "SELECT ?uri ?datetime ?type {" +
+      "SELECT ?uri ?datetime ?type ?process {" +
           "?actuation semiot:isResultOf ?command ;" +
           "dul:hasEventTime ?datetime ;" +
-          "dul:involvesAgent ?uri ." +
-          "?command a ?type . " +
+          "dul:hasParticipant ?uri ." +
+          "?command a ?type ;" +
+          " semiot:forProcess ?process ." +
           "FILTER(?type != semiot:Command)" +
           "} LIMIT 1", DUL.class, SEMIOT.class));
   private static final Query GET_PROPERTIES = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
       "SELECT ?uri ?value {" +
           "?command a semiot:Command ;" +
           "  ?uri ?value ." +
-          "FILTER(?uri != rdf:type && ?uri != dul:involvesAgent && ?uri != dul:hasParameter)" +
+          "FILTER(?uri != rdf:type && ?uri != dul:hasParameter && " +
+          "   ?uri != semiot:forProcess && ?uri != dul:associatedWith)" +
           "}", SEMIOT.class, DUL.class, RDF.class));
   private static final Query GET_PARAMETERS = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
       "SELECT ?uri ?value {" +
@@ -53,6 +55,7 @@ public class CommandResultListener extends RDFMessageObserver {
         QuerySolution qsCommandResults = rsCommandResults.next();
 
         Resource deviceUri = qsCommandResults.getResource("uri");
+        Resource processUri = qsCommandResults.getResource("process");
         Literal dateTime = qsCommandResults.getLiteral("datetime");
         Resource type = qsCommandResults.getResource("type");
 
@@ -60,6 +63,7 @@ public class CommandResultListener extends RDFMessageObserver {
 
         CommandResult commandResult = new CommandResult(
             NamespaceUtils.extractLocalName(deviceUri.getURI()),
+            NamespaceUtils.extractLocalName(processUri.getURI()),
             dateTime.getLexicalForm(),
             type.getURI());
 

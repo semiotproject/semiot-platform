@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 public class Observation {
 
   private static final String SENSOR_URI_TEMPLATE =
-      CONFIG.sensorsURIPrefix() + "systems/${SYSTEM_ID}/subsystems/${SENSOR_ID}";
+      CONFIG.rootUrl() + "systems/${SYSTEM_ID}/subsystems/${SENSOR_ID}";
 
   private final String sensorId;
   private final String systemId;

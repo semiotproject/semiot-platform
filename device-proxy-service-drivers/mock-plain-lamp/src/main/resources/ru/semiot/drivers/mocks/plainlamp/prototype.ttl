@@ -15,7 +15,7 @@
   ssn:hasSubSystem :PlainLamp-Actuator ;
   semiot:supportedProcess :PlainLamp-Shine .
 
-:PlainLamp-Shine a semiot:ActuationOperation ;
+:PlainLamp-Shine a semiot:Process, semiot:ActuationProcess ;
   semiot:supportedCommand [
     a semiot:Command, semiot:StopCommand ;
     rdfs:label "Turn off the light"@en ;

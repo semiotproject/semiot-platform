@@ -58,8 +58,8 @@ public class CommandExecutionException extends Exception {
     return new CommandExecutionException(Reason.DRIVER_NOT_FOUND, cause);
   }
 
-  public static CommandExecutionException badCommand(String message) {
-    return new CommandExecutionException(Reason.BAD_COMMAND, message);
+  public static CommandExecutionException badCommand(String message, Object... args) {
+    return new CommandExecutionException(Reason.BAD_COMMAND, String.format(message, args));
   }
 
   public static CommandExecutionException badCommand() {

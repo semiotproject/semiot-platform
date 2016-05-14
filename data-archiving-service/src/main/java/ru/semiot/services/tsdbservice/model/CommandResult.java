@@ -26,16 +26,19 @@ import javax.validation.constraints.NotNull;
 
 public class CommandResult {
 
-  private static final String SENSOR_URI_PREFIX = CONFIG.sensorsURIPrefix() + "systems/";
+  private static final String SYSTEMS_URI_PREFIX = CONFIG.rootUrl() + "systems/";
+  private static final String PROCESSES_PATH_URI = "processes";
   private final String systemId;
+  private final String processId;
   private final ZonedDateTime eventTime;
   private final String type;
   private final List<CommandProperty> properties = new ArrayList<>();
   private final Map<Resource, RDFNode> parameters = new HashMap<>();
 
-  public CommandResult(@NotNull String systemId, @NotNull String eventTime,
-      @NotNull String type) {
+  public CommandResult(@NotNull String systemId, @NotNull String processId,
+      @NotNull String eventTime, @NotNull String type) {
     this.systemId = systemId;
+    this.processId = processId;
     this.eventTime = ZonedDateTime.parse(eventTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     this.type = type;
   }
@@ -68,58 +71,52 @@ public class CommandResult {
   }
 
   public String toInsertQuery() {
-    if (properties.isEmpty()) {
-      return String.format("INSERT INTO semiot.commandresult " +
-          "(system_id, event_time, command_type) " +
-          "VALUES ('%s', '%s', '%s')", systemId, eventTime, type);
-    } else {
-      StringBuilder builderProps = new StringBuilder("[");
-      for (CommandProperty p : properties) {
-        builderProps.append(p.toCQLValue()).append(",");
-      }
-      builderProps.deleteCharAt(builderProps.length() - 1);
-      builderProps.append("]");
-
-      if (parameters.isEmpty()) {
-        return String.format("INSERT INTO semiot.commandresult " +
-                "(system_id, event_time, command_properties, command_type)" +
-                "VALUES ('%s', '%s', %s, '%s')",
-            systemId, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
-            builderProps.toString(), type);
-      } else {
-        StringBuilder builderParams = new StringBuilder("[");
-        for (Resource parameter : parameters.keySet()) {
-          builderParams.append("{").append("for_parameter:'").append(parameter.getURI())
-              .append("',value:'").append(parameters.get(parameter).asLiteral().getLexicalForm())
-              .append("'},");
-        }
-        builderParams.deleteCharAt(builderParams.length() - 1);
-        builderParams.append("]");
-
-        return String.format("INSERT INTO semiot.commandresult " +
-                "(system_id, event_time, command_properties, command_parameters, command_type)" +
-                "VALUES ('%s', '%s', %s, %s, '%s')",
-            systemId, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME), builderProps.toString(),
-            builderParams.toString(), type);
-      }
+    StringBuilder builderProps = new StringBuilder("[");
+    for (CommandProperty p : properties) {
+      builderProps.append(p.toCQLValue()).append(",");
     }
+    builderProps.deleteCharAt(builderProps.length() - 1);
+    builderProps.append("]");
+
+    StringBuilder builderParams = new StringBuilder("[");
+    for (Resource parameter : parameters.keySet()) {
+      builderParams.append("{").append("for_parameter:'").append(parameter.getURI())
+          .append("',value:'").append(parameters.get(parameter).asLiteral().getLexicalForm())
+          .append("'},");
+    }
+    builderParams.deleteCharAt(builderParams.length() - 1);
+    builderParams.append("]");
+
+    String commandProperties = properties.isEmpty() ? null : builderProps.toString();
+    String commandParameters = parameters.isEmpty() ? null : builderParams.toString();
+
+    return String.format(
+        "INSERT INTO semiot.commandresult " +
+            "(system_id, process_id, event_time, " +
+            "command_properties, command_parameters, command_type)" +
+            "VALUES ('%s', '%s', '%s', %s, %s, '%s')",
+        systemId, processId, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+        commandProperties, commandParameters, type);
   }
 
   public Model toRDF() {
     Model model = ModelFactory.createDefaultModel();
     Resource commandResult = ResourceFactory.createResource();
     Resource command = ResourceFactory.createResource();
-    Resource system = ResourceFactory.createResource(SENSOR_URI_PREFIX + systemId);
+    Resource system = ResourceFactory.createResource(SYSTEMS_URI_PREFIX + systemId);
+    Resource process = ResourceFactory.createResource(system.getURI()
+        + "/" + PROCESSES_PATH_URI + "/" + processId);
 
     model.add(commandResult, RDF.type, SEMIOT.CommandResult)
         .add(commandResult, SEMIOT.isResultOf, command)
         .add(commandResult, DUL.hasEventTime,
             eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-        .add(commandResult, DUL.involvesAgent, system);
+        .add(commandResult, DUL.hasParticipant, system);
 
     model.add(command, RDF.type, SEMIOT.Command)
         .add(command, RDF.type, ResourceFactory.createResource(type))
-        .add(command, DUL.involvesAgent, system);
+        .add(command, DUL.associatedWith, system)
+        .add(command, SEMIOT.forProcess, process);
 
     for (Resource parameter : parameters.keySet()) {
       Resource parameterResource = ResourceFactory.createResource();

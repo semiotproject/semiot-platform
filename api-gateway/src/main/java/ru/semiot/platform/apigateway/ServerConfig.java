@@ -33,7 +33,7 @@ public interface ServerConfig extends Config {
   @Key("services.wamp.public.path")
   String wampPublicPath();
 
-  @DefaultValue("ws")
+  @DefaultValue("wss")
   @Key("services.wamp.protocol.scheme")
   String wampProtocolScheme();
 

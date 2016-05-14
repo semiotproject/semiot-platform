@@ -64,5 +64,5 @@ public interface ServiceConfig extends Mutable {
 
   @DefaultValue("http://localhost/")
   @Key("ru.semiot.platform.domain")
-  String sensorsURIPrefix();
+  String rootUrl();
 }

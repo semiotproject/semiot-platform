@@ -47,12 +47,13 @@ public class TSDBClient {
           ");";
   private static final String CREATE_COMMANDRESULT_TABLE =
       "CREATE TABLE IF NOT EXISTS semiot.commandresult (" +
-          "  system_id text," +
-          "  event_time timestamp," +
-          "  command_type text," +
-          "  command_properties list<frozen <command_property>>," +
-          "  command_parameters list<frozen <command_parameter>>," +
-          "  PRIMARY KEY(system_id, event_time)" +
+          " system_id text," +
+          " process_id text," +
+          " event_time timestamp," +
+          " command_type text," +
+          " command_properties list<frozen <command_property>>," +
+          " command_parameters list<frozen <command_parameter>>," +
+          " PRIMARY KEY((system_id, process_id), event_time)" +
           ")" +
           "WITH CLUSTERING ORDER BY (event_time DESC);";
 

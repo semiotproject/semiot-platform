@@ -48,6 +48,10 @@ public class ContextProvider {
   public static final String SYSTEM_COMMANDRESULTS_COLLECTION = "SystemCommandResultsCollection";
   public static final String SYSTEM_COMMANDRESULTS_PARTIAL_COLLECTION =
       "SystemCommandResultsCollection-Partial";
+  public static final String PROCESS_SINGLE = "ProcessSingle";
+  public static final String PROCESS_COMMANDRESULTS_COLLECTION = "ProcessCommandResultsCollection";
+  public static final String PROCESS_COMMANDRESULTS_PARTIAL_COLLECTION =
+      "ProcessCommandResultsCollection-Partial";
 
   public static final String VAR_ROOT_URL = "${ROOT_URL}";
   public static final String VAR_SYSTEM_ID = "${SYSTEM_ID}";
@@ -55,6 +59,8 @@ public class ContextProvider {
   public static final String VAR_WAMP_URL = "${WAMP_URL}";
   public static final String VAR_QUERY_PARAMS = "${QUERY_PARAMS}";
   public static final String VAR_TOPIC_NAME = "${TOPIC_NAME}";
+  public static final String VAR_PROCESS_URI = "${PROCESS_URI}";
+  public static final String VAR_PROCESS_ID = "${PROCESS_ID}";
 
   public ContextProvider() {
   }
@@ -70,11 +76,14 @@ public class ContextProvider {
       loadModelAndFrame(SUBSYSTEM_SINGLE);
       loadModelAndFrame(SYSTEM_OBSERVATIONS_COLLECTION);
       loadModelAndFrame(SYSTEM_COMMANDRESULTS_COLLECTION);
+      loadModelAndFrame(PROCESS_SINGLE);
+      loadModelAndFrame(PROCESS_COMMANDRESULTS_COLLECTION);
 
       loadContext(COMMON_CONTEXT);
 
       loadFrame(SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION);
       loadFrame(SYSTEM_COMMANDRESULTS_PARTIAL_COLLECTION);
+      loadFrame(PROCESS_COMMANDRESULTS_PARTIAL_COLLECTION);
       loadFrame(COMMANDRESULT);
     } catch (IOException ex) {
       logger.error(ex.getMessage(), ex);

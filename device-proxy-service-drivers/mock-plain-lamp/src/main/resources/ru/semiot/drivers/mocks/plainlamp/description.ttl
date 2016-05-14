@@ -22,6 +22,7 @@
     dcterms:identifier "${ru.semiot.platform.device.id}-actuator"^^xsd:string ;
     .
 
-<${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.process_path}/light> a semiot:ActuationProcess, proto:Individual ;
+<${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.process_path}/light> a semiot:Process, semiot:ActuationProcess, proto:Individual ;
     proto:hasPrototype ws:PlainLamp-Shine ;
+    dcterms:identifier "light" ;
     .

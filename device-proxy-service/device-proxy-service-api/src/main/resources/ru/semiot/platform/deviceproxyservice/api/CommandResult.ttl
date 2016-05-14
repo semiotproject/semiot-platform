@@ -5,5 +5,5 @@
 [
     a semiot:CommandResult ;
     dul:hasEventTime "${ru.semiot.platform.commandresult.datetime}"^^xsd:dateTime ;
-    dul:involvesAgent <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
+    dul:hasParticipant <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
 ] .

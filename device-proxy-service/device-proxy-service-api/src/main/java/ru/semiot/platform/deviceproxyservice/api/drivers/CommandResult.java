@@ -45,6 +45,10 @@ public class CommandResult {
         dateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
   }
 
+  public Command getCommand() {
+    return command;
+  }
+
   public Model toRDFAsModel(Map<String, String> configuration) {
     StringReader readerCommandResult = new StringReader(TemplateUtils.resolve(
         COMMANDRESULT_TEMPLATE, properties, configuration));

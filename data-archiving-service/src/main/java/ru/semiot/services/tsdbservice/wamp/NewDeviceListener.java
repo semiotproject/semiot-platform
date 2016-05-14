@@ -138,8 +138,9 @@ public class NewDeviceListener implements Observer<String> {
               wampClient.subscribe(topicObsName, SubscriptionFlags.Prefix)
                   .subscribe(new ObservationListener(systemId)));
           //Subscribe to command results
-          wampClient.addSubscription(topicCommResName, wampClient.subscribe(topicCommResName)
-              .subscribe(new CommandResultListener()));
+          wampClient.addSubscription(topicCommResName,
+              wampClient.subscribe(topicCommResName, SubscriptionFlags.Prefix)
+                  .subscribe(new CommandResultListener()));
         } else {
           logger.debug("Topics {} and {} are already known", topicObsName, topicCommResName);
         }

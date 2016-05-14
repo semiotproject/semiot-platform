@@ -1,7 +1,9 @@
 package ru.semiot.platform.apigateway.rest;
 
+import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
 import static ru.semiot.commons.restapi.AsyncResponseHelper.resumeOnError;
 
+import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.ext.com.google.common.base.Strings;
@@ -9,8 +11,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -19,10 +19,13 @@ import ru.semiot.platform.apigateway.ServerConfig;
 import ru.semiot.platform.apigateway.beans.TSDBQueryService;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
 import ru.semiot.platform.apigateway.beans.impl.DeviceProxyService;
+import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
+import rx.exceptions.Exceptions;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,11 +33,14 @@ import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -42,59 +48,117 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-@Path("/systems/{system_id}/commandResults")
+@Path("/systems/{system_id}/processes/{process_id}")
 @Stateless
-public class SystemCommandResultsResource {
+public class ProcessResource {
 
-  private static final Logger logger = LoggerFactory.getLogger(SystemCommandResultsResource.class);
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
 
-  public SystemCommandResultsResource() {
-    super();
-  }
+  private static final String QUERY_DESCRIBE_PROCESS = "DESCRIBE <${PROCESS_URI}>";
+
+  private static final String VAR_PROCESS_URI = "${PROCESS_URI}";
 
   @Inject
   ContextProvider contextProvider;
   @Inject
-  TSDBQueryService tsdb;
-  @Inject
   DeviceProxyService dps;
+  @Inject
+  SPARQLQueryService metadata;
+  @Inject
+  TSDBQueryService tsdb;
   @Context
   UriInfo uriInfo;
 
   @GET
+  @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
+  public void getProcess(@Suspended AsyncResponse response) throws IOException {
+    URI requestUri = uriInfo.getRequestUri();
+    String rootUrl = URIUtils.extractRootURL(requestUri);
+    Model model = contextProvider.getRDFModel(ContextProvider.PROCESS_SINGLE,
+        MapBuilder.newMap()
+            .put(ContextProvider.VAR_ROOT_URL, rootUrl)
+            .put(ContextProvider.VAR_PROCESS_URI, requestUri.toASCIIString())
+            .build());
+    Object frame = contextProvider.getFrame(ContextProvider.PROCESS_SINGLE, rootUrl);
+    metadata.describe(QUERY_DESCRIBE_PROCESS.replace(VAR_PROCESS_URI, requestUri.toASCIIString()))
+        .map((Model rs) -> {
+          model.add(rs);
+          try {
+            if (!RDFUtils.listResourcesWithProperty(model, RDF.type, SEMIOT.Process).isEmpty()) {
+              return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
+            } else {
+              throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+          } catch (Throwable ex) {
+            throw Exceptions.propagate(ex);
+          }
+        }).subscribe(resume(response));
+  }
+
+  @POST
+  @Consumes({MediaType.APPLICATION_LD_JSON, MediaType.TEXT_TURTLE})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
+  public void executeCommand(@Suspended AsyncResponse response,
+      @PathParam("system_id") String systemId, Model command) {
+    try {
+      URI root = uriInfo.getRequestUri();
+      Map<String, Object> frame = contextProvider.getFrame(ContextProvider.COMMANDRESULT, root);
+
+      if (Strings.isNullOrEmpty(systemId)) {
+        response.resume(Response.status(Response.Status.NOT_FOUND).build());
+      }
+
+      if (command == null || command.isEmpty()) {
+        response.resume(Response.status(Response.Status.BAD_REQUEST).build());
+      } else {
+        dps.executeCommand(systemId, command).map((commandResult) -> {
+          try {
+            return Response.ok(ModelJsonLdUtils.toJsonLdCompact(commandResult, frame)).build();
+          } catch (JsonLdError | IOException ex) {
+            throw Exceptions.propagate(ex);
+          }
+        }).subscribe(resume(response));
+      }
+    } catch (Throwable ex) {
+      resumeOnError(response, ex);
+    }
+  }
+
+  @GET
+  @Path("/commandResults")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
   public void getCommandResults(@Suspended AsyncResponse response,
-      @PathParam("system_id") String systemId, @QueryParam("start") ZonedDateTime start,
-      @QueryParam("end") ZonedDateTime end) {
+      @PathParam("system_id") String systemId, @PathParam("process_id") String processId,
+      @QueryParam("start") ZonedDateTime start, @QueryParam("end") ZonedDateTime end) {
     URI root = uriInfo.getRequestUri();
     String rootURL = URIUtils.extractRootURL(root);
     Map params = MapBuilder.newMap()
         .put(ContextProvider.VAR_ROOT_URL, rootURL)
         .put(ContextProvider.VAR_WAMP_URL, UriBuilder
             .fromUri(rootURL + config.wampPublicPath())
-            .scheme(config.wampProtocolScheme()).build())
+            .scheme(config.wampProtocolScheme())
+            .build())
         .put(ContextProvider.VAR_SYSTEM_ID, systemId)
+        .put(ContextProvider.VAR_PROCESS_ID, processId)
         .build();
     if (Strings.isNullOrEmpty(systemId)) {
       response.resume(Response.status(Response.Status.NOT_FOUND).build());
     }
 
     if (start == null) {
-      tsdb.queryDateTimeOfLatestCommandResult(systemId, null).subscribe((dateTime) -> {
+      tsdb.queryDateTimeOfLatestCommandResult(systemId, processId).subscribe((dateTime) -> {
         if (dateTime != null) {
-          response.resume(Response.seeOther(
-              UriBuilder.fromUri(root)
-                  .queryParam("start", dateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-                  .build())
+          response.resume(Response.seeOther(UriBuilder.fromUri(root)
+              .queryParam("start", dateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+              .build())
               .build());
         } else {
           try {
             Map<String, Object> frame = contextProvider.getFrame(
-                ContextProvider.SYSTEM_COMMANDRESULTS_COLLECTION, rootURL);
+                ContextProvider.PROCESS_COMMANDRESULTS_COLLECTION, rootURL);
             params.put(ContextProvider.VAR_QUERY_PARAMS, "?noparams");
             Model model = contextProvider.getRDFModel(
-                ContextProvider.SYSTEM_COMMANDRESULTS_COLLECTION, params);
+                ContextProvider.PROCESS_COMMANDRESULTS_COLLECTION, params);
             Resource view = RDFUtils.subjectWithProperty(
                 model, RDF.type, Hydra.PartialCollectionView);
             model.removeAll(view, null, null);
@@ -114,11 +178,11 @@ public class SystemCommandResultsResource {
       params.put(ContextProvider.VAR_QUERY_PARAMS, queryParams);
 
       Model model = contextProvider.getRDFModel(
-          ContextProvider.SYSTEM_COMMANDRESULTS_COLLECTION, params);
-      tsdb.queryCommandResultsByRange(systemId, null, start, end).subscribe((result) -> {
+          ContextProvider.PROCESS_COMMANDRESULTS_COLLECTION, params);
+      tsdb.queryCommandResultsByRange(systemId, processId, start, end).subscribe((result) -> {
         try {
           Map<String, Object> frame = contextProvider.getFrame(
-              ContextProvider.SYSTEM_COMMANDRESULTS_PARTIAL_COLLECTION, rootURL);
+              ContextProvider.PROCESS_COMMANDRESULTS_PARTIAL_COLLECTION, rootURL);
           model.add(result);
           Resource collection = model.listSubjectsWithProperty(
               RDF.type, Hydra.PartialCollectionView).next();
@@ -135,4 +199,5 @@ public class SystemCommandResultsResource {
       }, resumeOnError(response));
     }
   }
+
 }

@@ -29,8 +29,7 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
       "https://raw.githubusercontent.com/semiotproject/semiot-platform/"
           + "release-1.0.7/device-proxy-service-drivers/mock-plain-lamp/"
           + "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#";
-  private static final String PROCESS_IDLE = PROTOTYPE_URI_PREFIX + "PlainLamp-Idle";
-  private static final String PROCESS_SHINE = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine";
+  private static final String PROCESS_LIGHT_ID = "light";
   private static final String PARAM_SHINE_LUMEN = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Lumen";
   private static final String PARAM_SHINE_COLOR = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Color";
   private static final String DRIVER_NAME = "Plain Lamp (Mock) Driver";
@@ -64,18 +63,18 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
         executor.scheduleAtFixedRate(() -> {
           try {
             PlainLamp l = lamps.get(lamp_id);
-            Command command = new Command(l.getId(), Command.TYPE_SWITCHPROCESSCOMMAND);
+            Command command;
 
             synchronized (l) {
               if (l.getIsOn()) {
                 l.setIsOn(false);
+                command = new Command(l.getId(), Command.TYPE_STOPCOMMAND, PROCESS_LIGHT_ID);
 
-                command.addProperty(Command.PROP_TARGETPROCESS, PROCESS_IDLE);
                 logger.debug("[ID={}] Switched off!", l.getId());
               } else {
                 l.setIsOn(true);
 
-                command.addProperty(Command.PROP_TARGETPROCESS, PROCESS_SHINE);
+                command = new Command(l.getId(), Command.TYPE_STARTCOMMAND, PROCESS_LIGHT_ID);
                 command.addParameter(PARAM_SHINE_LUMEN, 890);
                 command.addParameter(PARAM_SHINE_COLOR, 4000);
                 logger.debug("[ID={}] Switched on!", l.getId());
@@ -132,20 +131,26 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
       if (lamps.containsKey(command.getDeviceId())) {
         PlainLamp device = lamps.get(command.getDeviceId());
         String commandType = command.getCommandType();
+        String processId = command.getProcessId();
         synchronized (device) {
-          if (commandType.equals(Command.TYPE_SWITCHPROCESSCOMMAND)) {
-            String targetProcess = command.getPropertyValue(Command.PROP_TARGETPROCESS);
-            if (targetProcess.equals(PROCESS_IDLE)) {
+          if (processId.equals(PROCESS_LIGHT_ID)) {
+            if (commandType.equals(Command.TYPE_STOPCOMMAND)) {
               device.setIsOn(false);
 
-              logger.debug("[ID={}] Switched off!", device.getId());
-            } else if (targetProcess.equals(PROCESS_SHINE)) {
+              logger.debug("[ID={}] Turned off the light!", device.getId());
+            } else if (commandType.equals(Command.TYPE_STARTCOMMAND)) {
               device.setIsOn(true);
+              device.setLumen(command.getParameterAsInteger(PARAM_SHINE_LUMEN));
+              device.setKelvin(command.getParameterAsInteger(PARAM_SHINE_COLOR));
 
-              logger.debug("[ID={}] Switched on!", device.getId());
+              logger.debug("[ID={}] Turned on the light! Lumen: {}, Kelvin: {}",
+                  device.getId(), device.getLumen(), device.getKelvin());
+            } else {
+              throw CommandExecutionException.badCommand(
+                  "Command [%s] is not supported!", commandType);
             }
           } else {
-            throw CommandExecutionException.badCommand("Command is not supported!");
+            throw CommandExecutionException.badCommand("Process [%s] is not supported!", processId);
           }
         }
 
@@ -158,9 +163,11 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
         throw CommandExecutionException.systemNotFound();
       }
     } catch (Throwable e) {
-      logger.error(e.getMessage(), e);
-
-      return null;
+      if (e instanceof CommandExecutionException) {
+        throw e;
+      } else {
+        throw CommandExecutionException.badCommand();
+      }
     }
   }
 }

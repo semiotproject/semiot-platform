@@ -27,42 +27,51 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
 
-@Path("/commandresults")
+@Path("/commandResults")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_LD_JSON})
 public class CommandResults {
 
   private static final Logger logger = LoggerFactory.getLogger(CommandResults.class);
   private static final String GET_COMMANDRESULTS_BY_START =
       "SELECT * FROM semiot.commandresult WHERE " +
-          "system_id = '${SYSTEM_ID}' AND event_time >= '${START}';";
+          "system_id = '${SYSTEM_ID}' AND process_id = '${PROCESS_ID}' " +
+          "AND event_time >= '${START}';";
   private static final String GET_COMMANDRESULTS_BY_START_END =
       "SELECT * FROM semiot.commandresult WHERE " +
           "system_id = '${SYSTEM_ID}' " +
+          "AND process_id = '${PROCESS_ID}' " +
           "AND event_time >= '${START}' " +
           "AND event_time <= '${END}';";
   private static final String GET_LATEST_COMMANDRESULT =
       "SELECT * FROM semiot.commandresult WHERE " +
           "system_id = '${SYSTEM_ID}' " +
+          "AND process_id = '${PROCESS_ID}' " +
           "LIMIT 1";
+  private static final String VAR_SYSTEM_ID = "${SYSTEM_ID}";
+  private static final String VAR_PROCESS_ID = "${PROCESS_ID}";
+  private static final String VAR_START = "${START}";
+  private static final String VAR_END = "${END}";
 
   @GET
   public void getCommandResultsByRange(@Suspended AsyncResponse response,
-      @QueryParam("system_id") String systemId, @QueryParam("start") ZonedDateTime start,
-      @QueryParam("end") ZonedDateTime end) {
-    if (Strings.isNullOrEmpty(systemId) || start == null) {
+      @QueryParam("system_id") String systemId, @QueryParam("process_id") String processId,
+      @QueryParam("start") ZonedDateTime start, @QueryParam("end") ZonedDateTime end) {
+    if (Strings.isNullOrEmpty(systemId) || Strings.isNullOrEmpty(processId) || start == null) {
       response.resume(Response.status(Response.Status.BAD_REQUEST).build());
     }
 
     Observable<ResultSet> rs;
     if (end == null) {
       rs = TSDBClient.getInstance().executeAsync(GET_COMMANDRESULTS_BY_START
-          .replace("${SYSTEM_ID}", systemId)
-          .replace("${START}", start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+          .replace(VAR_SYSTEM_ID, systemId)
+          .replace(VAR_PROCESS_ID, processId)
+          .replace(VAR_START, start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     } else {
-      rs = TSDBClient.getInstance().executeAsync(GET_COMMANDRESULTS_BY_START
-          .replace("${SYSTEM_ID}", systemId)
-          .replace("${START}", start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
-          .replace("${END}", end.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+      rs = TSDBClient.getInstance().executeAsync(GET_COMMANDRESULTS_BY_START_END
+          .replace(VAR_SYSTEM_ID, systemId)
+          .replace(VAR_PROCESS_ID, processId)
+          .replace(VAR_START, start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+          .replace(VAR_END, end.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     }
 
     rs.map(new ResultSetToModel()).subscribe(responseModelOrError(response));
@@ -71,13 +80,15 @@ public class CommandResults {
   @GET
   @Path("/latest")
   public void getLatestCommandResult(@Suspended AsyncResponse response,
-      @QueryParam("system_id") String systemId) {
-    if (Strings.isNullOrEmpty(systemId)) {
-      response.resume(Response.status(Response.Status.NOT_FOUND).build());
+      @QueryParam("system_id") String systemId, @QueryParam("process_id") String processId) {
+    if (Strings.isNullOrEmpty(systemId) || Strings.isNullOrEmpty(processId)) {
+      response.resume(Response.status(Response.Status.BAD_REQUEST).build());
     }
 
-    TSDBClient.getInstance()
-        .executeAsync(GET_LATEST_COMMANDRESULT.replace("${SYSTEM_ID}", systemId))
+    TSDBClient.getInstance().executeAsync(
+        GET_LATEST_COMMANDRESULT
+            .replace(VAR_SYSTEM_ID, systemId)
+            .replace(VAR_PROCESS_ID, processId))
         .map(new ResultSetToModel())
         .subscribe(responseModelOrError(response));
   }
@@ -90,6 +101,7 @@ public class CommandResults {
       resultSet.forEach((row) -> {
         CommandResult commandResult = new CommandResult(
             row.getString("system_id"),
+            row.getString("process_id"),
             row.getTimestamp("event_time").toInstant().toString(),
             row.getString("command_type")
         );

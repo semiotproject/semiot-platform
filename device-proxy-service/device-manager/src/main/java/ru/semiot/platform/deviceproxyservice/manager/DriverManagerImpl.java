@@ -46,7 +46,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       FRAME_PATH_PREFIX + "CommandResult-frame.jsonld";
   private static final String SYSTEM_FRAME_PATH = FRAME_PATH_PREFIX + "System-frame.jsonld";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
-  private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults";
+  private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults.${PROCESS_ID}";
   private static final long TIMEOUT = 5000;
   private final Configuration configuration = new Configuration();
   private final Object observationFrame;
@@ -246,9 +246,11 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     try {
       Model model = result.toRDFAsModel(configuration);
       //TODO: There's no guarantee that WAMPClient is connected?
-      WAMPClient.getInstance()
-          .publish(TOPIC_COMMANDRESULT.replace("${SYSTEM_ID}", device.getId()),
-              JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, commandResultFrame)))
+      WAMPClient.getInstance().publish(
+          TOPIC_COMMANDRESULT
+              .replace("${SYSTEM_ID}", device.getId())
+              .replace("${PROCESS_ID}", result.getCommand().getProcessId()),
+          JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, commandResultFrame)))
           .subscribe(WAMPClient.onError());
     } catch (Throwable e) {
       logger.error(e.getMessage(), e);
@@ -284,9 +286,11 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
         throw CommandExecutionException.driverNotFound();
       }
     } catch (Throwable e) {
-      logger.error(e.getMessage(), e);
-
-      return null;
+      if (e instanceof CommandExecutionException) {
+        throw e;
+      } else {
+        throw CommandExecutionException.badCommand();
+      }
     }
   }
 

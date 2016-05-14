@@ -9,6 +9,9 @@ public class SEMIOT extends Namespace {
 
   public static final Resource Command = resource(URI, "Command");
   public static final Resource CommandResult = resource(URI, "CommandResult");
+  public static final Resource Process = resource(URI, "Process");
+  public static final Resource StartCommand = resource(URI, "StartCommand");
+  public static final Resource StopCommand = resource(URI, "StopCommand");
 
   public static final Property forProcess = property(URI, "forProcess");
   public static final Property forParameter = property(URI, "forParameter");

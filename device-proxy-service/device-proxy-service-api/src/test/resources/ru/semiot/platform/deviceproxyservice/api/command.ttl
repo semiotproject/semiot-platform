@@ -1,6 +1,6 @@
-[ a <http://w3id.org/semiot/ontologies/semiot#Command>, <http://w3id.org/semiot/ontologies/semiot#SwitchProcessCommand> ;
-    <http://w3id.org/semiot/ontologies/semiot#targetProcess> <https://example.com/prototype.ttl#PlainLamp-Idle> ;
-    <http://www.loa-cnr.it/ontologies/DUL.owl#involvesAgent> <http://localhost/systems/1231231231231230> ;
+[ a <http://w3id.org/semiot/ontologies/semiot#Command>, <http://w3id.org/semiot/ontologies/semiot#StartCommand> ;
+    <http://w3id.org/semiot/ontologies/semiot#forProcess> <https://example.com/prototype.ttl#PlainLamp-Idle> ;
+    <http://www.loa-cnr.it/ontologies/DUL.owl#associatedWith> <http://localhost/systems/1231231231231230> ;
     <http://www.loa-cnr.it/ontologies/DUL.owl#hasParameter> [
         a <http://w3id.org/semiot/ontologies/semiot#MappingParameter> ;
         <http://w3id.org/semiot/ontologies/semiot#forParameter> <https://example.com/prototype.ttl#LIFXWhite800-Shine-Lumen> ;

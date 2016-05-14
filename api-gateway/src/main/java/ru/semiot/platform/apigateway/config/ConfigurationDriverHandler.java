@@ -141,7 +141,7 @@ public class ConfigurationDriverHandler extends HttpServlet {
             .add(BundleConstants.WAMP_PASSWORD, pass)
             .build();
 
-        tsdb.sendSettingsAsPost(json).subscribe();
+        tsdb.submitConfiguration(json).subscribe();
 
         parameters.put(BundleConstants.WAMP_LOGIN, login);
         parameters.put(BundleConstants.WAMP_PASSWORD, pass);

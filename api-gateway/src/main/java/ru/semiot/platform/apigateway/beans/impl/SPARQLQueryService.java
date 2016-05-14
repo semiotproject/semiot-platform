@@ -25,6 +25,9 @@ import ru.semiot.platform.apigateway.ServerConfig;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
+import java.util.AbstractMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.ejb.Singleton;
 import javax.enterprise.concurrent.ManagedExecutorService;
@@ -79,6 +82,17 @@ public class SPARQLQueryService {
       o.onNext(model);
       o.onCompleted();
     }).subscribeOn(Schedulers.from(mes)).cast(Model.class);
+  }
+
+  public Observable<Map.Entry<Object, Model>> describe(Object key, String query) {
+    return Observable.<Map.Entry<Object, Model>>create(o -> {
+      Query describe = QueryFactory.create(PREFIXES + query);
+      Model model = QueryExecutionFactory.createServiceRequest(
+          config.sparqlEndpoint(), describe, httpAuthenticator).execDescribe();
+
+      o.onNext(new AbstractMap.SimpleImmutableEntry<>(key, model));
+      o.onCompleted();
+    }).subscribeOn(Schedulers.from(mes));
   }
 
 }

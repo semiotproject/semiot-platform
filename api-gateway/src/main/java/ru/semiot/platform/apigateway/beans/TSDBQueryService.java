@@ -12,22 +12,21 @@ import javax.ws.rs.core.Response;
 
 public interface TSDBQueryService {
 
-  public Observable<String> queryTimeOfLatestBySystemId(String systemId,
-                                                        List<String> sensorsId);
+  public Observable<String> queryDateTimeOfLatestObservation(String systemId,
+      List<String> sensorsId);
 
-  public Observable<Model> queryLatestBySystemId(String systemId,
-                                                 List<String> sensorsId);
+  public Observable<Model> queryLatestBySystemId(String systemId, List<String> sensorsId);
 
-  public Observable<Model> queryBySystemId(String systemId,
-                                           List<String> sensorsId, String start, String end);
+  public Observable<Model> queryObservationsByRange(String systemId, List<String> sensorsId,
+      String start, String end);
 
   public Observable<Response> remove(JsonArray array);
 
-  public Observable<ZonedDateTime> queryDateTimeOfLatestCommandResult(
-      String systemId);
+  public Observable<ZonedDateTime> queryDateTimeOfLatestCommandResult(String systemId,
+      String processId);
 
-  public Observable<Model> queryCommandResultsByRange(String systemId,
-                                                  ZonedDateTime start, ZonedDateTime end);
+  public Observable<Model> queryCommandResultsByRange(String systemId, String processId,
+      ZonedDateTime start, ZonedDateTime end);
 
-  public Observable<Response> sendSettingsAsPost(JsonObject json);
+  public Observable<Response> submitConfiguration(JsonObject json);
 }
