@@ -10,7 +10,7 @@ export default function(CONFIG, $http, $q, WAMP) {
 
     function extractSystemFromAPIMessage(msg, index = -1) {
         return {
-            index,
+            index: index + 1,
             uri: msg['@id'],
             id: msg['dcterms:identifier'],
             name: extractSystemNameFromAPIMessage(msg)
