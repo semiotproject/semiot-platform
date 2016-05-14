@@ -2,7 +2,7 @@ FROM fedora:23
 
 MAINTAINER Shilin Ivan <proniment@gmail.com>
 
-ENV FUSEKI_ARCHIVE_NAME apache-jena-fuseki-2.3.0
+ENV FUSEKI_ARCHIVE_NAME apache-jena-fuseki-2.3.1
 ENV FUSEKI_HOME /fuseki
 ENV FUSEKI_BASE /fuseki/base
 
@@ -13,7 +13,7 @@ RUN dnf install -y java-1.8.0-openjdk-headless nss-3.23.0 wget unzip which && dn
 RUN mkdir -p $FUSEKI_BASE
 WORKDIR $FUSEKI_HOME
 
-RUN wget http://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-2.3.0.zip
+RUN wget http://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-2.3.1.zip
 RUN unzip $FUSEKI_ARCHIVE_NAME.zip && rm $FUSEKI_ARCHIVE_NAME.zip
 RUN mv $FUSEKI_ARCHIVE_NAME/* . && rm -rf $FUSEKI_ARCHIVE_NAME
 ADD shiro.ini $FUSEKI_BASE/
