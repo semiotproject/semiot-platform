@@ -29,7 +29,7 @@ export default function($scope, systemAPI) {
 
     $scope.handleNewSystem = (system) => {
         console.info('new system registered: ', system);
-        system.index = $scope.totalSystems.length;
+        system.index = $scope.totalSystems.length + 1;
         $scope.totalSystems.push(system);
         $scope.setPagination();
 
