@@ -20,6 +20,12 @@ export default function(CONFIG, commonUtils) {
         }
     };
 
+    Highcharts.setOptions({
+        global: {
+            timezoneOffset: (new Date()).getTimezoneOffset()
+        }
+    });
+
     // store pair `uri`: { ... }
     let STATE_MAP = {};
 
@@ -29,8 +35,7 @@ export default function(CONFIG, commonUtils) {
                 options: $.extend({}, baseChartConfig.options, {
                     chart: {
                         type: "spline"
-                    },
-                    timezoneOffset: 3 * 60
+                    }
                 }),
                 title: {
                     text: title
@@ -234,7 +239,7 @@ export default function(CONFIG, commonUtils) {
             try {
                 return data['hydra:member'].map((m) => {
                     return [
-                        moment(m['ssn:observationResultTime']).toDate().getTime(),
+                        (new Date(m['ssn:observationResultTime'])).getTime(),
                         parseFloat(m['ssn:observationResult']['ssn:hasValue']['qudt:quantityValue'])
                     ];
                 }).sort((a, b) => {

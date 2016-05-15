@@ -13,11 +13,11 @@ export default function(CONFIG, $http, $q, WAMP) {
 
     return {
         loadObservations(observationsURI, range) {
-            console.info(`loading observations of ${observationsURI} from ${moment(range[0]).format('YYYY-MM-DDTHH:mm:ss')} to ${moment(range[1]).format('YYYY-MM-DDTHH:mm:ss')}`);
+            console.info(`loading observations of ${observationsURI} from ${moment(range[0]).format('YYYY-MM-DDTHH:mm:ssZ')} to ${moment(range[1]).format('YYYY-MM-DDTHH:mm:ss')}`);
             const defer = $q.defer();
 
-            const start = moment(range[0]).format('YYYY-MM-DDTHH:mm:ss');
-            const end = moment(range[1]).format('YYYY-MM-DDTHH:mm:ss');
+            const start = encodeURIComponent(moment(range[0]).format('YYYY-MM-DDTHH:mm:ssZ'));
+            const end = encodeURIComponent(moment(range[1]).format('YYYY-MM-DDTHH:mm:ssZ'));
 
             $http({
                 url: `${observationsURI}&start=${start}&end=${end}`,
@@ -41,6 +41,7 @@ export default function(CONFIG, $http, $q, WAMP) {
             return defer.promise;
         },
         loadWAMPTopic(observationsURI) {
+            console.info(`loading WAMP topic from oobservationsURI ${observationsURI}`);
             const defer = $q.defer();
 
             $http({
