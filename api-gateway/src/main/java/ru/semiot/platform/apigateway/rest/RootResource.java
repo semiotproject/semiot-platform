@@ -156,71 +156,10 @@ public class RootResource {
         .map((ResultSet rs) ->
             defineResourceIndividual(apiDoc, rootURL, LINK_SYSTEMS, rs, SSN.System));
 
-    Observable supportedProperty = systems.map((prototypes) -> {
-      List<Observable<ResultSet>> obs = new ArrayList<>();
-      prototypes.stream().forEach((prototype) -> obs.add(query.select(
-          QUERY_INDIVIDUAL_PROPERTIES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+    Observable supportedProperties = addSupportedProperties(apiDoc, rootURL, systems);
+    Observable supportedProcesses = addSupportedProcesses(apiDoc, rootURL, systems);
 
-      return Observable.merge(obs).toBlocking().toIterable();
-    }).map((Iterable<ResultSet> iter) -> {
-      iter.forEach((ResultSet rs) -> {
-        while (rs.hasNext()) {
-          QuerySolution qs = rs.next();
-          Resource prototype = qs.getResource(VAR_PROTOTYPE);
-          Resource prototypeResource = ResourceUtils.createResourceFromClass(
-              rootURL, prototype.getLocalName());
-          Resource property = ResourceFactory.createResource();
-          apiDoc.add(prototypeResource, Hydra.supportedProperty, property)
-              .add(property, Hydra.property,
-                  ResourceFactory.createProperty(qs.getResource(VAR_PROPERTY).getURI()));
-        }
-      });
-      return apiDoc;
-    });
-
-    Observable supportedProcess = systems.map((prototypes) -> {
-      List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
-      prototypes.stream().forEach((prototype) -> obs.add(query.describe(
-          ResourceUtils.createResourceFromClass(rootURL, prototype.getLocalName()),
-          QUERY_DESCRIBE_SUPPORTED_PROCESSES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
-
-      return Observable.merge(obs).toBlocking().toIterable();
-    }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
-      List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
-      iter.forEach((Map.Entry<Object, Model> rs) -> {
-        Resource prototypeResource = (Resource) rs.getKey();
-        Model model = rs.getValue();
-        Resource process = model.listSubjectsWithProperty(Proto.hasPrototype).next();
-        model.add(prototypeResource, SEMIOT.supportedProcess, process);
-
-        apiDoc.add(model);
-
-        obs.add(query.describe(
-            process, QUERY_DESCRIBE_COMMANDS.replace(VAR_PROCESS_URI, process.getURI())));
-      });
-      return Observable.merge(obs).toBlocking().toIterable();
-    }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
-      iter.forEach((Map.Entry<Object, Model> rs) -> {
-        Resource process = (Resource) rs.getKey();
-        Model model = rs.getValue();
-        Resource operation = ResourceFactory.createResource();
-        model.add(process, Hydra.supportedOperation, operation)
-            .add(operation, RDF.type, Hydra.Operation)
-            .add(operation, Hydra.method, "POST")
-            .add(operation, Hydra.returns, SEMIOT.CommandResult);
-
-        ResIterator commandIter = model.listSubjectsWithProperty(RDF.type, SEMIOT.Command);
-        while (commandIter.hasNext()) {
-          Resource command = commandIter.next();
-          model.add(operation, Hydra.expects, command);
-        }
-
-        apiDoc.add(model);
-      });
-      return apiDoc;
-    });
-
-    Observable.zip(supportedProperty, supportedProcess, (a, b) -> {
+    Observable.zip(supportedProperties, supportedProcesses, (a, b) -> {
       try {
         return JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(apiDoc, frame));
       } catch (JsonLdError | IOException e) {
@@ -268,8 +207,83 @@ public class RootResource {
     return resultPrototypes;
   }
 
+  private Observable addSupportedProperties(Model model, String rootUrl,
+      Observable<List<Resource>> observable) {
+    return observable.map((prototypes) -> {
+      List<Observable<ResultSet>> obs = new ArrayList<>();
+      prototypes.stream().forEach((prototype) -> obs.add(query.select(
+          QUERY_INDIVIDUAL_PROPERTIES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+
+      return Observable.merge(obs).toBlocking().toIterable();
+    }).map((Iterable<ResultSet> iter) -> {
+      iter.forEach((ResultSet rs) -> {
+        while (rs.hasNext()) {
+          QuerySolution qs = rs.next();
+          Resource prototype = qs.getResource(VAR_PROTOTYPE);
+          Resource prototypeResource = ResourceUtils.createResourceFromClass(
+              rootUrl, prototype.getLocalName());
+          Resource property = ResourceFactory.createResource();
+          model.add(prototypeResource, Hydra.supportedProperty, property)
+              .add(property, Hydra.property,
+                  ResourceFactory.createProperty(qs.getResource(VAR_PROPERTY).getURI()));
+        }
+      });
+      return model;
+    });
+  }
+
+  private Observable addSupportedProcesses(Model model, String rootUrl,
+      Observable<List<Resource>> observable) {
+    return observable.map((prototypes) -> {
+      List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
+      prototypes.stream().forEach((prototype) -> obs.add(query.describe(
+          ResourceUtils.createResourceFromClass(rootUrl, prototype.getLocalName()),
+          QUERY_DESCRIBE_SUPPORTED_PROCESSES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+
+      return Observable.merge(obs).toBlocking().toIterable();
+    }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
+      List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
+      iter.forEach((Map.Entry<Object, Model> rs) -> {
+        Resource prototypeResource = (Resource) rs.getKey();
+        Model value = rs.getValue();
+        if (!value.isEmpty()) {
+          logger.debug("Is not empty!");
+          Resource process = value.listSubjectsWithProperty(Proto.hasPrototype).next();
+          value.add(prototypeResource, SEMIOT.supportedProcess, process);
+
+          model.add(value);
+
+          obs.add(query.describe(
+              process, QUERY_DESCRIBE_COMMANDS.replace(VAR_PROCESS_URI, process.getURI())));
+        }
+      });
+      return Observable.merge(obs).toBlocking().toIterable();
+    }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
+      iter.forEach((Map.Entry<Object, Model> rs) -> {
+        logger.debug("found commands!");
+        Resource process = (Resource) rs.getKey();
+        Model value = rs.getValue();
+        Resource operation = ResourceFactory.createResource();
+        value.add(process, Hydra.supportedOperation, operation)
+            .add(operation, RDF.type, Hydra.Operation)
+            .add(operation, Hydra.method, "POST")
+            .add(operation, Hydra.returns, SEMIOT.CommandResult);
+
+        ResIterator commandIter = value.listSubjectsWithProperty(RDF.type, SEMIOT.Command);
+        while (commandIter.hasNext()) {
+          Resource command = commandIter.next();
+          value.add(operation, Hydra.expects, command);
+        }
+
+        model.add(value);
+      });
+      return model;
+    });
+  }
+
   @GET
   @Path("/logout")
+  //TODO: Move somewhere else
   public void getContext(@Context HttpServletRequest req, @Context HttpServletResponse resp)
       throws Exception {
     resp.setHeader("Cache-Control", "no-cache, no-store");
@@ -285,6 +299,7 @@ public class RootResource {
   @GET
   @Path("/user")
   @Produces(MediaType.APPLICATION_JSON)
+  //TODO: Move somewhere else
   public void getUserData(@Context HttpServletRequest req, @Context HttpServletResponse resp)
       throws Exception {
     Credentials c = db.getUser(req.getRemoteUser());

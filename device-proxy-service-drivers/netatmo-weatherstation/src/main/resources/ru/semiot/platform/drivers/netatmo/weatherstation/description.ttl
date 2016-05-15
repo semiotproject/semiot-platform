@@ -28,11 +28,13 @@
 <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature>
     a ssn:SensingDevice, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-TemperatureSensor ;
+    semiot:isSubSystemOf <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
     dcterms:identifier "${ru.semiot.platform.device.id}-temperature"^^xsd:string ;
     .
 
 <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-humidity>
     a ssn:SensingDevice, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-HumiditySensor ;
+    semiot:isSubSystemOf <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
     dcterms:identifier "${ru.semiot.platform.device.id}-humidity"^^xsd:string ;
     .
