@@ -1,5 +1,5 @@
 wamprouter:
-  image: docker.semiot.ru/wamp-router
+  image: semiot/wamp-router:v1.0.6
   links:
     - mysqlbase
   ports:
@@ -7,7 +7,7 @@ wamprouter:
   restart: always
 
 dataarchivingservice:
-  image: docker.semiot.ru/data-archiving-service
+  image: semiot/data-archiving-service:v1.0.6
   links:
     - tsdb
     - wamprouter
@@ -28,7 +28,7 @@ tsdb:
   restart: always
 
 deviceproxyservice:
-  image: docker.semiot.ru/device-proxy-service
+  image: semiot/device-proxy-service:v1.0.6
   links:
     - wamprouter
     - fuseki
@@ -41,7 +41,7 @@ deviceproxyservice:
   restart: always
 
 fuseki:
-  image: docker.semiot.ru/fuseki
+  image: semiot/fuseki:v1.0.6
   ports:
     - "3030:3030"
   volumes:
@@ -50,7 +50,7 @@ fuseki:
   restart: always
 
 apigateway:
-  image: docker.semiot.ru/api-gateway
+  image: semiot/api-gateway:v1.0.6
   links:
     - wamprouter
     - deviceproxyservice
@@ -65,7 +65,7 @@ apigateway:
   restart: always
 
 frontend:
-  image: docker.semiot.ru/frontend
+  image: semiot/frontend:v1.0.6
   links:
     - wamprouter
     - deviceproxyservice
@@ -75,7 +75,7 @@ frontend:
   restart: always
 
 mysqlbase:
-  image: docker.semiot.ru/mysql
+  image: semiot/mysql:v1.0.6
   ports:
     - "3306:3306"
   restart: always
