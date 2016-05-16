@@ -36,7 +36,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private final DriverInformation info = new DriverInformation(
             Keys.DRIVER_PID,
             URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/" +
-                    "master/device-proxy-service-drivers/netatmo-weatherstation/" +
+                    "release-1.0.7/device-proxy-service-drivers/netatmo-weatherstation/" +
                     "src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#" +
                     "NetatmoWeatherStationOutdoorModule"));
 

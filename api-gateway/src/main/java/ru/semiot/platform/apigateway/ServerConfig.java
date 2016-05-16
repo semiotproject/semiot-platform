@@ -33,7 +33,7 @@ public interface ServerConfig extends Config {
   @Key("services.wamp.public.path")
   String wampPublicPath();
 
-  @DefaultValue("ws")
+  @DefaultValue("wss")
   @Key("services.wamp.protocol.scheme")
   String wampProtocolScheme();
 
@@ -41,13 +41,13 @@ public interface ServerConfig extends Config {
   @DefaultValue("http://dataarchivingservice:8787")
   String tsdbEndpoint();
 
-  @Key("services.tsdb.actuators.path")
-  @DefaultValue("/actuations")
-  String tsdbActuatorsPath();
+  @Key("services.tsdb.commandResults.path")
+  @DefaultValue("/commandResults")
+  String tsdbCommandResultsPath();
 
-  @Key("services.tsdb.actuators.latest.path")
-  @DefaultValue("/actuations/latest")
-  String tsdbActuatorsLatestPath();
+  @Key("services.tsdb.commandResults.latest.path")
+  @DefaultValue("/commandResults/latest")
+  String tsdbCommandResultsLatestPath();
 
   @DefaultValue("http://deviceproxyservice:8181")
   @Key("services.deviceproxy.url")

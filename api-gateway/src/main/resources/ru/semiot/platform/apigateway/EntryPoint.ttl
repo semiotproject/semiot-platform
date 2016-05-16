@@ -1,5 +1,4 @@
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
 <${ROOT_URL}/> a apidoc:EntryPoint ;
-    apidoc:EntryPoint-Systems <${ROOT_URL}/systems> ;
-    apidoc:EntryPoint-Sensors <${ROOT_URL}/sensors> .
+    apidoc:systems <${ROOT_URL}/systems> .

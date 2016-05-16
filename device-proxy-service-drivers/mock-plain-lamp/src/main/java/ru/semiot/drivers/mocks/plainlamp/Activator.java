@@ -5,7 +5,7 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ManagedService;
-import ru.semiot.platform.deviceproxyservice.api.drivers.ActuatingDeviceDriver;
+import ru.semiot.platform.deviceproxyservice.api.drivers.ControllableDeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 
@@ -23,7 +23,7 @@ public class Activator extends DependencyActivatorBase {
 
     manager.add(createComponent()
         .setInterface(new String[]{
-                ActuatingDeviceDriver.class.getName(),
+                ControllableDeviceDriver.class.getName(),
                 DeviceDriver.class.getName(),
                 ManagedService.class.getName()},
             properties)

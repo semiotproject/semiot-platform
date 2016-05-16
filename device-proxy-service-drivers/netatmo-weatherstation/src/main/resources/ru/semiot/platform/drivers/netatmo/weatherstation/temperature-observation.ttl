@@ -6,15 +6,14 @@
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
 @prefix : <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}/observations/temperature#> .
 
-:${ru.semiot.platform.observation.timestamp} a ssn:Observation ;
+[ a ssn:Observation ;
     ssn:observedProperty qudt-quantity:ThermodynamicTemperature ;
     ssn:observedBy <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature> ;
     ssn:observationResultTime "${ru.semiot.platform.observation.datetime}"^^xsd:dateTime ;
-    ssn:observationResult :${ru.semiot.platform.observation.timestamp}-result .
-
-:${ru.semiot.platform.observation.timestamp}-result a ssn:SensorOutput ;
-    ssn:isProducedBy <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature> ;
-    ssn:hasValue :${ru.semiot.platform.observation.timestamp}-resultvalue .
-
-:${ru.semiot.platform.observation.timestamp}-resultvalue a qudt:QuantityValue ;
-    qudt:quantityValue "${ru.semiot.drivers.netatmo.observation.value}"^^xsd:double .
+    ssn:observationResult [ a ssn:SensorOutput ;
+        ssn:isProducedBy <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature> ;
+        ssn:hasValue [ a qudt:QuantityValue ;
+            qudt:quantityValue "${ru.semiot.drivers.netatmo.observation.value}"^^xsd:double ;
+        ] ;
+    ] ;
+] .

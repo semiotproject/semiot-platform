@@ -1,0 +1,45 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
+@prefix hydra: <http://www.w3.org/ns/hydra/core#> .
+@prefix hydra-pubsub: <http://w3id.org/semiot/ontologies/hydra-pubsub#> .
+@prefix hydra-filter: <http://w3id.org/semiot/ontologies/hydra-filter#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
+@prefix apidoc: <${ROOT_URL}/doc#> .
+
+<${ROOT_URL}/systems/${SYSTEM_ID}/commandResults${QUERY_PARAMS}> a hydra:PartialCollectionView, void:Dataset ;
+    hydra-filter:viewOf <${ROOT_URL}/systems/${SYSTEM_ID}/commandResults> ;
+.
+
+<${ROOT_URL}/systems/${SYSTEM_ID}/commandResults> a hydra:Collection, void:Dataset ;
+    void:classPartition [ void:class semiot:CommandResult ] ;
+    hydra:operation [
+        a hydra-pubsub:SubscribeOperation ;
+        hydra-pubsub:publishes semiot:CommandResult ;
+        hydra-pubsub:protocol hydra-pubsub:WAMP ;
+        hydra-pubsub:endpoint "${WAMP_URL}"^^xsd:anyURI ;
+        hydra-pubsub:topic "${SYSTEM_ID}.commandresults"^^xsd:string
+    ] ;
+    hydra-filter:viewTemplate [
+        a   hydra-filter:ViewTemplate ;
+        hydra:template "/systems/${SYSTEM_ID}/commandResults{?start,end}" ;
+        hydra:mapping [
+            a hydra-filter:DirectMapping ;
+            hydra:variable "start" ;
+            hydra:property "dul:hasEventTime" ;
+            hydra-filter:comparator "hydra-filter:greaterOrEquals" ;
+            hydra:required "true"^^xsd:boolean
+        ] ;
+        hydra:mapping [
+            a hydra-filter:DirectMapping ;
+            hydra:variable "end" ;
+            hydra:property "dul:hasEventTime" ;
+            hydra-filter:comparator "hydra-filter:lessOrEquals" ;
+            hydra:required "false"^^xsd:boolean
+        ]
+    ] ;
+.

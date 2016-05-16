@@ -28,6 +28,6 @@
   },
   "@type": "hydra:Collection",
   "hydra:member": {
-    "@type": "semiot:Actuation"
+    "@type": "semiot:CommandResult"
   }
 }

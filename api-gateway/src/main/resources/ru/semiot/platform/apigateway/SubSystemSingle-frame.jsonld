@@ -18,6 +18,7 @@
         "ssn:forProperty": {"@type": "@id"},
         "ssn:observes": {"@type": "@id"},
         "ssn:hasSubSystem": {"@type": "@id"},
-        "proto:hasPrototype": {"@type": "@id"}
+        "proto:hasPrototype": {"@type": "@id"},
+        "apidoc:observations": {"@type": "@id"}
     }
 }

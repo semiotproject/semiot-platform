@@ -38,15 +38,20 @@ public class ContextProvider {
   public static final String COMMON_CONTEXT = "CommonContext";
   public static final String API_DOCUMENTATION = "ApiDocumentation";
   public static final String ENTRYPOINT = "EntryPoint";
-  public static final String ACTUATION = "Actuation";
+  public static final String COMMANDRESULT = "CommandResult";
   public static final String SYSTEM_COLLECTION = "SystemCollection";
   public static final String SYSTEM_SINGLE = "SystemSingle";
   public static final String SENSOR_COLLECTION = "SensorCollection";
   public static final String SUBSYSTEM_SINGLE = "SubSystemSingle";
   public static final String SYSTEM_OBSERVATIONS_COLLECTION = "SystemObservationsCollection";
   public static final String SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION = "SystemObservationsCollection-Partial";
-  public static final String SYSTEM_ACTUATIONS_COLLECTION = "SystemActuationsCollection";
-  public static final String SYSTEM_ACTUATIONS_PARTIAL_COLLECTION = "SystemActuationsCollection-Partial";
+  public static final String SYSTEM_COMMANDRESULTS_COLLECTION = "SystemCommandResultsCollection";
+  public static final String SYSTEM_COMMANDRESULTS_PARTIAL_COLLECTION =
+      "SystemCommandResultsCollection-Partial";
+  public static final String PROCESS_SINGLE = "ProcessSingle";
+  public static final String PROCESS_COMMANDRESULTS_COLLECTION = "ProcessCommandResultsCollection";
+  public static final String PROCESS_COMMANDRESULTS_PARTIAL_COLLECTION =
+      "ProcessCommandResultsCollection-Partial";
 
   public static final String VAR_ROOT_URL = "${ROOT_URL}";
   public static final String VAR_SYSTEM_ID = "${SYSTEM_ID}";
@@ -54,6 +59,8 @@ public class ContextProvider {
   public static final String VAR_WAMP_URL = "${WAMP_URL}";
   public static final String VAR_QUERY_PARAMS = "${QUERY_PARAMS}";
   public static final String VAR_TOPIC_NAME = "${TOPIC_NAME}";
+  public static final String VAR_PROCESS_URI = "${PROCESS_URI}";
+  public static final String VAR_PROCESS_ID = "${PROCESS_ID}";
 
   public ContextProvider() {
   }
@@ -68,13 +75,16 @@ public class ContextProvider {
       loadModelAndFrame(SENSOR_COLLECTION);
       loadModelAndFrame(SUBSYSTEM_SINGLE);
       loadModelAndFrame(SYSTEM_OBSERVATIONS_COLLECTION);
-      loadModelAndFrame(SYSTEM_ACTUATIONS_COLLECTION);
+      loadModelAndFrame(SYSTEM_COMMANDRESULTS_COLLECTION);
+      loadModelAndFrame(PROCESS_SINGLE);
+      loadModelAndFrame(PROCESS_COMMANDRESULTS_COLLECTION);
 
       loadContext(COMMON_CONTEXT);
 
       loadFrame(SYSTEM_OBSERVATIONS_PARTIAL_COLLECTION);
-      loadFrame(SYSTEM_ACTUATIONS_PARTIAL_COLLECTION);
-      loadFrame(ACTUATION);
+      loadFrame(SYSTEM_COMMANDRESULTS_PARTIAL_COLLECTION);
+      loadFrame(PROCESS_COMMANDRESULTS_PARTIAL_COLLECTION);
+      loadFrame(COMMANDRESULT);
     } catch (IOException ex) {
       logger.error(ex.getMessage(), ex);
     }

@@ -48,8 +48,7 @@ public abstract class Observation {
     return TemplateUtils.resolve(getRDFTemplate(), properties);
   }
 
-  public Model toObservationAsModel(Map<String, String> properties,
-      Configuration configuration) {
+  public Model toObservationAsModel(Map<String, String> properties, Configuration configuration) {
     StringReader descr = new StringReader(
         TemplateUtils.resolve(toTurtleString(), properties, configuration));
 

@@ -1,19 +1,14 @@
 package ru.semiot.drivers.mocks.plainlamp;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Resource;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.commons.namespaces.DUL;
-import ru.semiot.commons.namespaces.NamespaceUtils;
-import ru.semiot.commons.namespaces.SEMIOT;
-import ru.semiot.platform.deviceproxyservice.api.drivers.ActuatingDeviceDriver;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Command;
 import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionException;
-import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionResult;
+import ru.semiot.platform.deviceproxyservice.api.drivers.CommandResult;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
+import ru.semiot.platform.deviceproxyservice.api.drivers.ControllableDeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
@@ -22,20 +17,30 @@ import java.time.ZonedDateTime;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
+public class PlainLampDriver implements ControllableDeviceDriver, ManagedService {
 
-  private static final Logger logger = LoggerFactory.getLogger(
-      PlainLampDriver.class);
+  private static final Logger logger = LoggerFactory.getLogger(PlainLampDriver.class);
+  private static final String PROTOTYPE_URI_PREFIX =
+      "https://raw.githubusercontent.com/semiotproject/semiot-platform/"
+          + "release-1.0.7/device-proxy-service-drivers/mock-plain-lamp/"
+          + "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#";
+  private static final String PROCESS_LIGHT_ID = "light";
+  private static final String PARAM_SHINE_LUMEN = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Lumen";
+  private static final String PARAM_SHINE_COLOR = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Color";
   private static final String DRIVER_NAME = "Plain Lamp (Mock) Driver";
   private static final String DEVICE_ID_PREFIX = "123123123123123";
+
   private final Configuration configuration = new Configuration();
-  private final DriverInformation info = new DriverInformation(
-      Activator.DRIVER_PID,
-      URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/" +
-          "master/device-proxy-service-drivers/mock-plain-lamp/" +
-          "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#PlainLamp"));
-  private Map<String, PlainLamp> devices = new HashMap<>();
+  private final DriverInformation info =
+      new DriverInformation(Activator.DRIVER_PID, URI.create(PROTOTYPE_URI_PREFIX + "PlainLamp"));
+  private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+  private Map<String, PlainLamp> lamps = new HashMap<>();
 
   private volatile DeviceDriverManager manager;
 
@@ -45,13 +50,42 @@ public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
 
       logger.info("{} started!", DRIVER_NAME);
 
-      Thread.sleep(10000);
+      Random random = new Random();
+      int switchOnOffInterval = configuration.getAsInteger(ConfigurationKeys.SWITCH_ONOFF_INTERVAL);
 
-      for (int i = 0; i < configuration.getAsInteger(
-          ConfigurationKeys.NUMBER_OF_LAMPS); i++) {
+      for (int i = 0; i < configuration.getAsInteger(ConfigurationKeys.NUMBER_OF_LAMPS); i++) {
         PlainLamp lamp = new PlainLamp(DEVICE_ID_PREFIX + i);
-        devices.put(lamp.getId(), lamp);
+        String lamp_id = lamp.getId();
+        lamps.put(lamp_id, lamp);
+
         manager.registerDevice(info, lamp);
+
+        executor.scheduleAtFixedRate(() -> {
+          try {
+            PlainLamp l = lamps.get(lamp_id);
+            Command command;
+
+            synchronized (l) {
+              if (l.getIsOn()) {
+                l.setIsOn(false);
+                command = new Command(l.getId(), Command.TYPE_STOPCOMMAND, PROCESS_LIGHT_ID);
+
+                logger.debug("[ID={}] Switched off!", l.getId());
+              } else {
+                l.setIsOn(true);
+
+                command = new Command(l.getId(), Command.TYPE_STARTCOMMAND, PROCESS_LIGHT_ID);
+                command.addParameter(PARAM_SHINE_LUMEN, 890);
+                command.addParameter(PARAM_SHINE_COLOR, 4000);
+                logger.debug("[ID={}] Switched on!", l.getId());
+              }
+            }
+
+            manager.registerCommand(l, new CommandResult(command, ZonedDateTime.now()));
+          } catch (Throwable e) {
+            logger.error(e.getMessage(), e);
+          }
+        }, random.nextInt(switchOnOffInterval), switchOnOffInterval, TimeUnit.SECONDS);
       }
     } catch (Throwable e) {
       logger.error(e.getMessage(), e);
@@ -59,7 +93,17 @@ public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
   }
 
   public void stop() {
-    devices.clear();
+    lamps.clear();
+
+    try {
+      executor.shutdown();
+      executor.awaitTermination(10, TimeUnit.SECONDS);
+      if (!executor.shutdownNow().isEmpty()) {
+        logger.warn("Some scheduled tasks were not shutdown!");
+      }
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
 
     logger.info("{} stopped!", DRIVER_NAME);
   }
@@ -82,50 +126,48 @@ public class PlainLampDriver implements ActuatingDeviceDriver, ManagedService {
     return DRIVER_NAME;
   }
 
-  public CommandExecutionResult executeCommand(Model command)
-      throws CommandExecutionException {
-    logger.debug("executeCommand");
-    //Algorithm:
-    // 1. Check whether the command is supported
-    // 1. Get the device id
-    // 1. Run the command against the given device id
-    // 1. Notify others about success or failure
-
+  public CommandResult executeCommand(Command command) throws CommandExecutionException {
     try {
-      NodeIterator deviceIterator = command.listObjectsOfProperty(DUL.involvesAgent);
-      NodeIterator operationIterator = command.listObjectsOfProperty(SEMIOT.targetOperation);
+      if (lamps.containsKey(command.getDeviceId())) {
+        PlainLamp device = lamps.get(command.getDeviceId());
+        String commandType = command.getCommandType();
+        String processId = command.getProcessId();
+        synchronized (device) {
+          if (processId.equals(PROCESS_LIGHT_ID)) {
+            if (commandType.equals(Command.TYPE_STOPCOMMAND)) {
+              device.setIsOn(false);
 
-      if (deviceIterator.hasNext() && operationIterator.hasNext()) {
-        Resource deviceUri = (Resource) deviceIterator.next();
-        Resource operationUri = (Resource) operationIterator.next();
+              logger.debug("[ID={}] Turned off the light!", device.getId());
+            } else if (commandType.equals(Command.TYPE_STARTCOMMAND)) {
+              device.setIsOn(true);
+              device.setLumen(command.getParameterAsInteger(PARAM_SHINE_LUMEN));
+              device.setKelvin(command.getParameterAsInteger(PARAM_SHINE_COLOR));
 
-        String deviceId = NamespaceUtils.extractLocalName(deviceUri.getURI());
-
-        if (devices.containsKey(deviceId)) {
-          PlainLamp device = devices.get(deviceId);
-
-          try {
-            Thread.sleep(2000);
-          } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+              logger.debug("[ID={}] Turned on the light! Lumen: {}, Kelvin: {}",
+                  device.getId(), device.getLumen(), device.getKelvin());
+            } else {
+              throw CommandExecutionException.badCommand(
+                  "Command [%s] is not supported!", commandType);
+            }
+          } else {
+            throw CommandExecutionException.badCommand("Process [%s] is not supported!", processId);
           }
-
-          CommandExecutionResult result = new CommandExecutionResult(
-              device, command, ZonedDateTime.now());
-
-          manager.registerCommand(result);
-
-          return result;
-        } else {
-          throw CommandExecutionException.systemNotFound();
         }
+
+        CommandResult result = new CommandResult(command, ZonedDateTime.now());
+
+        manager.registerCommand(device, result);
+
+        return result;
       } else {
-        throw CommandExecutionException.badCommand("Some information is missing!");
+        throw CommandExecutionException.systemNotFound();
       }
     } catch (Throwable e) {
-      logger.error(e.getMessage(), e);
-
-      return null;
+      if (e instanceof CommandExecutionException) {
+        throw e;
+      } else {
+        throw CommandExecutionException.badCommand();
+      }
     }
   }
 }

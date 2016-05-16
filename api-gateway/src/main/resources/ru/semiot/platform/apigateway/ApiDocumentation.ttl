@@ -3,114 +3,81 @@
 @prefix hydra: <http://www.w3.org/ns/hydra/core#> .
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
-@prefix san: <https://www.irit.fr/recherches/MELODI/ontologies/SAN#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
-apidoc:EntryPoint-Sensors a hydra:Link ;
+apidoc:systems a hydra:Link ;
     rdfs:domain apidoc:EntryPoint ;
-    rdfs:range [
-        a hydra:Collection, sh:Shape ;
-        sh:property [
-            sh:predicate hydra:member ;
-            sh:class ssn:SensingDevice
-        ]
-    ] ;
-    hydra:supportedOperation [
-        a hydra:Operation ;
-        hydra:method "GET" ;
-        hydra:returns hydra:Collection
-    ] .
-
-apidoc:EntryPoint-Systems a hydra:Link ;
-    rdfs:domain apidoc:EntryPoint ;
-    rdfs:range [
-        a hydra:Collection, sh:Shape ;
+    rdfs:range [ a hydra:Collection, sh:Shape ;
         sh:property [
             sh:predicate hydra:member ;
             sh:class ssn:System
         ]
     ] ;
-    hydra:supportedOperation [
-        a hydra:Operation ;
+    hydra:supportedOperation [ a hydra:Operation ;
         hydra:method "GET" ;
         hydra:returns hydra:Collection
     ] .
 
 apidoc:EntryPoint a hydra:Class ;
-    hydra:supportedOperation [
-        a hydra:Operation ;
+    hydra:supportedOperation [ a hydra:Operation ;
         hydra:method "GET" ;
         hydra:returns apidoc:EntryPoint
     ] ;
-    hydra:supportedProperty [
-        hydra:property apidoc:EntryPoint-Systems
-    ] , [
-        hydra:property apidoc:EntryPoint-Sensors
-    ] .
+    hydra:supportedProperty [ hydra:property apidoc:systems ] .
 
 apidoc:observations a hydra:Link ;
     rdfs:domain ssn:System ;
-    rdfs:range [
-        a hydra:Collection, sh:Shape ;
+    rdfs:range [ a hydra:Collection, sh:Shape ;
         sh:property [
             sh:predicate hydra:member ;
-            sh:class ssn:Observation
-        ]
+            sh:class ssn:Observation ;
+        ] ;
     ] ;
-    hydra:supportedOperation [
-        a hydra:Operation ;
+    hydra:supportedOperation [ a hydra:Operation ;
         hydra:method "GET" ;
-        hydra:returns hydra:Collection
+        hydra:returns hydra:Collection ;
     ] .
 
-apidoc:actuations a hydra:Link ;
+apidoc:commandResults a hydra:Link ;
     rdfs:domain ssn:System ;
-    rdfs:range [
-        a hydra:Collection, sh:Shape ;
+    rdfs:range [ a hydra:Collection, sh:Shape ;
         sh:property [
             sh:predicate hydra:member ;
-            sh:class semiot:Actuation
-        ]
+            sh:class semiot:CommandResult ;
+        ] ;
     ] ;
-    hydra:supportedOperation [
-        a hydra:Operation ;
+    hydra:supportedOperation [ a hydra:Operation ;
         hydra:method "GET" ;
-        hydra:returns hydra:Collection
+        hydra:returns hydra:Collection ;
     ] ;
-    hydra:supportedOperation [
-        a hydra:Operation, semiot:SubmitCommandOperation ;
+    hydra:supportedOperation [ a hydra:Operation, semiot:CommandOperation ;
         hydra:method "POST" ;
-        hydra:returns semiot:Actuation ;
+        hydra:returns semiot:CommandResult ;
         hydra:expects semiot:Command ;
     ] .
 
 apidoc:ApiDocumentation a hydra:ApiDocumentation ;
-    hydra:supportedClass apidoc:observations, apidoc:actuations, apidoc:EntryPoint,
-    ssn:SensingDevice, san:ActuatingDevice, ssn:System .
+    hydra:supportedClass apidoc:observations, apidoc:commandResults, apidoc:EntryPoint,
+    ssn:SensingDevice, semiot:ActuatingDevice, ssn:System .
 
 ssn:SensingDevice a hydra:Class ;
-    hydra:supportedOperation [
-        a hydra:Operation ;
+    hydra:supportedOperation [ a hydra:Operation ;
         hydra:method "GET" ;
-        hydra:returns ssn:SensingDevice
+        hydra:returns ssn:SensingDevice ;
     ] .
 
-san:ActuatingDevice a hydra:Class ;
-    hydra:supportedOperation [
-        a hydra:Operation ;
+semiot:ActuatingDevice a hydra:Class ;
+    hydra:supportedOperation [ a hydra:Operation ;
         hydra:method "GET" ;
-        hydra:returns san:ActuatingDevice
+        hydra:returns semiot:ActuatingDevice ;
     ] .
 
 ssn:System a hydra:Class ;
-    hydra:supportedOperation [
-        a hydra:Operation ;
+    hydra:supportedOperation [ a hydra:Operation ;
         hydra:method "GET" ;
-        hydra:returns ssn:System
+        hydra:returns ssn:System ;
     ] ;
-    hydra:supportedProperty [
-        hydra:property ssn:hasSubSystem
-    ] .
+    hydra:supportedProperty [ hydra:property ssn:hasSubSystem ] .

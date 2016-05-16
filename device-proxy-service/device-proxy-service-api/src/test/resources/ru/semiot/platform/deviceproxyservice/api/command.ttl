@@ -1,0 +1,14 @@
+[ a <http://w3id.org/semiot/ontologies/semiot#Command>, <http://w3id.org/semiot/ontologies/semiot#StartCommand> ;
+    <http://w3id.org/semiot/ontologies/semiot#forProcess> <https://example.com/prototype.ttl#PlainLamp-Idle> ;
+    <http://www.loa-cnr.it/ontologies/DUL.owl#associatedWith> <http://localhost/systems/1231231231231230> ;
+    <http://www.loa-cnr.it/ontologies/DUL.owl#hasParameter> [
+        a <http://w3id.org/semiot/ontologies/semiot#MappingParameter> ;
+        <http://w3id.org/semiot/ontologies/semiot#forParameter> <https://example.com/prototype.ttl#LIFXWhite800-Shine-Lumen> ;
+        <http://www.loa-cnr.it/ontologies/DUL.owl#hasParameterDataValue> "890"^^<http://www.w3.org/2001/XMLSchema#integer> ;
+    ] ;
+    <http://www.loa-cnr.it/ontologies/DUL.owl#hasParameter> [
+        a <http://w3id.org/semiot/ontologies/semiot#MappingParameter> ;
+        <http://w3id.org/semiot/ontologies/semiot#forParameter> <https://example.com/prototype.ttl#LIFXWhite800-Shine-Color> ;
+        <http://www.loa-cnr.it/ontologies/DUL.owl#hasParameterDataValue> "4000"^^<http://www.w3.org/2001/XMLSchema#integer> ;
+    ] ;
+] .

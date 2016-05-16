@@ -22,7 +22,7 @@
 <head>
     <meta charset="UTF-8">
     <title>SemIoT Platform | System Settings</title>
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/css/bootstrap-material-design.min.css">
@@ -103,7 +103,7 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="http://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
+    <script src="https://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
     <script>$.material.init();</script>
     <script></script>
 </body>

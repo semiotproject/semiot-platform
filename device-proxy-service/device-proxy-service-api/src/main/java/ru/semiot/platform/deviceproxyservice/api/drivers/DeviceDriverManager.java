@@ -23,7 +23,7 @@ public interface DeviceDriverManager {
    *
    * @param commandExecutionResult a command performed on a device
    */
-  public void registerCommand(CommandExecutionResult commandExecutionResult);
+  public void registerCommand(Device device, CommandResult commandExecutionResult);
 
   public Model executeCommand(String systemId, Model command)
       throws CommandExecutionException;

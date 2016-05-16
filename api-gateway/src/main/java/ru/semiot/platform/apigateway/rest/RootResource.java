@@ -12,7 +12,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
+import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SHACL;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -65,11 +66,6 @@ public class RootResource {
       + "	?device a proto:Individual, ssn:System ;"
       + "    	proto:hasPrototype ?prototype ."
       + "}";
-  private static final String QUERY_SENSOR_PROTOTYPES
-      = "SELECT DISTINCT ?prototype {"
-      + " ?device a proto:Individual, ssn:SensingDevice ;"
-      + "         proto:hasPrototype ?prototype ."
-      + "}";
   private static final String QUERY_COLLECTION_MEMBER
       = "SELECT ?uri {"
       + " <${COLLECTION_URI}> rdfs:range ?shape ."
@@ -82,13 +78,27 @@ public class RootResource {
       + "     proto:hasPrototype <${PROTOTYPE_URI}> ;"
       + "     proto:hasPrototype ?prototype ;"
       + "     ?property ?value ."
-      + " FILTER(?property NOT IN (rdf:type, proto:hasPrototype))"
+      + " FILTER(isLiteral(?value))"
       + "}";
+  private static final String QUERY_DESCRIBE_SUPPORTED_PROCESSES
+      = "DESCRIBE ?process {"
+      + " ?device a proto:Individual ;"
+      + "   proto:hasPrototype <${PROTOTYPE_URI}> ;"
+      + "   semiot:supportedProcess ?process ."
+      + "}";
+  private static final String QUERY_DESCRIBE_COMMANDS
+      = "DESCRIBE ?command {"
+      + " <${PROCESS_URI}> proto:hasPrototype ?prototype ."
+      + " ?prototype semiot:supportedCommand ?command ." +
+      "}";
+  private static final String LINK_SYSTEMS = "systems";
   private static final String VAR_PROTOTYPE = "prototype";
   private static final String VAR_PROPERTY = "property";
+  private static final String VAR_PROCESS = "process";
   private static final String VAR_URI = "uri";
   private static final String VAR_COLLECTION_URI = "${COLLECTION_URI}";
   private static final String VAR_PROTOTYPE_URI = "${PROTOTYPE_URI}";
+  private static final String VAR_PROCESS_URI = "${PROCESS_URI}";
 
   public RootResource() {
   }
@@ -136,43 +146,20 @@ public class RootResource {
   public void documentation(@Suspended final AsyncResponse response)
       throws JsonLdError, IOException {
     String rootURL = URIUtils.extractRootURL(uriInfo.getRequestUri());
-    Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION,
-        MapBuilder.newMap()
-            .put(ContextProvider.VAR_ROOT_URL, rootURL)
-            .put(ContextProvider.VAR_WAMP_URL, rootURL + config.wampPublicPath())
-            .build());
+    Model apiDoc = contextProvider.getRDFModel(API_DOCUMENTATION, MapBuilder.newMap()
+        .put(ContextProvider.VAR_ROOT_URL, rootURL)
+        .put(ContextProvider.VAR_WAMP_URL, rootURL + config.wampPublicPath())
+        .build());
     Map<String, Object> frame = contextProvider.getFrame(API_DOCUMENTATION, rootURL);
 
     Observable<List<Resource>> systems = query.select(QUERY_SYSTEM_PROTOTYPES)
-        .map((ResultSet rs) -> defineResourceIndividual(
-            apiDoc, rootURL, "EntryPoint-Systems", rs, SSN.System));
-    Observable<List<Resource>> sensors = query.select(QUERY_SENSOR_PROTOTYPES)
-        .map((ResultSet rs) -> defineResourceIndividual(
-            apiDoc, rootURL, "EntryPoint-Sensors", rs, SSN.SensingDevice));
+        .map((ResultSet rs) ->
+            defineResourceIndividual(apiDoc, rootURL, LINK_SYSTEMS, rs, SSN.System));
 
-    Observable.zip(systems, sensors, (rsSystems, rsSensors) -> {
-      List<Resource> rs = new ArrayList<>(rsSystems);
-      rs.addAll(rsSensors);
-      List<Observable<ResultSet>> obs = new ArrayList<>();
-      rs.stream().forEach((prototype) -> obs.add(query.select(QUERY_INDIVIDUAL_PROPERTIES
-          .replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+    Observable supportedProperties = addSupportedProperties(apiDoc, rootURL, systems);
+    Observable supportedProcesses = addSupportedProcesses(apiDoc, rootURL, systems);
 
-      return Observable.merge(obs).toBlocking().toIterable();
-    }).map((Iterable<ResultSet> iter) -> {
-      iter.forEach((ResultSet rs) -> {
-        while (rs.hasNext()) {
-          QuerySolution qs = rs.next();
-          Resource prototype = qs.getResource(VAR_PROTOTYPE);
-          Resource prototypeResource = ResourceUtils.createResourceFromClass(
-              rootURL, prototype.getLocalName());
-          Property property = ResourceFactory.createProperty(
-              qs.getResource(VAR_PROPERTY).getURI());
-
-          apiDoc.add(prototypeResource, Hydra.supportedProperty, property);
-        }
-      });
-      return apiDoc;
-    }).lastOrDefault(apiDoc).map((__) -> {
+    Observable.zip(supportedProperties, supportedProcesses, (a, b) -> {
       try {
         return JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(apiDoc, frame));
       } catch (JsonLdError | IOException e) {
@@ -220,8 +207,83 @@ public class RootResource {
     return resultPrototypes;
   }
 
+  private Observable addSupportedProperties(Model model, String rootUrl,
+      Observable<List<Resource>> observable) {
+    return observable.map((prototypes) -> {
+      List<Observable<ResultSet>> obs = new ArrayList<>();
+      prototypes.stream().forEach((prototype) -> obs.add(query.select(
+          QUERY_INDIVIDUAL_PROPERTIES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+
+      return Observable.merge(obs).toBlocking().toIterable();
+    }).map((Iterable<ResultSet> iter) -> {
+      iter.forEach((ResultSet rs) -> {
+        while (rs.hasNext()) {
+          QuerySolution qs = rs.next();
+          Resource prototype = qs.getResource(VAR_PROTOTYPE);
+          Resource prototypeResource = ResourceUtils.createResourceFromClass(
+              rootUrl, prototype.getLocalName());
+          Resource property = ResourceFactory.createResource();
+          model.add(prototypeResource, Hydra.supportedProperty, property)
+              .add(property, Hydra.property,
+                  ResourceFactory.createProperty(qs.getResource(VAR_PROPERTY).getURI()));
+        }
+      });
+      return model;
+    });
+  }
+
+  private Observable addSupportedProcesses(Model model, String rootUrl,
+      Observable<List<Resource>> observable) {
+    return observable.map((prototypes) -> {
+      List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
+      prototypes.stream().forEach((prototype) -> obs.add(query.describe(
+          ResourceUtils.createResourceFromClass(rootUrl, prototype.getLocalName()),
+          QUERY_DESCRIBE_SUPPORTED_PROCESSES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
+
+      return Observable.merge(obs).toBlocking().toIterable();
+    }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
+      List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
+      iter.forEach((Map.Entry<Object, Model> rs) -> {
+        Resource prototypeResource = (Resource) rs.getKey();
+        Model value = rs.getValue();
+        if (!value.isEmpty()) {
+          logger.debug("Is not empty!");
+          Resource process = value.listSubjectsWithProperty(Proto.hasPrototype).next();
+          value.add(prototypeResource, SEMIOT.supportedProcess, process);
+
+          model.add(value);
+
+          obs.add(query.describe(
+              process, QUERY_DESCRIBE_COMMANDS.replace(VAR_PROCESS_URI, process.getURI())));
+        }
+      });
+      return Observable.merge(obs).toBlocking().toIterable();
+    }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
+      iter.forEach((Map.Entry<Object, Model> rs) -> {
+        logger.debug("found commands!");
+        Resource process = (Resource) rs.getKey();
+        Model value = rs.getValue();
+        Resource operation = ResourceFactory.createResource();
+        value.add(process, Hydra.supportedOperation, operation)
+            .add(operation, RDF.type, Hydra.Operation)
+            .add(operation, Hydra.method, "POST")
+            .add(operation, Hydra.returns, SEMIOT.CommandResult);
+
+        ResIterator commandIter = value.listSubjectsWithProperty(RDF.type, SEMIOT.Command);
+        while (commandIter.hasNext()) {
+          Resource command = commandIter.next();
+          value.add(operation, Hydra.expects, command);
+        }
+
+        model.add(value);
+      });
+      return model;
+    });
+  }
+
   @GET
   @Path("/logout")
+  //TODO: Move somewhere else
   public void getContext(@Context HttpServletRequest req, @Context HttpServletResponse resp)
       throws Exception {
     resp.setHeader("Cache-Control", "no-cache, no-store");
@@ -237,6 +299,7 @@ public class RootResource {
   @GET
   @Path("/user")
   @Produces(MediaType.APPLICATION_JSON)
+  //TODO: Move somewhere else
   public void getUserData(@Context HttpServletRequest req, @Context HttpServletResponse resp)
       throws Exception {
     Credentials c = db.getUser(req.getRemoteUser());
@@ -245,8 +308,7 @@ public class RootResource {
           "{\"username\": \"" + c.getLogin() + "\", \"password\": \"" + c.getPassword() + "\"}");
       resp.getWriter().flush();
       resp.getWriter().close();
-    }
-    else{
+    } else {
       resp.sendError(401);//Forbidden
     }
   }

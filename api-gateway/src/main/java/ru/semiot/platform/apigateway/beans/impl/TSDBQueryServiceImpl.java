@@ -38,10 +38,8 @@ import javax.ws.rs.core.UriBuilder;
 @Default
 public class TSDBQueryServiceImpl implements TSDBQueryService {
 
-  private static final Logger logger = LoggerFactory
-      .getLogger(TSDBQueryServiceImpl.class);
-  private static final ServerConfig config = ConfigFactory
-      .create(ServerConfig.class);
+  private static final Logger logger = LoggerFactory.getLogger(TSDBQueryServiceImpl.class);
+  private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
 
   private static final String QUERY_OBSERVATIONS = "/observations";
   private static final String QUERY_OBSERVATIONS_LATEST = "/observations/latest";
@@ -57,7 +55,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
   private ManagedExecutorService mes;
 
   @Override
-  public Observable<String> queryTimeOfLatestBySystemId(String systemId, List<String> sensorsId) {
+  public Observable<String> queryDateTimeOfLatestObservation(String systemId, List<String> sensorsId) {
     Observable<Response> get = Rx.newClient(RxObservableInvoker.class, mes)
         .target(UriBuilder.fromPath(config.tsdbEndpoint())
             .path(QUERY_TIME_OBSERVATIONS_LATEST)
@@ -82,14 +80,15 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
   }
 
   @Override
-  public Observable<Model> queryBySystemId(String systemId, List<String> sensorsId,
-                                           String start, String end) {
+  public Observable<Model> queryObservationsByRange(String systemId, List<String> sensorsId,
+      String start, String end) {
     if (Strings.isNullOrEmpty(start)) {
       throw new IllegalArgumentException();
     }
 
     UriBuilder uriBuilder = UriBuilder.fromPath(config.tsdbEndpoint())
-        .path(QUERY_OBSERVATIONS).queryParam(PARAM_SYSTEM_ID, systemId)
+        .path(QUERY_OBSERVATIONS)
+        .queryParam(PARAM_SYSTEM_ID, systemId)
         .queryParam(PARAM_SENSOR_ID, sensorsId.toArray())
         .queryParam(PARAM_START, start);
 
@@ -108,8 +107,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
       Model model = ModelFactory.createDefaultModel();
       try {
         if (response.getStatus() == HttpStatus.SC_OK) {
-          StringReader reader = new StringReader(
-              response.readEntity(String.class));
+          StringReader reader = new StringReader(response.readEntity(String.class));
           model.read(reader, null, RDFLanguages.strLangJSONLD);
         }
       } catch (RiotException re) {
@@ -121,33 +119,30 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
 
   public Observable<Response> remove(JsonArray jsonArray) {
     return Rx.newClient(RxObservableInvoker.class, mes)
-        .target(UriBuilder.fromPath(config.tsdbEndpoint())
-            .path(QUERY_REMOVE))
-        .request().rx().post(Entity.entity(jsonArray.toString(),
-            MediaType.TEXT_PLAIN));
+        .target(UriBuilder.fromPath(config.tsdbEndpoint()).path(QUERY_REMOVE))
+        .request().rx().post(Entity.entity(jsonArray.toString(), MediaType.TEXT_PLAIN));
   }
 
   @Override
-  public Observable<ZonedDateTime> queryDateTimeOfLatestActuation(
-      String systemId) {
+  public Observable<ZonedDateTime> queryDateTimeOfLatestCommandResult(String systemId,
+      String processId) {
     URI uri = UriBuilder.fromPath(config.tsdbEndpoint())
-        .path(config.tsdbActuatorsLatestPath())
-        .queryParam("system_id", systemId).build();
+        .path(config.tsdbCommandResultsLatestPath())
+        .queryParam("system_id", systemId)
+        .queryParam("process_id", processId).build();
 
-    logger.debug("queryDateTimeOfLatestActuation: URL {}", uri);
+    logger.debug("queryDateTimeOfLatestCommandResult: URL {}", uri);
 
     Observable<Response> result = Rx.newClient(RxObservableInvoker.class, mes)
         .target(uri).request().rx().get();
 
     return result.map((response -> {
       if (response.getStatus() == 200) {
-        Model model = RDFUtils.toModel(
-            response.readEntity(String.class), RDFLanguages.JSONLD);
+        Model model = RDFUtils.toModel(response.readEntity(String.class), RDFLanguages.JSONLD);
         if (model.isEmpty()) {
           return null;
         } else {
-          Literal dateTime = (Literal) model
-              .listObjectsOfProperty(DUL.hasEventTime).next();
+          Literal dateTime = (Literal) model.listObjectsOfProperty(DUL.hasEventTime).next();
 
           return ZonedDateTime.parse(dateTime.getLexicalForm(),
               DateTimeFormatter.ISO_OFFSET_DATE_TIME);
@@ -164,28 +159,26 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
     }));
   }
 
-  public Observable<Model> queryActuationsByRange(String systemId,
-                                                  ZonedDateTime start, ZonedDateTime end) {
+  public Observable<Model> queryCommandResultsByRange(String systemId, String processId,
+      ZonedDateTime start, ZonedDateTime end) {
     UriBuilder uriBuilder = UriBuilder.fromPath(config.tsdbEndpoint())
-        .path(config.tsdbActuatorsPath())
-        .queryParam("system_id", systemId).queryParam("start",
-            start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        .path(config.tsdbCommandResultsPath())
+        .queryParam("system_id", systemId)
+        .queryParam("process_id", processId)
+        .queryParam("start", start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
     if (end != null) {
-      uriBuilder.queryParam("end",
-          end.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+      uriBuilder.queryParam("end", end.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
     }
     URI uri = uriBuilder.build();
 
-    logger.debug("queryActuationsByRange: URL {}", uri);
+    logger.debug("queryCommandResultsByRange: URL {}", uri);
 
-    Observable<Response> result = Rx
-        .newClient(RxObservableInvoker.class, mes).target(uri).request()
-        .rx().get();
+    Observable<Response> result = Rx.newClient(RxObservableInvoker.class, mes)
+        .target(uri).request().rx().get();
 
     return result.map((response -> {
       if (response.getStatus() == 200) {
-        return RDFUtils.toModel(response.readEntity(String.class),
-            RDFLanguages.JSONLD);
+        return RDFUtils.toModel(response.readEntity(String.class), RDFLanguages.JSONLD);
       } else {
         logger.debug("None 200 nor 404");
         return null;
@@ -199,11 +192,9 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
   }
 
   @Override
-  public Observable<Response> sendSettingsAsPost(JsonObject json) {
+  public Observable<Response> submitConfiguration(JsonObject json) {
     return Rx.newClient(RxObservableInvoker.class, mes)
-        .target(UriBuilder.fromPath(config.tsdbEndpoint())
-            .path(QUERY_SETTINGS))
-        .request().rx().post(Entity.entity(json.toString(),
-            MediaType.APPLICATION_JSON));
+        .target(UriBuilder.fromPath(config.tsdbEndpoint()).path(QUERY_SETTINGS))
+        .request().rx().post(Entity.entity(json.toString(), MediaType.APPLICATION_JSON));
   }
 }

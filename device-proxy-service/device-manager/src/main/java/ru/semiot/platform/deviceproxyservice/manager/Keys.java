@@ -1,6 +1,6 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-public class Keys {
+public class Keys extends ru.semiot.platform.deviceproxyservice.api.drivers.Keys {
 
   public static final String TOPIC_NEWANDOBSERVING = "ru.semiot.platform.deviceproxyservice.manager.topic_newandobserving";
   public static final String TOPIC_INACTIVE = "ru.semiot.platform.deviceproxyservice.manager.topic_inactive";
@@ -14,19 +14,5 @@ public class Keys {
   public static final String FUSEKI_UPDATE_URL = "ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url";
   public static final String FUSEKI_QUERY_URL = "ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url";
   public static final String FUSEKI_STORE_URL = "ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url";
-
-  /**
-   * Shared properties.
-   *
-   * They're can be used in driver's RDF templates.
-   */
-  public static final String PLATFORM_DOMAIN =
-      "ru.semiot.platform.domain";
-  public static final String PLATFORM_SYSTEMS_PATH =
-      "ru.semiot.platform.systems_path";
-  public static final String PLATFORM_SYSTEMS_URI_PREFIX =
-      "ru.semiot.platform.systems_uri_prefix";
-  public static final String PLATFORM_SUBSYSTEM_PATH =
-      "ru.semiot.platform.subsystem_path";
 
 }

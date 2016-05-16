@@ -1,9 +1,0 @@
-@prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
-@prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-[
-    a semiot:Actuation ;
-    dul:hasEventTime "${ru.semiot.platform.actuation.datetime}"^^xsd:dateTime ;
-    dul:involvesAgent <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
-] .

@@ -85,7 +85,7 @@ public class SystemObservationsResource extends AbstractSystemResource {
     if (Strings.isNullOrEmpty(systemId)) {
       response.resume(Response.status(Response.Status.NOT_FOUND).build());
     }
-
+    
     URI root = uriInfo.getRequestUri();
     String rootUrl = URIUtils.extractRootURL(root);
     Map params = MapBuilder.newMap()
@@ -105,7 +105,7 @@ public class SystemObservationsResource extends AbstractSystemResource {
           .replace("${SYSTEM_ID}", systemId).replace("${SENSOR_ID}", sensorId));
     }
     if (Strings.isNullOrEmpty(start)) {
-      tsdbQuery.queryTimeOfLatestBySystemId(
+      tsdbQuery.queryDateTimeOfLatestObservation(
           systemId, getListSensorsId(systemId, listSensorId)).subscribe((result) -> {
         if (StringUtils.isNotBlank(result)) {
           UriBuilder uriBuilder = UriBuilder.fromUri(root).queryParam("start", result);
@@ -144,7 +144,7 @@ public class SystemObservationsResource extends AbstractSystemResource {
       Model model = contextProvider.getRDFModel(
           ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, params);
 
-      tsdbQuery.queryBySystemId(systemId,
+      tsdbQuery.queryObservationsByRange(systemId,
           getListSensorsId(systemId, listSensorId), start, end).map((result) -> {
         model.add(result);
         Resource collection = model.listSubjectsWithProperty(

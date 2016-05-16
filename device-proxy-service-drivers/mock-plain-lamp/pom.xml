@@ -40,9 +40,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-osgi</artifactId>
-            <version>3.0.0</version>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java</artifactId>
+            <version>0.8.2</version>
             <scope>provided</scope>
         </dependency>
 
@@ -76,7 +76,7 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            org.apache.jena.*,
+                            com.github.jsonldjava.utils,
                             org.apache.felix.dm,
                             org.osgi.framework,
                             org.osgi.service.cm,

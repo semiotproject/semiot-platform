@@ -34,9 +34,7 @@ public class RDFStore {
 
   public void save(Model model) {
     DatasetAccessorFactory
-        .createHTTP(
-            config.get(Keys.FUSEKI_STORE_URL),
-            httpAuthenticator)
+        .createHTTP(config.get(Keys.FUSEKI_STORE_URL), httpAuthenticator)
         .add(model);
   }
 

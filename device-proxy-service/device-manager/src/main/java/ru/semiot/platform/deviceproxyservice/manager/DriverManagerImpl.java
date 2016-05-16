@@ -10,7 +10,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFLanguages;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -19,10 +18,11 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
-import ru.semiot.platform.deviceproxyservice.api.drivers.ActuatingDeviceDriver;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Command;
 import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionException;
-import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionResult;
+import ru.semiot.platform.deviceproxyservice.api.drivers.CommandResult;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
+import ru.semiot.platform.deviceproxyservice.api.drivers.ControllableDeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceProperties;
@@ -40,15 +40,18 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(DriverManagerImpl.class);
   private static final String FRAME_PATH_PREFIX = "/ru/semiot/platform/deviceproxyservice/manager/";
-  private static final String OBSERVATION_FRAME_PATH = FRAME_PATH_PREFIX +
-      "Observation-frame.jsonld";
+  private static final String OBSERVATION_FRAME_PATH =
+      FRAME_PATH_PREFIX + "Observation-frame.jsonld";
+  private static final String COMMANDRESULT_FRAME_PATH =
+      FRAME_PATH_PREFIX + "CommandResult-frame.jsonld";
   private static final String SYSTEM_FRAME_PATH = FRAME_PATH_PREFIX + "System-frame.jsonld";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
-  private static final String TOPIC_ACTUATIONS = "${SYSTEM_ID}.commandresults";
+  private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults.${PROCESS_ID}";
   private static final long TIMEOUT = 5000;
   private final Configuration configuration = new Configuration();
   private final Object observationFrame;
   private final Object systemFrame;
+  private final Object commandResultFrame;
 
   //Injected by Dependency Manager
   private BundleContext bundleContext;
@@ -66,7 +69,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     }
     this.observationFrame = frame;
 
-    //Loadin JSONLD frame for systems
+    //Loading JSONLD frame for systems
     try {
       frame = JsonUtils.fromInputStream(
           this.getClass().getResourceAsStream(SYSTEM_FRAME_PATH));
@@ -74,6 +77,14 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       logger.error(e.getMessage(), e);
     }
     this.systemFrame = frame;
+
+    try {
+      frame = JsonUtils.fromInputStream(
+          this.getClass().getResourceAsStream(COMMANDRESULT_FRAME_PATH));
+    } catch (Throwable e) {
+      logger.error(e.getMessage(), e);
+    }
+    this.commandResultFrame = frame;
   }
 
   public void start() {
@@ -81,8 +92,6 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     try {
       directoryService = new DirectoryService(new RDFStore(configuration));
 
-      connectToDataStore();
-      
       logger.debug("Directory service is ready");
 
       WAMPClient
@@ -136,21 +145,17 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
           configuration.put(Keys.WAMP_RECONNECT, "15");
           configuration.put(Keys.WAMP_LOGIN, "internal");
           configuration.put(Keys.WAMP_PASSWORD, "internal");
-          configuration.put(Keys.TOPIC_NEWANDOBSERVING,
-              "ru.semiot.devices.newandobserving");
-          configuration.put(Keys.TOPIC_INACTIVE,
-              "ru.semiot.devices.turnoff");
+          configuration.put(Keys.TOPIC_NEWANDOBSERVING, "ru.semiot.devices.newandobserving");
+          configuration.put(Keys.TOPIC_INACTIVE, "ru.semiot.devices.turnoff");
           configuration.put(Keys.FUSEKI_PASSWORD, "pw");
           configuration.put(Keys.FUSEKI_USERNAME, "admin");
-          configuration.put(Keys.FUSEKI_UPDATE_URL,
-              "http://fuseki:3030/ds/update");
-          configuration.put(Keys.FUSEKI_QUERY_URL,
-              "http://fuseki:3030/ds/query");
-          configuration.put(Keys.FUSEKI_STORE_URL,
-              "http://fuseki:3030/ds/data");
+          configuration.put(Keys.FUSEKI_UPDATE_URL, "http://fuseki:3030/ds/update");
+          configuration.put(Keys.FUSEKI_QUERY_URL, "http://fuseki:3030/ds/query");
+          configuration.put(Keys.FUSEKI_STORE_URL, "http://fuseki:3030/ds/data");
           configuration.put(Keys.PLATFORM_DOMAIN, "http://localhost");
           configuration.put(Keys.PLATFORM_SYSTEMS_PATH, "systems");
           configuration.put(Keys.PLATFORM_SUBSYSTEM_PATH, "subsystems");
+          configuration.put(Keys.PLATFORM_PROCESS_PATH, "processes");
 
           configuration.putAll(dictionary);
 
@@ -223,10 +228,10 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     try {
       WAMPClient.getInstance()
           .publish(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
-              .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
+                  .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
               JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
           .subscribe(WAMPClient.onError());
-    } catch (JsonLdError | IOException ex) {
+    } catch (Throwable ex) {
       logger.error(ex.getMessage(), ex);
     }
   }
@@ -237,12 +242,19 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   }
 
   @Override
-  public void registerCommand(CommandExecutionResult result) {
-    //TODO: There's no guarantee that WAMPClient is connected?
-    WAMPClient.getInstance()
-        .publish(TOPIC_ACTUATIONS.replace("${SYSTEM_ID}", result.getDevice().getId()),
-            result.toActuationAsString(configuration, RDFLanguages.JSONLD))
-        .subscribe(WAMPClient.onError());
+  public void registerCommand(Device device, CommandResult result) {
+    try {
+      Model model = result.toRDFAsModel(configuration);
+      //TODO: There's no guarantee that WAMPClient is connected?
+      WAMPClient.getInstance().publish(
+          TOPIC_COMMANDRESULT
+              .replace("${SYSTEM_ID}", device.getId())
+              .replace("${PROCESS_ID}", result.getCommand().getProcessId()),
+          JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, commandResultFrame)))
+          .subscribe(WAMPClient.onError());
+    } catch (Throwable e) {
+      logger.error(e.getMessage(), e);
+    }
   }
 
   @Override
@@ -254,16 +266,16 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       if (pid != null) {
         try {
           Collection services = bundleContext.getServiceReferences(
-              ActuatingDeviceDriver.class, "(service.pid=" + pid + ")");
+              ControllableDeviceDriver.class, "(service.pid=" + pid + ")");
           if (!services.isEmpty()) {
-            logger.info("Driver [{}] found!", pid);
-            ServiceReference<ActuatingDeviceDriver> reference =
+            logger.debug("Driver [{}] found!", pid);
+            ServiceReference<ControllableDeviceDriver> reference =
                 (ServiceReference) services.iterator().next();
-            ActuatingDeviceDriver driver = bundleContext.getService(reference);
+            ControllableDeviceDriver driver = bundleContext.getService(reference);
 
-            CommandExecutionResult result = driver.executeCommand(command);
+            CommandResult result = driver.executeCommand(new Command(command));
 
-            return result.toActuationAsModel(configuration);
+            return result.toRDFAsModel(configuration);
           } else {
             throw CommandExecutionException.driverNotFound();
           }
@@ -274,9 +286,11 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
         throw CommandExecutionException.driverNotFound();
       }
     } catch (Throwable e) {
-      logger.error(e.getMessage(), e);
-
-      return null;
+      if (e instanceof CommandExecutionException) {
+        throw e;
+      } else {
+        throw CommandExecutionException.badCommand();
+      }
     }
   }
 
@@ -311,7 +325,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       logger.error("The storeURL is WRONG!!!");
     }
   }
-  
+
   void sleep() {
     logger.warn("Can`t connect to the triplestore! Retry in {}ms", TIMEOUT);
     try {

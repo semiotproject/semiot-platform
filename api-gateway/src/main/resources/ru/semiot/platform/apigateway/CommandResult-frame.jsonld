@@ -22,5 +22,5 @@
     "proto:hasPrototype": {"@type": "@id"},
     "void:class": {"@type": "@id"}
   },
-  "@type": "semiot:Actuation"
+  "@type": "semiot:CommandResult"
 }
