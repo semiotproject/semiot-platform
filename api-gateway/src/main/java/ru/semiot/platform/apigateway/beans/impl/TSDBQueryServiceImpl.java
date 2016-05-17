@@ -44,7 +44,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
   private static final String QUERY_OBSERVATIONS = "/observations";
   private static final String QUERY_OBSERVATIONS_LATEST = "/observations/latest";
   private static final String QUERY_TIME_OBSERVATIONS_LATEST = "/observations/latest/time";
-  private static final String QUERY_REMOVE = "/observations/remove";
+  private static final String QUERY_REMOVE = "/remove";
   private static final String PARAM_SYSTEM_ID = "system_id";
   private static final String PARAM_SENSOR_ID = "sensor_id";
   private static final String PARAM_START = "start";
