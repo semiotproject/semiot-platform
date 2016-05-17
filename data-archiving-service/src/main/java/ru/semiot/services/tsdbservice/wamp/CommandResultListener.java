@@ -34,14 +34,14 @@ public class CommandResultListener extends RDFMessageObserver {
           "} LIMIT 1", DUL.class, SEMIOT.class));
   private static final Query GET_PROPERTIES = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
       "SELECT ?uri ?value {" +
-          "?command a semiot:Command ;" +
+          "?command semiot:forProcess ?process ;" +
           "  ?uri ?value ." +
           "FILTER(?uri != rdf:type && ?uri != dul:hasParameter && " +
           "   ?uri != semiot:forProcess && ?uri != dul:associatedWith)" +
           "}", SEMIOT.class, DUL.class, RDF.class));
   private static final Query GET_PARAMETERS = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
       "SELECT ?uri ?value {" +
-          "?command a semiot:Command ;" +
+          "?command semiot:forProcess ?process ;" +
           " dul:hasParameter ?parameter ." +
           "?parameter semiot:forParameter ?uri ;" +
           " dul:hasParameterDataValue ?value ." +
@@ -61,6 +61,7 @@ public class CommandResultListener extends RDFMessageObserver {
 
         ResultSet rsProps = query(model, GET_PROPERTIES);
 
+        logger.debug(dateTime.getLexicalForm());
         CommandResult commandResult = new CommandResult(
             NamespaceUtils.extractLocalName(deviceUri.getURI()),
             NamespaceUtils.extractLocalName(processUri.getURI()),
@@ -81,7 +82,7 @@ public class CommandResultListener extends RDFMessageObserver {
         }
 
         String query = commandResult.toInsertQuery();
-
+        logger.debug(query);
         TSDBClient.getInstance().executeAsync(query).subscribe(TSDBClient.onError());
 
         logger.debug("Query: {}", query);

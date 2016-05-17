@@ -3,6 +3,8 @@ package ru.semiot.platform.apigateway.beans.impl;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.http.HttpStatus;
 import org.apache.jena.ext.com.google.common.base.Strings;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -27,7 +29,8 @@ import java.util.List;
 import javax.ejb.Singleton;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.enterprise.inject.Default;
-import javax.json.JsonArray;
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
@@ -117,10 +120,36 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
     });
   }
 
-  public Observable<Response> remove(JsonArray jsonArray) {
+  @Override
+  public Observable<Response> remove(ResultSet observationsIdRS, ResultSet commandresultsIdRS) {
+    JsonArrayBuilder observationsId = Json.createArrayBuilder();
+    while (observationsIdRS.hasNext()) {
+      QuerySolution qs = observationsIdRS.next();
+      Literal system_id = qs.getLiteral("system_id");
+      Literal sensor_id = qs.getLiteral("sensor_id");
+      JsonObject observationId = Json.createObjectBuilder()
+          .add("system_id", system_id.toString())
+          .add("sensor_id", sensor_id.toString()).build();
+      observationsId.add(observationId);
+    }
+    
+    JsonArrayBuilder commandresultsId = Json.createArrayBuilder();
+    while (commandresultsIdRS.hasNext()) {
+      QuerySolution qs = commandresultsIdRS.next();
+      Literal system_id = qs.getLiteral("system_id");
+      Literal sensor_id = qs.getLiteral("process_id");
+      JsonObject commandresultId = Json.createObjectBuilder()
+          .add("system_id", system_id.toString())
+          .add("process_id", sensor_id.toString()).build();
+      commandresultsId.add(commandresultId);
+    }
+    JsonObject json = Json.createObjectBuilder()
+        .add("observations", observationsId)
+        .add("commandresults", commandresultsId).build();
+    
     return Rx.newClient(RxObservableInvoker.class, mes)
         .target(UriBuilder.fromPath(config.tsdbEndpoint()).path(QUERY_REMOVE))
-        .request().rx().post(Entity.entity(jsonArray.toString(), MediaType.TEXT_PLAIN));
+        .request().rx().post(Entity.entity(json.toString(), MediaType.TEXT_PLAIN));
   }
 
   @Override
@@ -159,6 +188,7 @@ public class TSDBQueryServiceImpl implements TSDBQueryService {
     }));
   }
 
+  @Override
   public Observable<Model> queryCommandResultsByRange(String systemId, String processId,
       ZonedDateTime start, ZonedDateTime end) {
     UriBuilder uriBuilder = UriBuilder.fromPath(config.tsdbEndpoint())
