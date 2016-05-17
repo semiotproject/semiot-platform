@@ -8,7 +8,7 @@
 @prefix qudt: <http://qudt.org/schema/qudt#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
-@prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
+@prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
 @prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#> .
 
 <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> a ssn:System, proto:Individual ;
