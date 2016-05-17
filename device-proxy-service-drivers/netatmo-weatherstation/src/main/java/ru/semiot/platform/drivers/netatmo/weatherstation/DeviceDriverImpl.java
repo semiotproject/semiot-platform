@@ -1,5 +1,15 @@
 package ru.semiot.platform.drivers.netatmo.weatherstation;
 
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,16 +22,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
-import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriver;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
-import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 
 public class DeviceDriverImpl implements DeviceDriver, ManagedService {
 
@@ -36,7 +36,7 @@ public class DeviceDriverImpl implements DeviceDriver, ManagedService {
     private final DriverInformation info = new DriverInformation(
             Keys.DRIVER_PID,
             URI.create("https://raw.githubusercontent.com/semiotproject/semiot-platform/" +
-                    "release-1.0.7/device-proxy-service-drivers/netatmo-weatherstation/" +
+                    "master/device-proxy-service-drivers/netatmo-weatherstation/" +
                     "src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#" +
                     "NetatmoWeatherStationOutdoorModule"));
 

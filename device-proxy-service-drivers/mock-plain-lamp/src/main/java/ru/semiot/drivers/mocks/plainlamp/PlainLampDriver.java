@@ -27,7 +27,7 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
   private static final Logger logger = LoggerFactory.getLogger(PlainLampDriver.class);
   private static final String PROTOTYPE_URI_PREFIX =
       "https://raw.githubusercontent.com/semiotproject/semiot-platform/"
-          + "release-1.0.7/device-proxy-service-drivers/mock-plain-lamp/"
+          + "master/device-proxy-service-drivers/mock-plain-lamp/"
           + "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#";
   private static final String PROCESS_LIGHT_ID = "light";
   private static final String PARAM_SHINE_LUMEN = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Lumen";
@@ -108,6 +108,7 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
     logger.info("{} stopped!", DRIVER_NAME);
   }
 
+  @Override
   public void updated(Dictionary dictionary) throws ConfigurationException {
     synchronized (this) {
       if (dictionary != null) {
@@ -122,10 +123,12 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
     }
   }
 
+  @Override
   public String getDriverName() {
     return DRIVER_NAME;
   }
 
+  @Override
   public CommandResult executeCommand(Command command) throws CommandExecutionException {
     try {
       if (lamps.containsKey(command.getDeviceId())) {
