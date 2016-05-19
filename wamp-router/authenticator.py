@@ -28,17 +28,17 @@ class AuthenticatorSession(ApplicationSession):
 
 			role = checkCredential(authid, ticket)
 			
-			print("WAMP-Ticket custom authenticator invoked: realm='{}', authid='{}', ticket='{}', role='{}'".format(realm, authid, ticket, role))
+			print("WAMP-Ticket custom authenticator invoked!")
 			
 			if(role == "internal"):
-				print("Authorization for authid='{}', ticket='{}' was success! Role is 'internal'".format(authid, ticket))
+				print("Authorization success! Role is 'internal'")
 				return u"internal"
 
 			if(role == "admin" or role == "user"):
-				print("Authorization for authid='{}', ticket='{}' was success! Role is 'listener'".format(authid, ticket))
+				print("Authorization success! Role is 'listener'")
 				return u"listener"
 			else:
-				raise ApplicationError("ru.semiot.invalid_grants", "could not authenticate session - bad auth_id '{}' or ticket '{}'".format(authid, ticket))
+				raise ApplicationError("ru.semiot.invalid_grants", "could not authenticate session - bad auth_id or ticket ")
 
 		try:
 			yield self.register(authenticate, 'ru.semiot.authenticate')

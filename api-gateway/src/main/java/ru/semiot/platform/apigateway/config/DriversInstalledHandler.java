@@ -1,9 +1,7 @@
 package ru.semiot.platform.apigateway.config;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.apigateway.beans.TSDBQueryService;
@@ -17,10 +15,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.inject.Inject;
-import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -32,14 +27,25 @@ import javax.servlet.http.HttpServletResponse;
 public class DriversInstalledHandler extends HttpServlet {
 
   private static final Logger logger = LoggerFactory.getLogger(DriversInstalledHandler.class);
-  public static final String QUERY_ID_SYSTEMS_FOR_DRIVER = "SELECT DISTINCT "
-      + "?system_id ?sensor_id  " + "WHERE { "
-      + "GRAPH <urn:semiot:graphs:private> { "
-      + "?system  semiot:hasDriver "
-      + "<urn:semiot:drivers:ru.semiot.platform.drivers.netatmo-weatherstation> } "
-      + "?system  dcterms:identifier ?system_id; "
-      + "ssn:hasSubSystem ?sensor. "
-      + "?sensor dcterms:identifier ?sensor_id. }";
+  public static final String QUERY_ID_SYSTEMS_SERNSORS_FOR_DRIVER = "SELECT DISTINCT "
+      + "?system_id ?sensor_id  " 
+        + "WHERE { "
+        + "GRAPH <urn:semiot:graphs:private> { "
+          + "?system  semiot:hasDriver "
+          + "<urn:semiot:drivers:${DRIVER}> } "
+        + "?system  dcterms:identifier ?system_id; "
+        + "ssn:hasSubSystem ?sensor. "
+        + "?sensor dcterms:identifier ?sensor_id. }";
+  
+  public static final String QUERY_ID_SYSTEMS_PROCESSES_FOR_DRIVER = "SELECT DISTINCT "
+      + "?system_id ?process_id  " 
+        + "WHERE { "
+        + "GRAPH <urn:semiot:graphs:private> { "
+          + "?system  semiot:hasDriver "
+          + "<urn:semiot:drivers:${DRIVER}> } "
+        + "?system  dcterms:identifier ?system_id; "
+        + "semiot:supportedProcess ?process. "
+        +  "?process dcterms:identifier ?process_id. }";
 
   @Inject
   OSGiApiService service;
@@ -65,6 +71,7 @@ public class DriversInstalledHandler extends HttpServlet {
         () -> ctx.dispatch("/configuration/DriversInstalled"));
   }
 
+  @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     HashMap<String, String> parameters = getRequestParameters(request);
@@ -84,19 +91,12 @@ public class DriversInstalledHandler extends HttpServlet {
         Observable<String> unistall = service.sendPostUninstall(pid);
         unistall.map((__) -> {
           Observable<ResultSet> obsSystemsRS = query.select(
-              QUERY_ID_SYSTEMS_FOR_DRIVER.replace("${DRIVER}", pid));
-          ResultSet systemsRS = obsSystemsRS.toBlocking().single();
-          JsonArrayBuilder jArrBuilder = Json.createArrayBuilder();
-          while (systemsRS.hasNext()) {
-            QuerySolution qs = systemsRS.next();
-            Literal system_id = qs.getLiteral("system_id");
-            Literal sensor_id = qs.getLiteral("sensor_id");
-            JsonObject object = Json.createObjectBuilder()
-                .add("system_id", system_id.toString())
-                .add("sensor_id", sensor_id.toString()).build();
-            jArrBuilder.add(object);
-          }
-          tsdbQuery.remove(jArrBuilder.build()).subscribe();
+              QUERY_ID_SYSTEMS_SERNSORS_FOR_DRIVER.replace("${DRIVER}", pid));
+          ResultSet systemsSensorsRS = obsSystemsRS.toBlocking().single();
+          Observable<ResultSet> commresSystemsRS = query.select(
+              QUERY_ID_SYSTEMS_PROCESSES_FOR_DRIVER.replace("${DRIVER}", pid));
+          ResultSet systemsProcessesRS = commresSystemsRS.toBlocking().single(); 
+          tsdbQuery.remove(systemsSensorsRS, systemsProcessesRS).subscribe();
           externalService.sendRsRemoveFromFuseki(pid).subscribe();
           Observable<JsonArray> jsonArray = service.getBundlesJsonArray();
           JsonArray jsArray = jsonArray.toBlocking().single();
