@@ -14,6 +14,9 @@
       "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
       "dcterms": "http://purl.org/dc/terms/",
       "semiot": "http://w3id.org/semiot/ontologies/semiot#",
+      "qudt-unit": "http://qudt.org/vocab/unit#",
+      "qudt-quantity": "http://qudt.org/vocab/quantity#",
+      "qudt-quantity-ext": "http://w3id.org/qudt/vocab/quantity/ext#",
       "apidoc": "${ROOT_URL}/doc#",
 
       "hydra:entrypoint": {"@type": "@id"},

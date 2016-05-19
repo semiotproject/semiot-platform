@@ -52,16 +52,12 @@ apidoc:commandResults a hydra:Link ;
     hydra:supportedOperation [ a hydra:Operation ;
         hydra:method "GET" ;
         hydra:returns hydra:Collection ;
-    ] ;
-    hydra:supportedOperation [ a hydra:Operation, semiot:CommandOperation ;
-        hydra:method "POST" ;
-        hydra:returns semiot:CommandResult ;
-        hydra:expects semiot:Command ;
     ] .
 
 apidoc:ApiDocumentation a hydra:ApiDocumentation ;
     hydra:supportedClass apidoc:observations, apidoc:commandResults, apidoc:EntryPoint,
-    ssn:SensingDevice, semiot:ActuatingDevice, ssn:System .
+    ssn:SensingDevice, semiot:ActuatingDevice, ssn:System ;
+    hydra:entrypoint <${ROOT_URL}> .
 
 ssn:SensingDevice a hydra:Class ;
     hydra:supportedOperation [ a hydra:Operation ;

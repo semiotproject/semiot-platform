@@ -13,10 +13,13 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.GEO;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.NamespaceUtils;
 import ru.semiot.commons.namespaces.Proto;
+import ru.semiot.commons.namespaces.QUDT;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SHACL;
 import ru.semiot.commons.namespaces.SSN;
@@ -35,16 +38,16 @@ import javax.enterprise.concurrent.ManagedExecutorService;
 @Singleton
 public class SPARQLQueryService {
 
-  @Resource
-  ManagedExecutorService mes;
-
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
   private static final String PREFIXES = NamespaceUtils.toSPARQLPrologue(
       SSN.class, RDF.class, OWL.class, RDFS.class, SSNCOM.class,
       DCTerms.class, XSD.class, Proto.class, Hydra.class, SHACL.class,
-      SEMIOT.class, GEO.class);
+      SEMIOT.class, GEO.class, QUDT.class);
 
   private final HttpAuthenticator httpAuthenticator;
+
+  @Resource
+  private ManagedExecutorService mes;
 
   public SPARQLQueryService() {
     this.httpAuthenticator = new SimpleAuthenticator(config.sparqlUsername(),

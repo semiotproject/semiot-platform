@@ -9,13 +9,16 @@ import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
 import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
@@ -89,16 +92,31 @@ public class RootResource {
   private static final String QUERY_DESCRIBE_COMMANDS
       = "DESCRIBE ?command {"
       + " <${PROCESS_URI}> proto:hasPrototype ?prototype ."
-      + " ?prototype semiot:supportedCommand ?command ." +
-      "}";
+      + " ?prototype semiot:supportedCommand ?command ."
+      + "}";
+  private static final String QUERY_PROPERTIES_AND_UNITS
+      = "SELECT ?propertyOrUnit ?label {"
+      + " VALUES ?prototype { ${PROTOTYPES} }"
+      + " {"
+      + "   ?prototype ssn:hasSubSystem/ssn:observes ?propertyOrUnit ."
+      + " } UNION {"
+      + "   ?prototype ssn:hasSubSystem/ssn:hasMeasurementCapability/ssn:hasMeasurementProperty ?p ."
+      + "   ?p a qudt:Unit ;"
+      + "      ssn:hasValue/ssn:hasValue ?propertyOrUnit ."
+      + " }"
+      + " ?propertyOrUnit rdfs:label ?label ."
+      + "}";
   private static final String LINK_SYSTEMS = "systems";
   private static final String VAR_PROTOTYPE = "prototype";
   private static final String VAR_PROPERTY = "property";
   private static final String VAR_PROCESS = "process";
   private static final String VAR_URI = "uri";
+  private static final String VAR_PROPERTY_OR_UNIT = "propertyOrUnit";
+  private static final String VAR_LABEL = "label";
   private static final String VAR_COLLECTION_URI = "${COLLECTION_URI}";
   private static final String VAR_PROTOTYPE_URI = "${PROTOTYPE_URI}";
   private static final String VAR_PROCESS_URI = "${PROCESS_URI}";
+  private static final String VAR_PROTOTYPES = "${PROTOTYPES}";
 
   public RootResource() {
   }
@@ -152,17 +170,18 @@ public class RootResource {
         .build());
     Map<String, Object> frame = contextProvider.getFrame(API_DOCUMENTATION, rootURL);
 
-    Observable<List<Resource>> systems = query.select(QUERY_SYSTEM_PROTOTYPES)
+    Observable<List<Resource>> prototypes = query.select(QUERY_SYSTEM_PROTOTYPES)
         .map((ResultSet rs) ->
             defineResourceIndividual(apiDoc, rootURL, LINK_SYSTEMS, rs, SSN.System));
 
-    Observable supportedProperties = addSupportedProperties(apiDoc, rootURL, systems);
-    Observable supportedProcesses = addSupportedProcesses(apiDoc, rootURL, systems);
+    Observable<Model> supportedProperties = addSupportedProperties(apiDoc, rootURL, prototypes);
+    Observable<Model> supportedProcesses = addSupportedProcesses(apiDoc, rootURL, prototypes);
+    Observable<Model> propertiesAndUnits = addPropertiesAndUnits(apiDoc, prototypes);
 
-    Observable.zip(supportedProperties, supportedProcesses, (a, b) -> {
+    Observable.zip(supportedProperties, supportedProcesses, propertiesAndUnits, (a, b, c) -> {
       try {
         return JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(apiDoc, frame));
-      } catch (JsonLdError | IOException e) {
+      } catch (Throwable e) {
         throw Exceptions.propagate(e);
       }
     }).subscribe(resume(response));
@@ -207,7 +226,7 @@ public class RootResource {
     return resultPrototypes;
   }
 
-  private Observable addSupportedProperties(Model model, String rootUrl,
+  private Observable<Model> addSupportedProperties(Model model, String rootUrl,
       Observable<List<Resource>> observable) {
     return observable.map((prototypes) -> {
       List<Observable<ResultSet>> obs = new ArrayList<>();
@@ -232,7 +251,7 @@ public class RootResource {
     });
   }
 
-  private Observable addSupportedProcesses(Model model, String rootUrl,
+  private Observable<Model> addSupportedProcesses(Model model, String rootUrl,
       Observable<List<Resource>> observable) {
     return observable.map((prototypes) -> {
       List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
@@ -277,6 +296,32 @@ public class RootResource {
       });
       return model;
     });
+  }
+
+  private Observable<Model> addPropertiesAndUnits(Model model,
+      Observable<List<Resource>> observable) {
+    return observable
+        .map((List<Resource> ps) -> StringUtils.join(
+            ps.stream().map((p) -> "<" + p.getURI() + ">").toArray(String[]::new), " "))
+        .map((values) -> query
+            .select(QUERY_PROPERTIES_AND_UNITS.replace(VAR_PROTOTYPES, values))
+            .toBlocking().toIterable())
+        .map((Iterable<ResultSet> iter) -> {
+          iter.forEach((rs) -> {
+            Resource doc = model.listSubjectsWithProperty(RDF.type, Hydra.ApiDocumentation).next();
+
+            while (rs.hasNext()) {
+              QuerySolution qs = rs.next();
+              Resource propertyOrUnit = qs.getResource(VAR_PROPERTY_OR_UNIT);
+              Literal label = qs.getLiteral(VAR_LABEL);
+
+              model.add(doc, Hydra.supportedClass, propertyOrUnit)
+                  .add(propertyOrUnit, RDF.type, Hydra.Class)
+                  .add(propertyOrUnit, RDFS.label, label);
+            }
+          });
+          return model;
+        });
   }
 
   @GET
