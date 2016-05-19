@@ -247,7 +247,6 @@ public class RootResource {
         Resource prototypeResource = (Resource) rs.getKey();
         Model value = rs.getValue();
         if (!value.isEmpty()) {
-          logger.debug("Is not empty!");
           Resource process = value.listSubjectsWithProperty(Proto.hasPrototype).next();
           value.add(prototypeResource, SEMIOT.supportedProcess, process);
 
@@ -260,7 +259,6 @@ public class RootResource {
       return Observable.merge(obs).toBlocking().toIterable();
     }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
       iter.forEach((Map.Entry<Object, Model> rs) -> {
-        logger.debug("found commands!");
         Resource process = (Resource) rs.getKey();
         Model value = rs.getValue();
         Resource operation = ResourceFactory.createResource();
