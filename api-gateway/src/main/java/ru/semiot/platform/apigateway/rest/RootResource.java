@@ -17,6 +17,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
@@ -176,9 +177,9 @@ public class RootResource {
 
     Observable<Model> supportedProperties = addSupportedProperties(apiDoc, rootURL, prototypes);
     Observable<Model> supportedProcesses = addSupportedProcesses(apiDoc, rootURL, prototypes);
-    Observable<Model> propertiesAndUnits = addPropertiesAndUnits(apiDoc, prototypes);
+//    Observable<Model> propertiesAndUnits = addPropertiesAndUnits(apiDoc, prototypes);
 
-    Observable.zip(supportedProperties, supportedProcesses, propertiesAndUnits, (a, b, c) -> {
+    Observable.zip(supportedProperties, supportedProcesses, (a, b) -> {
       try {
         return JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(apiDoc, frame));
       } catch (Throwable e) {
