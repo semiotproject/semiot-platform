@@ -6,7 +6,7 @@
 @prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
 @prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/command_to_keyvalue/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
+@prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
 
 <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}> a ssn:System, proto:Individual ;
     rdfs:label "Plain lamp / {{ru.semiot.platform.device.id}}"@en ;
