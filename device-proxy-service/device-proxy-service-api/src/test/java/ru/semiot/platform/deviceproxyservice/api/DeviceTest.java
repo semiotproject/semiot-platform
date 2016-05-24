@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotSame;
 
 import org.junit.Test;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
+import ru.semiot.platform.deviceproxyservice.api.drivers.RDFTemplate;
 
 public class DeviceTest {
 
@@ -30,7 +31,7 @@ public class DeviceTest {
     }
 
     @Override
-    public String getRDFTemplate() {
+    public RDFTemplate getRDFTemplate() {
       throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -1,8 +1,8 @@
 package ru.semiot.platform.drivers.netatmo.weatherstation;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
+import ru.semiot.platform.deviceproxyservice.api.drivers.RDFTemplate;
 
 import java.io.IOException;
 
@@ -12,8 +12,8 @@ public class WeatherStationObservation extends Observation {
       "/ru/semiot/platform/drivers/netatmo/weatherstation/temperature-observation.ttl";
   private static final String HUMIDITY_TEMPLATE_PATH =
       "/ru/semiot/platform/drivers/netatmo/weatherstation/humidity-observation.ttl";
-  private static String TEMPERATURE_TEMPLATE;
-  private static String HUMIDITY_TEMPLATE;
+  private static RDFTemplate TEMPERATURE_TEMPLATE;
+  private static RDFTemplate HUMIDITY_TEMPLATE;
 
   public static final String TEMPERATURE_TYPE = "temperature";
   public static final String HUMIDITY_TYPE = "humidity";
@@ -22,10 +22,10 @@ public class WeatherStationObservation extends Observation {
 
   static {
     try {
-      TEMPERATURE_TEMPLATE = IOUtils
-          .toString(WeatherStationObservation.class.getResourceAsStream(TEMPERATURE_TEMPLATE_PATH));
-      HUMIDITY_TEMPLATE = IOUtils
-          .toString(WeatherStationObservation.class.getResourceAsStream(HUMIDITY_TEMPLATE_PATH));
+      TEMPERATURE_TEMPLATE = new RDFTemplate("temperature",
+          WeatherStationObservation.class.getResourceAsStream(TEMPERATURE_TEMPLATE_PATH));
+      HUMIDITY_TEMPLATE = new RDFTemplate("humidity",
+          WeatherStationObservation.class.getResourceAsStream(HUMIDITY_TEMPLATE_PATH));
     } catch (IOException ex) {
       LoggerFactory.getLogger(WeatherStation.class).error(ex.getMessage(), ex);
     }
@@ -40,13 +40,11 @@ public class WeatherStationObservation extends Observation {
   }
 
   @Override
-  public String getRDFTemplate() {
-    if (getProperties().get(NetatmoDeviceProperties.OBSERVATION_TYPE)
-        .equalsIgnoreCase(TEMPERATURE_TYPE)) {
+  public RDFTemplate getRDFTemplate() {
+    if (getProperty(NetatmoDeviceProperties.OBSERVATION_TYPE).equalsIgnoreCase(TEMPERATURE_TYPE)) {
       return TEMPERATURE_TEMPLATE;
     }
-    if (getProperties().get(NetatmoDeviceProperties.OBSERVATION_TYPE)
-        .equalsIgnoreCase(HUMIDITY_TYPE)) {
+    if (getProperty(NetatmoDeviceProperties.OBSERVATION_TYPE).equalsIgnoreCase(HUMIDITY_TYPE)) {
       return HUMIDITY_TEMPLATE;
     }
 

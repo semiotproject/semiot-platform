@@ -17,7 +17,7 @@ import java.util.Objects;
 
 public abstract class Observation {
 
-  private final Map<String, String> properties = new HashMap<>();
+  private final Map<String, Object> properties = new HashMap<>();
 
   /**
    * @param timestamp number of seconds since the Unix Epoch
@@ -34,30 +34,25 @@ public abstract class Observation {
     properties.put(DeviceProperties.OBSERVATION_DATETIME, dateTime);
   }
 
-  public Map<String, String> getProperties() {
+  public Map<String, Object> getProperties() {
     return properties;
   }
 
   public String getProperty(String name) {
-    return properties.get(name);
+    return properties.get(name).toString();
   }
 
-  public abstract String getRDFTemplate();
+  public abstract RDFTemplate getRDFTemplate();
 
-  public String toTurtleString() {
-    return TemplateUtils.resolve(getRDFTemplate(), properties);
-  }
-
-  public Model toObservationAsModel(Map<String, String> properties, Configuration configuration) {
-    StringReader descr = new StringReader(
-        TemplateUtils.resolve(toTurtleString(), properties, configuration));
+  public Model toObservationAsModel(Map<String, Object> properties, Configuration configuration) {
+    StringReader descr = getRDFTemplate().resolveToReader(properties, configuration);
 
     Model model = ModelFactory.createDefaultModel().read(descr, null, RDFLanguages.strLangTurtle);
 
     return model;
   }
 
-  public String toObservationAsString(Map<String, String> properties, Configuration configuration,
+  public String toObservationAsString(Map<String, Object> properties, Configuration configuration,
       Lang lang) {
     StringWriter writer = new StringWriter();
 
@@ -80,12 +75,11 @@ public abstract class Observation {
     }
 
     try {
-      Iterator<Map.Entry<String, String>> i
-          = this.properties.entrySet().iterator();
+      Iterator<Map.Entry<String, Object>> i = this.properties.entrySet().iterator();
       while (i.hasNext()) {
-        Map.Entry<String, String> e = i.next();
+        Map.Entry<String, Object> e = i.next();
         String key = e.getKey();
-        String value = e.getValue();
+        Object value = e.getValue();
         if (value == null) {
           if (!(m.properties.get(key) == null && m.properties.containsKey(key))) {
             return false;

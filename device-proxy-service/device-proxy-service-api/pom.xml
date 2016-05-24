@@ -47,6 +47,11 @@
             <version>2.4</version>
         </dependency>
         <dependency>
+            <groupId>com.github.spullara.mustache.java</groupId>
+            <artifactId>compiler</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+        <dependency>
             <groupId>ru.semiot.commons</groupId>
             <artifactId>commons-namespaces</artifactId>
             <version>1.0-SNAPSHOT</version>
@@ -101,7 +106,9 @@
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Bundle-Activator/>
-                        <Export-Package>ru.semiot.platform.deviceproxyservice.api.drivers
+                        <Export-Package>
+                            ru.semiot.platform.deviceproxyservice.api.drivers,
+                            ru.semiot.platform.deviceproxyservice.api.manager
                         </Export-Package>
                     </instructions>
                 </configuration>

@@ -65,4 +65,8 @@ public class CommandExecutionException extends Exception {
   public static CommandExecutionException badCommand() {
     return new CommandExecutionException(Reason.BAD_COMMAND);
   }
+
+  public static CommandExecutionException badCommand(Throwable cause) {
+    return new CommandExecutionException(Reason.BAD_COMMAND, cause);
+  }
 }

@@ -1,0 +1,22 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dul: <http://www.loa-cnr.it/ontologies/DUL.owl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/command_to_keyvalue/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
+
+[ a semiot:StartCommand ;
+  dcterms:identifier "light-startcommand" ;
+  semiot:forProcess <{{ru.semiot.platform.process.uri}}> ;
+  dul:associatedWith <{{ru.semiot.platform.device.uri}}> ;
+  dul:hasParameter [
+    a semiot:MappingParameter ;
+    semiot:forParameter :PlainLamp-Shine-Lumen ;
+    dul:hasParameterDataValue "{{ru.semiot.drivers.mocks.plainlamp.light.lumen}}"^^xsd:integer ;
+  ] ;
+  dul:hasParameter [
+    a semiot:MappingParameter ;
+    semiot:forParameter :PlainLamp-Shine-Color ;
+    dul:hasParameterDataValue "{{ru.semiot.drivers.mocks.plainlamp.light.color}}"^^xsd:integer ;
+  ] ;
+] .

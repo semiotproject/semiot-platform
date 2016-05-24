@@ -28,20 +28,18 @@ public class RDFStore {
   public RDFStore(Configuration config) {
     this.config = config;
     httpAuthenticator = new SimpleAuthenticator(
-        config.get(Keys.FUSEKI_USERNAME),
-        config.get(Keys.FUSEKI_PASSWORD).toCharArray());
+        config.getAsString(Keys.FUSEKI_USERNAME),
+        config.getAsString(Keys.FUSEKI_PASSWORD).toCharArray());
   }
 
   public void save(Model model) {
     DatasetAccessorFactory
-        .createHTTP(config.get(Keys.FUSEKI_STORE_URL), httpAuthenticator)
+        .createHTTP(config.getAsString(Keys.FUSEKI_STORE_URL), httpAuthenticator)
         .add(model);
   }
 
   public void save(String graphUri, Model model) {
-    DatasetAccessorFactory.createHTTP(
-        config.get(Keys.FUSEKI_STORE_URL),
-        httpAuthenticator)
+    DatasetAccessorFactory.createHTTP(config.getAsString(Keys.FUSEKI_STORE_URL), httpAuthenticator)
         .add(graphUri, model);
   }
 
@@ -53,7 +51,7 @@ public class RDFStore {
     Query select = QueryFactory.create(query);
     ResultSet rs = QueryExecutionFactory
         .createServiceRequest(
-            config.get(Keys.FUSEKI_QUERY_URL),
+            config.getAsString(Keys.FUSEKI_QUERY_URL),
             select,
             httpAuthenticator)
         .execSelect();
@@ -65,7 +63,7 @@ public class RDFStore {
 
     UpdateExecutionFactory.createRemote(
         updateRequest,
-        config.get(Keys.FUSEKI_UPDATE_URL),
+        config.getAsString(Keys.FUSEKI_UPDATE_URL),
         httpAuthenticator)
         .execute();
   }

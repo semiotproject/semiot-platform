@@ -140,6 +140,7 @@
                             org.slf4j.impl,
                             org.slf4j.spi,
                             ru.semiot.platform.deviceproxyservice.api.drivers,
+                            ru.semiot.platform.deviceproxyservice.api.manager,
                             sun.misc,
                             javax.naming,
                             javax.net.ssl,

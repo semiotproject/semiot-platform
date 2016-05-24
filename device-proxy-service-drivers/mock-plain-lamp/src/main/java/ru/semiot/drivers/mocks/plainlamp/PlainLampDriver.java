@@ -11,6 +11,7 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 import ru.semiot.platform.deviceproxyservice.api.drivers.ControllableDeviceDriver;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
+import ru.semiot.platform.deviceproxyservice.api.drivers.RDFTemplate;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -27,11 +28,11 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
   private static final Logger logger = LoggerFactory.getLogger(PlainLampDriver.class);
   private static final String PROTOTYPE_URI_PREFIX =
       "https://raw.githubusercontent.com/semiotproject/semiot-platform/"
-          + "master/device-proxy-service-drivers/mock-plain-lamp/"
+          + "command_to_keyvalue/device-proxy-service-drivers/mock-plain-lamp/"
           + "src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#";
-  private static final String PROCESS_LIGHT_ID = "light";
-  private static final String PARAM_SHINE_LUMEN = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Lumen";
-  private static final String PARAM_SHINE_COLOR = PROTOTYPE_URI_PREFIX + "PlainLamp-Shine-Color";
+  private static final String PROCESS_LIGHT = "light";
+  private static final String COMMAND_LIGHT_STOP = "light-stopcommand";
+  private static final String COMMAND_LIGHT_START = "light-startcommand";
   private static final String DRIVER_NAME = "Plain Lamp (Mock) Driver";
   private static final String DEVICE_ID_PREFIX = "123123123123123";
 
@@ -40,12 +41,17 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
       new DriverInformation(Activator.DRIVER_PID, URI.create(PROTOTYPE_URI_PREFIX + "PlainLamp"));
   private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+  private RDFTemplate TEMPLATE_COMMAND_LIGHT_STOP;
+  private RDFTemplate TEMPLATE_COMMAND_LIGHT_START;
+
   private Map<String, PlainLamp> lamps = new HashMap<>();
 
   private volatile DeviceDriverManager manager;
 
   public void start() {
     try {
+      loadRDFTemplates();
+
       manager.registerDriver(info);
 
       logger.info("{} started!", DRIVER_NAME);
@@ -63,25 +69,38 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
         executor.scheduleAtFixedRate(() -> {
           try {
             PlainLamp l = lamps.get(lamp_id);
-            Command command;
 
             synchronized (l) {
               if (l.getIsOn()) {
                 l.setIsOn(false);
-                command = new Command(l.getId(), Command.TYPE_STOPCOMMAND, PROCESS_LIGHT_ID);
+
+                Command command = new Command(PROCESS_LIGHT, COMMAND_LIGHT_STOP);
+                command.add(PlainLampProps.PROCESS_ID, PROCESS_LIGHT);
+                command.add(PlainLampProps.DEVICE_ID, l.getId());
 
                 logger.debug("[ID={}] Switched off!", l.getId());
+
+                manager.registerCommand(l, new CommandResult(
+                    command,
+                    getRDFTemplate(COMMAND_LIGHT_STOP),
+                    ZonedDateTime.now()));
               } else {
                 l.setIsOn(true);
 
-                command = new Command(l.getId(), Command.TYPE_STARTCOMMAND, PROCESS_LIGHT_ID);
-                command.addParameter(PARAM_SHINE_LUMEN, 890);
-                command.addParameter(PARAM_SHINE_COLOR, 4000);
+                Command command = new Command(PROCESS_LIGHT, COMMAND_LIGHT_START);
+                command.add(PlainLampProps.PROCESS_ID, PROCESS_LIGHT);
+                command.add(PlainLampProps.DEVICE_ID, l.getId());
+                command.add(PlainLampProps.PROCESS_LIGHT_PARAMETER_LUMEN, 890);
+                command.add(PlainLampProps.PROCESS_LIGHT_PARAMETER_COLOR, 4000);
+
                 logger.debug("[ID={}] Switched on!", l.getId());
+
+                manager.registerCommand(l, new CommandResult(
+                    command,
+                    getRDFTemplate(COMMAND_LIGHT_START),
+                    ZonedDateTime.now()));
               }
             }
-
-            manager.registerCommand(l, new CommandResult(command, ZonedDateTime.now()));
           } catch (Throwable e) {
             logger.error(e.getMessage(), e);
           }
@@ -129,36 +148,61 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
   }
 
   @Override
+  public RDFTemplate getRDFTemplate(String id) {
+    switch (id) {
+      case COMMAND_LIGHT_START:
+        return TEMPLATE_COMMAND_LIGHT_START;
+      case COMMAND_LIGHT_STOP:
+        return TEMPLATE_COMMAND_LIGHT_STOP;
+      default:
+        throw new IllegalArgumentException();
+    }
+  }
+
+  private void loadRDFTemplates() {
+    try {
+      TEMPLATE_COMMAND_LIGHT_STOP = new RDFTemplate(COMMAND_LIGHT_STOP, this.getClass()
+          .getResourceAsStream("/ru/semiot/drivers/mocks/plainlamp/light-stopcommand.ttl"));
+      TEMPLATE_COMMAND_LIGHT_START = new RDFTemplate(COMMAND_LIGHT_START, this.getClass()
+          .getResourceAsStream("/ru/semiot/drivers/mocks/plainlamp/light-startcommand.ttl"));
+    } catch (Throwable ex) {
+      logger.error(ex.getMessage(), ex);
+    }
+  }
+
+  @Override
   public CommandResult executeCommand(Command command) throws CommandExecutionException {
     try {
-      if (lamps.containsKey(command.getDeviceId())) {
-        PlainLamp device = lamps.get(command.getDeviceId());
-        String commandType = command.getCommandType();
-        String processId = command.getProcessId();
+      if (lamps.containsKey(command.get(PlainLampProps.DEVICE_ID))) {
+        PlainLamp device = lamps.get(command.get(PlainLampProps.DEVICE_ID));
+        String commandId = command.get(PlainLampProps.COMMAND_ID);
+        String processId = command.get(PlainLampProps.PROCESS_ID);
         synchronized (device) {
-          if (processId.equals(PROCESS_LIGHT_ID)) {
-            if (commandType.equals(Command.TYPE_STOPCOMMAND)) {
+          if (processId.equals(PROCESS_LIGHT)) {
+            if (commandId.equals(COMMAND_LIGHT_STOP)) {
               device.setIsOn(false);
 
               logger.debug("[ID={}] Turned off the light!", device.getId());
-            } else if (commandType.equals(Command.TYPE_STARTCOMMAND)) {
+            } else if (commandId.equals(COMMAND_LIGHT_START)) {
               device.setIsOn(true);
-              device.setLumen(command.getParameterAsInteger(PARAM_SHINE_LUMEN));
-              device.setKelvin(command.getParameterAsInteger(PARAM_SHINE_COLOR));
+              device.setLumen(command.getAsInteger(
+                  PlainLampProps.PROCESS_LIGHT_PARAMETER_LUMEN));
+              device.setKelvin(command.getAsInteger(
+                  PlainLampProps.PROCESS_LIGHT_PARAMETER_COLOR));
 
               logger.debug("[ID={}] Turned on the light! Lumen: {}, Kelvin: {}",
                   device.getId(), device.getLumen(), device.getKelvin());
             } else {
               throw CommandExecutionException.badCommand(
-                  "Command [%s] is not supported!", commandType);
+                  "Command [%s] is not supported!", commandId);
             }
           } else {
             throw CommandExecutionException.badCommand("Process [%s] is not supported!", processId);
           }
         }
 
-        CommandResult result = new CommandResult(command, ZonedDateTime.now());
-
+        CommandResult result = new CommandResult(
+            command, getRDFTemplate(commandId), ZonedDateTime.now());
         manager.registerCommand(device, result);
 
         return result;
@@ -169,7 +213,7 @@ public class PlainLampDriver implements ControllableDeviceDriver, ManagedService
       if (e instanceof CommandExecutionException) {
         throw e;
       } else {
-        throw CommandExecutionException.badCommand();
+        throw CommandExecutionException.badCommand(e);
       }
     }
   }

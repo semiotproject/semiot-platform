@@ -8,7 +8,7 @@
 @prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
 @prefix proto: <http://w3id.org/semiot/ontologies/proto#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
+@prefix : <https://raw.githubusercontent.com/semiotproject/semiot-platform/command_to_keyvalue/device-proxy-service-drivers/mock-plain-lamp/src/main/resources/ru/semiot/drivers/mocks/plainlamp/prototype.ttl#> .
 
 :PlainLamp a ssn:System, proto:Prototype ;
   rdfs:label "A plain lamp"^^xsd:string ;
@@ -17,13 +17,15 @@
 
 :PlainLamp-Shine a semiot:Process, semiot:ActuationProcess ;
   semiot:supportedCommand [
-    a semiot:Command, semiot:StopCommand ;
+    a semiot:StopCommand ;
+    dcterms:identifier "light-stopcommand" ;
     rdfs:label "Turn off the light"@en ;
   ] ;
   semiot:supportedCommand [
-    a semiot:Command, semiot:StartCommand ;
+    a semiot:StartCommand ;
+    dcterms:identifier "light-startcommand" ;
     rdfs:label "Turn on the light"@en ;
-    dul:hasParameter [ a dul:Parameter, semiot:MappingParameter, sh:Shape ;
+    dul:hasParameter [ a semiot:MappingParameter, sh:Shape ;
       sh:property [
         sh:name "Brightness"@en ;
         sh:datatype xsd:integer ;
@@ -32,7 +34,7 @@
       ] ;
       semiot:forParameter :PlainLamp-Shine-Lumen ;
     ] ;
-    dul:hasParameter [ a dul:Parameter, semiot:MappingParameter, sh:Shape ;
+    dul:hasParameter [ a semiot:MappingParameter, sh:Shape ;
       sh:property [
         sh:name "Color temperature"@en ;
         sh:datatype xsd:integer ;
@@ -49,11 +51,11 @@
   dul:hasParameter :PlainLamp-Shine-Lumen ;
   dul:hasParameter :PlainLamp-Shine-Color .
 
-:PlainLamp-Shine-Lumen a dul:Parameter, semiot:PropertyMappingParameter ;
+:PlainLamp-Shine-Lumen a semiot:PropertyMappingParameter ;
   dul:associatedWith :PlainLamp-Actuator ;
   ssn:forProperty qudt-quantity:LuminousFlux .
 
-:PlainLamp-Shine-Color a dul:Parameter, semiot:PropertyMappingParameter ;
+:PlainLamp-Shine-Color a semiot:PropertyMappingParameter ;
   dul:associatedWith :PlainLamp-Actuator ;
   ssn:forProperty qudt-quantity-ext:CorrelatedColorTemperature .
 

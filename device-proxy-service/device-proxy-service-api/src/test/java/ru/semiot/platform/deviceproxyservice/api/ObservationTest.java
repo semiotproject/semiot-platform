@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
+import ru.semiot.platform.deviceproxyservice.api.drivers.RDFTemplate;
 
 import java.io.IOException;
 
@@ -37,9 +38,9 @@ public class ObservationTest {
     }
 
     @Override
-    public String getRDFTemplate() {
+    public RDFTemplate getRDFTemplate() {
       try {
-        return IOUtils.toString(this.getClass()
+        return new RDFTemplate("observation", this.getClass()
             .getResourceAsStream("/ru/semiot/platform/deviceproxyservice/api/observation.ttl"));
       } catch (IOException e) {
         e.printStackTrace();
@@ -57,7 +58,7 @@ public class ObservationTest {
     }
 
     @Override
-    public String getRDFTemplate() {
+    public RDFTemplate getRDFTemplate() {
       return null;
     }
   }

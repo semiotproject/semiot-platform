@@ -3,9 +3,9 @@ package ru.semiot.platform.deviceproxyservice.api.drivers;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFLanguages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,18 +13,21 @@ import java.util.Objects;
 
 public abstract class Device {
 
-  private final Map<String, String> properties = new HashMap<>();
+  private static final Logger logger = LoggerFactory.getLogger(Device.class);
+  private final Map<String, Object> properties = new HashMap<>();
 
   public Device(String id) {
-    properties.put(DeviceProperties.DEVICE_ID, id);
+    this.properties.put(DeviceProperties.DEVICE_ID, id);
+    this.properties.put(DeviceProperties.DEVICE_URI,
+        "{{" + Keys.PLATFORM_SYSTEMS_URI_PREFIX + "}}/" + id);
   }
 
-  public Map<String, String> getProperties() {
+  public Map<String, Object> getProperties() {
     return properties;
   }
 
   public String getProperty(String name) {
-    return properties.get(name);
+    return properties.get(name).toString();
   }
 
   public void setProperty(String key, String value) {
@@ -32,19 +35,16 @@ public abstract class Device {
   }
 
   public String getId() {
-    return properties.get(DeviceProperties.DEVICE_ID);
+    return properties.get(DeviceProperties.DEVICE_ID).toString();
   }
 
-  public abstract String getRDFTemplate();
+  public abstract RDFTemplate getRDFTemplate();
 
-  public String toTurtleString() {
-    return TemplateUtils.resolve(getRDFTemplate(), properties);
-  }
-  
   public Model toDescriptionAsModel(Configuration configuration) {
-    StringReader descr = new StringReader(TemplateUtils.resolve(toTurtleString(), configuration));
-
-    Model model = ModelFactory.createDefaultModel().read(descr, null, RDFLanguages.strLangTurtle);
+    Model model = ModelFactory.createDefaultModel().read(
+        getRDFTemplate().resolveToReader(properties, configuration),
+        null,
+        getRDFTemplate().getRDFLanguage());
 
     return model;
   }

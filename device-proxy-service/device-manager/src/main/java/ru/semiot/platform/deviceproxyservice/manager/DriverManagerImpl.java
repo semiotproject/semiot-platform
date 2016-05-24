@@ -28,6 +28,8 @@ import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceProperties;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
+import ru.semiot.platform.deviceproxyservice.api.drivers.RDFTemplate;
+import ru.semiot.platform.deviceproxyservice.api.manager.CommandFactory;
 import ws.wamp.jawampa.WampClient;
 
 import java.io.IOException;
@@ -45,6 +47,8 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   private static final String COMMANDRESULT_FRAME_PATH =
       FRAME_PATH_PREFIX + "CommandResult-frame.jsonld";
   private static final String SYSTEM_FRAME_PATH = FRAME_PATH_PREFIX + "System-frame.jsonld";
+  private static final String VAR_SYSTEM_ID = "${SYSTEM_ID}";
+  private static final String VAR_PROCESS_ID = "${PROCESS_ID}";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
   private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults.${PROCESS_ID}";
   private static final long TIMEOUT = 5000;
@@ -96,11 +100,11 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
       WAMPClient
           .getInstance()
-          .init(configuration.get(Keys.WAMP_URI),
-              configuration.get(Keys.WAMP_REALM),
+          .init(configuration.getAsString(Keys.WAMP_URI),
+              configuration.getAsString(Keys.WAMP_REALM),
               configuration.getAsInteger(Keys.WAMP_RECONNECT),
-              configuration.get(Keys.WAMP_LOGIN),
-              configuration.get(Keys.WAMP_PASSWORD))
+              configuration.getAsString(Keys.WAMP_LOGIN),
+              configuration.getAsString(Keys.WAMP_PASSWORD))
           .subscribe(
               (WampClient.State newState) -> {
                 if (newState instanceof WampClient.ConnectedState) {
@@ -159,9 +163,14 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
           configuration.putAll(dictionary);
 
+          //Composite properties
           configuration.put(Keys.PLATFORM_SYSTEMS_URI_PREFIX,
               configuration.get(Keys.PLATFORM_DOMAIN) + "/"
                   + configuration.get(Keys.PLATFORM_SYSTEMS_PATH));
+          configuration.put(Keys.PLATFORM_PROCESS_URI_PREFIX,
+              configuration.get(Keys.PLATFORM_SYSTEMS_URI_PREFIX) + "/{{"
+                  + DeviceProperties.DEVICE_ID + "}}/"
+                  + configuration.get(Keys.PLATFORM_PROCESS_PATH));
 
           configuration.setConfigured();
 
@@ -207,7 +216,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
           String message = JsonUtils.toString(
               ModelJsonLdUtils.toJsonLdCompact(description, systemFrame));
           WAMPClient.getInstance().publish(
-              getConfiguration().get(Keys.TOPIC_NEWANDOBSERVING), message)
+              getConfiguration().getAsString(Keys.TOPIC_NEWANDOBSERVING), message)
               .subscribe(WAMPClient.onError());
         } catch (JsonLdError | IOException ex) {
           logger.error(ex.getMessage(), ex);
@@ -248,8 +257,8 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       //TODO: There's no guarantee that WAMPClient is connected?
       WAMPClient.getInstance().publish(
           TOPIC_COMMANDRESULT
-              .replace("${SYSTEM_ID}", device.getId())
-              .replace("${PROCESS_ID}", result.getCommand().getProcessId()),
+              .replace(VAR_SYSTEM_ID, device.getId())
+              .replace(VAR_PROCESS_ID, result.get(DeviceProperties.PROCESS_ID)),
           JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, commandResultFrame)))
           .subscribe(WAMPClient.onError());
     } catch (Throwable e) {
@@ -258,7 +267,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   }
 
   @Override
-  public Model executeCommand(String deviceId, Model command)
+  public Model executeCommand(String deviceId, Model commandModel)
       throws CommandExecutionException {
     try {
       String pid = directoryService.findDriverPidByDeviceId(deviceId);
@@ -273,7 +282,10 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
                 (ServiceReference) services.iterator().next();
             ControllableDeviceDriver driver = bundleContext.getService(reference);
 
-            CommandResult result = driver.executeCommand(new Command(command));
+            String commandId = CommandFactory.extractCommandId(commandModel);
+            RDFTemplate template = driver.getRDFTemplate(commandId);
+            Command command = CommandFactory.buildCommand(commandModel, template);
+            CommandResult result = driver.executeCommand(command);
 
             return result.toRDFAsModel(configuration);
           } else {
@@ -289,7 +301,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       if (e instanceof CommandExecutionException) {
         throw e;
       } else {
-        throw CommandExecutionException.badCommand();
+        throw CommandExecutionException.badCommand(e);
       }
     }
   }
@@ -298,9 +310,10 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     return configuration;
   }
 
+  //TODO: Move to the DirectoryService
   private void connectToDataStore() {
     try {
-      URI fullUri = new URI(configuration.get(Keys.FUSEKI_STORE_URL));
+      URI fullUri = new URI(configuration.getAsString(Keys.FUSEKI_STORE_URL));
       URIBuilder uri =
           new URIBuilder().setScheme("http").setHost(fullUri.getHost()).setPort(fullUri.getPort());
       HttpGet request = new HttpGet(uri.build());

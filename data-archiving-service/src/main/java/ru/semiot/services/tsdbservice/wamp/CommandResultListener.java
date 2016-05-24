@@ -26,8 +26,8 @@ public class CommandResultListener extends RDFMessageObserver {
   private static final Query GET_INFORMATION = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
       "SELECT ?uri ?datetime ?type ?process {" +
           "?actuation semiot:isResultOf ?command ;" +
-          "dul:hasEventTime ?datetime ;" +
-          "dul:hasParticipant ?uri ." +
+          "semiot:commandResultTime ?datetime ;" +
+          "dul:associatedWith ?uri ." +
           "?command a ?type ;" +
           " semiot:forProcess ?process ." +
           "FILTER(?type != semiot:Command)" +

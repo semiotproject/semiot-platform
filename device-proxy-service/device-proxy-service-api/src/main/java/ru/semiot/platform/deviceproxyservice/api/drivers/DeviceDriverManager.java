@@ -1,6 +1,11 @@
 package ru.semiot.platform.deviceproxyservice.api.drivers;
 
 import org.apache.jena.rdf.model.Model;
+import ru.semiot.platform.deviceproxyservice.api.drivers.CommandExecutionException;
+import ru.semiot.platform.deviceproxyservice.api.drivers.CommandResult;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
+import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Observation;
 
 public interface DeviceDriverManager {
 
@@ -21,9 +26,10 @@ public interface DeviceDriverManager {
   /**
    * It's called by a device driver.
    *
-   * @param commandExecutionResult a command performed on a device
+   * @param device a device which performed the command
+   * @param result the result of a command performed on the device
    */
-  public void registerCommand(Device device, CommandResult commandExecutionResult);
+  public void registerCommand(Device device, CommandResult result);
 
   public Model executeCommand(String systemId, Model command)
       throws CommandExecutionException;

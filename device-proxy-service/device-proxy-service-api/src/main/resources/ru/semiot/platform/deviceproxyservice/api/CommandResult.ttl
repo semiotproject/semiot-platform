@@ -4,6 +4,6 @@
 
 [
     a semiot:CommandResult ;
-    dul:hasEventTime "${ru.semiot.platform.commandresult.datetime}"^^xsd:dateTime ;
-    dul:hasParticipant <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
+    semiot:commandResultTime "{{ru.semiot.platform.commandresult.datetime}}"^^xsd:dateTime ;
+    dul:associatedWith <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}> ;
 ] .

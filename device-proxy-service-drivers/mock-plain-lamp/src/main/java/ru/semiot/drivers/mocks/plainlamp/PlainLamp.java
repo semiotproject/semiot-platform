@@ -3,20 +3,22 @@ package ru.semiot.drivers.mocks.plainlamp;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
+import ru.semiot.platform.deviceproxyservice.api.drivers.RDFTemplate;
 
 import java.io.IOException;
 
 public class PlainLamp extends Device {
 
   private static final String TEMPLATE_PATH = "/ru/semiot/drivers/mocks/plainlamp/description.ttl";
-  private static String DESCRIPTION_TEMPLATE;
+  private static RDFTemplate TEMPLATE_DESCRIPTION;
   private boolean isOn = false;
   private int lumen = 890;
   private int kelvin = 4000;
 
   static {
     try {
-      DESCRIPTION_TEMPLATE = IOUtils.toString(PlainLamp.class.getResourceAsStream(TEMPLATE_PATH));
+      TEMPLATE_DESCRIPTION = new RDFTemplate("description",
+          PlainLamp.class.getResourceAsStream(TEMPLATE_PATH));
     } catch (IOException ex) {
       LoggerFactory.getLogger(PlainLamp.class).error(ex.getMessage(), ex);
     }
@@ -50,7 +52,7 @@ public class PlainLamp extends Device {
     this.kelvin = kelvin;
   }
 
-  public String getRDFTemplate() {
-    return DESCRIPTION_TEMPLATE;
+  public RDFTemplate getRDFTemplate() {
+    return TEMPLATE_DESCRIPTION;
   }
 }
