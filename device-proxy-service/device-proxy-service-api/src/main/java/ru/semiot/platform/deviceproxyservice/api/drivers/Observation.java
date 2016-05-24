@@ -45,7 +45,8 @@ public abstract class Observation {
   public abstract RDFTemplate getRDFTemplate();
 
   public Model toObservationAsModel(Map<String, Object> properties, Configuration configuration) {
-    StringReader descr = getRDFTemplate().resolveToReader(properties, configuration);
+    StringReader descr = getRDFTemplate().resolveToReader(
+        this.properties, properties, configuration);
 
     Model model = ModelFactory.createDefaultModel().read(descr, null, RDFLanguages.strLangTurtle);
 

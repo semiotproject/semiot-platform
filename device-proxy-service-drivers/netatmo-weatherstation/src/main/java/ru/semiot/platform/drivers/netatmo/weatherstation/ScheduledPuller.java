@@ -77,10 +77,8 @@ public class ScheduledPuller implements Runnable {
         logger.info("Found [{}] observations", observations.size());
 
         for (WeatherStationObservation newObs : observations) {
-          String deviceId = newObs.getProperty(
-              DeviceProperties.DEVICE_ID);
-          String type = newObs.getProperty(
-              NetatmoDeviceProperties.OBSERVATION_TYPE);
+          String deviceId = newObs.getProperty(DeviceProperties.DEVICE_ID);
+          String type = newObs.getProperty(NetatmoDeviceProperties.OBSERVATION_TYPE);
 
           WeatherStationObservation oldObs = driver.getObservation(
               deviceId, type);

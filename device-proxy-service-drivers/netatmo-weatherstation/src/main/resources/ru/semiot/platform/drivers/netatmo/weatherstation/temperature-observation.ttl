@@ -4,16 +4,16 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix qudt: <http://qudt.org/schema/qudt#> .
 @prefix qudt-quantity: <http://qudt.org/vocab/quantity#> .
-@prefix : <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}/observations/temperature#> .
+@prefix : <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}/{{ru.semiot.platform.subsystem.path}}/{{ru.semiot.platform.device.id}}/observations/temperature#> .
 
 [ a ssn:Observation ;
     ssn:observedProperty qudt-quantity:ThermodynamicTemperature ;
-    ssn:observedBy <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature> ;
-    ssn:observationResultTime "${ru.semiot.platform.observation.datetime}"^^xsd:dateTime ;
+    ssn:observedBy <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}/{{ru.semiot.platform.subsystem.path}}/{{ru.semiot.platform.device.id}}-temperature> ;
+    ssn:observationResultTime "{{ru.semiot.platform.observation.datetime}}"^^xsd:dateTime ;
     ssn:observationResult [ a ssn:SensorOutput ;
-        ssn:isProducedBy <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature> ;
+        ssn:isProducedBy <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}/{{ru.semiot.platform.subsystem.path}}/{{ru.semiot.platform.device.id}}-temperature> ;
         ssn:hasValue [ a qudt:QuantityValue ;
-            qudt:quantityValue "${ru.semiot.drivers.netatmo.observation.value}"^^xsd:double ;
+            qudt:quantityValue "{{ru.semiot.drivers.netatmo.observation.value}}"^^xsd:double ;
         ] ;
     ] ;
 ] .

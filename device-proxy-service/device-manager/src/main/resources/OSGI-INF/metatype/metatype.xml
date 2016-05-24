@@ -35,11 +35,11 @@
 
         <AD name="Domain" id="ru.semiot.platform.domain"
             required="true" type="String" default="https://localhost"/>
-        <AD name="System URL Path" id="ru.semiot.platform.systems_path"
+        <AD name="System URL Path" id="ru.semiot.platform.systems.path"
             required="false" type="String" default="systems"/>
-        <AD name="Subsystem URL Path" id="ru.semiot.platform.subsystem_path"
+        <AD name="Subsystem URL Path" id="ru.semiot.platform.subsystem.path"
             required="false" type="String" default="subsystems"/>
-        <AD name="Process URL Path" id="ru.semiot.platform.process_path"
+        <AD name="Process URL Path" id="ru.semiot.platform.process.path"
             required="false" type="String" default="processes"/>
     </OCD>
 

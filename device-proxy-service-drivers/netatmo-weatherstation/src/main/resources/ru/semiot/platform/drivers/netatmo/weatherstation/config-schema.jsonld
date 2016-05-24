@@ -41,7 +41,7 @@
 				"rdfs:label": "Client application secret",
 				"dtype:defaultValue": "C5hws3Fo0fG0wiZpdd1AKi64OTZK7G3Ic0eu5R"
 			},
-                        "ru.semiot.onlyNewObservations": {
+			"ru.semiot.onlyNewObservations": {
 				"@type": "xsd:boolean",
 				"rdfs:label": "Get from driver only new observations",
 				"dtype:defaultValue": "true"

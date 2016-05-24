@@ -54,7 +54,6 @@ public class CommandResult {
         TEMPLATE_COMMANDRESULT.resolveToReader(properties, configuration),
         null,
         TEMPLATE_COMMANDRESULT.getRDFLanguage());
-    logger.debug(commandTemplate.resolveToString(properties, configuration));
     Model command = ModelFactory.createDefaultModel().read(
         commandTemplate.resolveToReader(properties, configuration),
         null,

@@ -22,5 +22,5 @@
         "apidoc:observations": {"@type": "@id"},
         "apidoc:commandResults": {"@type": "@id"}
     },
-    "@type": "ssn:System"
+    "@type": "${SYSTEM_TYPE}"
 }

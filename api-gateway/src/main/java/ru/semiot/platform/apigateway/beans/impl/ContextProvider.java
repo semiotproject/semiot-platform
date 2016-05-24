@@ -55,6 +55,7 @@ public class ContextProvider {
 
   public static final String VAR_ROOT_URL = "${ROOT_URL}";
   public static final String VAR_SYSTEM_ID = "${SYSTEM_ID}";
+  public static final String VAR_SYSTEM_TYPE = "${SYSTEM_TYPE}";
   public static final String VAR_SUBSYSTEM_ID = "${SUBSYSTEM_ID}";
   public static final String VAR_WAMP_URL = "${WAMP_URL}";
   public static final String VAR_QUERY_PARAMS = "${QUERY_PARAMS}";
@@ -116,6 +117,14 @@ public class ContextProvider {
 
     return (Map<String, Object>) JsonUtils.fromString(str);
   }
+
+  public Map<String, Object> getFrame(String name, Map<String, Object> vars)
+      throws IOException {
+    String str = resolveVars(frames.get(name), vars);
+
+    return (Map<String, Object>) JsonUtils.fromString(str);
+  }
+
 
   public String getContext(String name, URI root) {
     String str = contexts.get(name).replace(VAR_ROOT_URL,

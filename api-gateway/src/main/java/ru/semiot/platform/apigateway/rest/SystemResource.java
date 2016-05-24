@@ -5,7 +5,7 @@ import static ru.semiot.commons.restapi.AsyncResponseHelper.resume;
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
 import org.aeonbits.owner.ConfigFactory;
-import org.apache.commons.io.IOUtils;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
@@ -36,12 +36,10 @@ import rx.exceptions.Exceptions;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.servlet.ServletException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -59,15 +57,18 @@ public class SystemResource extends AbstractSystemResource {
 
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
   private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
-  private static final String QUERY_GET_ALL_SYSTEMS = "SELECT DISTINCT ?uri ?id ?label ?prototype {"
-      + " ?uri a ssn:System, proto:Individual ;"
-      + "     dcterms:identifier ?id ;"
-      + "     proto:hasPrototype ?prototype ."
-      + " OPTIONAL { ?uri rdfs:label ?label }"
-      + "}";
+  private static final String QUERY_GET_ALL_SYSTEMS =
+      "SELECT DISTINCT ?uri ?id ?label ?prototype {"
+          + " ?uri a ssn:System, proto:Individual ;"
+          + "     dcterms:identifier ?id ;"
+          + "     proto:hasPrototype ?prototype ."
+          + " OPTIONAL { ?uri rdfs:label ?label }"
+          + " FILTER NOT EXISTS { [] ssn:hasSubSystem ?uri }"
+          + "}";
   private static final String QUERY_GET_SYSTEM_PROTOTYPES = "SELECT DISTINCT ?prototype {"
       + " ?uri a ssn:System, proto:Individual ;"
-      + "     proto:hasPrototype ?prototype ."
+      + "   proto:hasPrototype ?prototype ."
+      + " FILTER NOT EXISTS { [] ssn:hasSubSystem ?uri }"
       + "}";
   private static final String QUERY_DESCRIBE_SYSTEM = "CONSTRUCT {"
       + "  ?system ?p ?o ."
@@ -161,26 +162,30 @@ public class SystemResource extends AbstractSystemResource {
   public void getSystem(@Suspended final AsyncResponse response, @PathParam("id") String id)
       throws URISyntaxException, IOException {
     URI root = uriInfo.getRequestUri();
+    String rootUrl = URIUtils.extractRootURL(root);
     Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_SINGLE,
         MapBuilder.newMap()
-            .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
+            .put(ContextProvider.VAR_ROOT_URL, rootUrl)
             .put(ContextProvider.VAR_SYSTEM_ID, id).build());
-    Map<String, Object> frame = contextProvider.getFrame(ContextProvider.SYSTEM_SINGLE, root);
 
     sparqlQuery.describe(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id)).map((Model result) -> {
       model.add(result);
       try {
-        List<Resource> list = RDFUtils.listResourcesWithProperty(
-            model, RDF.type, SSN.System, Proto.Individual);
-        if (!list.isEmpty()) {
-          Resource system = RDFUtils.listResourcesWithProperty(
-              model, RDF.type, SSN.System, Proto.Individual).get(FIRST);
+        Literal systemId = ResourceFactory.createTypedLiteral(id, XSDDatatype.XSDstring);
+        boolean found = model.contains(null, DCTerms.identifier, systemId);
+        if (found) {
+          Resource system = model.listResourcesWithProperty(DCTerms.identifier, systemId).next();
           Resource prototype = model.listObjectsOfProperty(system, Proto.hasPrototype)
               .next().asResource();
           Resource prototypeResource = ResourceUtils.createResourceFromClass(
               root, prototype.getLocalName());
           model.add(system, RDF.type, prototypeResource);
 
+          Map<String, Object> frame = contextProvider.getFrame(ContextProvider.SYSTEM_SINGLE,
+              MapBuilder.newMap()
+                  .put(ContextProvider.VAR_ROOT_URL, rootUrl)
+                  .put(ContextProvider.VAR_SYSTEM_TYPE, prototypeResource.getURI())
+                  .build());
           return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
         } else {
           throw new WebApplicationException(Response.Status.NOT_FOUND);

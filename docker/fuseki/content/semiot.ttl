@@ -1,0 +1,377 @@
+@prefix : <http://w3id.org/semiot/ontologies/semiot-core##> .
+@prefix dul: <http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://w3id.org/semiot/ontologies/semiot#> .
+
+<http://w3id.org/semiot/ontologies/semiot#> rdf:type owl:Ontology ;
+                                            
+                                            rdfs:label "SemIoT Core Ontology"^^xsd:string ;
+                                            
+                                            owl:versionInfo "0.0.1"^^xsd:string ;
+                                            
+                                            <http://purl.org/vocab/vann/preferredNamespaceUri> "http://w3id.org/semiot/ontologies/semiot#"^^xsd:anyURI ;
+                                            
+                                            <http://purl.org/vocab/vann/preferredNamespacePrefix> "semiot"^^xsd:string ;
+                                            
+                                            owl:versionIRI <http://w3id.org/semiot/ontologies/semiot/0.0.1#> .
+
+
+#################################################################
+#
+#    Annotation properties
+#
+#################################################################
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+
+<http://purl.org/vocab/vann/preferredNamespacePrefix> rdf:type owl:AnnotationProperty .
+
+
+
+###  http://purl.org/vocab/vann/preferredNamespaceUri
+
+<http://purl.org/vocab/vann/preferredNamespaceUri> rdf:type owl:AnnotationProperty .
+
+
+
+
+
+#################################################################
+#
+#    Object Properties
+#
+#################################################################
+
+
+###  http://purl.oclc.org/NET/ssnx/ssn#hasProperty
+
+ssn:hasProperty rdf:type owl:ObjectProperty .
+
+
+
+###  http://purl.oclc.org/NET/ssnx/ssn#hasSubSystem
+
+ssn:hasSubSystem rdf:type owl:ObjectProperty .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#actsOn
+
+<http://w3id.org/semiot/ontologies/semiot#actsOn> rdf:type owl:ObjectProperty ;
+                                                  
+                                                  rdfs:range ssn:Property ;
+                                                  
+                                                  rdfs:domain <http://w3id.org/semiot/ontologies/semiot#Actuator> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#forParameter
+
+<http://w3id.org/semiot/ontologies/semiot#forParameter> rdf:type owl:ObjectProperty ;
+                                                        
+                                                        rdfs:domain <http://w3id.org/semiot/ontologies/semiot#MappingParameter> ;
+                                                        
+                                                        rdfs:range dul:Parameter .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#forProcess
+
+<http://w3id.org/semiot/ontologies/semiot#forProcess> rdf:type owl:ObjectProperty ;
+                                                      
+                                                      rdfs:domain <http://w3id.org/semiot/ontologies/semiot#Command> ;
+                                                      
+                                                      rdfs:range <http://w3id.org/semiot/ontologies/semiot#Process> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#hasActuatingCapability
+
+<http://w3id.org/semiot/ontologies/semiot#hasActuatingCapability> rdf:type owl:ObjectProperty ;
+                                                                  
+                                                                  rdfs:subPropertyOf ssn:hasProperty ;
+                                                                  
+                                                                  rdfs:range <http://w3id.org/semiot/ontologies/semiot#ActuatingCapability> ;
+                                                                  
+                                                                  rdfs:domain <http://w3id.org/semiot/ontologies/semiot#ActuatingDevice> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#hasActuatingProperty
+
+<http://w3id.org/semiot/ontologies/semiot#hasActuatingProperty> rdf:type owl:ObjectProperty ;
+                                                                
+                                                                rdfs:subPropertyOf ssn:hasProperty ;
+                                                                
+                                                                rdfs:domain <http://w3id.org/semiot/ontologies/semiot#ActuatingCapability> ;
+                                                                
+                                                                rdfs:range <http://w3id.org/semiot/ontologies/semiot#ActuatingProperty> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#isResultOf
+
+<http://w3id.org/semiot/ontologies/semiot#isResultOf> rdf:type owl:ObjectProperty ;
+                                                      
+                                                      rdfs:range <http://w3id.org/semiot/ontologies/semiot#Command> ;
+                                                      
+                                                      rdfs:domain <http://w3id.org/semiot/ontologies/semiot#CommandResult> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#isSubSystemOf
+
+<http://w3id.org/semiot/ontologies/semiot#isSubSystemOf> rdf:type owl:ObjectProperty ;
+                                                         
+                                                         rdfs:range ssn:System ;
+                                                         
+                                                         rdfs:domain ssn:System ;
+                                                         
+                                                         owl:inverseOf ssn:hasSubSystem .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#supportedCommand
+
+<http://w3id.org/semiot/ontologies/semiot#supportedCommand> rdf:type owl:ObjectProperty ;
+                                                            
+                                                            rdfs:range <http://w3id.org/semiot/ontologies/semiot#Command> ;
+                                                            
+                                                            rdfs:domain <http://w3id.org/semiot/ontologies/semiot#Process> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#supportedProcess
+
+<http://w3id.org/semiot/ontologies/semiot#supportedProcess> rdf:type owl:ObjectProperty ;
+                                                            
+                                                            rdfs:domain ssn:System ;
+                                                            
+                                                            rdfs:range <http://w3id.org/semiot/ontologies/semiot#Process> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#triggers
+
+<http://w3id.org/semiot/ontologies/semiot#triggers> rdf:type owl:ObjectProperty ;
+                                                    
+                                                    rdfs:range ssn:Process ;
+                                                    
+                                                    rdfs:domain <http://w3id.org/semiot/ontologies/semiot#Process> .
+
+
+
+
+
+#################################################################
+#
+#    Data properties
+#
+#################################################################
+
+
+###  http://w3id.org/semiot/ontologies/semiot#commandResultTime
+
+<http://w3id.org/semiot/ontologies/semiot#commandResultTime> rdf:type owl:DatatypeProperty ;
+                                                             
+                                                             rdfs:domain <http://w3id.org/semiot/ontologies/semiot#CommandResult> ;
+                                                             
+                                                             rdfs:range xsd:dateTime .
+
+
+
+
+
+#################################################################
+#
+#    Classes
+#
+#################################################################
+
+
+###  http://purl.oclc.org/NET/ssnx/ssn#Observation
+
+ssn:Observation rdf:type owl:Class ;
+                
+                rdfs:subClassOf <http://www.loa-cnr.it/ontologies/DUL.owl#Situation> .
+
+
+
+###  http://purl.oclc.org/NET/ssnx/ssn#Process
+
+ssn:Process rdf:type owl:Class .
+
+
+
+###  http://purl.oclc.org/NET/ssnx/ssn#Property
+
+ssn:Property rdf:type owl:Class .
+
+
+
+###  http://purl.oclc.org/NET/ssnx/ssn#SensingDevice
+
+ssn:SensingDevice rdf:type owl:Class ;
+                  
+                  rdfs:subClassOf ssn:System .
+
+
+
+###  http://purl.oclc.org/NET/ssnx/ssn#System
+
+ssn:System rdf:type owl:Class .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#Actuating
+
+<http://w3id.org/semiot/ontologies/semiot#Actuating> rdf:type owl:Class ;
+                                                     
+                                                     rdfs:subClassOf ssn:Process .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#ActuatingCapability
+
+<http://w3id.org/semiot/ontologies/semiot#ActuatingCapability> rdf:type owl:Class ;
+                                                               
+                                                               rdfs:subClassOf ssn:Property .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#ActuatingDevice
+
+<http://w3id.org/semiot/ontologies/semiot#ActuatingDevice> rdf:type owl:Class ;
+                                                           
+                                                           rdfs:subClassOf ssn:System ,
+                                                                           <http://w3id.org/semiot/ontologies/semiot#Actuator> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#ActuatingProcess
+
+<http://w3id.org/semiot/ontologies/semiot#ActuatingProcess> rdf:type owl:Class ;
+                                                            
+                                                            rdfs:subClassOf <http://w3id.org/semiot/ontologies/semiot#Process> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#ActuatingProperty
+
+<http://w3id.org/semiot/ontologies/semiot#ActuatingProperty> rdf:type owl:Class ;
+                                                             
+                                                             rdfs:subClassOf ssn:Property .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#ActuatingValue
+
+<http://w3id.org/semiot/ontologies/semiot#ActuatingValue> rdf:type owl:Class ;
+                                                          
+                                                          rdfs:subClassOf <http://w3id.org/semiot/ontologies/semiot#ActuatingProperty> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#ActuatingValueRange
+
+<http://w3id.org/semiot/ontologies/semiot#ActuatingValueRange> rdf:type owl:Class ;
+                                                               
+                                                               rdfs:subClassOf <http://w3id.org/semiot/ontologies/semiot#ActuatingProperty> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#Actuator
+
+<http://w3id.org/semiot/ontologies/semiot#Actuator> rdf:type owl:Class ;
+                                                    
+                                                    rdfs:subClassOf dul:PhysicalObject .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#Command
+
+<http://w3id.org/semiot/ontologies/semiot#Command> rdf:type owl:Class .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#CommandResult
+
+<http://w3id.org/semiot/ontologies/semiot#CommandResult> rdf:type owl:Class ;
+                                                         
+                                                         rdfs:subClassOf <http://www.loa-cnr.it/ontologies/DUL.owl#Situation> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#MappingParameter
+
+<http://w3id.org/semiot/ontologies/semiot#MappingParameter> rdf:type owl:Class ;
+                                                            
+                                                            rdfs:subClassOf dul:Parameter .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#Process
+
+<http://w3id.org/semiot/ontologies/semiot#Process> rdf:type owl:Class .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#PropertyMappingParameter
+
+<http://w3id.org/semiot/ontologies/semiot#PropertyMappingParameter> rdf:type owl:Class ;
+                                                                    
+                                                                    rdfs:subClassOf dul:Parameter .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#SensingProcess
+
+<http://w3id.org/semiot/ontologies/semiot#SensingProcess> rdf:type owl:Class ;
+                                                          
+                                                          rdfs:subClassOf <http://w3id.org/semiot/ontologies/semiot#Process> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#StartCommand
+
+<http://w3id.org/semiot/ontologies/semiot#StartCommand> rdf:type owl:Class ;
+                                                        
+                                                        rdfs:subClassOf <http://w3id.org/semiot/ontologies/semiot#Command> .
+
+
+
+###  http://w3id.org/semiot/ontologies/semiot#StopCommand
+
+<http://w3id.org/semiot/ontologies/semiot#StopCommand> rdf:type owl:Class ;
+                                                       
+                                                       rdfs:subClassOf <http://w3id.org/semiot/ontologies/semiot#Command> .
+
+
+
+###  http://www.loa-cnr.it/ontologies/DUL.owl#Situation
+
+<http://www.loa-cnr.it/ontologies/DUL.owl#Situation> rdf:type owl:Class .
+
+
+
+###  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Parameter
+
+dul:Parameter rdf:type owl:Class .
+
+
+
+###  http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject
+
+dul:PhysicalObject rdf:type owl:Class .
+
+
+
+
+###  Generated by the OWL API (version 3.5.1) http://owlapi.sourceforge.net
+

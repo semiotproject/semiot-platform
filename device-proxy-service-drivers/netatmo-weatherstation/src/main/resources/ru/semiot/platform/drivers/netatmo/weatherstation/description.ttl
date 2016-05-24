@@ -11,30 +11,30 @@
 @prefix semiot: <http://w3id.org/semiot/ontologies/semiot#> .
 @prefix ws: <https://raw.githubusercontent.com/semiotproject/semiot-platform/master/device-proxy-service-drivers/netatmo-weatherstation/src/main/resources/ru/semiot/platform/drivers/netatmo/weatherstation/prototype.ttl#> .
 
-<${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> a ssn:System, proto:Individual ;
-    rdfs:label "Netatmo Weather Station (Outdoor module) / ${ru.semiot.platform.device.id}"@en ;
+<{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}> a ssn:System, proto:Individual ;
+    rdfs:label "Netatmo Weather Station (Outdoor module) / {{ru.semiot.platform.device.id}}"@en ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule ;
-    ssn:hasSubSystem <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature> ;
-    ssn:hasSubSystem <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-humidity> ;
-    dcterms:identifier "${ru.semiot.platform.device.id}"^^xsd:string ;
+    ssn:hasSubSystem <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}/{{ru.semiot.platform.subsystem.path}}/{{ru.semiot.platform.device.id}}-temperature> ;
+    ssn:hasSubSystem <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}/{{ru.semiot.platform.subsystem.path}}/{{ru.semiot.platform.device.id}}-humidity> ;
+    dcterms:identifier "{{ru.semiot.platform.device.id}}"^^xsd:string ;
     geo:location [
 	    a geo:Point ;
-	    geo:lat "${ru.semiot.drivers.netatmo.latitude}"^^xsd:string ;
-        geo:long "${ru.semiot.drivers.netatmo.langitude}"^^xsd:string ;
-        geo:alt "${ru.semiot.drivers.netatmo.altitude}"^^xsd:string ;
+	    geo:lat "{{ru.semiot.drivers.netatmo.latitude}}"^^xsd:string ;
+        geo:long "{{ru.semiot.drivers.netatmo.langitude}}"^^xsd:string ;
+        geo:alt "{{ru.semiot.drivers.netatmo.altitude}}"^^xsd:string ;
     ] ;
     .
 
-<${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-temperature>
+<{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}/{{ru.semiot.platform.subsystem.path}}/{{ru.semiot.platform.device.id}}-temperature>
     a ssn:SensingDevice, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-TemperatureSensor ;
-    semiot:isSubSystemOf <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
-    dcterms:identifier "${ru.semiot.platform.device.id}-temperature"^^xsd:string ;
+    semiot:isSubSystemOf <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}> ;
+    dcterms:identifier "{{ru.semiot.platform.device.id}}-temperature"^^xsd:string ;
     .
 
-<${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}/${ru.semiot.platform.subsystem_path}/${ru.semiot.platform.device.id}-humidity>
+<{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}/{{ru.semiot.platform.subsystem.path}}/{{ru.semiot.platform.device.id}}-humidity>
     a ssn:SensingDevice, proto:Individual ;
     proto:hasPrototype ws:NetatmoWeatherStationOutdoorModule-HumiditySensor ;
-    semiot:isSubSystemOf <${ru.semiot.platform.systems_uri_prefix}/${ru.semiot.platform.device.id}> ;
-    dcterms:identifier "${ru.semiot.platform.device.id}-humidity"^^xsd:string ;
+    semiot:isSubSystemOf <{{ru.semiot.platform.systems.uriprefix}}/{{ru.semiot.platform.device.id}}> ;
+    dcterms:identifier "{{ru.semiot.platform.device.id}}-humidity"^^xsd:string ;
     .
