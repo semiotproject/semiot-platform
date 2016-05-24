@@ -18,7 +18,7 @@ export default function(CONFIG, $http, $q) {
                 defer.resolve({
                     uri: res['@id'],
                     id: res['dcterms:identifier'],
-                    observationsURI: res['apidoc:observations']['@id'],
+                    observationsURI: res['apidoc:observations'],
                     label: getSensorLabel(res['dcterms:identifier'])
                 });
             });
