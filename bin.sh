@@ -110,7 +110,7 @@ case "$1" in
         ;;
 
     "build-mvn")
-        if [ -z "$2" ]
+        if [ -z "$2" ];
             then
                 mvn_build_all
             else
@@ -119,7 +119,7 @@ case "$1" in
         ;;
 
     "build-docker")
-        if [ -z "$2" ]
+        if [ -z "$2" ];
             then
                 docker_build_all
             else
@@ -133,7 +133,7 @@ case "$1" in
         ;;
 
     "update-singe-image")
-        if [ -z "$2" ]
+        if [ -z "$2" ];
             then
                 echo "update-single-image requires a second argument; do nothing"
                 exit 1
