@@ -1,4 +1,4 @@
-export default function(CONFIG, $http, $q) {
+export default ["CONFIG", "$http", "$q", function(CONFIG, $http, $q) {
 
     function getSensorLabel(id) {
         return `this name would be asked from prototype / ${id}`;
@@ -26,4 +26,4 @@ export default function(CONFIG, $http, $q) {
             return defer.promise;
         }
     };
-}
+}];

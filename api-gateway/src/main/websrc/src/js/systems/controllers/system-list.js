@@ -1,6 +1,6 @@
 "use strict";
 
-export default function($scope, systemAPI) {
+export default ["$scope", "systemAPI", function($scope, systemAPI) {
     $scope.isLoading = true;
     $scope.totalSystems = [];
     $scope.filteredSystems = [];
@@ -48,4 +48,4 @@ export default function($scope, systemAPI) {
 
     $scope.init();
 
-}
+}];

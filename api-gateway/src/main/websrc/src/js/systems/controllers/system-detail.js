@@ -7,18 +7,29 @@ function parseIdFromURI(uri) {
     return uri.substring(uri.lastIndexOf('/') + 1);
 }
 
-export default function(
-    $scope,
-    $routeParams,
-    $q,
-    $interval,
-    commonUtils,
-    chartUtils,
-    systemAPI,
-    sensorAPI,
-    observationAPI,
-    CONFIG
-) {
+export default [
+    "$scope",
+    "$routeParams",
+    "$q",
+    "$interval",
+    "commonUtils",
+    "chartUtils",
+    "systemAPI",
+    "sensorAPI",
+    "observationAPI",
+    "CONFIG",
+    function(
+        $scope,
+        $routeParams,
+        $q,
+        $interval,
+        commonUtils,
+        chartUtils,
+        systemAPI,
+        sensorAPI,
+        observationAPI,
+        CONFIG
+    ) {
 
     function getLastHourRange() {
         // time difference between server and client
@@ -111,4 +122,4 @@ export default function(
     };
 
     $scope.init(CONFIG.URLS.base + location.pathname);
-}
+}];

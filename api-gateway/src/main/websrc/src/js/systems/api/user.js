@@ -1,4 +1,4 @@
-export default function(CONFIG, $http, $q) {
+export default ["CONFIG", "$http", "$q", function(CONFIG, $http, $q) {
 
     let currentUser = null;
 
@@ -30,4 +30,4 @@ export default function(CONFIG, $http, $q) {
             return defer.promise;
         }
     };
-}
+}];

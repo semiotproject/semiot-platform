@@ -1,4 +1,4 @@
-export default function(CONFIG, $http, $q, WAMP) {
+export default ["CONFIG", "$http", "$q", "WAMP", function(CONFIG, $http, $q, WAMP) {
 
     function extractSystemNameFromAPIMessage(msg) {
         return msg['rdfs:label'] ? msg['rdfs:label']['@value'] : msg['@id'];
@@ -132,4 +132,4 @@ export default function(CONFIG, $http, $q, WAMP) {
             // WAMP.unsubscribe(getWAMPTopicFromSensor(sensor));
         }
     };
-}
+}];

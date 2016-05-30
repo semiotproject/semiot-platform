@@ -1,6 +1,6 @@
 "use strict";
 
-export default function($http, CONFIG) {
+export default ["$http", "CONFIG", function($http, CONFIG) {
 
     // helpers
     let getPrefixes = function() {
@@ -24,4 +24,4 @@ export default function($http, CONFIG) {
     };
 
     return instance;
-}
+}];

@@ -2,7 +2,7 @@
 
 import N3 from "n3";
 
-export default function($q, CONFIG) {
+export default ["$q", "CONFIG", function($q, CONFIG) {
 
     let N3Utils = N3.Util;
 
@@ -97,4 +97,4 @@ export default function($q, CONFIG) {
     };
 
     return instance;
-}
+}];

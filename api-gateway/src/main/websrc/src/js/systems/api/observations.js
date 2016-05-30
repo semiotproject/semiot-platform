@@ -1,4 +1,4 @@
-export default function(CONFIG, $http, $q, WAMP) {
+export default ["CONFIG", "$http", "$q", "WAMP", function(CONFIG, $http, $q, WAMP) {
 
     function extractObservationFromWAMPMessage(msg) {
         return {
@@ -110,4 +110,4 @@ export default function(CONFIG, $http, $q, WAMP) {
             WAMP.unsubscribe(getWAMPTopicFromSensor(sensor));
         }
     };
-}
+}];

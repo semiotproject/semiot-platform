@@ -1,6 +1,6 @@
 "use strict";
 
-export default function($q, CONFIG) {
+export default ["$q", "CONFIG", function($q, CONFIG) {
 
     let counter = 666;
 
@@ -86,4 +86,4 @@ export default function($q, CONFIG) {
     };
 
     return instance;
-}
+}];

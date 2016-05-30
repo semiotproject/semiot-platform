@@ -1,6 +1,6 @@
 "use strict";
 
-export default function($routeProvider, $locationProvider) {
+export default ["$routeProvider", "$locationProvider", function($routeProvider, $locationProvider) {
     $routeProvider
         .when('/', {
             templateUrl: '/partials/system-list.html',
@@ -13,4 +13,4 @@ export default function($routeProvider, $locationProvider) {
 
     // use the HTML5 History API
     $locationProvider.html5Mode(true);
-}
+}];

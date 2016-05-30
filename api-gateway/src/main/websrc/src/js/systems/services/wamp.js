@@ -2,7 +2,7 @@
 
 import autobahn from 'autobahn';
 
-export default function(CONFIG, currentUser) {
+export default ["CONFIG", "currentUser", function(CONFIG, currentUser) {
 
     // `endpoint` : { `topic`:`autobahn.Subscribtion` }
     let _sessions = {};
@@ -79,4 +79,4 @@ export default function(CONFIG, currentUser) {
     };
 
     return instance;
-}
+}];

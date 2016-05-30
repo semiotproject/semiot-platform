@@ -1,6 +1,6 @@
 "use strict";
 
-export default function(CONFIG, commonUtils) {
+export default ["CONFIG", "commonUtils", function(CONFIG, commonUtils) {
 
     const baseChartConfig = {
         useHighStocks: true,
@@ -281,4 +281,4 @@ export default function(CONFIG, commonUtils) {
     };
 
     return instance;
-}
+}];
