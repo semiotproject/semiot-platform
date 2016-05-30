@@ -39,7 +39,7 @@ module.exports = function (grunt) {
                     browserifyOptions: {
                         debug: true
                     },
-                    transform: ['babelify'],
+                    transform: ['babelify', 'uglifyify'],
                     watch: true
                 }
             },
@@ -57,6 +57,12 @@ module.exports = function (grunt) {
         },
         eslint: {
             target: [BUILD_CONFIG.src_dir + '**/*.js']
+        },
+        uglify : {
+            main : {
+                src : BUILD_CONFIG.dist_dir + "js/systems/index.js",
+                dest : BUILD_CONFIG.dist_dir + "js/systems/index.js",
+            }
         },
         copy: {
             index: {
@@ -151,9 +157,10 @@ module.exports = function (grunt) {
     });
 
     var buildTasks = ["less", "browserify", "copy"];
+    var prodTasks = ["uglify"];
     var watchTasks = ["http-server", "watch"];
 
-    grunt.registerTask('build', buildTasks);
+    grunt.registerTask('build', buildTasks.concat(prodTasks));
     grunt.registerTask('serve', watchTasks);
     grunt.registerTask('dev', buildTasks.concat(watchTasks))
 
