@@ -60,6 +60,9 @@ module.exports = function (grunt) {
         },
         uglify : {
             main : {
+                options: {
+                    sourceMap: true
+                },
                 src : BUILD_CONFIG.dist_dir + "js/systems/index.js",
                 dest : BUILD_CONFIG.dist_dir + "js/systems/index.js",
             }
