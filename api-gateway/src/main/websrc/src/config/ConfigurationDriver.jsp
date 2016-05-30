@@ -126,7 +126,7 @@
          <div style="height: 500px;"></div>
     </div>
 
-    <form action="${pageContext.request.contextPath}/config/ConfigurationDriver" method="post" id='target-form'>
+    <form action="${pageContext.request.contextPath}/config/ConfigurationDriver" method="post" id='target-form' style="visibility: hidden;">
         <input type="hidden" name="save" value="Save and start">
     </form>
 
