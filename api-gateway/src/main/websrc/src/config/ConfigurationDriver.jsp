@@ -435,6 +435,8 @@
         function init() {
             if (SCHEMAS.common) {
                 BLOCK_BUILDERS.common();
+            } else {
+                $('.common-fields').hide();
             }
             if (SCHEMAS.repeatable) {
                 BLOCK_BUILDERS.repeatable();
