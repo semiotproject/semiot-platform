@@ -39,7 +39,7 @@ module.exports = function (grunt) {
                     browserifyOptions: {
                         debug: true
                     },
-                    transform: ['babelify', 'uglifyify'],
+                    transform: ['babelify'],
                     watch: true
                 }
             },
