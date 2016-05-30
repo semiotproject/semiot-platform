@@ -17,10 +17,10 @@
         "ssn:hasValue": {"@type": "@id"},
         "ssn:forProperty": {"@type": "@id"},
         "ssn:observes": {"@type": "@id"},
-        "ssn:hasSubSystem": {"@type": "@id"},
         "proto:hasPrototype": {"@type": "@id"},
         "apidoc:observations": {"@type": "@id"},
-        "apidoc:commandResults": {"@type": "@id"}
+        "apidoc:commandResults": {"@type": "@id"},
+        "ssn:hasSubSystem": {"@container": "@set"}
     },
     "@type": "${SYSTEM_TYPE}"
 }
