@@ -433,7 +433,9 @@
         }
 
         function init() {
-            BLOCK_BUILDERS.common();
+            if (SCHEMAS.common) {
+                BLOCK_BUILDERS.common();
+            }
             if (SCHEMAS.repeatable) {
                 BLOCK_BUILDERS.repeatable();
             } else {
