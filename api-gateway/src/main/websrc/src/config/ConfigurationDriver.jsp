@@ -38,6 +38,16 @@
         var MAX_REPEATABLE_COUNT = parseInt('<%=repeatbleMax%>');
         var REPEATABLE_CONFIGURATIONS = [];
     </script>
+    <style>
+        i.fa.fa-info-circle {
+            cursor: help;
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 18px;
+            vertical-align: sub;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="navbar navbar-default">
@@ -318,6 +328,10 @@
                 field.find('input').val(f['dtype:defaultValue']).attr({
                     name: key
                 });
+
+                if (f['rdfs:comment']) {
+                    field.find('label').append($('<i class="fa fa-info-circle" title="'+ f['rdfs:comment'] + '">'))
+                }
 
                 return field;
             },
