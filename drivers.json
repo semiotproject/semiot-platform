@@ -35,6 +35,11 @@
         "name": "Simulator",
         "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_simulator_build/lastSuccessfulBuild/artifact/simulator/target/simulator-1.0-SNAPSHOT.jar",
         "pid": "ru.semiot.platform.drivers.simulator"
+      },
+      {
+        "name": "Temperature Simulator",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_temp_simulator/lastSuccessfulBuild/artifact/temperature-simulator/target/temperature-simulator-1.0.jar",
+        "pid": "ru.semiot.drivers.temperature-simulator"
       }
     ]
   }
