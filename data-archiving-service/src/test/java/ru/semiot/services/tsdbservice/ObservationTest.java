@@ -16,7 +16,7 @@ public class ObservationTest {
   @Test
   public void testToRDF1() {
     Observation observation = new Observation("123123", "123123-humidity",
-        "2016-03-31 16:39:57+0100",
+        "2016-03-31T16:39:57+01:00",
         "http://qudt.org/vocab/quantity#ThermodynamicTemperature",
         null, "3.4");
 
@@ -34,7 +34,7 @@ public class ObservationTest {
   @Test
   public void testToRDF2() {
     Observation observation = new Observation("123123", "123123-humidity",
-        "2016-03-31 16:39:57+0100",
+        "2016-03-31T16:39:57+01:00",
         "http://qudt.org/vocab/quantity#ThermodynamicTemperature",
         null, "3.4");
 
