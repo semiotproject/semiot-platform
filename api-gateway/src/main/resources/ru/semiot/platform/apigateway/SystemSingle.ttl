@@ -8,7 +8,7 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
-<${ROOT_URL}/systems/${SYSTEM_ID}> apidoc:observations <${ROOT_URL}/systems/${SYSTEM_ID}/observations> .
+# <${ROOT_URL}/systems/${SYSTEM_ID}> apidoc:observations <${ROOT_URL}/systems/${SYSTEM_ID}/observations> .
 
 # TODO: Need to be implemented
 #<${ROOT_URL}/systems/${SYSTEM_ID}> apidoc:commandResults <${ROOT_URL}/systems/${SYSTEM_ID}/commandResults> .

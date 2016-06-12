@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
+import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.VOID;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -180,6 +181,12 @@ public class SystemResource extends AbstractSystemResource {
           Resource prototypeResource = ResourceUtils.createResourceFromClass(
               root, prototype.getLocalName());
           model.add(system, RDF.type, prototypeResource);
+
+          if(model.contains(null, RDF.type, SSN.SensingDevice)) {
+            model.add(system,
+                ResourceFactory.createProperty(rootUrl + "/doc#observations"),
+                ResourceFactory.createResource(rootUrl + "/systems/" + systemId + "/observations"));
+          }
 
           Map<String, Object> frame = contextProvider.getFrame(ContextProvider.SYSTEM_SINGLE,
               MapBuilder.newMap()
