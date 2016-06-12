@@ -1,9 +1,7 @@
 {
-    "@context": {
-        "apidoc": "${ROOT_URL}/doc#",
-        
-        "apidoc:EntryPoint-Systems": {"@type": "@id"},
-        "apidoc:EntryPoint-Sensors": {"@type": "@id"}
-    },
-    "@type": "apidoc:EntryPoint"
+  "@context": {
+    "apidoc": "${ROOT_URL}/doc#",
+    "apidoc:systems": {"@type": "@id"}
+  },
+  "@type": "apidoc:EntryPoint"
 }

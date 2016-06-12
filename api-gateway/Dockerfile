@@ -2,7 +2,7 @@ FROM jboss/wildfly:9.0.2.Final
 USER root
 
 ENV WILDFLY_HOME=/opt/jboss/wildfly
-RUN /opt/jboss/wildfly/bin/add-user.sh admin admin --silent
+RUN $WILDFLY_HOME/bin/add-user.sh admin admin --silent
 
 #Install MySQL Connector
 ENV MYSQL_CONNECTOR http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.35/mysql-connector-java-5.1.35.jar

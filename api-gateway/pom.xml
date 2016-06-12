@@ -56,8 +56,8 @@
         <dependency>
             <groupId>com.github.jsonld-java.jsonld-java</groupId>
             <artifactId>jsonld-java</artifactId>
-            <version>a124ac1951</version>
-            <!-- instead of 0.8.2 because of CME exception -->
+            <version>b779efa73a</version>
+            <!-- instead of 0.8.3 because of NPE exception -->
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

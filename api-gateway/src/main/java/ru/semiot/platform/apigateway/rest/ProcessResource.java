@@ -10,7 +10,10 @@ import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -23,9 +26,11 @@ import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
+import rx.Observable;
 import rx.exceptions.Exceptions;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +60,11 @@ public class ProcessResource {
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
 
   private static final String QUERY_DESCRIBE_PROCESS = "DESCRIBE <${PROCESS_URI}>";
+  private static final String QUERY_DESCRIBE_COMMANDS
+      = "DESCRIBE ?command {"
+      + " <${PROCESS_URI}> proto:hasPrototype ?prototype ."
+      + " ?prototype semiot:supportedCommand ?command ."
+      + "}";
 
   private static final String VAR_PROCESS_URI = "${PROCESS_URI}";
 
@@ -85,10 +95,18 @@ public class ProcessResource {
           model.add(rs);
           try {
             if (!RDFUtils.listResourcesWithProperty(model, RDF.type, SEMIOT.Process).isEmpty()) {
-              return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
+              return ResourceFactory.createResource(requestUri.toASCIIString());
             } else {
               throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
+          } catch (Throwable ex) {
+            throw Exceptions.propagate(ex);
+          }
+        })
+        .map((Resource process) -> addSupportedCommands(model, process).toBlocking().first())
+        .map((__) -> {
+          try {
+            return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
           } catch (Throwable ex) {
             throw Exceptions.propagate(ex);
           }
@@ -200,4 +218,23 @@ public class ProcessResource {
     }
   }
 
+  private Observable<Model> addSupportedCommands(Model model, Resource process) {
+    return metadata.describe(QUERY_DESCRIBE_COMMANDS.replace(VAR_PROCESS_URI, process.getURI()))
+        .map((Model rs) -> {
+          Resource operation = ResourceFactory.createResource();
+          rs.add(process, Hydra.supportedOperation, operation)
+              .add(operation, RDF.type, Hydra.Operation)
+              .add(operation, Hydra.method, "POST")
+              .add(operation, Hydra.returns, SEMIOT.CommandResult);
+
+          ResIterator commandIter = rs.listSubjectsWithProperty(RDF.type, SEMIOT.Command);
+          while (commandIter.hasNext()) {
+            Resource command = commandIter.next();
+            rs.add(operation, Hydra.expects, command);
+          }
+
+          model.add(rs);
+          return model;
+        });
+  }
 }

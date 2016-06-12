@@ -69,6 +69,7 @@ public class RootResource {
       = "SELECT DISTINCT ?prototype {"
       + "	?device a proto:Individual, ssn:System ;"
       + "    	proto:hasPrototype ?prototype ."
+      + " FILTER NOT EXISTS { [] ssn:hasSubSystem ?device }"
       + "}";
   private static final String QUERY_COLLECTION_MEMBER
       = "SELECT ?uri {"
@@ -82,42 +83,14 @@ public class RootResource {
       + "     proto:hasPrototype <${PROTOTYPE_URI}> ;"
       + "     proto:hasPrototype ?prototype ;"
       + "     ?property ?value ."
-      + " FILTER(isLiteral(?value))"
-      + "}";
-  private static final String QUERY_DESCRIBE_SUPPORTED_PROCESSES
-      = "DESCRIBE ?process {"
-      + " ?device a proto:Individual ;"
-      + "   proto:hasPrototype <${PROTOTYPE_URI}> ;"
-      + "   semiot:supportedProcess ?process ."
-      + "}";
-  private static final String QUERY_DESCRIBE_COMMANDS
-      = "DESCRIBE ?command {"
-      + " <${PROCESS_URI}> proto:hasPrototype ?prototype ."
-      + " ?prototype semiot:supportedCommand ?command ."
-      + "}";
-  private static final String QUERY_PROPERTIES_AND_UNITS
-      = "SELECT ?propertyOrUnit ?label {"
-      + " VALUES ?prototype { ${PROTOTYPES} }"
-      + " {"
-      + "   ?prototype ssn:hasSubSystem/ssn:observes ?propertyOrUnit ."
-      + " } UNION {"
-      + "   ?prototype ssn:hasSubSystem/ssn:hasMeasurementCapability/ssn:hasMeasurementProperty ?p ."
-      + "   ?p a qudt:Unit ;"
-      + "      ssn:hasValue/ssn:hasValue ?propertyOrUnit ."
-      + " }"
-      + " ?propertyOrUnit rdfs:label ?label ."
+      + " FILTER(?property NOT IN (rdf:type, proto:hasPrototype))"
       + "}";
   private static final String LINK_SYSTEMS = "systems";
   private static final String VAR_PROTOTYPE = "prototype";
   private static final String VAR_PROPERTY = "property";
-  private static final String VAR_PROCESS = "process";
   private static final String VAR_URI = "uri";
-  private static final String VAR_PROPERTY_OR_UNIT = "propertyOrUnit";
-  private static final String VAR_LABEL = "label";
   private static final String VAR_COLLECTION_URI = "${COLLECTION_URI}";
   private static final String VAR_PROTOTYPE_URI = "${PROTOTYPE_URI}";
-  private static final String VAR_PROCESS_URI = "${PROCESS_URI}";
-  private static final String VAR_PROTOTYPES = "${PROTOTYPES}";
 
   public RootResource() {
   }
@@ -141,9 +114,7 @@ public class RootResource {
     Model entrypoint = contextProvider.getRDFModel(ENTRYPOINT, root);
     Map<String, Object> frame = contextProvider.getFrame(ENTRYPOINT, root);
 
-    Object entrypointObj = ModelJsonLdUtils.toJsonLd(entrypoint);
-
-    return JsonUtils.toString(JsonLdProcessor.frame(entrypointObj, frame, new JsonLdOptions()));
+    return JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(entrypoint, frame));
   }
 
   @GET
@@ -176,10 +147,8 @@ public class RootResource {
             defineResourceIndividual(apiDoc, rootURL, LINK_SYSTEMS, rs, SSN.System));
 
     Observable<Model> supportedProperties = addSupportedProperties(apiDoc, rootURL, prototypes);
-    Observable<Model> supportedProcesses = addSupportedProcesses(apiDoc, rootURL, prototypes);
-//    Observable<Model> propertiesAndUnits = addPropertiesAndUnits(apiDoc, prototypes);
 
-    Observable.zip(supportedProperties, supportedProcesses, (a, b) -> {
+    supportedProperties.map((__) -> {
       try {
         return JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(apiDoc, frame));
       } catch (Throwable e) {
@@ -250,79 +219,6 @@ public class RootResource {
       });
       return model;
     });
-  }
-
-  private Observable<Model> addSupportedProcesses(Model model, String rootUrl,
-      Observable<List<Resource>> observable) {
-    return observable.map((prototypes) -> {
-      List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
-      prototypes.stream().forEach((prototype) -> obs.add(query.describe(
-          ResourceUtils.createResourceFromClass(rootUrl, prototype.getLocalName()),
-          QUERY_DESCRIBE_SUPPORTED_PROCESSES.replace(VAR_PROTOTYPE_URI, prototype.getURI()))));
-
-      return Observable.merge(obs).toBlocking().toIterable();
-    }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
-      List<Observable<Map.Entry<Object, Model>>> obs = new ArrayList<>();
-      iter.forEach((Map.Entry<Object, Model> rs) -> {
-        Resource prototypeResource = (Resource) rs.getKey();
-        Model value = rs.getValue();
-        if (!value.isEmpty()) {
-          Resource process = value.listSubjectsWithProperty(Proto.hasPrototype).next();
-          value.add(prototypeResource, SEMIOT.supportedProcess, process);
-
-          model.add(value);
-
-          obs.add(query.describe(
-              process, QUERY_DESCRIBE_COMMANDS.replace(VAR_PROCESS_URI, process.getURI())));
-        }
-      });
-      return Observable.merge(obs).toBlocking().toIterable();
-    }).map((Iterable<Map.Entry<Object, Model>> iter) -> {
-      iter.forEach((Map.Entry<Object, Model> rs) -> {
-        Resource process = (Resource) rs.getKey();
-        Model value = rs.getValue();
-        Resource operation = ResourceFactory.createResource();
-        value.add(process, Hydra.supportedOperation, operation)
-            .add(operation, RDF.type, Hydra.Operation)
-            .add(operation, Hydra.method, "POST")
-            .add(operation, Hydra.returns, SEMIOT.CommandResult);
-
-        ResIterator commandIter = value.listSubjectsWithProperty(RDF.type, SEMIOT.Command);
-        while (commandIter.hasNext()) {
-          Resource command = commandIter.next();
-          value.add(operation, Hydra.expects, command);
-        }
-
-        model.add(value);
-      });
-      return model;
-    });
-  }
-
-  private Observable<Model> addPropertiesAndUnits(Model model,
-      Observable<List<Resource>> observable) {
-    return observable
-        .map((List<Resource> ps) -> StringUtils.join(
-            ps.stream().map((p) -> "<" + p.getURI() + ">").toArray(String[]::new), " "))
-        .map((values) -> query
-            .select(QUERY_PROPERTIES_AND_UNITS.replace(VAR_PROTOTYPES, values))
-            .toBlocking().toIterable())
-        .map((Iterable<ResultSet> iter) -> {
-          iter.forEach((rs) -> {
-            Resource doc = model.listSubjectsWithProperty(RDF.type, Hydra.ApiDocumentation).next();
-
-            while (rs.hasNext()) {
-              QuerySolution qs = rs.next();
-              Resource propertyOrUnit = qs.getResource(VAR_PROPERTY_OR_UNIT);
-              Literal label = qs.getLiteral(VAR_LABEL);
-
-              model.add(doc, Hydra.supportedClass, propertyOrUnit)
-                  .add(propertyOrUnit, RDF.type, Hydra.Class)
-                  .add(propertyOrUnit, RDFS.label, label);
-            }
-          });
-          return model;
-        });
   }
 
   @GET

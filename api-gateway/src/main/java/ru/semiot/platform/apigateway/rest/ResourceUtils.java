@@ -15,8 +15,7 @@ public class ResourceUtils {
   public static final Resource createResourceFromClass(String rootURL, String className) {
     StringBuilder builder = new StringBuilder(rootURL)
         .append("/doc#")
-        .append(className)
-        .append("Resource");
+        .append(className);
 
     return ResourceFactory.createResource(builder.toString());
   }
