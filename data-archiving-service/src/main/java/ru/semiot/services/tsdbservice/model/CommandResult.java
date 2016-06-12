@@ -70,6 +70,18 @@ public class CommandResult {
     parameters.put(parameter, value);
   }
 
+  public void addParameters(List<UDTValue> parameters) {
+    if (parameters != null && !parameters.isEmpty()) {
+      for (UDTValue value : parameters) {
+        Resource parameter = ResourceFactory.createResource(value.getString("for_parameter"));
+        RDFNode parameterValue = ResourceFactory.createTypedLiteral(value.getString("value"),
+            TypeMapper.getInstance().getSafeTypeByName(value.getString("datatype")));
+
+        addParameter(parameter, parameterValue);
+      }
+    }
+  }
+
   public String toInsertQuery() {
     StringBuilder builderProps = new StringBuilder("[");
     for (CommandProperty p : properties) {
@@ -82,6 +94,7 @@ public class CommandResult {
     for (Resource parameter : parameters.keySet()) {
       builderParams.append("{").append("for_parameter:'").append(parameter.getURI())
           .append("',value:'").append(parameters.get(parameter).asLiteral().getLexicalForm())
+          .append("',datatype:'").append(parameters.get(parameter).asLiteral().getDatatypeURI())
           .append("'},");
     }
     builderParams.deleteCharAt(builderParams.length() - 1);

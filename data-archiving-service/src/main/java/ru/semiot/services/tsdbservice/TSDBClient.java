@@ -37,7 +37,7 @@ public class TSDBClient {
           "WITH CLUSTERING ORDER BY (event_time DESC);";
   private static final String CREATE_COMMAND_PARAMETER_TYPE =
       "CREATE TYPE IF NOT EXISTS semiot.command_parameter (" +
-          "for_parameter text, value text" +
+          "for_parameter text, value text, datatype text" +
           ");";
   private static final String CREATE_COMMAND_PROPERTY_TYPE =
       "CREATE TYPE IF NOT EXISTS semiot.command_property (" +

@@ -27,6 +27,7 @@
     "dul:associatedWith": {"@type": "@id"},
     "dul:hasParticipant": {"@type": "@id"},
     "semiot:forProcess": {"@type": "@id"},
+    "semiot:forParameter": {"@type": "@id"},
     "hydra:member": {"@container": "@set"}
   },
   "@type": "hydra:PartialCollectionView"

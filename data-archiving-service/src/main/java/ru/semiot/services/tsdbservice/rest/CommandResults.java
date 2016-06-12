@@ -109,6 +109,9 @@ public class CommandResults {
         List<UDTValue> properties = row.getList("command_properties", UDTValue.class);
         commandResult.addProperties(properties);
 
+        List<UDTValue> parameters = row.getList("command_parameters", UDTValue.class);
+        commandResult.addParameters(parameters);
+
         commandResults.add(commandResult.toRDF());
       });
 
