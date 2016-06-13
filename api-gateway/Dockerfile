@@ -20,5 +20,11 @@ RUN keytool -genkey -noprompt \
     -keypass password
 
 ADD standalone.xml $WILDFLY_HOME/standalone/configuration/
+ADD standalone.conf $WILDFLY_HOME/bin/
+
+# Add inspectIT's agent
+ADD https://github.com/inspectIT/inspectIT/releases/download/1.6.7.79/inspectit-agent-sun1.5.zip $WILDFLY_HOME/
+RUN unzip $WILDFLY_HOME/inspectit-agent-sun1.5.zip -d $WILDFLY_HOME/inspectit
+ADD inspectit-agent.cfg $WILDFLY_HOME/inspectit/agent/config/inspectit-agent.cfg
 
 ADD target/api-gateway-1.0-SNAPSHOT/ $WILDFLY_HOME/standalone/deployments/api-gateway-1.0-SNAPSHOT.war/

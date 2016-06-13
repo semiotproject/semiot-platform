@@ -22,6 +22,13 @@ ADD log4j.properties $FUSEKI_BASE/
 ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
 ADD content $FUSEKI_HOME/content
 
+# Add inspectIT's agent
+ADD https://github.com/inspectIT/inspectIT/releases/download/1.6.7.79/inspectit-agent-sun1.5.zip .
+RUN unzip inspectit-agent-sun1.5.zip -d inspectit
+ADD inspectit-agent.cfg inspectit/agent/config/inspectit-agent.cfg
+
+ENV JVM_ARGS "-javaagent:inspectit/agent/inspectit-agent.jar -Dinspectit.config=inspectit/agent/config/ -Xbootclasspath/p:inspectit/agent/inspectit-agent.jar"
+
 CMD rm -f $FUSEKI_HOME/fuseki-db/tdb.lock
 CMD if [ -e $FUSEKI_HOME/app/shiro.ini ] then rm $FUSEKI_BASE/shiro.ini cp $FUSEKI_HOME/app/shiro.ini $FUSEKI_BASE/shiro.ini fi
 CMD ./fuseki-server --config=base/config.ttl
