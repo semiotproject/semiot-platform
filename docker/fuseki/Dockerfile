@@ -23,11 +23,10 @@ ADD web.xml $FUSEKI_HOME/webapp/WEB-INF/web.xml
 ADD content $FUSEKI_HOME/content
 
 # Add inspectIT's agent
-ADD https://github.com/inspectIT/inspectIT/releases/download/1.6.7.79/inspectit-agent-sun1.5.zip .
-RUN unzip inspectit-agent-sun1.5.zip -d inspectit
-ADD inspectit-agent.cfg inspectit/agent/config/inspectit-agent.cfg
+ADD https://github.com/inspectIT/inspectIT/releases/download/1.6.8.82/inspectit-agent-sun1.5-1.6.8.82.zip ./inspectit-agent.zip
+RUN unzip inspectit-agent.zip -d inspectit
 
-ENV JVM_ARGS "-javaagent:inspectit/agent/inspectit-agent.jar -Dinspectit.config=inspectit/agent/config/ -Xbootclasspath/p:inspectit/agent/inspectit-agent.jar"
+ENV JVM_ARGS "-javaagent:inspectit/agent/inspectit-agent.jar -Dinspectit.repository=winghouse.semiot.ru:9070 -Dinspectit.agent.name=triplestore -Xbootclasspath/p:inspectit/agent/inspectit-agent.jar"
 
 CMD rm -f $FUSEKI_HOME/fuseki-db/tdb.lock
 CMD if [ -e $FUSEKI_HOME/app/shiro.ini ] then rm $FUSEKI_BASE/shiro.ini cp $FUSEKI_HOME/app/shiro.ini $FUSEKI_BASE/shiro.ini fi

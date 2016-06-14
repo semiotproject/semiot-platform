@@ -10,9 +10,8 @@ RUN dnf install -y unzip java-1.8.0-openjdk-headless && dnf clean all
 WORKDIR /root/semiot-platform/$SERVICE_NAME
 
 # Add inspectIT's agent
-ADD https://github.com/inspectIT/inspectIT/releases/download/1.6.7.79/inspectit-agent-sun1.5.zip .
-RUN unzip inspectit-agent-sun1.5.zip -d inspectit
-ADD inspectit-agent.cfg inspectit/agent/config/inspectit-agent.cfg
+ADD https://github.com/inspectIT/inspectIT/releases/download/1.6.8.82/inspectit-agent-sun1.5-1.6.8.82.zip ./inspectit-agent.zip
+RUN unzip inspectit-agent.zip -d inspectit
 
 ADD target/$SERVICE_JAR_NAME.jar $SERVICE_JAR_NAME.jar
 
