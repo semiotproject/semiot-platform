@@ -51,6 +51,7 @@ app.factory('chartUtils', require('./utils/chart'));
 
 // services
 app.factory('WAMP', require('./services/wamp'));
+app.factory('HTTP', require('./services/http'));
 
 // api
 app.factory('systemAPI', require('./api/systems'));
