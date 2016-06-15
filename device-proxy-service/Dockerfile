@@ -19,7 +19,7 @@ ADD logback.xml ./
 
 CMD java \
     -javaagent:inspectit/agent/inspectit-agent.jar \
-     -Dinspectit.repository=winghouse.semiot.ru:9070 \
+     -Dinspectit.repository=$INSPECTIT_REPOSITORY \
      -Dinspectit.agent.name=proxyservice \
      -Xbootclasspath/p:inspectit/agent/inspectit-agent.jar \
      -Dlogback.configurationFile=/root/semiot-platform/$SERVICE_NAME/logback.xml \

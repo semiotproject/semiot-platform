@@ -26,8 +26,14 @@ ADD content $FUSEKI_HOME/content
 ADD https://github.com/inspectIT/inspectIT/releases/download/1.6.8.82/inspectit-agent-sun1.5-1.6.8.82.zip ./inspectit-agent.zip
 RUN unzip inspectit-agent.zip -d inspectit
 
-ENV JVM_ARGS "-javaagent:inspectit/agent/inspectit-agent.jar -Dinspectit.repository=winghouse.semiot.ru:9070 -Dinspectit.agent.name=triplestore -Xbootclasspath/p:inspectit/agent/inspectit-agent.jar"
-
 CMD rm -f $FUSEKI_HOME/fuseki-db/tdb.lock
 CMD if [ -e $FUSEKI_HOME/app/shiro.ini ] then rm $FUSEKI_BASE/shiro.ini cp $FUSEKI_HOME/app/shiro.ini $FUSEKI_BASE/shiro.ini fi
-CMD ./fuseki-server --config=base/config.ttl
+CMD java \
+  -Xmx1200M \
+  -javaagent:inspectit/agent/inspectit-agent.jar \
+  -Dinspectit.repository=$INSPECTIT_REPOSITORY \
+  -Dinspectit.agent.name=triplestore \
+  -Xbootclasspath/p:inspectit/agent/inspectit-agent.jar \
+  -cp $FUSEKI_HOME/fuseki-server.jar org.apache.jena.fuseki.cmd.FusekiCmd \
+  --config=base/config.ttl
+

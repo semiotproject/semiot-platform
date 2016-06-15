@@ -15,6 +15,8 @@ dataarchivingservice:
     - fuseki
   ports:
     - "8787:8787"
+  #environment:
+    #INSPECTIT_REPOSITORY: '' #InspectIT CMR's address
   volumes:
     - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
@@ -36,6 +38,8 @@ deviceproxyservice:
     - "8181:8181"
     - "9500:9500/udp"
     - "3131:3131/udp"
+  #environment:
+    #INSPECTIT_REPOSITORY: '' #InspectIT CMR's address
   volumes:
     - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
   restart: always
@@ -44,6 +48,8 @@ fuseki:
   image: docker.semiot.ru/fuseki
   ports:
     - "3030:3030"
+  #environment:
+    #INSPECTIT_REPOSITORY: '' #InspectIT CMR's address
   volumes:
     - /semiot-platform/fuseki/fuseki-db:/fuseki/fuseki-db
     - /semiot-platform/fuseki/app:/fuseki/app
@@ -60,6 +66,8 @@ apigateway:
   ports:
     - "8383:8080"
     - "9990:9990"
+  #environment:
+    #INSPECTIT_REPOSITORY: '' #InspectIT CMR's address
   volumes:
     - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
   restart: always
