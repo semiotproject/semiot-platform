@@ -7,6 +7,7 @@
 **/bundles/*.jar
 **/.*
 **/*.iml
+**/*.log
 api-gateway/src/main/webapp
 api-gateway/src/main/websrc/bower_components
 api-gateway/src/main/websrc/node_modules
