@@ -7,10 +7,6 @@
 **/bundles/*.jar
 **/.*
 **/*.iml
-web-ui/npm-debug.log
-web-ui/dist
-web-ui/bower_components
-web-ui/node_modules
 api-gateway/src/main/webapp
 api-gateway/src/main/websrc/bower_components
 api-gateway/src/main/websrc/node_modules

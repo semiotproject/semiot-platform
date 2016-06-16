@@ -119,7 +119,7 @@ public class SystemObservationsResource extends AbstractSystemResource {
                 ContextProvider.SYSTEM_OBSERVATIONS_COLLECTION, params);
             Resource view = RDFUtils.subjectWithProperty(
                 model, RDF.type, Hydra.PartialCollectionView);
-            model.remove(view, null, null);
+            model.removeAll(view, null, null);
 
             response.resume(JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame)));
           } catch (Throwable ex) {

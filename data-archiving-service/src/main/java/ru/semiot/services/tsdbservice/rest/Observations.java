@@ -18,6 +18,7 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
@@ -100,8 +101,13 @@ public class Observations {
           .replace("${SYSTEM_ID}", systemId)
           .replace("${SENSOR_IDS}", toSensors(listSensorId)));
 
-      rs.map((result) -> result.one().getTimestamp("event_time").toInstant().toString())
-          .subscribe(responseStringOrError(response));
+      rs.map((result) -> {
+        if(!result.isExhausted()) {
+          return result.one().getTimestamp("event_time").toInstant().toString();
+        } else {
+          throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+      }).subscribe(responseStringOrError(response));
     }
   }
 
