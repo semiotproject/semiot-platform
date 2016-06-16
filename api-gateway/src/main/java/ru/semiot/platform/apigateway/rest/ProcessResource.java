@@ -12,8 +12,7 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ru.semiot.commons.namespaces.DUL;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -30,7 +29,6 @@ import rx.Observable;
 import rx.exceptions.Exceptions;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -81,9 +79,12 @@ public class ProcessResource {
 
   @GET
   @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
-  public void getProcess(@Suspended AsyncResponse response) throws IOException {
+  public void getProcess(@Suspended AsyncResponse response, @PathParam("system_id") String systemId)
+      throws IOException {
     URI requestUri = uriInfo.getRequestUri();
     String rootUrl = URIUtils.extractRootURL(requestUri);
+    Resource system = ResourceFactory.createResource(
+        uriInfo.getRequestUriBuilder().replacePath("/systems/" + systemId).build().toASCIIString());
     Model model = contextProvider.getRDFModel(ContextProvider.PROCESS_SINGLE,
         MapBuilder.newMap()
             .put(ContextProvider.VAR_ROOT_URL, rootUrl)
@@ -103,7 +104,8 @@ public class ProcessResource {
             throw Exceptions.propagate(ex);
           }
         })
-        .map((Resource process) -> addSupportedCommands(model, process).toBlocking().first())
+        .map((Resource process) ->
+            addSupportedCommands(model, system, process).toBlocking().first())
         .map((__) -> {
           try {
             return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
@@ -218,7 +220,7 @@ public class ProcessResource {
     }
   }
 
-  private Observable<Model> addSupportedCommands(Model model, Resource process) {
+  private Observable<Model> addSupportedCommands(Model model, Resource system, Resource process) {
     return metadata.describe(QUERY_DESCRIBE_COMMANDS.replace(VAR_PROCESS_URI, process.getURI()))
         .map((Model rs) -> {
           Resource operation = ResourceFactory.createResource();
@@ -230,7 +232,9 @@ public class ProcessResource {
           ResIterator commandIter = rs.listSubjectsWithProperty(RDF.type, SEMIOT.Command);
           while (commandIter.hasNext()) {
             Resource command = commandIter.next();
-            rs.add(operation, Hydra.expects, command);
+            rs.add(operation, Hydra.expects, command)
+                .add(command, SEMIOT.forProcess, process)
+                .add(command, DUL.associatedWith, system);
           }
 
           model.add(rs);
