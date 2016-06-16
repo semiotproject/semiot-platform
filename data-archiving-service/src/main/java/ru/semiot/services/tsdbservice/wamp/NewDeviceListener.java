@@ -68,7 +68,6 @@ public class NewDeviceListener implements Observer<String> {
   public NewDeviceListener() {
     httpAuthenticator = new SimpleAuthenticator(
         CONFIG.storeUsername(), CONFIG.storePassword().toCharArray());
-    subscribeTopics(null);
   }
 
   @Override
@@ -85,7 +84,15 @@ public class NewDeviceListener implements Observer<String> {
       Model description = ModelFactory.createDefaultModel().read(
           new StringReader(message), null, RDFLanguages.strLangJSONLD);
       if (description != null && !description.isEmpty()) {
-        subscribeTopics(description);
+        QueryExecution qe = getQEFromModelTopics(description);
+        ResultSet topics = null;
+        if (qe != null) {
+          topics = qe.execSelect();
+        } else {
+          logger.error("Can'f find a ssn:System in device description!");
+        }
+
+        subscribeToDeviceTopics(topics);
       } else {
         logger.warn("Received an empty message or in a wrong format!");
       }
@@ -94,35 +101,29 @@ public class NewDeviceListener implements Observer<String> {
     }
   }
 
-  private void subscribeTopics(Model description) {
-    QueryExecution qe;
-    ResultSet topics = null;
-    if (description == null) {
-      qe = getQEFromStoredTopics();
-      boolean isConnected = false;
-      while (!isConnected) {
+  public void loadDeviceTopicsAndSubscribe() {
+    QueryExecution qe = getQEFromStoredTopics();
+    boolean isConnected = false;
+    while (!isConnected) {
+      try {
+        ResultSet topics = qe.execSelect();
+        logger.info("Connected to triplestore");
+        isConnected = true;
+
+        subscribeToDeviceTopics(topics);
+      } catch (Throwable ex) {
+        logger.warn(ex.getMessage());
+        logger.warn("Can`t connect to the triplestore! Retry in {} ms", TIMEOUT);
         try {
-          topics = qe.execSelect();
-          logger.info("Connected to the triplestore");
-          isConnected = true;
-        } catch (Exception ex) {
-          logger.warn(ex.getMessage());
-          logger.warn("Can`t connect to the triplestore! Retry in {}ms", TIMEOUT);
-          try {
-            Thread.sleep(TIMEOUT);
-          } catch (InterruptedException e) {
-            logger.error(e.getMessage());
-          }
+          Thread.sleep(TIMEOUT);
+        } catch (InterruptedException e) {
+          logger.error(e.getMessage());
         }
       }
-    } else {
-      qe = getQEFromModelTopics(description);
-      if (qe != null) {
-        topics = qe.execSelect();
-      } else {
-        logger.error("Can'f find a ssn:System in device description!");
-      }
     }
+  }
+
+  private void subscribeToDeviceTopics(ResultSet topics) {
     while (topics != null && topics.hasNext()) {
       QuerySolution qs = topics.next();
       String topicObsName = qs.get(VAR_OBSERVATIONS_TOPIC).asLiteral().getString();

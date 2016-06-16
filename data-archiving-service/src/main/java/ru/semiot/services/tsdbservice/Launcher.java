@@ -91,9 +91,16 @@ public class Launcher {
           if (newState instanceof WampClient.ConnectedState) {
             logger.info("Connected to {}", CONFIG.wampUri());
 
-            WAMPClient.getInstance()
-                .subscribe(CONFIG.topicsSubscriber())
-                .subscribe(new NewDeviceListener());
+            try {
+              NewDeviceListener newDeviceListener = new NewDeviceListener();
+              WAMPClient.getInstance()
+                  .subscribe(CONFIG.topicsSubscriber())
+                  .subscribe(newDeviceListener);
+
+              newDeviceListener.loadDeviceTopicsAndSubscribe();
+            } catch (Throwable ex) {
+              logger.debug(ex.getMessage(), ex);
+            }
 
           } else if (newState instanceof WampClient.DisconnectedState) {
             logger.info("Disconnected from {}", CONFIG.wampUri());
@@ -101,7 +108,7 @@ public class Launcher {
             logger.debug("Connecting to {}", CONFIG.wampUri());
           }
         });
-      } catch (Exception ex) {
+      } catch (Throwable ex) {
         logger.error(ex.getMessage(), ex);
       }
     }
