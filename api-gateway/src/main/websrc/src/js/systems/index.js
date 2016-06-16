@@ -57,6 +57,7 @@ app.factory('HTTP', require('./services/http'));
 app.factory('systemAPI', require('./api/systems'));
 app.factory('sensorAPI', require('./api/sensors'));
 app.factory('observationAPI', require('./api/observations'));
+app.factory('processAPI', require('./api/processes'));
 app.factory('currentUser', require('./api/user'));
 
 // controllers

@@ -17,6 +17,7 @@ export default [
     "systemAPI",
     "sensorAPI",
     "observationAPI",
+    "processAPI",
     "CONFIG",
     function(
         $scope,
@@ -28,6 +29,7 @@ export default [
         systemAPI,
         sensorAPI,
         observationAPI,
+        processAPI,
         CONFIG
     ) {
 
@@ -43,6 +45,7 @@ export default [
 
     $scope.system = null;
     $scope.sensors = [];
+    $scope.processes = [];
 
     $scope.getModes = () => {
         return {
@@ -62,6 +65,16 @@ export default [
                 $scope.unsubscribe();
             }
         }
+    };
+    $scope.onPerformOperationClick = function(process) {
+        const operation = this.getCurrentOperation(process);
+        console.info("processing operation:", operation);
+        processAPI.performOperation(operation);
+    };
+    $scope.getCurrentOperation = function(process) {
+        return process.operations.find((o) => {
+            return o.id === process.currentOperation;
+        });
     };
     $scope.onSetRangeClick = function(index) {
         let sensor = $scope.sensors[index];
@@ -116,6 +129,13 @@ export default [
                     });
 
                     $scope.sensors.push(sensor);
+                });
+            });
+            system.processes.map((p, index) => {
+                processAPI.loadProcessInformation(p.uri).then((process) => {
+                    console.info(`loaded process information: `, process);
+                    process.currentOperation = process.operations[0].id;
+                    $scope.processes.push(process);
                 });
             });
         });

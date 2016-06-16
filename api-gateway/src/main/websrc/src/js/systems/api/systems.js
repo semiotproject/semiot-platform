@@ -1,4 +1,4 @@
-export default ["CONFIG", "HTTP", "WAMP", function(CONFIG, HTTP, WAMP) {
+export default ["CONFIG", "HTTP", "WAMP", "commonUtils", function(CONFIG, HTTP, WAMP, commonUtils) {
 
     function extractSystemNameFromAPIMessage(msg) {
         return msg['rdfs:label'] ? msg['rdfs:label']['@value'] : msg['@id'];
@@ -34,13 +34,8 @@ export default ["CONFIG", "HTTP", "WAMP", function(CONFIG, HTTP, WAMP) {
 
 
             return HTTP.get(uri).then((res) => {
-                const subsystems = res['ssn:hasSubSystem'];
-                let processes = res['semiot:supportedProcess'];
-                if (!processes) {
-                    processes = [];
-                } else if (!Array.isArray(processes)) {
-                    processes = [];
-                }
+                const subsystems = commonUtils.ensureArray(res['ssn:hasSubSystem']);
+                const processes = commonUtils.ensureArray(res['semiot:supportedProcess']);
                 return {
                     uri: res['@id'],
                     id: getIdFromURI(res['@id']),
@@ -61,8 +56,8 @@ export default ["CONFIG", "HTTP", "WAMP", function(CONFIG, HTTP, WAMP) {
                     }),
                     processes: processes.map((p) => {
                         return {
-                            uri: p["id"],
-                            id: p["dcterm:identifier"]
+                            uri: p["@id"],
+                            id: p["dcterms:identifier"]
                         };
                     })
                 };
