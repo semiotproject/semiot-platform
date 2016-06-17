@@ -89,7 +89,7 @@ export default ["CONFIG", "HTTP", "WAMP", "$q", "commonUtils", function(CONFIG, 
 
     function extractCommandResultFromWAMPMessage(data) {
         return {
-            value: data["semiot:isResultOf"]["http://purl.org/dc/terms/identifier"],
+            value: data["semiot:isResultOf"]["dcterms:identifier"],
             timestamp: data["semiot:commandResultTime"]["@value"]
         };
     }
@@ -121,7 +121,7 @@ export default ["CONFIG", "HTTP", "WAMP", "$q", "commonUtils", function(CONFIG, 
             return HTTP.get(uri).then((res) => {
                 let commandResult;
                 if (!res["hydra:member"]) {
-                    commandResult = null;
+                    commandResult = {};
                 } else if (Array.isArray(res["hydra:member"])) {
                     commandResult = res["hydra:member"][0];
                 }
