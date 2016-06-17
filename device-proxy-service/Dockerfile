@@ -1,12 +1,12 @@
 FROM fedora:23
 
-MAINTAINER Shilin Ivan <proniment@gmail.com>
+MAINTAINER SemIoT Project <semiotproject@gmail.com>
 
 ENV SERVICE_NAME device-proxy-service
 ENV SERVICE_JAR_NAME device-proxy-service-launcher-1.0-SNAPSHOT-jar-with-dependencies
 
 WORKDIR /
-RUN dnf install -y java-1.8.0-openjdk-headless nss-3.23.0 && dnf clean all
+RUN dnf install -y java-1.8.0-openjdk-headless nss && dnf clean all
 
 WORKDIR /root/semiot-platform/$SERVICE_NAME
 
