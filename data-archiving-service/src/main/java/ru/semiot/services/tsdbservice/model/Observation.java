@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import ru.semiot.commons.namespaces.QUDT;
 import ru.semiot.commons.namespaces.SSN;
+import ru.semiot.services.tsdbservice.TSDBClient;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -50,8 +51,8 @@ public class Observation {
     }
     return "INSERT INTO semiot.observation (sensor_id, system_id, "
         + "event_time, property, feature_of_interest, value)" + " VALUES ('" + sensorId + "', '"
-        + systemId + "','" + eventTime.toString() + "', '" + property.getURI() + "', '" + foi
-        + "', '" + value + "')";
+        + systemId + "','" + TSDBClient.formatToCQLTimestamp(eventTime) + "', '"
+        + property.getURI() + "', '" + foi + "', '" + value + "')";
   }
 
   public Model toRDF() {
