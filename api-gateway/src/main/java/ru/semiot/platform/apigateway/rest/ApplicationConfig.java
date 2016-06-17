@@ -17,6 +17,7 @@ public class ApplicationConfig extends Application {
     resources.add(ru.semiot.platform.apigateway.rest.SystemObservationsResource.class);
     resources.add(ru.semiot.platform.apigateway.rest.SystemResource.class);
     resources.add(ru.semiot.platform.apigateway.rest.ProcessResource.class);
+    resources.add(ru.semiot.platform.apigateway.rest.config.SystemSettingsResource.class);
 
     //Providers
     resources.add(ru.semiot.platform.apigateway.rest.providers.ModelMessageBodyReader.class);
