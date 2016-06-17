@@ -20,7 +20,7 @@ public abstract class Observation {
   private final Map<String, Object> properties = new HashMap<>();
 
   /**
-   * @param timestamp number of seconds since the Unix Epoch
+   * @param timestamp number of seconds or milliseconds since the Unix Epoch
    */
   public Observation(String deviceId, String sensorId, String timestamp) {
     properties.put(DeviceProperties.DEVICE_ID, deviceId);
@@ -28,9 +28,16 @@ public abstract class Observation {
     properties.put(DeviceProperties.OBSERVATION_TIMESTAMP, timestamp);
 
     //Timestamp to ISO 8601 date and time
-    String dateTime = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        .withZone(ZoneOffset.UTC)
-        .format(Instant.ofEpochSecond(Long.valueOf(timestamp)));
+    String dateTime = null;
+    if (timestamp.length() > 10) {
+      dateTime = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+          .withZone(ZoneOffset.UTC)
+          .format(Instant.ofEpochMilli(Long.valueOf(timestamp)));
+    } else {
+      dateTime = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+          .withZone(ZoneOffset.UTC)
+          .format(Instant.ofEpochSecond(Long.valueOf(timestamp)));
+    }
     properties.put(DeviceProperties.OBSERVATION_DATETIME, dateTime);
   }
 
