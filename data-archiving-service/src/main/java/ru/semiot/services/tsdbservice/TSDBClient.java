@@ -1,5 +1,9 @@
 package ru.semiot.services.tsdbservice;
 
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static ru.semiot.services.tsdbservice.ServiceConfig.CONFIG;
 
 import com.datastax.driver.core.BatchStatement;
@@ -15,6 +19,9 @@ import ru.semiot.services.tsdbservice.model.Observation;
 import rx.Observable;
 import rx.Subscriber;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
 public class TSDBClient {
@@ -56,6 +63,21 @@ public class TSDBClient {
           " PRIMARY KEY((system_id, process_id), event_time)" +
           ")" +
           "WITH CLUSTERING ORDER BY (event_time DESC);";
+  private static final DateTimeFormatter CQL_TIMESTAMP_FORMAT = new DateTimeFormatterBuilder()
+      .parseCaseInsensitive()
+      .append(DateTimeFormatter.ISO_LOCAL_DATE)
+      .appendLiteral('T')
+      .appendValue(HOUR_OF_DAY, 2)
+      .appendLiteral(':')
+      .appendValue(MINUTE_OF_HOUR, 2)
+      .optionalStart()
+      .appendLiteral(':')
+      .appendValue(SECOND_OF_MINUTE, 2)
+      .optionalStart()
+      .appendFraction(NANO_OF_SECOND, 2, 9, true)
+      .appendOffsetId()
+      .parseStrict()
+      .toFormatter();
 
   private static volatile TSDBClient instance = null;
 
@@ -142,4 +164,7 @@ public class TSDBClient {
     return Observable.from(rsf);
   }
 
+  public static String formatToCQLTimestamp(ZonedDateTime dateTime) {
+    return dateTime.format(CQL_TIMESTAMP_FORMAT);
+  }
 }

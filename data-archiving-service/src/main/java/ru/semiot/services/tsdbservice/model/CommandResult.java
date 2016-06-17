@@ -14,6 +14,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import ru.semiot.commons.namespaces.DUL;
 import ru.semiot.commons.namespaces.SEMIOT;
+import ru.semiot.services.tsdbservice.TSDBClient;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -108,7 +109,7 @@ public class CommandResult {
             "(system_id, process_id, event_time, " +
             "command_properties, command_parameters, command_type)" +
             "VALUES ('%s', '%s', '%s', %s, %s, '%s')",
-        systemId, processId, eventTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+        systemId, processId, TSDBClient.formatToCQLTimestamp(eventTime),
         commandProperties, commandParameters, type);
   }
 
