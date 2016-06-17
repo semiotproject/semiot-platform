@@ -8,6 +8,6 @@
 **/.*
 **/*.iml
 **/*.log
+**/node_modules
 api-gateway/src/main/webapp
 api-gateway/src/main/websrc/bower_components
-api-gateway/src/main/websrc/node_modules
