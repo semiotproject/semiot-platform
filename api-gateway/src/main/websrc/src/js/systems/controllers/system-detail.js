@@ -72,9 +72,10 @@ export default [
         processAPI.performOperation(operation);
     };
     $scope.getCurrentOperation = function(process) {
-        return process.operations.find((o) => {
+        const a =  process.operations.find((o) => {
             return o.id === process.currentOperation;
         });
+        return a;
     };
     $scope.onSetRangeClick = function(index) {
         let sensor = $scope.sensors[index];
@@ -98,7 +99,7 @@ export default [
             sensor.chartConfig.series[0].data = chartUtils.observationsToSerie(obs);
         });
     };
-    $scope.subscribe = function(sensor) {
+    $scope.subscribeForObservations = function(sensor) {
         observationAPI.subscribeForNewObservations(sensor.endpoint, sensor.topic, (msg) => {
             console.info(`received new observation for endpoint ${sensor.endpoint}, topic ${sensor.topic}: `, msg);
             sensor.chartConfig.series[0].data.push(chartUtils.observationsToChartPoint(msg));
@@ -109,6 +110,16 @@ export default [
     };
     $scope.unsubscribe = function(sensor) {
         observationAPI.unsubscribeFromNewObservations(sensor);
+    };
+    $scope.subscribeForCommandResults = function(process) {
+        if (process.wamp && process.wamp.topic && process.wamp.endpoint) {
+            processAPI.subscribe(process.wamp.endpoint, process.wamp.topic, (data) => {
+                console.info(`received new commandresult! `, data);
+                process.result = data;
+            });
+        } else {
+            console.warn(`unable to subscribe to processes' command results: `, process);
+        }
     };
 
     $scope.init = function(uri) {
@@ -125,7 +136,7 @@ export default [
                         console.info(`loaded WAMP topic: `, res);
                         sensor.endpoint = res.endpoint;
                         sensor.topic = res.topic;
-                        $scope.subscribe(sensor);
+                        $scope.subscribeForObservations(sensor);
                     });
 
                     $scope.sensors.push(sensor);
@@ -134,8 +145,10 @@ export default [
             system.processes.map((p, index) => {
                 processAPI.loadProcessInformation(p.uri).then((process) => {
                     console.info(`loaded process information: `, process);
-                    process.currentOperation = process.operations[0].id;
                     $scope.processes.push(process);
+                    $scope.processes[$scope.processes.length - 1].currentOperation = process.operations[0].id;
+                    console.warn('result processes: ', $scope.processes);
+                    $scope.subscribeForCommandResults(process);
                 });
             });
         });

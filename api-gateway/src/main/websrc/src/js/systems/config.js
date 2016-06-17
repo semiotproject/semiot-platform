@@ -12,7 +12,7 @@ export default {
     VERSION: `@VERSION`,
     URLS: {
         base: BASE_URL,
-        currentUser: `${BASE_URL}/user`,
+        currentUser: `${BASE_URL}/systems`,
         messageBus: `${WS_PROTOCOL}//${BASE_HOSTNAME}/wamp`,
         tripleStore: `${BASE_URL}:3030/ds/query`,
         tsdb: {
@@ -22,12 +22,6 @@ export default {
             last: `${BASE_URL}/last/{0}`
         },
         systems: {
-            list: `${BASE_URL}/systems`
-        },
-        sensors: {
-            list: `${BASE_URL}/systems`
-        },
-        observations: {
             list: `${BASE_URL}/systems`
         }
     },
