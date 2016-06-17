@@ -3,7 +3,12 @@
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "dul": "http://www.loa-cnr.it/ontologies/DUL.owl#",
-    "semiot": "http://w3id.org/semiot/ontologies/semiot#"
+    "semiot": "http://w3id.org/semiot/ontologies/semiot#",
+    "dcterms": "http://purl.org/dc/terms/",
+
+    "dul:associatedWith": {"@type": "@id"},
+    "semiot:forProcess": {"@type": "@id"},
+    "semiot:forParameter": {"@type": "@id"}
   },
   "@type": "semiot:CommandResult"
 }

@@ -134,10 +134,6 @@ module.exports = function (grunt) {
                     livereload: true
                 }
             },
-            eslint: {
-                files: BUILD_CONFIG.src_dir + "**/*.js",
-                tasks: ['newer:eslint']
-            },
             other: {
                 files: [BUILD_CONFIG.src_dir + "**/*"].concat(["**/*.less", "**/*.js"].map(function(glob) {
                     return "!" + BUILD_CONFIG.src_dir + glob;

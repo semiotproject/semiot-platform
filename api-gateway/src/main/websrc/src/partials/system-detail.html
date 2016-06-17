@@ -4,6 +4,44 @@
         <li class="active">{{ system.name }}</li>
     </ol>
     <div id="single-system-wrapper" ng-class="{preloader: isLoading}">
+        <div ng-repeat="process in processes" class="process-view">
+            <h2 class="process__title">{{ process.id }}</h2>
+            <div class="process__last-command-result" ng-if="process.result">
+                <label>Last command result: </label>
+                <span>{{ process.result.value }}</span> on {{ process.result.timestamp }}
+            </div>
+            <div class="process__actiations">
+                <label>Supported operations:</label>
+                <form class="form-horizontal">
+                    <fieldset>
+                        <div class="form-group is-empty">
+                            <label class="col-md-2 control-label">Action</label>
+                            <div class="col-md-10">
+                                <select class="form-control" ng-model="process.currentOperation">
+                                    <option ng-repeat="operation in process.operations"
+                                        ng-value="operation.id"
+                                        ng-selected="operation.id == process.currentOperation"
+                                    >{{ operation.label }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group is-empty" ng-repeat="param in getCurrentOperation(process).body['dul:hasParameter']">
+                                <label class="col-md-2 control-label">{{ param['sh:property']['sh:name']['@value'] }}</label>
+                                <div class="col-md-10">
+                                    <input class="form-control" ng-model="param['dul:hasParameterDataValue']" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group is-empty">
+                            <div class="col-md-10 col-md-offset-2">
+                                <button type="submit" class="btn btn-primary" ng-click="onPerformOperationClick(process)">Perform</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
         <div ng-repeat="sensor in sensors" class="sensor-view">
             <div class="mode-control btn-group">
                 <label class="btn btn-raised" ng-click="onSetModeClick(sensor, getModes()['real-time'])" ng-model="sensor.mode" btn-radio="getModes()['real-time']">Real-Time</label>

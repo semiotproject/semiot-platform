@@ -1,29 +1,22 @@
-export default ["CONFIG", "$http", "$q", function(CONFIG, $http, $q) {
+export default ["CONFIG", "HTTP", function(CONFIG, HTTP) {
 
     function getSensorLabel(id) {
-        return `this name would be asked from prototype / ${id}`;
+        return `${id}`;
     }
 
     return {
         loadSensor(uri) {
             console.info(`loading sensor ${uri}`);
-            const defer = $q.defer();
-
-            $http({
-                url: uri,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).success((res) => {
-                defer.resolve({
+            return HTTP.get(uri).then((res) => {
+                return {
                     uri: res['@id'],
                     id: res['dcterms:identifier'],
                     observationsURI: res['apidoc:observations'],
                     label: getSensorLabel(res['dcterms:identifier'])
-                });
+                };
+            }, (e) => {
+                console.error(`unable to parse system: e = `, e);
             });
-
-            return defer.promise;
         }
     };
 }];
