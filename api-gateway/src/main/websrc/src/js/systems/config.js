@@ -1,10 +1,10 @@
 const DEFAULT_HOSTNAME = "demo.semiot.ru";
 
-const HTTP_PROTOCOL = location.protocol;
+const HTTP_PROTOCOL = 'https:';
 const WS_PROTOCOL = HTTP_PROTOCOL === 'https:' ? 'wss:' : 'ws:';
 
 // change it to target BASE_HOSTNAME when develop
-const BASE_HOSTNAME = location.hostname;
+const BASE_HOSTNAME = DEFAULT_HOSTNAME; // location.hostname;
 
 const BASE_URL = `${HTTP_PROTOCOL}//${BASE_HOSTNAME}`;
 
@@ -12,7 +12,7 @@ export default {
     VERSION: `@VERSION`,
     URLS: {
         base: BASE_URL,
-        currentUser: `${BASE_URL}/user`,
+        currentUser: `${BASE_URL}/systems`,
         messageBus: `${WS_PROTOCOL}//${BASE_HOSTNAME}/wamp`,
         tripleStore: `${BASE_URL}:3030/ds/query`,
         tsdb: {
@@ -22,12 +22,6 @@ export default {
             last: `${BASE_URL}/last/{0}`
         },
         systems: {
-            list: `${BASE_URL}/systems`
-        },
-        sensors: {
-            list: `${BASE_URL}/systems`
-        },
-        observations: {
             list: `${BASE_URL}/systems`
         }
     },

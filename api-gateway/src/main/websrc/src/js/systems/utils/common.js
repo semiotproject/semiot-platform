@@ -5,6 +5,15 @@ export default ["$q", "CONFIG", function($q, CONFIG) {
     let counter = 666;
 
     let instance = {
+        ensureArray: function(data) {
+            if (!data) {
+                return [];
+            }
+            if (!Array.isArray(data)) {
+                return [data];
+            }
+            return data;
+        },
         normalizeTSDBData: function(type, result) {
             let data = [];
             if (result.data[0]) {
