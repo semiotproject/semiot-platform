@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
-import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.VOID;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -29,7 +28,6 @@ import ru.semiot.platform.apigateway.beans.TSDBQueryService;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
 import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
-import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
@@ -162,6 +160,7 @@ public class SystemResource extends AbstractSystemResource {
   @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
   public void getSystem(@Suspended final AsyncResponse response, @PathParam("id") String id)
       throws URISyntaxException, IOException {
+    long start = System.currentTimeMillis();
     URI root = uriInfo.getRequestUri();
     String rootUrl = URIUtils.extractRootURL(root);
     Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_SINGLE,
@@ -193,7 +192,10 @@ public class SystemResource extends AbstractSystemResource {
                   .put(ContextProvider.VAR_ROOT_URL, rootUrl)
                   .put(ContextProvider.VAR_SYSTEM_TYPE, prototypeResource.getURI())
                   .build());
-          return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
+          String res = JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
+          long stop = System.currentTimeMillis();
+          logger.debug("Execution time for `{}` is {} ms", id, stop-start);
+          return res;
         } else {
           throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
