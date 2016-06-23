@@ -167,8 +167,10 @@ public class SystemResource extends AbstractSystemResource {
         MapBuilder.newMap()
             .put(ContextProvider.VAR_ROOT_URL, rootUrl)
             .put(ContextProvider.VAR_SYSTEM_ID, id).build());
-
+    long start_fuseki = System.currentTimeMillis();
     sparqlQuery.describe(QUERY_DESCRIBE_SYSTEM.replace("${SYSTEM_ID}", id)).map((Model result) -> {
+      long stop_fuseki = System.currentTimeMillis();
+      logger.debug("Fuseki execution time for `{}` is {} ms", id, stop_fuseki-start_fuseki);
       model.add(result);
       try {
         Literal systemId = ResourceFactory.createTypedLiteral(id, XSDDatatype.XSDstring);
