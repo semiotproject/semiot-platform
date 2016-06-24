@@ -77,7 +77,10 @@ public class DirectoryService {
       SSN.class, DCTerms.class);
   private static final String GET_DRIVER_PID_BY_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
       "SELECT ?pid {" + "?system dcterms:identifier \"${SYSTEM_ID}\" ."
-          + "GRAPH <urn:semiot:graphs:private> {" + "?system semiot:hasDriver ?pid" + "}} LIMIT 1",
+//          + "GRAPH <urn:semiot:graphs:private> {"
+          + "?system semiot:hasDriver ?pid"
+//          + "}" +
+          + "} LIMIT 1",
       DCTerms.class, SEMIOT.class);
 
   private final RDFStore store;

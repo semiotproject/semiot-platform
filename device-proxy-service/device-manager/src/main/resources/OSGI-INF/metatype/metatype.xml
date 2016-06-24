@@ -25,13 +25,13 @@
             required="false" type="String" default="admin"/>
         <AD name="Fuseki update url"
             id="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url"
-            required="false" type="String" default="http://fuseki:3030/ds/update"/>
+            required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
         <AD name="Fuseki query url"
             id="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url"
-            required="false" type="String" default="http://fuseki:3030/ds/query"/>
+            required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
         <AD name="Fuseki store url"
             id="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url"
-            required="false" type="String" default="http://fuseki:3030/ds/data"/>
+            required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
 
         <AD name="Domain" id="ru.semiot.platform.domain"
             required="true" type="String" default="https://localhost"/>

@@ -12,7 +12,7 @@ dataarchivingservice:
     - tsdb
     - wamprouter
     - deviceproxyservice
-    - fuseki
+    - triplestore
   ports:
     - "8787:8787"
   volumes:
@@ -31,7 +31,7 @@ deviceproxyservice:
   image: docker.semiot.ru/device-proxy-service
   links:
     - wamprouter
-    - fuseki
+    - triplestore
   ports:
     - "8181:8181"
     - "9500:9500/udp"
@@ -40,13 +40,13 @@ deviceproxyservice:
     - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
   restart: always
 
-fuseki:
-  image: docker.semiot.ru/fuseki
+triplestore:
+  image: docker.semiot.ru/triplestore
   ports:
     - "3030:3030"
-  volumes:
-    - /semiot-platform/fuseki/fuseki-db:/fuseki/fuseki-db
-    - /semiot-platform/fuseki/app:/fuseki/app
+  #volumes:
+  #  - /semiot-platform/fuseki/fuseki-db:/fuseki/fuseki-db
+  #  - /semiot-platform/fuseki/app:/fuseki/app
   restart: always
 
 apigateway:
@@ -56,7 +56,7 @@ apigateway:
     - deviceproxyservice
     - dataarchivingservice
     - mysqlbase
-    - fuseki
+    - triplestore
   ports:
     - "8383:8080"
     - "9990:9990"

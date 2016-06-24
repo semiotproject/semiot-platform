@@ -153,9 +153,9 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
           configuration.put(Keys.TOPIC_INACTIVE, "ru.semiot.devices.turnoff");
           configuration.put(Keys.FUSEKI_PASSWORD, "pw");
           configuration.put(Keys.FUSEKI_USERNAME, "admin");
-          configuration.put(Keys.FUSEKI_UPDATE_URL, "http://fuseki:3030/ds/update");
-          configuration.put(Keys.FUSEKI_QUERY_URL, "http://fuseki:3030/ds/query");
-          configuration.put(Keys.FUSEKI_STORE_URL, "http://fuseki:3030/ds/data");
+          configuration.put(Keys.FUSEKI_UPDATE_URL, "http://triplestore:3030/blazegraph/sparql");
+          configuration.put(Keys.FUSEKI_QUERY_URL, "http://triplestore:3030/blazegraph/sparql");
+          configuration.put(Keys.FUSEKI_STORE_URL, "http://triplestore:3030/blazegraph/sparql");
           configuration.put(Keys.PLATFORM_DOMAIN, "http://localhost");
           configuration.put(Keys.PLATFORM_SYSTEMS_PATH, "systems");
           configuration.put(Keys.PLATFORM_SUBSYSTEM_PATH, "subsystems");

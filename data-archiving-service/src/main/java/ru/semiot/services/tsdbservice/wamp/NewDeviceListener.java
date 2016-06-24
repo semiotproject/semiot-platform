@@ -43,26 +43,26 @@ public class NewDeviceListener implements Observer<String> {
   private static final Query GET_TOPICS_QUERY = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
       "SELECT ?system_id ?obs_topic ?commres_topic { "
           + "?x dcterms:identifier ?system_id. "
-          + "GRAPH <urn:semiot:graphs:private> {"
+//          + "GRAPH <urn:semiot:graphs:private> {"
           + " ?x ssncom:hasCommunicationEndpoint ?e ."
           + " ?e ssncom:protocol \"WAMP\"; "
           + "   ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
           + " ?x ssncom:hasCommunicationEndpoint ?ee ."
           + " ?ee ssncom:protocol \"WAMP\";"
           + "   ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
-          + "}"
+//          + "}"
           + "}", SSN.class, SSNCOM.class, DCTerms.class));
   private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils.newSPARQLQuery(
       "SELECT ?system_id ?obs_topic ?commres_topic { "
           + "<${SYSTEM_URI}> dcterms:identifier ?system_id. "
-          + "GRAPH <urn:semiot:graphs:private> {"
+//          + "GRAPH <urn:semiot:graphs:private> {"
           + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
           + " ?e ssncom:protocol \"WAMP\"; "
           + "   ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
           + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?ee ."
           + " ?ee ssncom:protocol \"WAMP\"; "
           + "   ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
-          + "}"
+//          + "}"
           + "}", SSN.class, SSNCOM.class, DCTerms.class);
 
   public NewDeviceListener() {

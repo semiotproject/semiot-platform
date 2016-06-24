@@ -46,7 +46,7 @@ public interface ServiceConfig extends Mutable {
   @Key("services.tsdb.url")
   String tsdbUrl();
 
-  @DefaultValue("http://fuseki:3030/ds/query")
+  @DefaultValue("http://triplestore:3030/blazegraph/sparql")
   @Key("services.fuseki.store.url")
   String storeUrl();
 
