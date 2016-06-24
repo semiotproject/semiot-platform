@@ -69,7 +69,7 @@ export default ["CONFIG", "HTTP", "WAMP", "$q", "commonUtils", function(CONFIG, 
             };
             if (e['dul:hasParameter']) {
                 result.body = $.extend(result.body, {
-                    'dul:hasParameter': e['dul:hasParameter'].map(parseParameter)
+                    'dul:hasParameter': commonUtils.ensureArray(e['dul:hasParameter']).map(parseParameter)
                 });
             }
             return result;
