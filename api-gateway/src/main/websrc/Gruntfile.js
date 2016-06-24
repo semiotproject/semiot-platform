@@ -23,7 +23,12 @@ module.exports = function (grunt) {
                 cwd: BUILD_CONFIG.src_dir,
                 src: ['css/**/*.less'],
                 dest: BUILD_CONFIG.dist_dir,
-                ext: '.css'
+                ext: '.css',
+                options: {
+                    plugins: [
+                        new (require('less-plugin-autoprefix'))(),
+                    ]
+                }
             }
         },
         browserify: {

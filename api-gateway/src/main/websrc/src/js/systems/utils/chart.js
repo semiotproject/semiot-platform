@@ -37,9 +37,6 @@ export default ["CONFIG", "commonUtils", function(CONFIG, commonUtils) {
                         type: "spline"
                     }
                 }),
-                title: {
-                    text: title
-                },
                 series: [
                     {}
                 ]
@@ -83,9 +80,6 @@ export default ["CONFIG", "commonUtils", function(CONFIG, commonUtils) {
                     labels: {
                         formatter: yFormatter
                     }
-                },
-                title: {
-                    text: title
                 },
                 series: [
                     {

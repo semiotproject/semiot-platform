@@ -42,62 +42,72 @@
                 </form>
             </div>
         </div>
-        <div ng-repeat="sensor in sensors" class="sensor-view">
-            <div class="mode-control btn-group">
-                <label class="btn btn-raised" ng-click="onSetModeClick(sensor, getModes()['real-time'])" ng-model="sensor.mode" btn-radio="getModes()['real-time']">Real-Time</label>
-                <label class="btn btn-raised" ng-click="onSetModeClick(sensor, getModes()['archive'])" ng-model="sensor.mode" btn-radio="getModes()['archive']">Archive</label>
-            </div>
+        <h3>Available sensors</h3>
+        <div class="sensor-view-list">
+            <div ng-repeat="sensor in sensors" class="sensor-view">
+                <div class="sensor-title">
+                    <h4>{{ sensor.label }}</h4>
+                    <h5>last observation -
+                        {{ sensor.chartConfig.series[0].data[sensor.chartConfig.series[0].data.length - 1][1] }} at
+                        {{ sensor.chartConfig.series[0].data[sensor.chartConfig.series[0].data.length - 1][0] | date: 'yyyy-MM-dd HH:mm' }}
+                    </h5>
+                </div>
+                <div class="mode-control btn-group">
+                    <label class="btn btn-raised btn-sm" ng-click="onSetModeClick(sensor, getModes()['real-time'])" ng-model="sensor.mode" btn-radio="getModes()['real-time']">Real-Time</label>
+                    <label class="btn btn-raised btn-sm" ng-click="onSetModeClick(sensor, getModes()['archive'])" ng-model="sensor.mode" btn-radio="getModes()['archive']">Archive</label>
+                </div>
 
-            <div class="range-control" ng-if="sensor.mode === getModes()['archive']">
-                <div class="chart-control">
-                    <button class="btn btn-primary btn-raised" ng-click="onSetRangeClick($index)">Select</button>
-                </div>
-                <div class="chart-control">
-                    <label>From</label>
-                    <div class="dropdown">
-                        <a class="dropdown-toggle" id="dropdown{{ $index }}.0" role="button" data-toggle="dropdown" data-target="#">
-                            <div class="input-group">
-                                <input type="text" class="form-control" ng-value="sensor.range[0] | date: 'yyyy-MM-dd HH:mm'">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <datetimepicker
-                                data-ng-model="sensor.range[0]"
-                                data-on-set-time="onTimeSet(newDate, oldDate)"
-                                data-datetimepicker-config="{ dropdownSelector: '#dropdown{{ $index }}.0' }"/>
-                        </ul>
+                <div class="range-control" ng-if="sensor.mode === getModes()['archive']">
+                    <div class="chart-control">
+                        <label>From</label>
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" id="dropdown{{ $index }}.0" role="button" data-toggle="dropdown" data-target="#">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" ng-value="sensor.range[0] | date: 'yyyy-MM-dd HH:mm'">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker
+                                    data-ng-model="sensor.range[0]"
+                                    data-on-set-time="onTimeSet(newDate, oldDate)"
+                                    data-datetimepicker-config="{ dropdownSelector: '#dropdown{{ $index }}.0' }"/>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                <div ng-if="sensor.mode === getModes()['archive']" class="chart-control">
-                    <label>
-                        <span>To</span>
-                        <a ng-click="onNowClicked(sensor)">[now]</a>
-                    </label>
-                    <div class="dropdown">
-                        <a class="dropdown-toggle" id="dropdown{{ $index }}.1" role="button" data-toggle="dropdown" data-target="#">
-                            <div class="input-group">
-                                <input type="text" class="form-control" ng-value="sensor.range[1] | date: 'yyyy-MM-dd HH:mm'">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <datetimepicker data-ng-model="sensor.range[1]" data-datetimepicker-config="{ dropdownSelector: '#dropdown{{ $index }}.1' }"/>
-                        </ul>
+                    <div ng-if="sensor.mode === getModes()['archive']" class="chart-control">
+                        <label>
+                            <span>To</span>
+                            <a ng-click="onNowClicked(sensor)">[now]</a>
+                        </label>
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" id="dropdown{{ $index }}.1" role="button" data-toggle="dropdown" data-target="#">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" ng-value="sensor.range[1] | date: 'yyyy-MM-dd HH:mm'">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker data-ng-model="sensor.range[1]" data-datetimepicker-config="{ dropdownSelector: '#dropdown{{ $index }}.1' }"/>
+                            </ul>
+                        </div>
                     </div>
+                    <button class="btn btn-primary btn-raised btn-sm" ng-click="onSetRangeClick($index)">Select</button>
                 </div>
-            </div>
-            <highchart ng-if="sensor.chartConfig.series[0].data.length > 0" config="sensor.chartConfig"></highchart>
-            <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['archive']" class="empty-sensor-chart">
-                <span>{{ sensor.label }}</span>
-                <br>
-                <span>No observations found for this period</span>
-            </div>
-            <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['real-time']" class="empty-sensor-chart">
+                <div class="chart-wrapper">
+                    <highchart ng-if="sensor.chartConfig.series[0].data.length > 0" config="sensor.chartConfig"></highchart>
+                </div>
+                <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['archive']" class="empty-sensor-chart">
+                    <span>{{ sensor.label }}</span>
+                    <br>
+                    <span>No observations found for this period</span>
+                </div>
+                <div ng-if="sensor.chartConfig.series[0].data.length === 0 && sensor.mode === getModes()['real-time']" class="empty-sensor-chart">
 
-                <span>{{ sensor.label }}</span>
-                <br>
-                <span>Waiting for the first observation..</span>
+                    <span>{{ sensor.label }}</span>
+                    <br>
+                    <span>Waiting for the first observation..</span>
+                </div>
             </div>
         </div>
     </div>

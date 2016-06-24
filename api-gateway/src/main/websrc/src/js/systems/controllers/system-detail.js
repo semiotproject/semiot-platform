@@ -58,7 +58,7 @@ export default [
         if (sensor.mode !== mode) {
             sensor.mode = mode;
             if (mode === $scope.getModes()['real-time']) {
-                $scope.subscribe(sensor);
+                $scope.subscribeForObservations(sensor);
                 sensor.range = getLastHourRange();
                 $scope.fillChart(sensor);
             } else {
