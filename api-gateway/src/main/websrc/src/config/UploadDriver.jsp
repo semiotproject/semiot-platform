@@ -80,7 +80,7 @@
                           <span class="material-input"></span>
                         </div>
                         <div style="text-align: center;">
-                            <button class="btn btn-lg btn-warning btn-raised" type="submit">Upload <i class="fa fa-cloud-upload"></i></button>
+                            <button class="btn btn-lg btn-warning btn-raised upload-button" type="submit">Upload <i class="fa fa-cloud-upload"></i></button>
                         </div>
                     </form>
                 </div>
@@ -91,6 +91,7 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
     <script>$.material.init();</script>
+    <script src="/js/config/platform-check.js"></script>
     <script></script>
 </body>
 </html>

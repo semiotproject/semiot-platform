@@ -143,6 +143,7 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.9/js/material.min.js"></script>
     <script>$.material.init();</script>
+    <script src="/js/config/platform-check.js"></script>
     <script>
         $('.install-button').on('click', function() {
             var url = $(this).attr('data-url');
