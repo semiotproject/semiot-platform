@@ -38,7 +38,7 @@ export default [
         // FIXME
         let now = (new Date()).getTime();
         let end_date = new Date(now);
-        let start_date = (new Date(now - 1 * 3600 * 1000));
+        let start_date = (new Date(now - 5 * 3600 * 1000));
 
         return [start_date.getTime(), end_date.getTime()];
     }
