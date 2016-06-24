@@ -54,10 +54,10 @@ spatial:SpatialIndexLucene  rdfs:subClassOf  spatial:SpatialIndex .
     ];
     ja:content [
         ja:externalContent <file:////fuseki/content/semiot.ttl> ;
-        ja:externalContent <file:////fuseki/content/qudt-unit.owl> ;
-        ja:externalContent <file:////fuseki/content/qudt-quantity.owl> ;
-        ja:externalContent <file:////fuseki/content/qudt.owl> ;
-        ja:externalContent <file:////fuseki/content/qudt-quantity-ext.owl> ;
+        #ja:externalContent <file:////fuseki/content/qudt-unit.owl> ;
+        #ja:externalContent <file:////fuseki/content/qudt-quantity.owl> ;
+        #ja:externalContent <file:////fuseki/content/qudt.owl> ;
+        #ja:externalContent <file:////fuseki/content/qudt-quantity-ext.owl> ;
     ];
     ja:reasoner [
         ja:reasonerURL <http://jena.hpl.hp.com/2003/RDFSExptRuleReasoner> ;
