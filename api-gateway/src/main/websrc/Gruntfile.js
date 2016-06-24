@@ -43,6 +43,17 @@ module.exports = function (grunt) {
                     watch: true
                 }
             },
+            platformCheck: {
+                src: BUILD_CONFIG.src_dir + "js/config/platform-check.js",
+                dest: BUILD_CONFIG.dist_dir + "js/config/platform-check.js",
+                options: {
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    transform: ['babelify'],
+                    watch: true
+                }
+            },
             wamp_client: {
                 src: BUILD_CONFIG.src_dir + "js/wamp-client.js",
                 dest: BUILD_CONFIG.dist_dir + "js/wamp-client.js",
