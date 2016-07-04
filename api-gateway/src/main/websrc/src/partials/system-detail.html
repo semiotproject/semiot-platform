@@ -46,10 +46,8 @@
         <div class="sensor-view-list">
             <div ng-repeat="sensor in sensors" class="sensor-view">
                 <div class="sensor-title">
-                    <h4>{{ sensor.label }}</h4>
-                    <h5>last observation -
-                        {{ sensor.chartConfig.series[0].data[sensor.chartConfig.series[0].data.length - 1][1] }} at
-                        {{ sensor.chartConfig.series[0].data[sensor.chartConfig.series[0].data.length - 1][0] | date: 'yyyy-MM-dd HH:mm' }}
+                    <h4>{{ sensor.chartConfig.series[0].data[sensor.chartConfig.series[0].data.length - 1][1] }}</h4>
+                    <h5>{{ sensor.label }}
                     </h5>
                 </div>
                 <div class="mode-control btn-group">

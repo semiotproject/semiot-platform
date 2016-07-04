@@ -1,33 +1,11 @@
-export default ["$http", "$q", function($http, $q) {
+import axios from 'axios';
+import bluebird from 'bluebird';
 
-    return {
-        get(url) {
-            return this.query(url, "GET");
-        },
-        query(url, method, data = undefined) {
-            console.info(`performing http '${method}'' request on ${url}; data is`, data);
-            const defer = $q.defer();
+axios.defaults.headers.common['Accept'] = "application/ld+json";
+axios.defaults.headers.common['Content-Type'] = "application/ld+json";
 
-            const options = {
-                method,
-                url,
-                data,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            };
-
-            if (method === "POST") {
-                options.headers['Content-Type'] = "application/ld+json";
-            }
-
-            $http(options).then((res) => {
-                defer.resolve(res.data);
-            }, () => {
-                defer.reject();
-            });
-
-            return defer.promise;
-        }
-    };
-}];
+export default {
+    get(url) {
+        return axios(url).then((res) => { return res.data; });
+    }
+};
