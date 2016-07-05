@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import sensorAPI from '../api/sensors';
 import observationAPI from '../api/observations';
+import DateRangePicker from './date-range-picker';
 import Chart from './chart';
 import moment from 'moment';
 import WAMP from '../services/wamp';
@@ -113,6 +114,9 @@ export default class SensorDetail extends Component {
             console.warn("not found WAMPTopic; do nothing");
         }
     }
+    filterObservations(obs) {
+        return this.state.mode === "real-time" ? obs.slice(Math.max(obs.length - 5, 1)) : obs;
+    }
 
     renderModeControls() {
         const { mode } = this.state;
@@ -158,7 +162,7 @@ export default class SensorDetail extends Component {
                 }
                 {
                     !isLoading &&
-                        <Chart data={observations} color={baseColor} label={label}/>
+                        <Chart data={this.filterObservations(observations)} color={baseColor} label={label}/>
                 }
             </div>
         )
