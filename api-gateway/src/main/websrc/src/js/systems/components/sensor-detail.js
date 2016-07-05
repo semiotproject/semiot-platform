@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import sensorAPI from '../api/sensors';
 import observationAPI from '../api/observations';
 import Chart from './chart';
-import DateRangePicker from './date-range-picker';
 import moment from 'moment';
 import WAMP from '../services/wamp';
 
