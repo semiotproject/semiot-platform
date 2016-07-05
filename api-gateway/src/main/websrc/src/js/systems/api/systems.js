@@ -76,8 +76,8 @@ export default {
             }
         });
     },
-    unsubscribeFromNewSystems() {
-        console.info(`NOT_IMPLEMENTED: nsubscribing from new systems..`);
-        // WAMP.unsubscribe(getWAMPTopicFromSensor(sensor));
+    unsubscribeForNewSystems() {
+        console.info(`unsubscribing from new systems..`);
+        WAMP.unsubscribe(CONFIG.TOPICS['device_registered']);
     }
 };

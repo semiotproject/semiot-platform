@@ -7,5 +7,12 @@ axios.defaults.headers.common['Content-Type'] = "application/ld+json";
 export default {
     get(url) {
         return axios(url).then((res) => { return res.data; });
+    },
+    post(url, body) {
+        return axios.post(url, body, {
+            headers: {
+                'Content-Type': "application/ld+json"
+            }
+        });
     }
 };

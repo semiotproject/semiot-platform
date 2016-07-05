@@ -1,9 +1,18 @@
 import React, { Component } from 'react';
 import systemAPI from '../api/systems';
 import CONFIG from '../config';
+import { Link } from 'react-router';
 
 import SensorDetail from '../components/sensor-detail';
 import ProcessDetail from '../components/process-detail';
+
+const COLORS = [
+    "#4bc0c0",
+    "#37495F",
+    "#29AD61",
+    "#3598DB",
+    "#7266B8"
+];
 
 export default class SystemDetail extends Component {
     constructor(...args) {
@@ -36,23 +45,33 @@ export default class SystemDetail extends Component {
 
     render() {
         const { name, isLoading, sensors, processes } = this.state;
+        let colorIndex = 0;
         return (
             <section>
                 <ol className="breadcrumb">
-                    <li><a href="/systems">Systems</a></li>
+                    <li><Link to="/systems">Systems</Link></li>
                     <li className="active">{name}</li>
                 </ol>
-                <div id="single-system-wrapper" className={isLoading ? "preloader" : ""}>
+                <div id="single-system-wrapper" className={"container" + (isLoading ? " preloader" : "")}>
                     <div>
-                        <h4>Available sensors:</h4>
                         {
-                            sensors.map((s, i) => { return <SensorDetail key={i} data={s}/> })
+                            sensors.map((s, i) => {
+                                return <SensorDetail key={i}
+                                    uri={s.uri}
+                                    baseColor={COLORS[colorIndex++ % COLORS.length]}
+                                />
+                            })
                         }
                     </div>
                     <div>
-                        <h4>Available processes:</h4>
                         {
-                            processes.map((p, i) => { return <ProcessDetail key={i} data={p}/> })
+                            processes.map((p, i) => {
+                                const color = COLORS[colorIndex++ % COLORS.length];
+                                return <ProcessDetail key={i}
+                                    uri={p.uri}
+                                    baseColor={color}
+                                />
+                            })
                         }
                     </div>
                 </div>

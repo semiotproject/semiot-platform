@@ -24,7 +24,14 @@ export default class SystemList extends Component {
         };
         this.handleSearchChange = (e) => {
             this.setState({
-                search: e.target.value
+                search: e.target.value.toLowerCase()
+            }, () => {
+                const { systems, currentIndex } = this.state;
+                if (this.filterSystems(systems).length < currentIndex * MAX_ITEMS_PER_PAGE) {
+                    this.setState({
+                        currentIndex: 1
+                    });
+                }
             });
         };
         this.handlePageClick = (e) => {
@@ -36,41 +43,60 @@ export default class SystemList extends Component {
     componentDidMount() {
         this.querySystems();
     }
+    componentWillUnmount() {
+        this.unsubscribe();
+    }
     querySystems() {
         systemAPI.loadSystems().then((res) => {
             this.setState({
                 systems: res,
                 isLoading: false
-            })
-            systemAPI.subscribeForNewSystems(this.handleNewSystem);
+            }, () => {
+                this.subscribe();
+            });
         });
     }
     filterSystems(systems) {
-        const { currentIndex, search } = this.state;
+        const { search } = this.state;
         return systems.filter((s) => {
-            return s.name.indexOf(search) > -1;
-        }).slice((currentIndex - 1) * MAX_ITEMS_PER_PAGE, currentIndex * MAX_ITEMS_PER_PAGE);
-    } 
+            return s.name.toLowerCase().indexOf(search) > -1;
+        });
+    }
+    paginateSystems(systems) {
+        const { currentIndex } = this.state;
+        return systems.slice((currentIndex - 1) * MAX_ITEMS_PER_PAGE, currentIndex * MAX_ITEMS_PER_PAGE);
+    }
+    subscribe() {
+        systemAPI.subscribeForNewSystems(this.handleNewSystem);
+    }
+    unsubscribe() {
+        systemAPI.unsubscribeForNewSystems();
+    }
 
     render() {
         const { isLoading, systems, search, currentIndex } = this.state;
+        const filteredSystems = this.filterSystems(systems);
+        const paginatedSystems = this.paginateSystems(filteredSystems);
         return (
             <section className={isLoading ? "preloader" : ""}>
                 <ol className="breadcrumb">
                     <li className="active">Systems</li>
                 </ol>
-                <SystemListTable systems={this.filterSystems(systems)} search={search} onSearchChange={this.handleSearchChange} />
-                <Pagination
-                        prev
-                        next
-                        first
-                        last
-                        ellipsis
-                        boundaryLinks
-                        items={systems.length / MAX_ITEMS_PER_PAGE}
-                        maxButtons={5}
-                        activePage={currentIndex}
-                        onSelect={this.handlePageClick} />
+                <SystemListTable systems={paginatedSystems} search={search} onSearchChange={this.handleSearchChange} />
+                {
+                    filteredSystems.length > MAX_ITEMS_PER_PAGE &&
+                        <Pagination
+                                prev
+                                next
+                                first
+                                last
+                                ellipsis
+                                boundaryLinks
+                                items={Math.ceil(filteredSystems.length / MAX_ITEMS_PER_PAGE)}
+                                maxButtons={5}
+                                activePage={currentIndex}
+                                onSelect={this.handlePageClick} />
+                }
             </section>
         );
     }

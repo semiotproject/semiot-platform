@@ -23,7 +23,8 @@ export default {
                 renderUsername(res.username);
                 resolve(currentUser);
             }).catch((e) => {
-                reject(e);
+                logger.error("unable to load current user: ", e);
+                reject();
             });
         });
     }

@@ -7,7 +7,7 @@ import currentUser from '../api/user';
 let _sessions = {};
 
 // hash `topic`:`autobahn.Subscribtion`
-// let _subscriptions = {};
+let _subscriptions = {};
 
 // lasy initialisation
 const checkSession = (endpoint, callback) => {
@@ -38,9 +38,16 @@ const checkSession = (endpoint, callback) => {
             if (!_sessions[endpoint]) {
                 _sessions[endpoint] = session;
             } else {
-                console.warn(`session opened, but another session for endpoint ${endpoint} already registered; possible race run?`);
+                console.info(`session opened, but another session for endpoint ${endpoint} already registered; possible race run?`);
             }
             callback(_sessions[endpoint]);
+        };
+        connection.onclose = function(reason, details) {
+            /*console.warn(`unexpected WAMP connection close; reason: ${reason}, details: `, details);
+            setTimeout(() => {
+                console.info("reconnecting to WAMP..");
+                checkSession(endpoint, callback)
+            }, 1000);*/
         };
         connection.open();
     });
@@ -52,15 +59,15 @@ export default {
             if (!topic) {
                 throw new Error('WAMP topic is required');
             }
-            console.info(`subscribing to ${topic}..`);
+            console.info(`subscribing to endpoint ${endpoint}; topic is ${topic}..`);
             s.subscribe(topic, callback).then((subscr) => {
                 console.info(`subscription to ${topic} created`);
+                _subscriptions[topic] = subscr;
             });
         });
     },
-    unsubscribe(topic) {
-        /*
-        checkSession((s) => {
+    unsubscribe(topic, endpoint = CONFIG.URLS.messageBus) {
+        checkSession(endpoint, (s) => {
             if (!_subscriptions[topic]) {
                 console.warn(`not found subscriptions for topic ${topic}`);
                 return;
@@ -68,6 +75,5 @@ export default {
             console.log(`unsubscribing from ${topic}..`);
             s.unsubscribe(_subscriptions[topic]);
         });
-        */
     }
 };
