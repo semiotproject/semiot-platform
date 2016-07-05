@@ -15,7 +15,7 @@ export default {
                 resolve(currentUser);
                 return;
             }
-            HTTP.get(CONFIG.URLS.currentUser).then((res) => {
+            HTTP.get(CONFIG.URLS.currentUser, true).then((res) => {
                 console.info(`loaded current user: `, res);
                 currentUser = {
                     data: res
@@ -23,12 +23,7 @@ export default {
                 renderUsername(res.username);
                 resolve(currentUser);
             }).catch((e) => {
-                resolve({
-                    data: {
-                        username: "root",
-                        password: "root"
-                    }
-                });
+                reject();
             });
         });
     }

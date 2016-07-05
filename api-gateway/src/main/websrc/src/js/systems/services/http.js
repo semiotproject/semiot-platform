@@ -1,12 +1,12 @@
 import axios from 'axios';
-import bluebird from 'bluebird';
-
-axios.defaults.headers.common['Accept'] = "application/ld+json";
-axios.defaults.headers.common['Content-Type'] = "application/ld+json";
 
 export default {
-    get(url) {
-        return axios(url).then((res) => { return res.data; });
+    get(url, plainJson = false) {
+        return axios(url, {
+            headers: {
+                'Accept': plainJson ? "application/json" : "application/ld+json"
+            }
+        }).then((res) => { return res.data; });
     },
     post(url, body) {
         return axios.post(url, body, {
