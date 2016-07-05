@@ -1,4 +1,4 @@
-const DEFAULT_HOSTNAME = "winghouse.semiot.ru";
+const DEFAULT_HOSTNAME = "demo.semiot.ru";
 
 const HTTP_PROTOCOL = 'https:';
 const WS_PROTOCOL = HTTP_PROTOCOL === 'https:' ? 'wss:' : 'ws:';

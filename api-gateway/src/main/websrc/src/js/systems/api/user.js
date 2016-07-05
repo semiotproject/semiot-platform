@@ -1,33 +1,31 @@
-export default ["CONFIG", "$http", "$q", function(CONFIG, $http, $q) {
+import CONFIG from '../config';
+import HTTP from '../services/http';
+import Promise from 'bluebird';
 
-    let currentUser = null;
+let currentUser = null;
 
-    function renderUsername(user) {
-        document.querySelector('.username').innerHTML = user;
-    }
+function renderUsername(user) {
+    document.querySelector('.username').innerHTML = user;
+}
 
-    return {
-        getCurrentUser() {
-            const defer = $q.defer();
-            if (!currentUser) {
-                console.info(`loading current user`);
-
-                // defer.resolve({ data: { username: "root", password: "root" } });
-                $http({
-                    url: CONFIG.URLS.currentUser
-                }).success((res) => {
-                    console.info(`loaded current user: `, res);
-                    currentUser = {
-                        data: res
-                    };
-                    renderUsername(res.username);
-                    defer.resolve(currentUser);
-                });
-            } else {
-                defer.resolve(currentUser);
+export default {
+    getCurrentUser() {
+        return new Promise((resolve, reject) => {
+            if (currentUser) {
+                resolve(currentUser);
+                return;
             }
-
-            return defer.promise;
-        }
-    };
-}];
+            HTTP.get(CONFIG.URLS.currentUser).then((res) => {
+                console.info(`loaded current user: `, res);
+                currentUser = {
+                    data: res
+                };
+                renderUsername(res.username);
+                resolve(currentUser);
+            }).catch((e) => {
+                logger.error("unable to load current user: ", e);
+                reject();
+            });
+        });
+    }
+};
