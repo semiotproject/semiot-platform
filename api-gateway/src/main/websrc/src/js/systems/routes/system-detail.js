@@ -52,7 +52,7 @@ export default class SystemDetail extends Component {
                     <li><Link to="/systems">Systems</Link></li>
                     <li className="active">{name}</li>
                 </ol>
-                <div id="single-system-wrapper" className={"container" + (isLoading ? " preloader" : "")}>
+                <div id="single-system-wrapper" className={(isLoading ? " preloader" : "")}>
                     <div>
                         {
                             sensors.map((s, i) => {
