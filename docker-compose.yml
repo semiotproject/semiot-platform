@@ -7,7 +7,7 @@ wamprouter:
   restart: always
 
 dataarchivingservice:
-  image: docker.semiot.ru/data-archiving-service
+  image: docker.semiot.ru/data-archiving-service:blazegraph
   links:
     - tsdb
     - wamprouter
@@ -28,7 +28,7 @@ tsdb:
   restart: always
 
 deviceproxyservice:
-  image: docker.semiot.ru/device-proxy-service
+  image: docker.semiot.ru/device-proxy-service:blazegraph
   links:
     - wamprouter
     - triplestore
@@ -50,7 +50,7 @@ triplestore:
   restart: always
 
 apigateway:
-  image: docker.semiot.ru/api-gateway
+  image: docker.semiot.ru/api-gateway:blazegraph
   links:
     - wamprouter
     - deviceproxyservice
