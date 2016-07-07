@@ -37,6 +37,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
@@ -61,6 +64,8 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   private BundleContext bundleContext;
 
   private DirectoryService directoryService;
+  
+  private ExecutorService executor = Executors.newFixedThreadPool(10);
 
   public DriverManagerImpl() {
     //Loading JSONLD frame for observations
@@ -132,7 +137,10 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     try {
       WAMPClient.getInstance().close();
       directoryService = null;
-    } catch (IOException ex) {
+      executor.shutdown();
+      executor.awaitTermination(30, TimeUnit.SECONDS);
+      executor.shutdownNow();
+    } catch (Throwable ex) {
       logger.error(ex.getMessage(), ex);
     }
     logger.info("Device Proxy Service Manager stopped!");
@@ -200,49 +208,59 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
   @Override
   public void registerDevice(DriverInformation info, Device device) {
-    if (directoryService != null) {
-      logger.debug("Device [{}] is being registered", device.getId());
+    executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        if (directoryService != null) {
+          logger.debug("Device [{}] is being registered", device.getId());
 
-      /**
-       * Resolve common variables, e.g. platform's domain name.
-       */
-      final Model description = device.toDescriptionAsModel(configuration);
+          /**
+           * Resolve common variables, e.g. platform's domain name.
+           */
+          final Model description = device.toDescriptionAsModel(configuration);
 
-      boolean isAdded = directoryService.addNewDevice(info, device, description);
+          boolean isAdded = directoryService.addNewDevice(info, device, description);
 
-      if (isAdded) {
-        try {
-          logger.info("Device [{}] was registered!", device.getId());
-          String message = JsonUtils.toString(
-              ModelJsonLdUtils.toJsonLdCompact(description, systemFrame));
-          WAMPClient.getInstance().publish(
-              getConfiguration().getAsString(Keys.TOPIC_NEWANDOBSERVING), message)
-              .subscribe(WAMPClient.onError());
-        } catch (JsonLdError | IOException ex) {
-          logger.error(ex.getMessage(), ex);
+          if (isAdded) {
+            try {
+              logger.info("Device [{}] was registered!", device.getId());
+              String message = JsonUtils.toString(
+                  ModelJsonLdUtils.toJsonLdCompact(description, systemFrame));
+              WAMPClient.getInstance().publish(
+                  getConfiguration().getAsString(Keys.TOPIC_NEWANDOBSERVING), message)
+                  .subscribe(WAMPClient.onError());
+            } catch (JsonLdError | IOException ex) {
+              logger.error(ex.getMessage(), ex);
+            }
+          } else {
+            logger.warn("Device [{}] was not added in database!");
+          }
+        } else {
+          logger.error("DirectoryService hasn't been initialized!");
         }
-      } else {
-        logger.warn("Device [{}] was not added in database!");
       }
-    } else {
-      logger.error("DirectoryService hasn't been initialized!");
-    }
+    });
   }
 
   @Override
   public void registerObservation(Device device, Observation observation) {
-    logger.info("Observation [Device ID={}] is being registered", device.getId());
-    // TODO: There's no guarantee that WAMPClient is connected.
-    Model model = observation.toObservationAsModel(device.getProperties(), configuration);
-    try {
-      WAMPClient.getInstance()
-          .publish(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
-                  .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
-              JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
-          .subscribe(WAMPClient.onError());
-    } catch (Throwable ex) {
-      logger.error(ex.getMessage(), ex);
-    }
+    executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        logger.info("Observation [Device ID={}] is being registered", device.getId());
+        // TODO: There's no guarantee that WAMPClient is connected.
+        Model model = observation.toObservationAsModel(device.getProperties(), configuration);
+        try {
+          WAMPClient.getInstance()
+              .publish(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
+                      .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
+                  JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
+              .subscribe(WAMPClient.onError());
+        } catch (Throwable ex) {
+          logger.error(ex.getMessage(), ex);
+        }
+      }
+    });
   }
 
   @Override
@@ -252,18 +270,24 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
 
   @Override
   public void registerCommand(Device device, CommandResult result) {
-    try {
-      Model model = result.toRDFAsModel(configuration);
-      //TODO: There's no guarantee that WAMPClient is connected?
-      WAMPClient.getInstance().publish(
-          TOPIC_COMMANDRESULT
-              .replace(VAR_SYSTEM_ID, device.getId())
-              .replace(VAR_PROCESS_ID, result.get(DeviceProperties.PROCESS_ID)),
-          JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, commandResultFrame)))
-          .subscribe(WAMPClient.onError());
-    } catch (Throwable e) {
-      logger.error(e.getMessage(), e);
-    }
+    executor.execute(new Runnable() {
+      
+      @Override
+      public void run() {
+        try {
+          Model model = result.toRDFAsModel(configuration);
+          //TODO: There's no guarantee that WAMPClient is connected?
+          WAMPClient.getInstance().publish(
+              TOPIC_COMMANDRESULT
+                  .replace(VAR_SYSTEM_ID, device.getId())
+                  .replace(VAR_PROCESS_ID, result.get(DeviceProperties.PROCESS_ID)),
+              JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, commandResultFrame)))
+              .subscribe(WAMPClient.onError());
+        } catch (Throwable e) {
+          logger.error(e.getMessage(), e);
+        }
+      }
+    });
   }
 
   @Override
