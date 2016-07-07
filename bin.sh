@@ -51,7 +51,7 @@ function stop_and_clean() {
 function start_and_logs() {
     echo "starting docker-compose with logs"
     sudo docker-compose up -d && \
-        sudo docker-compose logs
+        sudo docker-compose logs -f
 
     exit $?
 }
