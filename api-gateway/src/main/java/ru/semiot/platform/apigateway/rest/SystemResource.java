@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
-import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.VOID;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -29,7 +28,6 @@ import ru.semiot.platform.apigateway.beans.TSDBQueryService;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
 import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
-import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
@@ -76,7 +74,7 @@ public class SystemResource extends AbstractSystemResource {
       + "  ?o ?o_p ?o_o ."
       + "} WHERE {"
       + "  ?system ?p ?o ;"
-      + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
+      + "    dcterms:identifier \"${SYSTEM_ID}\" ."
       + "  OPTIONAL {"
       + "    ?o ?o_p ?o_o ."
       + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"

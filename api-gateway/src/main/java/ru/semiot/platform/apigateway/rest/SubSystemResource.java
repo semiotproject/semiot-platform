@@ -20,7 +20,6 @@ import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
 import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
-import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.exceptions.Exceptions;
 
@@ -51,7 +50,7 @@ public class SubSystemResource extends AbstractSystemResource {
       + " ?o ?o_p ?o_o ."
       + "} WHERE {"
       + " ?subsystem ?p ?o ;"
-      + "  dcterms:identifier \"${SUBSYSTEM_ID}\"^^xsd:string ."
+      + "  dcterms:identifier \"${SUBSYSTEM_ID}\" ."
       + " OPTIONAL {"
       + "  ?o ?o_p ?o_o ."
       + "  FILTER isBlank(?o)"

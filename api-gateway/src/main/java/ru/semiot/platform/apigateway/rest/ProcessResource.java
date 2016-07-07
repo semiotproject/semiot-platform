@@ -57,12 +57,25 @@ public class ProcessResource {
 
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
 
-  private static final String QUERY_DESCRIBE_PROCESS = "DESCRIBE <${PROCESS_URI}>";
+  private static final String QUERY_DESCRIBE_PROCESS = "CONSTRUCT { <${PROCESS_URI}> ?x ?y } "
+      + " WHERE {<${PROCESS_URI}> ?x ?y} ";
   private static final String QUERY_DESCRIBE_COMMANDS
-      = "DESCRIBE ?command {"
-      + " <${PROCESS_URI}> proto:hasPrototype ?prototype ."
-      + " ?prototype semiot:supportedCommand ?command ."
-      + "}";
+      = "CONSTRUCT { "
+          + "     ?command ?x ?y ."
+          + "     ?y ?x1 ?y1 ."
+          + "    ?y2 ?x3 ?y3 ."
+          + " }"
+          + " WHERE {"
+          + "     <${PROCESS_URI}> proto:hasPrototype ?prototype . "
+          + "     ?prototype semiot:supportedCommand ?command . "
+          + "     ?command ?x ?y ."
+          + "     OPTIONAL { "
+          + "             ?y ?x1 ?y1 . "
+          + "                      ?y ?x2 ?y2 ."
+          + "                      ?y2 ?x3 ?y3 ."
+          + "                      FILTER(?x2 NOT IN (semiot:forParameter)) "
+          + "           }"
+          + " }";
 
   private static final String VAR_PROCESS_URI = "${PROCESS_URI}";
 
