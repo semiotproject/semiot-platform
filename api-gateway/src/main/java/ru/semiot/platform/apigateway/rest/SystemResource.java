@@ -19,9 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
-import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SSN;
-import ru.semiot.commons.namespaces.VOID;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
 import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
@@ -29,7 +27,6 @@ import ru.semiot.platform.apigateway.beans.TSDBQueryService;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
 import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
-import ru.semiot.platform.apigateway.utils.RDFUtils;
 import ru.semiot.platform.apigateway.utils.URIUtils;
 import rx.Observable;
 import rx.exceptions.Exceptions;
@@ -45,11 +42,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/systems")
@@ -65,29 +64,29 @@ public class SystemResource extends AbstractSystemResource {
           + "     proto:hasPrototype ?prototype ."
           + " OPTIONAL { ?uri rdfs:label ?label }"
           + " FILTER NOT EXISTS { [] ssn:hasSubSystem ?uri }"
+          + "}"
+          + "LIMIT ${LIMIT}"
+          + "OFFSET ${OFFSET}";
+  private static final String QUERY_DESCRIBE_SYSTEM =
+      "CONSTRUCT {"
+          + "  ?system ?p ?o ."
+          + "  ?o ?o_p ?o_o ."
+          + "} WHERE {"
+          + "  ?system ?p ?o ;"
+          + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
+          + "  OPTIONAL {"
+          + "    ?o ?o_p ?o_o ."
+          + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"
+          + "  }"
           + "}";
-  private static final String QUERY_GET_SYSTEM_PROTOTYPES = "SELECT DISTINCT ?prototype {"
-      + " ?uri a ssn:System, proto:Individual ;"
-      + "   proto:hasPrototype ?prototype ."
-      + " FILTER NOT EXISTS { [] ssn:hasSubSystem ?uri }"
-      + "}";
-  private static final String QUERY_DESCRIBE_SYSTEM = "CONSTRUCT {"
-      + "  ?system ?p ?o ."
-      + "  ?o ?o_p ?o_o ."
-      + "} WHERE {"
-      + "  ?system ?p ?o ;"
-      + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
-      + "  OPTIONAL {"
-      + "    ?o ?o_p ?o_o ."
-      + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"
-      + "  }"
-      + "}";
 
   private static final String VAR_URI = "uri";
   private static final String VAR_ID = "id";
   private static final String VAR_LABEL = "label";
   private static final String VAR_PROTOTYPE = "prototype";
-  private static final int FIRST = 0;
+  private static final String VAR_LIMIT = "${LIMIT}";
+  private static final String VAR_OFFSET = "${OFFSET}";
+  private static final int FIRST_PAGE = 0;
 
   public SystemResource() {
     super();
@@ -104,57 +103,54 @@ public class SystemResource extends AbstractSystemResource {
 
   @GET
   @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
-  public void listSystems(@Suspended final AsyncResponse response)
+  public void listSystems(@Suspended final AsyncResponse response, @QueryParam("page") Integer page)
       throws JsonLdError, IOException {
     URI root = uriInfo.getRequestUri();
-    final Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_COLLECTION, root);
-    final Map<String, Object> frame = contextProvider.getFrame(
-        ContextProvider.SYSTEM_COLLECTION, root);
+    if (page == null) {
+      UriBuilder uriBuilder = UriBuilder.fromUri(root).queryParam("page", FIRST_PAGE);
+      response.resume(Response.seeOther(uriBuilder.build()).build());
+    } else {
+      final Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_COLLECTION,
+          MapBuilder.newMap().put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
+              .put(ContextProvider.VAR_QUERY_PARAMS, "?page=" + page).build());
+      final Map<String, Object> frame = contextProvider.getFrame(
+          ContextProvider.SYSTEM_COLLECTION, root);
+      int offset = page > 0 ? (page - 1) * config.systemsPageSize() : FIRST_PAGE;
 
-    Observable<Void> prototypes = sparqlQuery
-        .select(QUERY_GET_SYSTEM_PROTOTYPES).map((ResultSet rs) -> {
-          while (rs.hasNext()) {
-            Resource prototype = rs.next().getResource(VAR_PROTOTYPE);
-            Resource prototypeResource = ResourceUtils
-                .createResourceFromClass(root, prototype.getLocalName());
-            Resource collection = model.listResourcesWithProperty(
-                RDF.type, Hydra.Collection).next();
+      Resource collection = model.listResourcesWithProperty(
+          RDF.type, Hydra.PartialCollectionView).next();
+      model.add(collection, Hydra.next, ResourceFactory.createResource(
+          UriBuilder.fromUri(root).replaceQueryParam("page", page + 1).build().toASCIIString()));
 
-            Resource restriction = ResourceFactory.createResource();
-            model.add(collection, VOID.classPartition, restriction);
-            model.add(restriction, VOID.clazz, prototypeResource);
-            model.add(collection, VOID.classPartition, restriction);
-          }
+      Observable<String> systems = sparqlQuery.select(QUERY_GET_ALL_SYSTEMS
+          .replace(VAR_LIMIT, String.valueOf(config.systemsPageSize()))
+          .replace(VAR_OFFSET, String.valueOf(offset)))
+          .map((ResultSet rs) -> {
+            while (rs.hasNext()) {
+              QuerySolution qs = rs.next();
+              Resource system = qs.getResource(VAR_URI);
+              Literal systemId = qs.getLiteral(VAR_ID);
+              Literal systemLabel = qs.getLiteral(VAR_LABEL);
+              Resource prototype = qs.getResource(VAR_PROTOTYPE);
 
-          return null;
-        });
-    Observable<String> systems = sparqlQuery.select(QUERY_GET_ALL_SYSTEMS).map((ResultSet rs) -> {
-      while (rs.hasNext()) {
-        QuerySolution qs = rs.next();
-        Resource system = qs.getResource(VAR_URI);
-        Literal systemId = qs.getLiteral(VAR_ID);
-        Literal systemLabel = qs.getLiteral(VAR_LABEL);
-        Resource prototype = qs.getResource(VAR_PROTOTYPE);
+              model.add(collection, Hydra.member, system);
+              model.add(system, DCTerms.identifier, systemId);
+              model.add(system, RDF.type, ResourceUtils.createResourceFromClass(root,
+                  prototype.getLocalName()));
+              if (systemLabel != null) {
+                model.add(system, RDFS.label, systemLabel);
+              }
+            }
 
-        Resource collection = model.listResourcesWithProperty(
-            RDF.type, Hydra.Collection).next();
-        model.add(collection, Hydra.member, system);
-        model.add(system, DCTerms.identifier, systemId);
-        model.add(system, RDF.type, ResourceUtils.createResourceFromClass(root,
-            prototype.getLocalName()));
-        if (systemLabel != null) {
-          model.add(system, RDFS.label, systemLabel);
-        }
-      }
+            try {
+              return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
+            } catch (IOException | JsonLdError e) {
+              throw Exceptions.propagate(e);
+            }
+          });
 
-      try {
-        return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
-      } catch (IOException | JsonLdError e) {
-        throw Exceptions.propagate(e);
-      }
-    });
-
-    Observable.zip(systems, prototypes, (a, __) -> a).subscribe(resume(response));
+      systems.subscribe(resume(response));
+    }
   }
 
   @GET
@@ -182,7 +178,7 @@ public class SystemResource extends AbstractSystemResource {
               root, prototype.getLocalName());
           model.add(system, RDF.type, prototypeResource);
 
-          if(model.contains(null, RDF.type, SSN.SensingDevice)) {
+          if (model.contains(null, RDF.type, SSN.SensingDevice)) {
             model.add(system,
                 ResourceFactory.createProperty(rootUrl + "/doc#observations"),
                 ResourceFactory.createResource(rootUrl + "/systems/" + systemId + "/observations"));

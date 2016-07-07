@@ -1,11 +1,27 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix hydra: <http://www.w3.org/ns/hydra/core#> .
+@prefix hydra-filter: <http://w3id.org/semiot/ontologies/hydra-filter#> .
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix ssn: <http://purl.oclc.org/NET/ssnx/ssn#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix apidoc: <${ROOT_URL}/doc#> .
 
+<${ROOT_URL}/systems${QUERY_PARAMS}> a hydra:PartialCollectionView, void:Dataset ;
+    hydra-filter:viewOf <${ROOT_URL}/systems> ;
+    hydra:first <${ROOT_URL}/systems?page=0> ;
+.
+
 <${ROOT_URL}/systems> a hydra:Collection, void:Dataset ;
-    void:classPartition [ void:class ssn:System ] .
+    void:classPartition [ void:class ssn:System ] ;
+    hydra-filter:viewTemplate [
+        a   hydra-filter:ViewTemplate ;
+        hydra:template "/systems{?page}" ;
+        hydra:mapping [
+            a hydra:IriTemplateMapping ;
+            hydra:variable "page" ;
+            hydra:required "true"^^xsd:boolean ;
+        ] ;
+    ] ;
+.
