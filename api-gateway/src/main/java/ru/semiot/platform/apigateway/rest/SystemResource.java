@@ -86,6 +86,7 @@ public class SystemResource extends AbstractSystemResource {
   private static final String VAR_PROTOTYPE = "prototype";
   private static final String VAR_LIMIT = "${LIMIT}";
   private static final String VAR_OFFSET = "${OFFSET}";
+  private static final String VAR_PAGE_SIZE = "${PAGE_SIZE}";
   private static final int FIRST_PAGE = 0;
 
   public SystemResource() {
@@ -103,27 +104,38 @@ public class SystemResource extends AbstractSystemResource {
 
   @GET
   @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
-  public void listSystems(@Suspended final AsyncResponse response, @QueryParam("page") Integer page)
+  public void listSystems(@Suspended final AsyncResponse response, @QueryParam("page") Integer page,
+      @QueryParam("size") Integer size)
       throws JsonLdError, IOException {
     URI root = uriInfo.getRequestUri();
     if (page == null) {
-      UriBuilder uriBuilder = UriBuilder.fromUri(root).queryParam("page", FIRST_PAGE);
-      response.resume(Response.seeOther(uriBuilder.build()).build());
+      URI redirectUri = UriBuilder.fromUri(root)
+          .queryParam("page", FIRST_PAGE).queryParam("size", config.systemsPageSize())
+          .build();
+      response.resume(Response.seeOther(redirectUri).build());
     } else {
+      int pageSize = config.systemsPageSize();
+      if (size != null) {
+        pageSize = size;
+      }
       final Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_COLLECTION,
-          MapBuilder.newMap().put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
-              .put(ContextProvider.VAR_QUERY_PARAMS, "?page=" + page).build());
+          MapBuilder.newMap()
+              .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
+              .put(VAR_PAGE_SIZE, pageSize)
+              .put(ContextProvider.VAR_QUERY_PARAMS, "?page=" + page + "&size=" + pageSize)
+              .build());
       final Map<String, Object> frame = contextProvider.getFrame(
           ContextProvider.SYSTEM_COLLECTION, root);
-      int offset = page > 0 ? (page - 1) * config.systemsPageSize() : FIRST_PAGE;
+      int offset = page > 0 ? (page - 1) * pageSize : FIRST_PAGE;
 
       Resource collection = model.listResourcesWithProperty(
           RDF.type, Hydra.PartialCollectionView).next();
-      model.add(collection, Hydra.next, ResourceFactory.createResource(
-          UriBuilder.fromUri(root).replaceQueryParam("page", page + 1).build().toASCIIString()));
+      model.add(collection, Hydra.next, ResourceFactory.createResource(UriBuilder.fromUri(root)
+          .replaceQueryParam("page", page + 1).replaceQueryParam("size", pageSize).build()
+          .toASCIIString()));
 
       Observable<String> systems = sparqlQuery.select(QUERY_GET_ALL_SYSTEMS
-          .replace(VAR_LIMIT, String.valueOf(config.systemsPageSize()))
+          .replace(VAR_LIMIT, String.valueOf(pageSize))
           .replace(VAR_OFFSET, String.valueOf(offset)))
           .map((ResultSet rs) -> {
             while (rs.hasNext()) {
