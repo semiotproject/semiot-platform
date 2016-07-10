@@ -8,27 +8,37 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
+import rx.Observer;
+import rx.subjects.PublishSubject;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class RDFStore {
 
+  private static final Logger logger = LoggerFactory.getLogger(RDFStore.class);
   private final HttpAuthenticator httpAuthenticator;
   private final Configuration configuration;
+  private final PublishSubject<Model> ps = PublishSubject.create();
 
   public RDFStore(Configuration configuration) {
     this.configuration = configuration;
     httpAuthenticator = new SimpleAuthenticator(
         configuration.getAsString(Keys.TRIPLESTORE_USERNAME),
         configuration.getAsString(Keys.TRIPLESTORE_PASSWORD).toCharArray());
+
+    ps.buffer(1, TimeUnit.SECONDS, 10).subscribe(new BatchUploader());
   }
 
   public void save(Model model) {
-    DatasetAccessorFactory
-        .createHTTP(configuration.getAsString(Keys.TRIPLESTORE_STORE_URL), httpAuthenticator)
-        .add(model);
+    ps.onNext(model);
   }
 
   public void save(String graphUri, Model model) {
@@ -59,6 +69,34 @@ public class RDFStore {
         updateRequest,
         configuration.getAsString(Keys.TRIPLESTORE_UPDATE_URL), httpAuthenticator)
         .execute();
+  }
+
+  private class BatchUploader implements Observer<List<Model>> {
+
+    @Override
+    public void onCompleted() {}
+
+    @Override
+    public void onError(Throwable e) {
+      logger.error(e.getMessage(), e);
+    }
+
+    @Override
+    public void onNext(List<Model> models) {
+      if (!models.isEmpty()) {
+        logger.info("Uploading {} models...", models.size());
+        long start = System.currentTimeMillis();
+        Model buffer = ModelFactory.createDefaultModel();
+
+        models.forEach(buffer::add);
+        long end = System.currentTimeMillis();
+        logger.info("Buffered {} ms", end - start);
+
+        DatasetAccessorFactory
+            .createHTTP(configuration.getAsString(Keys.TRIPLESTORE_STORE_URL), httpAuthenticator)
+            .add(buffer);
+      }
+    }
   }
 
 }

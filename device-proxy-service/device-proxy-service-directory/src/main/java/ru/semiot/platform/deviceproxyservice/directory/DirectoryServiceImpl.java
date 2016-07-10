@@ -5,7 +5,6 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.RDFDataMgr;
@@ -33,7 +32,6 @@ public class DirectoryServiceImpl implements DirectoryService, ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(DirectoryServiceImpl.class);
   private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
-  private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
   private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
   private static final String TOPIC_SENSOR_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations";
@@ -112,26 +110,21 @@ public class DirectoryServiceImpl implements DirectoryService, ManagedService {
 
           // Given uri is not a blank node
           if (system.isURIResource()) {
-            store.save(description);
-
-            // Add ssncom:hasCommunicationEndpoint to a private graph
-            Model privateDeviceInfo = ModelFactory.createDefaultModel();
-
             Resource wampResourceObs =
                 ResourceFactory.createResource(system.getURI() + "/observations/wamp");
-            addWampForResource(privateDeviceInfo, system, wampResourceObs,
+            addWampForResource(description, system, wampResourceObs,
                 TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId()));
-            privateDeviceInfo.add(wampResourceObs, SSNCOM.provide,
+            description.add(wampResourceObs, SSNCOM.provide,
                 ResourceFactory.createPlainLiteral("observations"));
 
             Resource wampResourceCommRes =
                 ResourceFactory.createResource(system.getURI() + "/commandresults/wamp");
-            addWampForResource(privateDeviceInfo, system, wampResourceCommRes,
+            addWampForResource(description, system, wampResourceCommRes,
                 TOPIC_COMMANDRESULT.replace("${SYSTEM_ID}", device.getId()));
-            privateDeviceInfo.add(wampResourceCommRes, SSNCOM.provide,
+            description.add(wampResourceCommRes, SSNCOM.provide,
                 ResourceFactory.createPlainLiteral("commandresults"));
 
-            privateDeviceInfo.add(system, SEMIOT.hasDriver, ResourceFactory
+            description.add(system, SEMIOT.hasDriver, ResourceFactory
                 .createResource(TEMPLATE_DRIVER_URN.replace("${PID}", info.getId())));
 
             ResultSet sensors = QueryExecutionFactory
@@ -143,12 +136,12 @@ public class DirectoryServiceImpl implements DirectoryService, ManagedService {
               String sensorId = qs.getLiteral(Vars.ID_SENSOR).getString();
               Resource sensorWampResource =
                   ResourceFactory.createResource(sensor.getURI() + "/wamp");
-              addWampForResource(privateDeviceInfo, sensor, sensorWampResource,
+              addWampForResource(description, sensor, sensorWampResource,
                   TOPIC_SENSOR_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
                       .replace("${SENSOR_ID}", sensorId));
             }
 
-            store.save(GRAPH_PRIVATE, privateDeviceInfo);
+            store.save(description);
 
             return true;
           } else {
