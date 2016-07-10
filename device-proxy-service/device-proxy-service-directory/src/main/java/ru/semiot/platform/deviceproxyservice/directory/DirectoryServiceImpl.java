@@ -1,6 +1,5 @@
-package ru.semiot.platform.deviceproxyservice.manager;
+package ru.semiot.platform.deviceproxyservice.directory;
 
-import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -14,61 +13,31 @@ import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RiotException;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.semiot.commons.namespaces.GEO;
 import ru.semiot.commons.namespaces.NamespaceUtils;
-import ru.semiot.commons.namespaces.Proto;
-import ru.semiot.commons.namespaces.SAREF;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.SSNCOM;
+import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Device;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DriverInformation;
+import ru.semiot.platform.deviceproxyservice.api.manager.DirectoryService;
 
-import java.io.StringReader;
 import java.net.URI;
+import java.util.Dictionary;
 
-public class DirectoryService {
+public class DirectoryServiceImpl implements DirectoryService, ManagedService {
 
-  private static final Logger logger = LoggerFactory.getLogger(DirectoryService.class);
+  private static final Logger logger = LoggerFactory.getLogger(DirectoryServiceImpl.class);
   private static final Literal WAMP = ResourceFactory.createPlainLiteral("WAMP");
   private static final String GRAPH_PRIVATE = "urn:semiot:graphs:private";
   private static final String TEMPLATE_DRIVER_URN = "urn:semiot:drivers:${PID}";
   private static final String TOPIC_SENSOR_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations";
   private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults";
-
-  protected static final String QUERY_DELETE_ALL_DATA_DRIVER = NamespaceUtils.newSPARQLQuery(
-      // @formatter:off
-      "DELETE { "
-      + "?system ?x1 ?y1. ?sensor ?x2 ?y2. "
-      + "?prototype ?x3 ?y3. ?mc ?x4 ?y4. "
-      + "?mp ?x5 ?y5. ?value ?x6 ?y6. ?loc ?x7 ?y7.  "
-      + "GRAPH <urn:semiot:graphs:private>{"
-        + "?system ?x8 ?y8. ?wamp ?x9 ?y9} }"
-      + "  WHERE { "
-        + "GRAPH <urn:semiot:graphs:private> {"
-          + "?system semiot:hasDriver <urn:semiot:drivers:${PID}>} . "
-        + "{ ?system  ssn:hasSubSystem  ?sensor . "
-          + "?sensor proto:hasPrototype ?prototype . "
-          + "?prototype ssn:hasMeasurementCapability ?mc . "
-          + "?mc ssn:hasMeasurementProperty ?mp . "
-          + "?mp ssn:hasValue ?value . "
-          + "?system ?x1 ?y1. ?sensor ?x2 ?y2. ?prototype ?x3 ?y3. "
-          + "?mc ?x4 ?y4. ?mp ?x5 ?y5. ?value ?x6 ?y6 } "
-        + "UNION { ?system geo:location ?loc. ?loc ?x7 ?y7 } "
-        + "UNION { "
-          + "GRAPH <urn:semiot:graphs:private> { "
-            + "?system ssncom:hasCommunicationEndpoint  ?wamp . "
-            + "?system ?x8 ?y8. ?wamp ?x9 ?y9} } }",
-      // @formatter:on
-      SSN.class, SSNCOM.class, SEMIOT.class, GEO.class, Proto.class);
-
-  protected static final String QUERY_UPDATE_STATE_SYSTEM =
-      NamespaceUtils.newSPARQLQuery("DELETE { <${URI_SYSTEM}> saref:hasState ?x } "
-          + "INSERT { <${URI_SYSTEM}> saref:hasState <${STATE}> } "
-          + "WHERE { <${URI_SYSTEM}> saref:hasState ?x }", SAREF.class);
   private static final String GET_SYSTEM_URI =
       NamespaceUtils.newSPARQLQuery("SELECT ?uri {?uri a ssn:System} LIMIT 1", SSN.class);
   private static final String GET_SENSOR = NamespaceUtils.newSPARQLQuery(
@@ -77,53 +46,53 @@ public class DirectoryService {
       SSN.class, DCTerms.class);
   private static final String GET_DRIVER_PID_BY_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
       "SELECT ?pid {" + "?system dcterms:identifier \"${SYSTEM_ID}\" ."
-//          + "GRAPH <urn:semiot:graphs:private> {"
           + "?system semiot:hasDriver ?pid"
-//          + "}" +
           + "} LIMIT 1",
       DCTerms.class, SEMIOT.class);
 
-  private final RDFStore store;
+  private final Configuration configuration = new Configuration();
+  private RDFStore store;
 
-  public DirectoryService(RDFStore store) {
-    this.store = store;
+  public DirectoryServiceImpl() {}
+
+  public void start() {
+    store = new RDFStore(configuration);
   }
 
-  public void inactiveDevice(String message) {
-    String request = null;
-    try {
-      Model description = ModelFactory.createDefaultModel().read(new StringReader(message), null,
-          RDFLanguages.TURTLE.getName());
+  public void stop() {
+    store = null;
+  }
 
-      if (!description.isEmpty()) {
-        logger.info("Update " + message);
+  @Override
+  public void updated(Dictionary dictionary) throws ConfigurationException {
+    synchronized (this) {
+      if (dictionary != null) {
+        if (!configuration.isConfigured()) {
+          //default values
+          configuration.put(Keys.TRIPLESTORE_USERNAME, "admin");
+          configuration.put(Keys.TRIPLESTORE_PASSWORD, "pw");
+          configuration.put(Keys.TRIPLESTORE_QUERY_URL,
+              "http://triplestore:3030/blazegraph/sparql");
+          configuration.put(Keys.TRIPLESTORE_UPDATE_URL,
+              "http://triplestore:3030/blazegraph/sparql");
+          configuration.put(Keys.TRIPLESTORE_STORE_URL,
+              "http://triplestore:3030/blazegraph/sparql");
 
-        QueryExecution qe = QueryExecutionFactory.create(GET_SYSTEM_URI, description);
-        ResultSet systems = qe.execSelect();
+          configuration.putAll(dictionary);
 
-        while (systems.hasNext()) {
-          QuerySolution qs = systems.next();
-          String uriSystem = qs.getResource("uri_system").getURI();
-          String state = qs.getResource("state").getURI();
-          request = QUERY_UPDATE_STATE_SYSTEM.replace("${URI_SYSTEM}", uriSystem)
-              .replace("${STATE}", state);
-          if (uriSystem != null && state != null) {
-            store.update(request);
-          }
+          configuration.setConfigured();
+
+          logger.debug("Bundle was configured");
+        } else {
+          logger.warn("Bundle is already configured. Ignoring it");
         }
       } else {
-        logger.warn("Received an empty message or in a wrong format!");
+        logger.debug("Configuration is empty. Skipping it");
       }
-    } catch (RiotException ex) {
-      logger.warn(ex.getMessage(), ex);
-    } catch (Exception ex) {
-      logger.info("Exception with string: "
-          + ((request != null && !request.isEmpty()) ? request : "request message is empty"));
-      logger.error(ex.getMessage(), ex);
     }
   }
 
-  public void addDevicePrototype(URI uri) {
+  public void loadDevicePrototype(URI uri) {
     try {
       Model model = RDFDataMgr.loadModel(uri.toASCIIString(), RDFLanguages.TURTLE);
 
@@ -133,11 +102,6 @@ public class DirectoryService {
     }
   }
 
-  /**
-   * Doesn't check whether device already exists.
-   *
-   * @return true if the given device successfully added.
-   */
   public boolean addNewDevice(DriverInformation info, Device device, Model description) {
     try {
       if (!description.isEmpty()) {
@@ -152,7 +116,7 @@ public class DirectoryService {
 
             // Add ssncom:hasCommunicationEndpoint to a private graph
             Model privateDeviceInfo = ModelFactory.createDefaultModel();
-            
+
             Resource wampResourceObs =
                 ResourceFactory.createResource(system.getURI() + "/observations/wamp");
             addWampForResource(privateDeviceInfo, system, wampResourceObs,
@@ -183,7 +147,7 @@ public class DirectoryService {
                   TOPIC_SENSOR_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
                       .replace("${SENSOR_ID}", sensorId));
             }
-            
+
             store.save(GRAPH_PRIVATE, privateDeviceInfo);
 
             return true;
@@ -204,17 +168,13 @@ public class DirectoryService {
 
     return false;
   }
-  
+
   private void addWampForResource(Model model, Resource res, Resource wampResource, String topic) {
     model.add(res, SSNCOM.hasCommunicationEndpoint, wampResource)
-    .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
-    .add(wampResource, SSNCOM.topic,
-        ResourceFactory.createPlainLiteral(topic))
-    .add(wampResource, SSNCOM.protocol, WAMP);
-  }
-
-  public void removeDataOfDriver(String pid) {
-    store.update(QUERY_DELETE_ALL_DATA_DRIVER.replace("${PID}", pid));
+        .add(wampResource, RDF.type, SSNCOM.CommunicationEndpoint)
+        .add(wampResource, SSNCOM.topic,
+            ResourceFactory.createPlainLiteral(topic))
+        .add(wampResource, SSNCOM.protocol, WAMP);
   }
 
   public String findDriverPidByDeviceId(String deviceId) {

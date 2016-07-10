@@ -40,7 +40,7 @@ function stop_and_clean() {
     echo "stopping and cleaning target directory $FILES_DIR"
 
     sudo docker-compose kill && \
-        sudo docker-compose rm -f && \
+        sudo docker-compose rm -f --all && \
         sudo rm -rf $FILES_DIR/fuseki/ $FILES_DIR/felix-cache/ $FILES_DIR/hbase/ $FILES_DIR/tsdb/
 
     exit $?
@@ -49,7 +49,7 @@ function stop_and_clean() {
 function start_and_logs() {
     echo "starting docker-compose with logs"
     sudo docker-compose up -d && \
-        sudo docker-compose logs
+        sudo docker-compose logs -f
 
     exit $?
 }

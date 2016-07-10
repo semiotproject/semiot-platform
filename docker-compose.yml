@@ -7,7 +7,7 @@ wamprouter:
   restart: always
 
 dataarchivingservice:
-  image: docker.semiot.ru/data-archiving-service:blazegraph
+  image: docker.semiot.ru/data-archiving-service
   links:
     - tsdb
     - wamprouter
@@ -28,7 +28,7 @@ tsdb:
   restart: always
 
 deviceproxyservice:
-  image: docker.semiot.ru/device-proxy-service:blazegraph
+  image: docker.semiot.ru/device-proxy-service
   links:
     - wamprouter
     - triplestore
@@ -38,19 +38,19 @@ deviceproxyservice:
     - "3131:3131/udp"
   volumes:
     - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
+  extra_hosts:
+    - "assets-cdn.github.com:151.101.12.133"
+    - "raw.githubusercontent.com:151.101.12.133"
   restart: always
 
 triplestore:
   image: docker.semiot.ru/triplestore
   ports:
     - "3030:3030"
-  #volumes:
-  #  - /semiot-platform/fuseki/fuseki-db:/fuseki/fuseki-db
-  #  - /semiot-platform/fuseki/app:/fuseki/app
   restart: always
 
 apigateway:
-  image: docker.semiot.ru/api-gateway:blazegraph
+  image: docker.semiot.ru/api-gateway
   links:
     - wamprouter
     - deviceproxyservice
@@ -62,6 +62,9 @@ apigateway:
     - "9990:9990"
   volumes:
     - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
+  extra_hosts:
+    - "assets-cdn.github.com:151.101.12.133"
+    - "raw.githubusercontent.com:151.101.12.133"
   restart: always
 
 frontend:

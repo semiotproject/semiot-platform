@@ -1,4 +1,4 @@
-package ru.semiot.platform.deviceproxyservice.manager;
+package ru.semiot.platform.deviceproxyservice.directory;
 
 import org.apache.jena.atlas.web.auth.HttpAuthenticator;
 import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
@@ -8,38 +8,32 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import ru.semiot.platform.deviceproxyservice.api.drivers.Configuration;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
 public class RDFStore {
 
-  private static final String PREFIXES = ""
-      + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-      + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
   private final HttpAuthenticator httpAuthenticator;
-  private final Configuration config;
+  private final Configuration configuration;
 
-  public RDFStore(Configuration config) {
-    this.config = config;
+  public RDFStore(Configuration configuration) {
+    this.configuration = configuration;
     httpAuthenticator = new SimpleAuthenticator(
-        config.getAsString(Keys.FUSEKI_USERNAME),
-        config.getAsString(Keys.FUSEKI_PASSWORD).toCharArray());
+        configuration.getAsString(Keys.TRIPLESTORE_USERNAME),
+        configuration.getAsString(Keys.TRIPLESTORE_PASSWORD).toCharArray());
   }
 
   public void save(Model model) {
     DatasetAccessorFactory
-        .createHTTP(config.getAsString(Keys.FUSEKI_STORE_URL), httpAuthenticator)
+        .createHTTP(configuration.getAsString(Keys.TRIPLESTORE_STORE_URL), httpAuthenticator)
         .add(model);
   }
 
   public void save(String graphUri, Model model) {
-    DatasetAccessorFactory.createHTTP(config.getAsString(Keys.FUSEKI_STORE_URL), httpAuthenticator)
+    DatasetAccessorFactory
+        .createHTTP(configuration.getAsString(Keys.TRIPLESTORE_STORE_URL), httpAuthenticator)
         .add(graphUri, model);
   }
 
@@ -51,7 +45,7 @@ public class RDFStore {
     Query select = QueryFactory.create(query);
     ResultSet rs = QueryExecutionFactory
         .createServiceRequest(
-            config.getAsString(Keys.FUSEKI_QUERY_URL),
+            configuration.getAsString(Keys.TRIPLESTORE_QUERY_URL),
             select,
             httpAuthenticator)
         .execSelect();
@@ -63,19 +57,8 @@ public class RDFStore {
 
     UpdateExecutionFactory.createRemote(
         updateRequest,
-        config.getAsString(Keys.FUSEKI_UPDATE_URL),
-        httpAuthenticator)
+        configuration.getAsString(Keys.TRIPLESTORE_UPDATE_URL), httpAuthenticator)
         .execute();
-  }
-
-  private String modelToQuery(Model model) throws IOException {
-    String query = PREFIXES + "INSERT DATA {\n";
-    try (StringWriter writer = new StringWriter()) {
-      model.write(writer, RDFLanguages.N3.getName());
-      query += writer.toString();
-    }
-    query += "\n}";
-    return query;
   }
 
 }
