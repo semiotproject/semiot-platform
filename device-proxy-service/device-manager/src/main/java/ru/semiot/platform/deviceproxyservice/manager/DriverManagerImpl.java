@@ -2,13 +2,6 @@ package ru.semiot.platform.deviceproxyservice.manager;
 
 import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.rdf.model.Model;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -34,12 +27,11 @@ import ru.semiot.platform.deviceproxyservice.api.manager.DirectoryService;
 import ws.wamp.jawampa.WampClient;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
@@ -66,7 +58,8 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   //Injected by Dependency Manager
   private DirectoryService directoryService;
 
-  private ExecutorService executor = Executors.newFixedThreadPool(10);
+  private ExecutorService executor = new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS,
+      new SynchronousQueue(), new ThreadPoolExecutor.CallerRunsPolicy());
 
   public DriverManagerImpl() {
     //Loading JSONLD frame for observations
