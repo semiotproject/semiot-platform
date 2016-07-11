@@ -1,7 +1,7 @@
 package ru.semiot.platform.apigateway.config;
 
 public class BundleConstants {
-  public static final int COUNT_DEFAULT_BUNDLES = 36;
+  public static final int COUNT_DEFAULT_BUNDLES = 37;
 
   public static final String MANAGER_DOMAIN = "ru.semiot.platform.domain";
   public static final String MANAGER_API =
