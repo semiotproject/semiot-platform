@@ -84,17 +84,19 @@ public class RDFStore {
     @Override
     public void onNext(List<Model> models) {
       if (!models.isEmpty()) {
-        logger.info("Uploading {} models...", models.size());
         long start = System.currentTimeMillis();
         Model buffer = ModelFactory.createDefaultModel();
-
         models.forEach(buffer::add);
         long end = System.currentTimeMillis();
-        logger.info("Buffered {} ms", end - start);
+        logger.info("Buffered {} models in {} ms", models.size(), end - start);
 
+        start = System.currentTimeMillis();
         DatasetAccessorFactory
             .createHTTP(configuration.getAsString(Keys.TRIPLESTORE_STORE_URL), httpAuthenticator)
             .add(buffer);
+        end = System.currentTimeMillis();
+
+        logger.info("Uploaded {} models in {} ms", models.size(), end - start);
       }
     }
   }

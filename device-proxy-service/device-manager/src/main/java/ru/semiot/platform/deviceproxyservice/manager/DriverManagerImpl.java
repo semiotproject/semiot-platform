@@ -204,13 +204,13 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
         boolean isAdded = directoryService.addNewDevice(info, device, description);
 
         if (isAdded) {
-
-          logger.info("Device [{}] was registered!", device.getId());
+          logger.debug("Device [{}] added to database!");
           String message = JsonUtils.toString(
               ModelJsonLdUtils.toJsonLdCompact(description, systemFrame));
           WAMPClient.getInstance().publish(
               getConfiguration().getAsString(Keys.TOPIC_NEWANDOBSERVING), message)
               .subscribe(WAMPClient.onError());
+          logger.info("Device [{}] was registered!", device.getId());
         } else {
           logger.warn("Device [{}] was not added in database!");
         }
