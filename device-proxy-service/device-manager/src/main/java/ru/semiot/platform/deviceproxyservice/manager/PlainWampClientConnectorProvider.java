@@ -11,13 +11,10 @@ public class PlainWampClientConnectorProvider extends NettyWampClientConnectorPr
 
   @Override
   public ScheduledExecutorService createScheduler() {
-    NioEventLoopGroup scheduler = new NioEventLoopGroup(10, new ThreadFactory() {
-      @Override
-      public Thread newThread(Runnable r) {
-        Thread t = new Thread(r, "WampClientEventLoop");
-        t.setDaemon(true);
-        return t;
-      }
+    NioEventLoopGroup scheduler = new NioEventLoopGroup(2, r -> {
+      Thread t = new Thread(r, "WampClientEventLoop");
+      t.setDaemon(true);
+      return t;
     });
     return scheduler;
   }

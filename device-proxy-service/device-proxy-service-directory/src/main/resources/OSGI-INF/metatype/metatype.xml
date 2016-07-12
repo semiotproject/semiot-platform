@@ -16,6 +16,12 @@
         <AD name="Triplestore Store URL"
             id="ru.semiot.platform.deviceproxyservice.directory.triplestore_store_url"
             required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
+        <AD name="Store Operation Buffer Size"
+            id="ru.semiot.platform.deviceproxyservice.directory.store_operation_buffersize"
+            required="false" type="String" default="100"/>
+        <AD name="Store Operation Buffer Idle (sec)"
+            id="ru.semiot.platform.deviceproxyservice.directory.store_operation_bufferidle"
+            required="false" type="String" default="1"/>
     </OCD>
 
     <Designate pid="ru.semiot.platform.deviceproxyservice.directory">

@@ -34,7 +34,10 @@ public class RDFStore {
         configuration.getAsString(Keys.TRIPLESTORE_USERNAME),
         configuration.getAsString(Keys.TRIPLESTORE_PASSWORD).toCharArray());
 
-    ps.buffer(1, TimeUnit.SECONDS, 10).subscribe(new BatchUploader());
+    ps.buffer(
+        configuration.getAsInteger(Keys.STORE_OPERATION_BUFFERIDLE), TimeUnit.SECONDS,
+        configuration.getAsInteger(Keys.STORE_OPERATION_BUFFERSIZE))
+        .subscribe(new BatchUploader());
   }
 
   public void save(Model model) {

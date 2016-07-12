@@ -7,7 +7,6 @@ import rx.Subscriber;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
 import ws.wamp.jawampa.auth.client.Ticket;
-import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 import java.io.Closeable;
 import java.io.IOException;

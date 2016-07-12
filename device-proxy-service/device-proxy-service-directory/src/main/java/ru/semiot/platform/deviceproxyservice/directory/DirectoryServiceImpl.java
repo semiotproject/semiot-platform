@@ -75,6 +75,8 @@ public class DirectoryServiceImpl implements DirectoryService, ManagedService {
               "http://triplestore:3030/blazegraph/sparql");
           configuration.put(Keys.TRIPLESTORE_STORE_URL,
               "http://triplestore:3030/blazegraph/sparql");
+          configuration.put(Keys.STORE_OPERATION_BUFFERSIZE, "100");
+          configuration.put(Keys.STORE_OPERATION_BUFFERIDLE, "1");
 
           configuration.putAll(dictionary);
 
