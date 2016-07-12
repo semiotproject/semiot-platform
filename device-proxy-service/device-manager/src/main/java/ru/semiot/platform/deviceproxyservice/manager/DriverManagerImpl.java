@@ -1,6 +1,5 @@
 package ru.semiot.platform.deviceproxyservice.manager;
 
-import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.utils.JsonUtils;
 import org.apache.jena.rdf.model.Model;
 import org.osgi.framework.BundleContext;
@@ -196,26 +195,27 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
     executor.execute(() -> {
       logger.debug("Device [{}] is being registered", device.getId());
 
-      /**
-       * Resolve common variables, e.g. platform's domain name.
-       */
-      final Model description = device.toDescriptionAsModel(configuration);
+      try {
+        /**
+         * Resolve common variables, e.g. platform's domain name.
+         */
+        final Model description = device.toDescriptionAsModel(configuration);
 
-      boolean isAdded = directoryService.addNewDevice(info, device, description);
+        boolean isAdded = directoryService.addNewDevice(info, device, description);
 
-      if (isAdded) {
-        try {
+        if (isAdded) {
+
           logger.info("Device [{}] was registered!", device.getId());
           String message = JsonUtils.toString(
               ModelJsonLdUtils.toJsonLdCompact(description, systemFrame));
           WAMPClient.getInstance().publish(
               getConfiguration().getAsString(Keys.TOPIC_NEWANDOBSERVING), message)
               .subscribe(WAMPClient.onError());
-        } catch (JsonLdError | IOException ex) {
-          logger.error(ex.getMessage(), ex);
+        } else {
+          logger.warn("Device [{}] was not added in database!");
         }
-      } else {
-        logger.warn("Device [{}] was not added in database!");
+      } catch (Throwable ex) {
+        logger.error(ex.getMessage(), ex);
       }
     });
   }
