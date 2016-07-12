@@ -48,7 +48,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
       String authId, String ticket)
       throws Exception {
     WampClientBuilder builder = new WampClientBuilder();
-    builder.withConnectorProvider(new NettyWampClientConnectorProvider())
+    builder.withConnectorProvider(new PlainWampClientConnectorProvider())
         .withUri(wampUri)
         .withRealm(wampRealm)
         .withInfiniteReconnects()
