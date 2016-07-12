@@ -204,15 +204,17 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
         boolean isAdded = directoryService.addNewDevice(info, device, description);
 
         if (isAdded) {
-          logger.debug("Device [{}] added to database!");
+          logger.debug("Device [{}] added to database!", device.getId());
+          long start = System.currentTimeMillis();
           String message = JsonUtils.toString(
               ModelJsonLdUtils.toJsonLdCompact(description, systemFrame));
           WAMPClient.getInstance().publish(
               getConfiguration().getAsString(Keys.TOPIC_NEWANDOBSERVING), message)
               .subscribe(WAMPClient.onError());
-          logger.info("Device [{}] was registered!", device.getId());
+          long end = System.currentTimeMillis();
+          logger.info("Device [{}] was registered in {} ms!", device.getId(), end - start);
         } else {
-          logger.warn("Device [{}] was not added in database!");
+          logger.warn("Device [{}] was not added in database!", device.getId());
         }
       } catch (Throwable ex) {
         logger.error(ex.getMessage(), ex);
@@ -223,15 +225,16 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   @Override
   public void registerObservation(Device device, Observation observation) {
     executor.execute(() -> {
-      logger.info("Observation [Device ID={}] is being registered", device.getId());
-      // TODO: There's no guarantee that WAMPClient is connected.
-      Model model = observation.toObservationAsModel(device.getProperties(), configuration);
       try {
+        logger.debug("Observation [Device ID={}] is being registered", device.getId());
+        // TODO: There's no guarantee that WAMPClient is connected.
+        Model model = observation.toObservationAsModel(device.getProperties(), configuration);
         WAMPClient.getInstance()
             .publish(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
                     .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
                 JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
             .subscribe(WAMPClient.onError());
+        logger.info("Observation [Device ID={}] was registered", device.getId());
       } catch (Throwable ex) {
         logger.error(ex.getMessage(), ex);
       }
