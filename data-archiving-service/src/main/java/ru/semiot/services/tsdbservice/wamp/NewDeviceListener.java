@@ -172,7 +172,7 @@ public class NewDeviceListener implements Observer<String> {
   private String getSystemId(Model description) {
     ResultSet rs = QueryExecutionFactory.create(GET_SYSTEM_ID, description).execSelect();
     if (rs.hasNext()) {
-      rs.next().getLiteral(VAR_SYSTEM_ID).getString();
+      return rs.next().getLiteral(VAR_SYSTEM_ID).getString();
     }
     return null;
   }
