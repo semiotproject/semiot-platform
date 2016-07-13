@@ -51,6 +51,7 @@ public class ObservationListener extends RDFMessageObserver {
   @Override
   public void onNext(Model description) {
     try {
+      long startTimestamp = System.currentTimeMillis();
       ResultSet metrics = query(description, METRICS_QUERY);
       while (metrics.hasNext()) {
         QuerySolution qs = metrics.next();
@@ -74,6 +75,8 @@ public class ObservationListener extends RDFMessageObserver {
           logger.warn("Required properties not found!");
         }
       }
+      logger.debug("Observation written in {} seconds",
+          System.currentTimeMillis() - startTimestamp);
     } catch (Throwable ex) {
       logger.error(ex.getMessage(), ex);
     }

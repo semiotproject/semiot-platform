@@ -81,6 +81,7 @@ public class NewDeviceListener implements Observer<String> {
   @Override
   public void onNext(String message) {
     try {
+      long startTimestamp = System.currentTimeMillis();
       Model description = ModelFactory.createDefaultModel().read(
           new StringReader(message), null, RDFLanguages.strLangJSONLD);
       if (description != null && !description.isEmpty()) {
@@ -93,6 +94,8 @@ public class NewDeviceListener implements Observer<String> {
         }
 
         subscribeToDeviceTopics(topics);
+        logger.debug("Subscription topics is made in {} seconds",
+            System.currentTimeMillis() - startTimestamp);
       } else {
         logger.warn("Received an empty message or in a wrong format!");
       }
