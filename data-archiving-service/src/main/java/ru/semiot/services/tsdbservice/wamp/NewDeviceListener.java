@@ -13,11 +13,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.DCTerms;
-import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.NamespaceUtils;
@@ -36,6 +33,8 @@ public class NewDeviceListener implements Observer<String> {
   private static final String VAR_OBSERVATIONS_TOPIC = "obs_topic";
   private static final String VAR_COMMANDRESULTS_TOPIC = "commres_topic";
   private static final String VAR_SYSTEM_ID = "system_id";
+  private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations";
+  private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults";
   private final HttpAuthenticator httpAuthenticator;
   private final WAMPClient wampClient = WAMPClient.getInstance();
   private final LinkedList<String> listTopics = new LinkedList<>();
@@ -52,7 +51,7 @@ public class NewDeviceListener implements Observer<String> {
           + "   ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
 //          + "}"
           + "}", SSN.class, SSNCOM.class, DCTerms.class));
-  private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils.newSPARQLQuery(
+  /* private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils.newSPARQLQuery(
       "SELECT ?system_id ?obs_topic ?commres_topic { "
           + "<${SYSTEM_URI}> dcterms:identifier ?system_id. "
 //          + "GRAPH <urn:semiot:graphs:private> {"
@@ -63,7 +62,11 @@ public class NewDeviceListener implements Observer<String> {
           + " ?ee ssncom:protocol \"WAMP\"; "
           + "   ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
 //          + "}"
-          + "}", SSN.class, SSNCOM.class, DCTerms.class);
+          + "}", SSN.class, SSNCOM.class, DCTerms.class);*/
+  
+  private static final String GET_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
+      "SELECT ?system_id { ?system a ssn:System. ?system dcterms:identifier ?system_id. }",
+      SSN.class, DCTerms.class);
 
   public NewDeviceListener() {
     httpAuthenticator = new SimpleAuthenticator(
@@ -85,17 +88,14 @@ public class NewDeviceListener implements Observer<String> {
       Model description = ModelFactory.createDefaultModel().read(
           new StringReader(message), null, RDFLanguages.strLangJSONLD);
       if (description != null && !description.isEmpty()) {
-        QueryExecution qe = getQEFromModelTopics(description);
-        ResultSet topics = null;
-        if (qe != null) {
-          topics = qe.execSelect();
+        String systemId = getSystemId(description);
+        if (StringUtils.isNoneBlank(systemId)) {
+          subscribeToDeviceTopic(systemId);
+          logger.debug("Subscription topic is made in {} seconds",
+              System.currentTimeMillis() - startTimestamp);
         } else {
           logger.error("Can'f find a ssn:System in device description!");
         }
-
-        subscribeToDeviceTopics(topics);
-        logger.debug("Subscription topics is made in {} seconds",
-            System.currentTimeMillis() - startTimestamp);
       } else {
         logger.warn("Received an empty message or in a wrong format!");
       }
@@ -113,7 +113,7 @@ public class NewDeviceListener implements Observer<String> {
         logger.info("Connected to triplestore");
         isConnected = true;
 
-        subscribeToDeviceTopics(topics);
+        subscribeToDevicesTopics(topics);
       } catch (Throwable ex) {
         logger.warn(ex.getMessage());
         logger.warn("Can`t connect to the triplestore! Retry in {} ms", TIMEOUT);
@@ -126,31 +126,41 @@ public class NewDeviceListener implements Observer<String> {
     }
   }
 
-  private void subscribeToDeviceTopics(ResultSet topics) {
+  private void subscribeToDevicesTopics(ResultSet topics) {
     while (topics != null && topics.hasNext()) {
       QuerySolution qs = topics.next();
       String topicObsName = qs.get(VAR_OBSERVATIONS_TOPIC).asLiteral().getString();
       String topicCommResName = qs.get(VAR_COMMANDRESULTS_TOPIC).asLiteral().getString();
       String systemId = qs.get(VAR_SYSTEM_ID).asLiteral().getString();
-      if (StringUtils.isNotBlank(topicObsName) && StringUtils.isNotBlank(topicCommResName)
-          && StringUtils.isNotBlank(systemId)) {
-        if (!listTopics.contains(topicObsName) && !listTopics.contains(topicCommResName)) {
-          listTopics.add(topicObsName);
-          listTopics.add(topicCommResName);
-          //Subscribe to observations
-          wampClient.addSubscription(topicObsName,
-              wampClient.subscribe(topicObsName, SubscriptionFlags.Prefix)
-                  .subscribe(new ObservationListener(systemId)));
-          //Subscribe to command results
-          wampClient.addSubscription(topicCommResName,
-              wampClient.subscribe(topicCommResName, SubscriptionFlags.Prefix)
-                  .subscribe(new CommandResultListener()));
-        } else {
-          logger.debug("Topics {} and {} are already known", topicObsName, topicCommResName);
-        }
+      subscriveToDeviceTopics(topicObsName, topicCommResName, systemId);
+    }
+  }
+  
+  private void subscribeToDeviceTopic(String systemId) {
+    subscriveToDeviceTopics(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", systemId), 
+        TOPIC_COMMANDRESULT.replace("${SYSTEM_ID}", systemId), systemId);
+  }
+  
+  private void subscriveToDeviceTopics(String topicObsName, String topicCommResName,
+      String systemId) {
+    if (StringUtils.isNotBlank(topicObsName) && StringUtils.isNotBlank(topicCommResName)
+        && StringUtils.isNotBlank(systemId)) {
+      if (!listTopics.contains(topicObsName) && !listTopics.contains(topicCommResName)) {
+        listTopics.add(topicObsName);
+        listTopics.add(topicCommResName);
+        // Subscribe to observations
+        wampClient.addSubscription(topicObsName,
+            wampClient.subscribe(topicObsName, SubscriptionFlags.Prefix)
+                .subscribe(new ObservationListener(systemId)));
+        // Subscribe to command results
+        wampClient.addSubscription(topicCommResName,
+            wampClient.subscribe(topicCommResName, SubscriptionFlags.Prefix)
+                .subscribe(new CommandResultListener()));
       } else {
-        logger.warn("Name topic is a blank string!");
+        logger.debug("Topics {} and {} are already known", topicObsName, topicCommResName);
       }
+    } else {
+      logger.warn("Name topic is a blank string!");
     }
   }
 
@@ -159,7 +169,15 @@ public class NewDeviceListener implements Observer<String> {
         GET_TOPICS_QUERY, httpAuthenticator);
   }
 
-  private QueryExecution getQEFromModelTopics(Model description) {
+  private String getSystemId(Model description) {
+    ResultSet rs = QueryExecutionFactory.create(GET_SYSTEM_ID, description).execSelect();
+    if (rs.hasNext()) {
+      rs.next().getLiteral(VAR_SYSTEM_ID).getString();
+    }
+    return null;
+  }
+  
+  /* private QueryExecution getQEFromModelTopics(Model description) {
     ResIterator iter = description.listResourcesWithProperty(RDF.type, SSN.System);
 
     if (iter.hasNext()) {
@@ -171,5 +189,6 @@ public class NewDeviceListener implements Observer<String> {
     } else {
       return null;
     }
-  }
+  }*/
+  
 }
