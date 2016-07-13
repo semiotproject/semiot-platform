@@ -228,11 +228,13 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
       try {
         logger.debug("Observation [Device ID={}] is being registered", device.getId());
         // TODO: There's no guarantee that WAMPClient is connected.
-        Model model = observation.toObservationAsModel(device.getProperties(), configuration);
-        WAMPClient.getInstance()
-            .publish(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", device.getId())
-                    .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
-                JsonUtils.toString(ModelJsonLdUtils.toJsonLdCompact(model, observationFrame)))
+        String message = observation.getRDFTemplate().resolveToString(
+            observation.getProperties(), device.getProperties(), configuration);
+        WAMPClient.getInstance().publish(
+            TOPIC_OBSERVATIONS
+                .replace("${SYSTEM_ID}", device.getId())
+                .replace("${SENSOR_ID}", observation.getProperty(DeviceProperties.SENSOR_ID)),
+            message)
             .subscribe(WAMPClient.onError());
         logger.info("Observation [Device ID={}] was registered", device.getId());
       } catch (Throwable ex) {
