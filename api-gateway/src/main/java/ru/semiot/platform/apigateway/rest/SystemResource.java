@@ -93,7 +93,7 @@ public class SystemResource extends AbstractSystemResource {
   private static final String VAR_LIMIT = "${LIMIT}";
   private static final String VAR_OFFSET = "${OFFSET}";
   private static final String VAR_PAGE_SIZE = "${PAGE_SIZE}";
-  private static final int FIRST_PAGE = 0;
+  private static final int FIRST_PAGE = 1;
 
   public SystemResource() {
     super();
@@ -130,7 +130,7 @@ public class SystemResource extends AbstractSystemResource {
               .build());
       final Map<String, Object> frame = contextProvider.getFrame(
           ContextProvider.SYSTEM_COLLECTION, root);
-      int offset = page > 0 ? page * pageSize : FIRST_PAGE;
+      int offset = page > 1 ? (page - 1) * pageSize : FIRST_PAGE;
 
       Resource collection = model.listResourcesWithProperty(
           RDF.type, Hydra.PartialCollectionView).next();

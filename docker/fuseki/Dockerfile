@@ -8,7 +8,7 @@ ENV FUSEKI_BASE /fuseki/base
 
 WORKDIR /
 RUN echo "fastestmirror=true" >> /etc/dnf/dnf.conf
-RUN dnf install -y java-1.8.0-openjdk-headless nss-3.23.0 wget unzip which && dnf clean all
+RUN dnf install -y java-1.8.0-openjdk-headless nss wget unzip which && dnf clean all
 
 RUN mkdir -p $FUSEKI_BASE
 WORKDIR $FUSEKI_HOME

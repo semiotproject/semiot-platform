@@ -10,7 +10,7 @@
 
 <${ROOT_URL}/systems${QUERY_PARAMS}> a hydra:PartialCollectionView, void:Dataset ;
     hydra-filter:viewOf <${ROOT_URL}/systems> ;
-    hydra:first <${ROOT_URL}/systems?page=0?size=${PAGE_SIZE}> ;
+    hydra:first <${ROOT_URL}/systems?page=1?size=${PAGE_SIZE}> ;
 .
 
 <${ROOT_URL}/systems> a hydra:Collection, void:Dataset ;
