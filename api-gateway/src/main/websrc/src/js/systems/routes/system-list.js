@@ -46,6 +46,7 @@ export default class SystemList extends Component {
     }
     componentDidMount() {
         this.querySystems();
+        this.subscribe();
     }
     componentWillUnmount() {
         this.unsubscribe();
@@ -57,8 +58,6 @@ export default class SystemList extends Component {
                 systems: res.systems,
                 totalSystemsCount: res.totalSystemsCount,
                 isLoading: false
-            }, () => {
-                this.subscribe();
             });
         });
     }
