@@ -27,7 +27,7 @@ export default class SystemListTable extends Component {
                         {
                             systems.map((s) => {
                                 return (
-                                    <tr key={s.index}>
+                                    <tr key={s.id}>
                                         <td>{fromIndex + s.index}</td>
                                         <td><Link to={'/systems/' + s.id}>{s.name}</Link></td>
                                         <td>
