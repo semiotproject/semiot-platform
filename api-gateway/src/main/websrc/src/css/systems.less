@@ -1,4 +1,6 @@
-.app-wrapper {
+@import (inline) "../../node_modules/react-bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css";
+
+#root {
     padding: 20px 20px 10px 20px;
     height: 100%;
 }
@@ -107,15 +109,51 @@ body {
     }
 }
 
-/* highcharts */
+.sensor-view-list {
+}
 .sensor-view {
+    display: inline-block;
+    width: 49%;
+    // height: 300px;
+    margin-right: 1%;
     margin-top: 20px;
     padding: 15px;
-    border-radius: 5px;
+    position: relative;
+    border-radius: 4px;
     background: white;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
     border: 1px solid rgb(219, 219, 219);
+    vertical-align: top;
+    .chart-wrapper {
+        width: 100%;
+        height: 100%;
+    }
+    .sensor-last-observation {
+        background-color: rgba(75,192,192,1);
+        color: white;
+        height: 70px;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+        padding: 10px;
+        border-radius: 2px;
+        display: inline-block;
+        span.big {
+            font-weight: bold;
+            font-size: 20px;
+        }
+        span {
+            font-size: 10px;
+            > span {
+                display: block;
+            }
+        }
+    }
+    .sensor-title {
+        display: inline-block;
+        vertical-align: top;
+        padding-left: 10px;
+        height: 70px;
+        line-height: 70px;
+    }
 }
 .highcharts-button {
     display: none;
@@ -124,29 +162,42 @@ body {
     margin-top: 10px;
 }
 .chart-control {
-    display: inline-block;
-    max-width: 225px;
-    margin: 0 0 10px 10px;
     vertical-align: bottom;
+    width: 200px;
+    margin-right: 10px;
     &.mode-control {
         vertical-align: top;
     }
 }
+.mode-control {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
 .range-control {
-    float: right;
-    display: inline-block;
+    margin-top: 10px;
+    > * {
+        display: inline-block;
+    }
     .btn.btn-raised {
         margin-bottom: 0;
     }
     .input-group {
-        border-bottom: 1px solid rgba(128, 128, 128, 0.25);
         input:focus {
             box-shadow: none !important;
         }
     }
-}
-.mode-control {
-    height: 70px;
+    label {
+        font-size: 12px;
+        margin-bottom: 0;
+    }
+    a {
+        padding-left: 5px;
+    }
+    button {
+        vertical-align: middle;
+        margin: 0;
+    }
 }
 .empty-sensor-chart {
     height: 400px;
@@ -154,8 +205,8 @@ body {
     text-align: center;
     font-style: italic;
 }
-.btn.btn-raised.ng-pristine.ng-untouched.ng-valid.active {
-    background-color: #0fb2fc;
+.mode-control .active {
+    background-color: #0fb2fc !important;
     color: white;
 }
 .form-group {
@@ -168,10 +219,21 @@ body {
 
 .process-view {
     margin: 20px 0;
-    padding: 0 15px;
+    padding: 25px;
+    margin-right: 1%;
+    margin-top: 20px;
+    position: relative;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
+    border: 1px solid rgb(219, 219, 219);
+    display: inline-block;
     label {
         display: block;
         margin-top: 20px;
+    }
+    h4 {
+        text-transform: capitalize;
     }
     fieldset {
         width: 500px;
@@ -184,4 +246,28 @@ body {
         text-align: left;
     }
     select option:empty { display:none }
+    button.operation-btn {
+        padding: 20px 15px;
+        margin-right: 10px;
+        height: 80px;
+        div {
+            font-size: 14px;
+            color: white;
+            line-height: initial;
+            &:nth-of-type(2) {
+                font-weight: normal;
+                font-size: 10px;
+            }
+        }
+    }
+    .form-horizontal .form-group {
+        margin: 30px 0 10px 0;
+    }
+    i.fa {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: white;
+    }
+
 }

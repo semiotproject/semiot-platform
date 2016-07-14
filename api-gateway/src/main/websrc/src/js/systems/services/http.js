@@ -1,33 +1,18 @@
-export default ["$http", "$q", function($http, $q) {
+import axios from 'axios';
 
-    return {
-        get(url) {
-            return this.query(url, "GET");
-        },
-        query(url, method, data = undefined) {
-            console.info(`performing http '${method}'' request on ${url}; data is`, data);
-            const defer = $q.defer();
-
-            const options = {
-                method,
-                url,
-                data,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            };
-
-            if (method === "POST") {
-                options.headers['Content-Type'] = "application/ld+json";
+export default {
+    get(url, plainJson = false) {
+        return axios(url, {
+            headers: {
+                'Accept': plainJson ? "application/json" : "application/ld+json"
             }
-
-            $http(options).then((res) => {
-                defer.resolve(res.data);
-            }, () => {
-                defer.reject();
-            });
-
-            return defer.promise;
-        }
-    };
-}];
+        }).then((res) => { return res.data; });
+    },
+    post(url, body) {
+        return axios.post(url, body, {
+            headers: {
+                'Content-Type': "application/ld+json"
+            }
+        });
+    }
+};

@@ -23,7 +23,12 @@ module.exports = function (grunt) {
                 cwd: BUILD_CONFIG.src_dir,
                 src: ['css/**/*.less'],
                 dest: BUILD_CONFIG.dist_dir,
-                ext: '.css'
+                ext: '.css',
+                options: {
+                    plugins: [
+                        new (require('less-plugin-autoprefix'))(),
+                    ]
+                }
             }
         },
         browserify: {
@@ -35,6 +40,17 @@ module.exports = function (grunt) {
             index: {
                 src: BUILD_CONFIG.src_dir + "js/systems/index.js",
                 dest: BUILD_CONFIG.dist_dir + "js/systems/index.js",
+                options: {
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    transform: ['babelify'],
+                    watch: true
+                }
+            },
+            platformCheck: {
+                src: BUILD_CONFIG.src_dir + "js/config/platform-check.js",
+                dest: BUILD_CONFIG.dist_dir + "js/config/platform-check.js",
                 options: {
                     browserifyOptions: {
                         debug: true

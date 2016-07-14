@@ -92,7 +92,7 @@
                             <span class="material-input"></span>
                         </div>
                         <div style="text-align: center;">
-                            <button class="btn btn-lg btn-primary btn-raised" type="submit">Save <i class="fa fa-save"></i></button>
+                            <button class="btn btn-lg btn-primary btn-raised save-platform-settings-button" type="submit">Save <i class="fa fa-save"></i></button>
                         </div>
                         <input type="hidden" name="configure" value="Save" />
                         <input type="hidden" name="pid" id="pid" value=<%=BundleConstants.MANAGER_PID%> />
@@ -105,7 +105,7 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
     <script>$.material.init();</script>
-    <script></script>
+    <script src="/js/config/platform-check.js"></script>
 </body>
 </html>
 

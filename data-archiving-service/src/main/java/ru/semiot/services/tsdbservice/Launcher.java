@@ -97,7 +97,7 @@ public class Launcher {
                   .subscribe(CONFIG.topicsSubscriber())
                   .subscribe(newDeviceListener);
 
-              newDeviceListener.loadDeviceTopicsAndSubscribe();
+              // newDeviceListener.loadDeviceTopicsAndSubscribe();
             } catch (Throwable ex) {
               logger.debug(ex.getMessage(), ex);
             }

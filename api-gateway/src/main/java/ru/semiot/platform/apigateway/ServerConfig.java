@@ -62,4 +62,8 @@ public interface ServerConfig extends Config {
   @Key("services.repository.url")
   String repositoryEndpoint();
 
+  @DefaultValue("20")
+  @Key("apigateway.systems.pagesize")
+  int systemsPageSize();
+
 }

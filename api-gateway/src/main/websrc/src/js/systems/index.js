@@ -1,4 +1,4 @@
-'use strict';
+/*'use strict';
 
 import moment from 'moment';
 
@@ -64,4 +64,18 @@ app.factory('currentUser', require('./api/user'));
 app.controller('SystemListCtrl', require('./controllers/system-list'));
 app.controller('SystemDetailCtrl', require('./controllers/system-detail'));
 
-app.config(require('./routing'));
+app.config(require('./routing'));*/
+
+import React from 'react';
+import { render } from 'react-dom';
+import { Router, Route, Link, browserHistory } from 'react-router';
+
+import SystemList from './routes/system-list';
+import SystemDetail from './routes/system-detail';
+
+render((
+  <Router history={browserHistory}>
+      <Route path="/systems" component={SystemList}/> 
+      <Route path="/systems/:systemId" component={SystemDetail}/>
+  </Router>
+), document.getElementById('root'));
