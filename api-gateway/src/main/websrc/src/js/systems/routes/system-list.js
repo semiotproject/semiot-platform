@@ -14,12 +14,15 @@ export default class SystemList extends Component {
             systems: [],
             isLoading: true,
             currentIndex: 1,
+            totalSystemsCount: MAX_ITEMS_PER_PAGE,
             search: ""
         };
         this.handleNewSystem = (s) => {
+            const { totalSystemsCount, systems } = this.state;
             console.info("registered new system: ", s);
             this.setState({
-                systems: [...this.state.systems, s]
+                systems: systems.length >= MAX_ITEMS_PER_PAGE ? systems : [...systems, s],
+                totalSystemsCount: totalSystemsCount + 1
             });
         };
         this.handleSearchChange = (e) => {
@@ -36,20 +39,30 @@ export default class SystemList extends Component {
         };
         this.handlePageClick = (e) => {
             this.setState({
-                currentIndex: e
-            });
+                currentIndex: e,
+                isLoading: true
+            }, this.querySystems.bind(this));
         };
     }
     componentDidMount() {
+        this.queryTotalSystemsCount();
         this.querySystems();
     }
     componentWillUnmount() {
         this.unsubscribe();
     }
-    querySystems() {
-        systemAPI.loadSystems().then((res) => {
+    queryTotalSystemsCount() {
+        systemAPI.loadSystemsCount().then((res) => {
             this.setState({
-                systems: res,
+                totalSystemsCount: res
+            });
+        });
+    }
+    querySystems() {
+        console.info(`querying systems; current index is ${this.state.currentIndex}, items per page: ${MAX_ITEMS_PER_PAGE}`);
+        systemAPI.loadSystems(this.state.currentIndex, MAX_ITEMS_PER_PAGE).then((systems, count) => {
+            this.setState({
+                systems: systems,
                 isLoading: false
             }, () => {
                 this.subscribe();
@@ -74,17 +87,15 @@ export default class SystemList extends Component {
     }
 
     render() {
-        const { isLoading, systems, search, currentIndex } = this.state;
-        const filteredSystems = this.filterSystems(systems);
-        const paginatedSystems = this.paginateSystems(filteredSystems);
+        const { isLoading, systems, search, currentIndex, totalSystemsCount } = this.state;
         return (
             <section className={isLoading ? "preloader" : ""}>
                 <ol className="breadcrumb">
                     <li className="active">Systems</li>
                 </ol>
-                <SystemListTable systems={paginatedSystems} search={search} onSearchChange={this.handleSearchChange} />
+                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} />
                 {
-                    filteredSystems.length > MAX_ITEMS_PER_PAGE &&
+                    totalSystemsCount > MAX_ITEMS_PER_PAGE &&
                         <Pagination
                                 prev
                                 next
@@ -92,7 +103,7 @@ export default class SystemList extends Component {
                                 last
                                 ellipsis
                                 boundaryLinks
-                                items={Math.ceil(filteredSystems.length / MAX_ITEMS_PER_PAGE)}
+                                items={Math.ceil(totalSystemsCount/ MAX_ITEMS_PER_PAGE)}
                                 maxButtons={5}
                                 activePage={currentIndex}
                                 onSelect={this.handlePageClick} />
