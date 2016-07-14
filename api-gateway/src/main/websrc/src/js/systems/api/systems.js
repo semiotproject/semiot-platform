@@ -21,9 +21,9 @@ function extractSystemFromAPIMessage(msg, index = -1) {
 }
 
 export default {
-    loadSystems() {
+    loadSystems(page, size) {
         console.info('loading systems list');
-        return HTTP.get(CONFIG.URLS.systems.list).then((res) => {
+        return HTTP.get(`${CONFIG.URLS.systems.list}?page=${page}&size=${size}`).then((res) => {
             return res['hydra:member'].map((s, index) => {
                 const id = getIdFromURI(s['@id']);
                 return extractSystemFromAPIMessage(s, index);
