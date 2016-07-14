@@ -42,7 +42,7 @@ function stop_and_clean() {
     echo "stopping and cleaning target directory $FILES_DIR"
 
     sudo docker-compose kill && \
-        sudo docker-compose rm -f && \
+        sudo docker-compose rm -f --all && \
         sudo rm -rf $FILES_DIR/fuseki/ $FILES_DIR/felix-cache/ $FILES_DIR/hbase/ $FILES_DIR/tsdb/
 
     exit $?
