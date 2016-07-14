@@ -25,7 +25,7 @@ export default {
         console.info('loading systems list');
         return HTTP.get(`${CONFIG.URLS.systems.list}?page=${page}&size=${size}`).then((res) => {
             return {
-                totalCount: res[`hydra-filter:viewOf`][`hydra:totalItems`],
+                totalSystemsCount: res[`hydra-filter:viewOf`][`hydra:totalItems`],
                 systems: res['hydra:member'].map((s, index) => {
                     const id = getIdFromURI(s['@id']);
                     return extractSystemFromAPIMessage(s, index);

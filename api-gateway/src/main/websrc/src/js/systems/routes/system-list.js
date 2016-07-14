@@ -86,7 +86,7 @@ export default class SystemList extends Component {
                 <ol className="breadcrumb">
                     <li className="active">Systems</li>
                 </ol>
-                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} />
+                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} fromIndex={(currentIndex - 1) * MAX_ITEMS_PER_PAGE} />
                 {
                     totalSystemsCount > MAX_ITEMS_PER_PAGE &&
                         <Pagination
