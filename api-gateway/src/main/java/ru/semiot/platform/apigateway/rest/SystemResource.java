@@ -18,6 +18,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
+import ru.semiot.commons.namespaces.HydraFilter;
 import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -67,6 +68,11 @@ public class SystemResource extends AbstractSystemResource {
           + "}"
           + "LIMIT ${LIMIT}"
           + "OFFSET ${OFFSET}";
+  private static final String COUNT_TOTAL_SYSTEMS =
+      "SELECT (COUNT(*) AS ?count) {"
+          + "?system a ssn:System, proto:Individual ."
+          + "FILTER NOT EXISTS { [] ssn:hasSubSystem ?system }"
+          + "}";
   private static final String QUERY_DESCRIBE_SYSTEM = "CONSTRUCT {"
       + "  ?system ?p ?o ."
       + "  ?o ?o_p ?o_o ."
@@ -86,7 +92,7 @@ public class SystemResource extends AbstractSystemResource {
   private static final String VAR_LIMIT = "${LIMIT}";
   private static final String VAR_OFFSET = "${OFFSET}";
   private static final String VAR_PAGE_SIZE = "${PAGE_SIZE}";
-  private static final int FIRST_PAGE = 0;
+  private static final int FIRST_PAGE = 1;
 
   public SystemResource() {
     super();
@@ -113,10 +119,8 @@ public class SystemResource extends AbstractSystemResource {
           .build();
       response.resume(Response.seeOther(redirectUri).build());
     } else {
-      int pageSize = config.systemsPageSize();
-      if (size != null) {
-        pageSize = size;
-      }
+      final int pageSize = size != null ? size : config.systemsPageSize();
+
       final Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_COLLECTION,
           MapBuilder.newMap()
               .put(ContextProvider.VAR_ROOT_URL, URIUtils.extractRootURL(root))
@@ -125,42 +129,61 @@ public class SystemResource extends AbstractSystemResource {
               .build());
       final Map<String, Object> frame = contextProvider.getFrame(
           ContextProvider.SYSTEM_COLLECTION, root);
-      int offset = page > 0 ? (page - 1) * pageSize : FIRST_PAGE;
+      int offset = page > 1 ? (page - 1) * pageSize : FIRST_PAGE;
 
       Resource collection = model.listResourcesWithProperty(
           RDF.type, Hydra.PartialCollectionView).next();
-      model.add(collection, Hydra.next, ResourceFactory.createResource(UriBuilder.fromUri(root)
-          .replaceQueryParam("page", page + 1).replaceQueryParam("size", pageSize).build()
-          .toASCIIString()));
+      Resource parentCollection = model.listObjectsOfProperty(collection, HydraFilter.viewOf)
+          .next().asResource();
 
-      Observable<String> systems = sparqlQuery.select(QUERY_GET_ALL_SYSTEMS
-          .replace(VAR_LIMIT, String.valueOf(pageSize))
-          .replace(VAR_OFFSET, String.valueOf(offset)))
+      Observable<Integer> totalItems = sparqlQuery.select(COUNT_TOTAL_SYSTEMS)
           .map((ResultSet rs) -> {
-            while (rs.hasNext()) {
-              QuerySolution qs = rs.next();
-              Resource system = qs.getResource(VAR_URI);
-              Literal systemId = qs.getLiteral(VAR_ID);
-              Literal systemLabel = qs.getLiteral(VAR_LABEL);
-              Resource prototype = qs.getResource(VAR_PROTOTYPE);
+            if (rs.hasNext()) {
+              int total = rs.next().getLiteral("count").getInt();
+              model.add(parentCollection, Hydra.totalItems, ResourceFactory
+                  .createTypedLiteral(String.valueOf(total), XSDDatatype.XSDinteger));
 
-              model.add(collection, Hydra.member, system);
-              model.add(system, DCTerms.identifier, systemId);
-              model.add(system, RDF.type, ResourceUtils.createResourceFromClass(root,
-                  prototype.getLocalName()));
-              if (systemLabel != null) {
-                model.add(system, RDFS.label, systemLabel);
+              if ((page + 1) * pageSize <= total) {
+                model.add(collection, Hydra.next,
+                    ResourceFactory.createResource(UriBuilder.fromUri(root)
+                        .replaceQueryParam("page", page + 1)
+                        .replaceQueryParam("size", pageSize).build()
+                        .toASCIIString()));
               }
-            }
-
-            try {
-              return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
-            } catch (IOException | JsonLdError e) {
-              throw Exceptions.propagate(e);
+              return total;
+            } else {
+              logger.error("Can't count number of existing systems!");
+              return null;
             }
           });
 
-      systems.subscribe(resume(response));
+      Observable<ResultSet> systems = sparqlQuery.select(QUERY_GET_ALL_SYSTEMS
+          .replace(VAR_LIMIT, String.valueOf(pageSize))
+          .replace(VAR_OFFSET, String.valueOf(offset)));
+
+      Observable.zip(systems, totalItems, (ResultSet rs, Integer total) -> {
+        while (rs.hasNext()) {
+          QuerySolution qs = rs.next();
+          Resource system = qs.getResource(VAR_URI);
+          Literal systemId = qs.getLiteral(VAR_ID);
+          Literal systemLabel = qs.getLiteral(VAR_LABEL);
+          Resource prototype = qs.getResource(VAR_PROTOTYPE);
+
+          model.add(collection, Hydra.member, system);
+          model.add(system, DCTerms.identifier, systemId);
+          model.add(system, RDF.type, ResourceUtils.createResourceFromClass(root,
+              prototype.getLocalName()));
+          if (systemLabel != null) {
+            model.add(system, RDFS.label, systemLabel);
+          }
+        }
+
+        try {
+          return JsonUtils.toPrettyString(ModelJsonLdUtils.toJsonLdCompact(model, frame));
+        } catch (IOException | JsonLdError e) {
+          throw Exceptions.propagate(e);
+        }
+      }).subscribe(resume(response));
     }
   }
 
