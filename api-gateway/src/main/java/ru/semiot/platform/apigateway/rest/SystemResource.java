@@ -64,7 +64,9 @@ public class SystemResource extends AbstractSystemResource {
           + "     proto:hasPrototype ?prototype ."
           + " OPTIONAL { ?uri rdfs:label ?label }"
           + " FILTER NOT EXISTS { [] ssn:hasSubSystem ?uri }"
-          + "}";
+          + "}"
+          + "LIMIT ${LIMIT}"
+          + "OFFSET ${OFFSET}";
   private static final String QUERY_DESCRIBE_SYSTEM = "CONSTRUCT {"
       + "  ?system ?p ?o ."
       + "  ?o ?o_p ?o_o ."
