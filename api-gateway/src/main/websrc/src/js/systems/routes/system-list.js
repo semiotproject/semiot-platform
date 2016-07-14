@@ -45,24 +45,17 @@ export default class SystemList extends Component {
         };
     }
     componentDidMount() {
-        this.queryTotalSystemsCount();
         this.querySystems();
     }
     componentWillUnmount() {
         this.unsubscribe();
     }
-    queryTotalSystemsCount() {
-        systemAPI.loadSystemsCount().then((res) => {
-            this.setState({
-                totalSystemsCount: res
-            });
-        });
-    }
     querySystems() {
         console.info(`querying systems; current index is ${this.state.currentIndex}, items per page: ${MAX_ITEMS_PER_PAGE}`);
-        systemAPI.loadSystems(this.state.currentIndex, MAX_ITEMS_PER_PAGE).then((systems, count) => {
+        systemAPI.loadSystems(this.state.currentIndex, MAX_ITEMS_PER_PAGE).then((res) => {
             this.setState({
-                systems: systems,
+                systems: res.systems,
+                totalSystemsCount: res.totalSystemsCount,
                 isLoading: false
             }, () => {
                 this.subscribe();
