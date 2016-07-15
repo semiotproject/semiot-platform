@@ -59,15 +59,16 @@ public class SystemResource extends AbstractSystemResource {
   private static final ServerConfig config = ConfigFactory.create(ServerConfig.class);
   private static final Logger logger = LoggerFactory.getLogger(SystemResource.class);
   private static final String QUERY_GET_ALL_SYSTEMS =
-      "SELECT DISTINCT ?uri ?id ?label ?prototype {"
+      "SELECT ?uri ?id ?label ?prototype {"
           + " ?uri a ssn:System, proto:Individual ;"
           + "     dcterms:identifier ?id ;"
           + "     proto:hasPrototype ?prototype ."
           + " OPTIONAL { ?uri rdfs:label ?label }"
           + " FILTER NOT EXISTS { [] ssn:hasSubSystem ?uri }"
-          + "}"
-          + "LIMIT ${LIMIT}"
-          + "OFFSET ${OFFSET}";
+          + "} "
+          + "ORDER BY ?id "
+          + "LIMIT ${LIMIT} "
+          + "OFFSET ${OFFSET} ";
   private static final String COUNT_TOTAL_SYSTEMS =
       "SELECT (COUNT(*) AS ?count) {"
           + "?system a ssn:System, proto:Individual ."
