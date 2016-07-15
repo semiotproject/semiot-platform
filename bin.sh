@@ -5,8 +5,6 @@ FILES_DIR=/semiot-platform
 VENDOR_DOCKER_IMAGES=(
     "fuseki"
     "mysql"
-    "hbase"
-    "opentsdb"
 )
 CUSTOM_DOCKER_IMAGES=(
     "api-gateway"
@@ -43,7 +41,7 @@ function stop_and_clean() {
 
     sudo docker-compose kill && \
         sudo docker-compose rm -f --all && \
-        sudo rm -rf $FILES_DIR/fuseki/ $FILES_DIR/felix-cache/ $FILES_DIR/hbase/ $FILES_DIR/tsdb/
+        sudo rm -rf $FILES_DIR/fuseki/ $FILES_DIR/felix-cache/ $FILES_DIR/tsdb/
 
     exit $?
 }

@@ -130,7 +130,7 @@ public class SystemResource extends AbstractSystemResource {
               .build());
       final Map<String, Object> frame = contextProvider.getFrame(
           ContextProvider.SYSTEM_COLLECTION, root);
-      int offset = page > 1 ? (page - 1) * pageSize : FIRST_PAGE;
+      int offset = page > 1 ? (page - 1) * pageSize : 0;
 
       Resource collection = model.listResourcesWithProperty(
           RDF.type, Hydra.PartialCollectionView).next();
