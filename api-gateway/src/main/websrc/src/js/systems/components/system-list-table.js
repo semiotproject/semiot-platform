@@ -11,34 +11,10 @@ export default class SystemListTable extends Component {
     }
 
     render() {
-        const { systems, search } = this.props;
+        const { systems, search, fromIndex } = this.props;
         return (
             <div className="table-responsive system-list">
                 <table className="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>
-                                <label>{systems.length}</label>
-                            </th>
-                            <th>
-                                <div className="form-group is-empty">
-                                    <div>
-                                        <input
-                                            onChange={this.handleSearchChange}
-                                            placeholder="Name"
-                                            className="form-control"
-                                            value={search}
-                                            type="text"
-                                        />
-                                    </div>
-                                    <span className="material-input"></span>
-                                </div>
-                            </th>
-                            <th>
-
-                            </th>
-                        </tr>
-                    </thead>
                     <tbody>
                         {
                             systems.length === 0 &&
@@ -51,8 +27,8 @@ export default class SystemListTable extends Component {
                         {
                             systems.map((s) => {
                                 return (
-                                    <tr key={s.index}>
-                                        <td>{s.index}</td>
+                                    <tr key={s.id}>
+                                        <td>{fromIndex + s.index}</td>
                                         <td><Link to={'/systems/' + s.id}>{s.name}</Link></td>
                                         <td>
                                         </td>
