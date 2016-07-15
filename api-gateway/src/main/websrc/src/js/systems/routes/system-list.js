@@ -3,6 +3,7 @@ import systemAPI from '../api/systems';
 import { Pagination } from 'react-bootstrap';
 
 import SystemListTable from '../components/system-list-table';
+import { browserHistory } from 'react-router'
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -13,7 +14,6 @@ export default class SystemList extends Component {
         this.state = {
             systems: [],
             isLoading: true,
-            currentIndex: 1,
             totalSystemsCount: MAX_ITEMS_PER_PAGE,
             search: ""
         };
@@ -26,34 +26,41 @@ export default class SystemList extends Component {
             });
         };
         this.handleSearchChange = (e) => {
-            this.setState({
+            /*this.setState({
                 search: e.target.value.toLowerCase()
             }, () => {
                 const { systems, currentIndex } = this.state;
-                if (this.filterSystems(systems).length < currentIndex * MAX_ITEMS_PER_PAGE) {
-                    this.setState({
-                        currentIndex: 1
-                    });
+                if (systems.length < currentIndex * MAX_ITEMS_PER_PAGE) {
+                    this.setPage(1);
                 }
-            });
+            });*/
         };
         this.handlePageClick = (e) => {
-            this.setState({
-                currentIndex: e,
-                isLoading: true
-            }, this.querySystems.bind(this));
+            this.setPage(e);
         };
+    }
+    setPage(page) {
+        browserHistory.push(`/systems?page=${page}`)
+    }
+    getCurrentPage() {
+        return this.props.location.query.page || 1;
     }
     componentDidMount() {
         this.querySystems();
         this.subscribe();
     }
+    componentDidUpdate(prevProps) {
+        if (prevProps.location.query.page !== this.props.location.query.page) {
+            this.querySystems();
+        }
+    }
     componentWillUnmount() {
         this.unsubscribe();
     }
     querySystems() {
-        console.info(`querying systems; current index is ${this.state.currentIndex}, items per page: ${MAX_ITEMS_PER_PAGE}`);
-        systemAPI.loadSystems(this.state.currentIndex, MAX_ITEMS_PER_PAGE).then((res) => {
+        const page = this.getCurrentPage();
+        console.info(`querying systems; current page is ${page}, items per page: ${MAX_ITEMS_PER_PAGE}`);
+        systemAPI.loadSystems(page, MAX_ITEMS_PER_PAGE).then((res) => {
             this.setState({
                 systems: res.systems,
                 totalSystemsCount: res.totalSystemsCount,
@@ -67,10 +74,6 @@ export default class SystemList extends Component {
             return s.name.toLowerCase().indexOf(search) > -1;
         });
     }
-    paginateSystems(systems) {
-        const { currentIndex } = this.state;
-        return systems.slice((currentIndex - 1) * MAX_ITEMS_PER_PAGE, currentIndex * MAX_ITEMS_PER_PAGE);
-    }
     subscribe() {
         systemAPI.subscribeForNewSystems(this.handleNewSystem);
     }
@@ -79,13 +82,14 @@ export default class SystemList extends Component {
     }
 
     render() {
-        const { isLoading, systems, search, currentIndex, totalSystemsCount } = this.state;
+        const page = this.getCurrentPage();
+        const { isLoading, systems, search, totalSystemsCount } = this.state;
         return (
             <section className={isLoading ? "preloader" : ""}>
                 <ol className="breadcrumb">
                     <li className="active">Systems</li>
                 </ol>
-                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} fromIndex={(currentIndex - 1) * MAX_ITEMS_PER_PAGE} />
+                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} fromIndex={(page - 1) * MAX_ITEMS_PER_PAGE} />
                 {
                     totalSystemsCount > MAX_ITEMS_PER_PAGE &&
                         <Pagination
@@ -97,7 +101,7 @@ export default class SystemList extends Component {
                                 boundaryLinks
                                 items={Math.ceil(totalSystemsCount/ MAX_ITEMS_PER_PAGE)}
                                 maxButtons={5}
-                                activePage={currentIndex}
+                                activePage={page}
                                 onSelect={this.handlePageClick} />
                 }
             </section>
