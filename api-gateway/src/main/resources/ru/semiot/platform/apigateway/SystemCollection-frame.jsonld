@@ -23,7 +23,8 @@
     "void:class": {"@type": "@id"},
     "hydra:member": {"@container": "@set"},
     "hydra:next": {"@type": "@id"},
-    "hydra:first": {"@type": "@id"}
+    "hydra:first": {"@type": "@id"},
+    "hydra:last": {"@type": "@id"}
   },
   "@type": "hydra:PartialCollectionView",
   "hydra:member": {}

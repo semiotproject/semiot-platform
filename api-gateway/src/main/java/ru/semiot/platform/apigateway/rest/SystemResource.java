@@ -120,7 +120,7 @@ public class SystemResource extends AbstractSystemResource {
           .build();
       response.resume(Response.seeOther(redirectUri).build());
     } else {
-      final int pageSize = size != null ? size : config.systemsPageSize();
+      final int pageSize = size != null && size != 0 ? size : config.systemsPageSize();
 
       final Model model = contextProvider.getRDFModel(ContextProvider.SYSTEM_COLLECTION,
           MapBuilder.newMap()
@@ -151,6 +151,12 @@ public class SystemResource extends AbstractSystemResource {
                         .replaceQueryParam("size", pageSize).build()
                         .toASCIIString()));
               }
+
+              model.add(collection, Hydra.last,
+                  ResourceFactory.createResource(UriBuilder.fromUri(root)
+                      .replaceQueryParam("page", computeLastPage(total, pageSize))
+                      .replaceQueryParam("size", pageSize)
+                      .build().toASCIIString()));
               return total;
             } else {
               logger.error("Can't count number of existing systems!");
@@ -232,5 +238,14 @@ public class SystemResource extends AbstractSystemResource {
         throw Exceptions.propagate(ex);
       }
     }).subscribe(resume(response));
+  }
+
+  private int computeLastPage(int total, int pageSize) {
+    if (total > 0) {
+      Double value = Double.valueOf(total / pageSize);
+      return Double.compare(value.intValue(), value) == 0 ? value.intValue() + 1 : value.intValue();
+    } else {
+      return FIRST_PAGE;
+    }
   }
 }
