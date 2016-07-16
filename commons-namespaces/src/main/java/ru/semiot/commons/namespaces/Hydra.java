@@ -23,6 +23,7 @@ public class Hydra extends Namespace {
   public static final Property returns = property(URI, "returns");
   public static final Property next = property(URI, "next");
   public static final Property first = property(URI, "first");
+  public static final Property last = property(URI, "last");
   public static final Property totalItems = property(URI, "totalItems");
 
 }
