@@ -42,28 +42,14 @@ public class NewDeviceListener implements Observer<String> {
   private static final Query GET_TOPICS_QUERY = QueryFactory.create(NamespaceUtils.newSPARQLQuery(
       "SELECT ?system_id ?obs_topic ?commres_topic { "
           + "?x dcterms:identifier ?system_id. "
-//          + "GRAPH <urn:semiot:graphs:private> {"
           + " ?x ssncom:hasCommunicationEndpoint ?e ."
           + " ?e ssncom:protocol \"WAMP\"; "
           + "   ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
           + " ?x ssncom:hasCommunicationEndpoint ?ee ."
           + " ?ee ssncom:protocol \"WAMP\";"
           + "   ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
-//          + "}"
           + "}", SSN.class, SSNCOM.class, DCTerms.class));
-  /* private static final String GET_TOPIC_BY_URI_QUERY = NamespaceUtils.newSPARQLQuery(
-      "SELECT ?system_id ?obs_topic ?commres_topic { "
-          + "<${SYSTEM_URI}> dcterms:identifier ?system_id. "
-//          + "GRAPH <urn:semiot:graphs:private> {"
-          + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?e ."
-          + " ?e ssncom:protocol \"WAMP\"; "
-          + "   ssncom:provide \"observations\"; ssncom:topic ?obs_topic ."
-          + " <${SYSTEM_URI}> ssncom:hasCommunicationEndpoint ?ee ."
-          + " ?ee ssncom:protocol \"WAMP\"; "
-          + "   ssncom:provide \"commandresults\"; ssncom:topic ?commres_topic ."
-//          + "}"
-          + "}", SSN.class, SSNCOM.class, DCTerms.class);*/
-  
+
   private static final String GET_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
       "SELECT ?system_id { ?system a ssn:System. ?system dcterms:identifier ?system_id. }",
       SSN.class, DCTerms.class);
@@ -135,12 +121,12 @@ public class NewDeviceListener implements Observer<String> {
       subscriveToDeviceTopics(topicObsName, topicCommResName, systemId);
     }
   }
-  
+
   private void subscribeToDeviceTopic(String systemId) {
-    subscriveToDeviceTopics(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", systemId), 
+    subscriveToDeviceTopics(TOPIC_OBSERVATIONS.replace("${SYSTEM_ID}", systemId),
         TOPIC_COMMANDRESULT.replace("${SYSTEM_ID}", systemId), systemId);
   }
-  
+
   private void subscriveToDeviceTopics(String topicObsName, String topicCommResName,
       String systemId) {
     if (StringUtils.isNotBlank(topicObsName) && StringUtils.isNotBlank(topicCommResName)
@@ -176,19 +162,5 @@ public class NewDeviceListener implements Observer<String> {
     }
     return null;
   }
-  
-  /* private QueryExecution getQEFromModelTopics(Model description) {
-    ResIterator iter = description.listResourcesWithProperty(RDF.type, SSN.System);
 
-    if (iter.hasNext()) {
-      Resource system = iter.nextResource();
-      return QueryExecutionFactory.sparqlService(
-          CONFIG.storeUrl(),
-          GET_TOPIC_BY_URI_QUERY.replace("${SYSTEM_URI}", system.getURI()),
-          httpAuthenticator);
-    } else {
-      return null;
-    }
-  }*/
-  
 }

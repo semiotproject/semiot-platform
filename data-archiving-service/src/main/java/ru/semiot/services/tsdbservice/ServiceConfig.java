@@ -13,7 +13,7 @@ public interface ServiceConfig extends Mutable {
 
   public static final ServiceConfig CONFIG = ConfigFactory.create(ServiceConfig.class);
 
-  @DefaultValue("ws://demo.semiot.ru:8080/ws")
+  @DefaultValue("ws://wamprouter:8080/ws")
   @Key("services.wamp.uri")
   String wampUri();
 
@@ -42,11 +42,11 @@ public interface ServiceConfig extends Mutable {
   @Key("services.topics.subscriber")
   String topicsSubscriber();
 
-  @DefaultValue("demo.semiot.ru")
+  @DefaultValue("tsdb")
   @Key("services.tsdb.url")
   String tsdbUrl();
 
-  @DefaultValue("http://winghouse.semiot.ru:3030/blazegraph/sparql")
+  @DefaultValue("http://triplestore:3030/blazegraph/sparql")
   @Key("services.fuseki.store.url")
   String storeUrl();
 
@@ -62,7 +62,7 @@ public interface ServiceConfig extends Mutable {
   @Key("services.fuseki.store.password")
   String storePassword();
 
-  @DefaultValue("http://demo.semiot.ru/")
+  @DefaultValue("http://localhost/")
   @Key("ru.semiot.platform.domain")
   String rootUrl();
 }
