@@ -86,6 +86,7 @@
                             org.apache.jena.riot,
                             org.apache.jena.rdf.model,
                             org.apache.jena.vocabulary,
+                            org.apache.jena.sparql.engine.http,
                             org.osgi.framework,
                             org.osgi.service.cm,
                             org.slf4j,
