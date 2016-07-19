@@ -2,7 +2,7 @@ package ru.semiot.platform.deviceproxyservice.directory;
 
 public class Keys {
 
-  private static final String KEY_PREFIX = "ru.semiot.platform.deviceproxyservice.directory.";
+  private static final String KEY_PREFIX = "ru.semiot.platform.device-proxy-service-directory.";
 
   public static final String TRIPLESTORE_PASSWORD = KEY_PREFIX + "triplestore_pass";
   public static final String TRIPLESTORE_USERNAME = KEY_PREFIX + "triplestore_username";

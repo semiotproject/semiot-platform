@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class Activator extends DependencyActivatorBase {
 
-  private static final String PID = "ru.semiot.platform.deviceproxyservice.directory";
+  private static final String PID = "ru.semiot.platform.device-proxy-service-directory";
 
   @Override
   public void init(BundleContext bc, DependencyManager manager)

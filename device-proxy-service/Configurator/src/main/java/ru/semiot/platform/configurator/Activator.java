@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Dictionary;
 import java.util.Properties;
 
-import javax.servlet.Servlet;
+import javax.servlet.Servlet; 
 
 public class Activator implements BundleActivator {
 

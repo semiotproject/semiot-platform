@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
     <OCD description="Device Proxy Service Directory" name="Device Proxy Service Directory"
-         id="ru.semiot.platform.deviceproxyservice.directory">
-        <AD name="Triplestore password" id="ru.semiot.platform.deviceproxyservice.directory.triplestore_pass"
+         id="ru.semiot.platform.device-proxy-service-directory">
+        <AD name="Triplestore password" 
+        	id="ru.semiot.platform.device-proxy-service-directory.triplestore_pass"
             required="false" type="String" default="pw"/>
         <AD name="Triplestore username"
-            id="ru.semiot.platform.deviceproxyservice.directory.triplestore_username"
+            id="ru.semiot.platform.device-proxy-service-directory.triplestore_username"
             required="false" type="String" default="admin"/>
         <AD name="Triplestore Update URL"
-            id="ru.semiot.platform.deviceproxyservice.directory.triplestore_update_url"
+            id="ru.semiot.platform.device-proxy-service-directory.triplestore_update_url"
             required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
         <AD name="Triplestore Query URL"
-            id="ru.semiot.platform.deviceproxyservice.directory.triplestore_query_url"
+            id="ru.semiot.platform.device-proxy-service-directory.triplestore_query_url"
             required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
         <AD name="Triplestore Store URL"
-            id="ru.semiot.platform.deviceproxyservice.directory.triplestore_store_url"
+            id="ru.semiot.platform.device-proxy-service-directory.triplestore_store_url"
             required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
         <AD name="Store Operation Buffer Size"
-            id="ru.semiot.platform.deviceproxyservice.directory.store_operation_buffersize"
+            id="ru.semiot.platform.device-proxy-service-directory.store_operation_buffersize"
             required="false" type="String" default="100"/>
         <AD name="Store Operation Buffer Idle (sec)"
-            id="ru.semiot.platform.deviceproxyservice.directory.store_operation_bufferidle"
+            id="ru.semiot.platform.device-proxy-service-directory.store_operation_bufferidle"
             required="false" type="String" default="1"/>
     </OCD>
 
-    <Designate pid="ru.semiot.platform.deviceproxyservice.directory">
-        <Object ocdref="ru.semiot.platform.deviceproxyservice.directory"/>
+    <Designate pid="ru.semiot.platform.device-proxy-service-directory">
+        <Object ocdref="ru.semiot.platform.device-proxy-service-directory"/>
     </Designate>
 </metatype:MetaData>
