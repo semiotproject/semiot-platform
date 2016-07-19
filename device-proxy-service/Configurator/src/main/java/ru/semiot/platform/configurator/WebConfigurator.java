@@ -23,13 +23,13 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Daniil Garayzuev <garayzuev@gmail.com>
  */
-public class Configurator extends AbstractWebConsolePlugin {
+public class WebConfigurator extends AbstractWebConsolePlugin {
 
   public static final String TITLE = "configurator";
   public static final String LABEL = "configurator";
   BundleContext context;
 
-  public Configurator(BundleContext bundle) {
+  public WebConfigurator(BundleContext bundle) {
     super();
     this.context = bundle;
   }
