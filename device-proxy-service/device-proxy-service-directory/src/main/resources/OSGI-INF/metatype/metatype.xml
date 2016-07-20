@@ -19,7 +19,7 @@
             required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
         <AD name="Store Operation Buffer Size"
             id="ru.semiot.platform.device-proxy-service-directory.store_operation_buffersize"
-            required="false" type="String" default="100"/>
+            required="false" type="String" default="300"/>
         <AD name="Store Operation Buffer Idle (sec)"
             id="ru.semiot.platform.device-proxy-service-directory.store_operation_bufferidle"
             required="false" type="String" default="1"/>

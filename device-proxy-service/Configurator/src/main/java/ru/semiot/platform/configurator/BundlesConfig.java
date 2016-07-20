@@ -21,7 +21,7 @@ public interface BundlesConfig extends Config {
   @Key("services.triplestore.password")
   String triplestorePassword();
   
-  @DefaultValue("100")
+  @DefaultValue("300")
   @Key("services.deviceproxyservice.directory.store_operation_buffersize")
   String directoryStoreOperationBuffersize();
   
