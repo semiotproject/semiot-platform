@@ -38,6 +38,7 @@ deviceproxyservice:
     - "3131:3131/udp"
   volumes:
     - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
+    - /semiot-platform/device-proxy-service:/semiot-platform/device-proxy-service
   extra_hosts:
     - "assets-cdn.github.com:151.101.12.133"
     - "raw.githubusercontent.com:151.101.12.133"
