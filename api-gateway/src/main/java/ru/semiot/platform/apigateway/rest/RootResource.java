@@ -5,26 +5,18 @@ import static ru.semiot.platform.apigateway.beans.impl.ContextProvider.API_DOCUM
 import static ru.semiot.platform.apigateway.beans.impl.ContextProvider.ENTRYPOINT;
 
 import com.github.jsonldjava.core.JsonLdError;
-import com.github.jsonldjava.core.JsonLdOptions;
-import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
 import org.aeonbits.owner.ConfigFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.Hydra;
 import ru.semiot.commons.namespaces.Proto;
-import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SHACL;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.rdf.ModelJsonLdUtils;
@@ -32,7 +24,6 @@ import ru.semiot.commons.restapi.MediaType;
 import ru.semiot.platform.apigateway.ServerConfig;
 import ru.semiot.platform.apigateway.beans.impl.ContextProvider;
 import ru.semiot.platform.apigateway.beans.impl.SPARQLQueryService;
-import ru.semiot.platform.apigateway.utils.Credentials;
 import ru.semiot.platform.apigateway.utils.DataBase;
 import ru.semiot.platform.apigateway.utils.MapBuilder;
 import ru.semiot.platform.apigateway.utils.URIUtils;
@@ -48,8 +39,6 @@ import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -103,9 +92,6 @@ public class RootResource {
 
   @Inject
   private ContextProvider contextProvider;
-
-  @Inject
-  private DataBase db;
 
   @GET
   @Produces({MediaType.APPLICATION_LD_JSON, MediaType.APPLICATION_JSON})
@@ -219,37 +205,5 @@ public class RootResource {
       });
       return model;
     });
-  }
-
-  @GET
-  @Path("/logout")
-  //TODO: Move somewhere else
-  public void getContext(@Context HttpServletRequest req, @Context HttpServletResponse resp)
-      throws Exception {
-    resp.setHeader("Cache-Control", "no-cache, no-store");
-    resp.setHeader("Pragma", "no-cache");
-    resp.setHeader("Expires", new java.util.Date().toString());
-    if (req.getSession(false) != null) {
-      req.getSession(false).invalidate();// remove session.
-    }
-    req.logout();
-    resp.sendRedirect("/");
-  }
-
-  @GET
-  @Path("/user")
-  @Produces(MediaType.APPLICATION_JSON)
-  //TODO: Move somewhere else
-  public void getUserData(@Context HttpServletRequest req, @Context HttpServletResponse resp)
-      throws Exception {
-    Credentials c = db.getUser(req.getRemoteUser());
-    if (c != null) {
-      resp.getWriter().write(
-          "{\"username\": \"" + c.getLogin() + "\", \"password\": \"" + c.getPassword() + "\"}");
-      resp.getWriter().flush();
-      resp.getWriter().close();
-    } else {
-      resp.sendError(401);//Forbidden
-    }
   }
 }
