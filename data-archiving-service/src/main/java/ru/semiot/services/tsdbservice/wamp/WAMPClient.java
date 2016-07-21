@@ -10,7 +10,6 @@ import ws.wamp.jawampa.SubscriptionFlags;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
 import ws.wamp.jawampa.auth.client.Ticket;
-import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -36,7 +35,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
     builder.withUri(CONFIG.wampUri()).withRealm(CONFIG.wampRealm())
         .withInfiniteReconnects()
         .withReconnectInterval(CONFIG.wampReconnectInterval(), TimeUnit.SECONDS)
-        .withConnectorProvider(new NettyWampClientConnectorProvider())
+        .withConnectorProvider(new PlainWampClientConnectorProvider())
         .withAuthId(CONFIG.wampLogin())
         .withAuthMethod(new Ticket(CONFIG.wampPassword()));
     client = builder.build();

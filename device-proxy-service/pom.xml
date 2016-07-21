@@ -27,6 +27,7 @@
 
     <modules>
         <module>device-proxy-service-api</module>
+        <module>device-proxy-service-directory</module>
         <module>device-manager</module>
         <module>rs-proxy-service</module>
         <module>Configurator</module>

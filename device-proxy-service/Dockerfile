@@ -13,4 +13,6 @@ WORKDIR /root/semiot-platform/$SERVICE_NAME
 ADD device-proxy-service-launcher/target/$SERVICE_JAR_NAME.jar $SERVICE_JAR_NAME.jar
 ADD logback.xml ./
 
-CMD java -jar -Dlogback.configurationFile=/root/semiot-platform/$SERVICE_NAME/logback.xml $SERVICE_JAR_NAME.jar
+#ENV JMX_OPTS -Dcom.sun.management.jmxremote.rmi.port=8989 -Djava.rmi.server.hostname=77.234.222.6 -Dcom.sun.management.jmxremote.port=8989 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false
+
+CMD java $JMX_OPTS -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/root/semiot-platform/$SERVICE_NAME/dump/dump.hprof -Dlogback.configurationFile=/root/semiot-platform/$SERVICE_NAME/logback.xml -jar $SERVICE_JAR_NAME.jar

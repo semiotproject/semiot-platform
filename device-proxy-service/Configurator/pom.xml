@@ -15,7 +15,7 @@
     <version>1.0.0</version>
     <packaging>bundle</packaging>
 
-    <name>Semiot Platform Drivers Configurator</name>
+    <name>Device Proxy Service Configurator</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,6 +53,17 @@
             <version>20140107</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aeonbits.owner</groupId>
+            <artifactId>owner-java8</artifactId>
+            <version>1.0.9</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -86,11 +97,23 @@
                             org.apache.felix.webconsole;version="[3.0,4.2.12]",
                             javax.servlet,
                             javax.servlet.http,
-                            org.json
+                            org.json,
+                            org.slf4j, 
+                            javax.management, 
+                            javax.xml.parsers, 
+                            org.xml.sax, 
+                            org.xml.sax.ext, 
+                            org.xml.sax.helpers
                         </Import-Package>
+                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
+                      
+                        
                         <Bundle-Activator>
                             ru.semiot.platform.configurator.Activator
                         </Bundle-Activator>
+                        
+                        <Export-Package/>
                     </instructions>
                 </configuration>
             </plugin>

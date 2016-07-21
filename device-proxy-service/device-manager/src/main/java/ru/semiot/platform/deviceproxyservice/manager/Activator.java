@@ -6,6 +6,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ManagedService;
 import ru.semiot.platform.deviceproxyservice.api.drivers.DeviceDriverManager;
+import ru.semiot.platform.deviceproxyservice.api.manager.DirectoryService;
 
 import java.util.Properties;
 
@@ -24,6 +25,9 @@ public class Activator extends DependencyActivatorBase {
                 ManagedService.class.getName()},
             properties)
         .setImplementation(DriverManagerImpl.class)
+        .add(createServiceDependency()
+            .setService(DirectoryService.class)
+            .setRequired(true))
         .add(createConfigurationDependency().setPid(PID)));
   }
 

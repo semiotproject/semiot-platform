@@ -3,7 +3,6 @@
 FILES_DIR=/semiot-platform
 
 VENDOR_DOCKER_IMAGES=(
-    "fuseki"
     "mysql"
 )
 CUSTOM_DOCKER_IMAGES=(
@@ -12,6 +11,7 @@ CUSTOM_DOCKER_IMAGES=(
     "device-proxy-service"
     "data-archiving-service"
     "frontend"
+    "triplestore"
 )
 MAVEN_PROJECTS=(
     "commons-namespaces"

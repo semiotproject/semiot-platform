@@ -8,11 +8,24 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFLanguages;
 import rx.Observer;
 
 import java.io.StringReader;
 
 public abstract class RDFMessageObserver implements Observer<String> {
+
+  private Lang messageFormat;
+
+  public RDFMessageObserver() {
+    this(null);
+  }
+
+  public RDFMessageObserver(Lang messageFormat) {
+    this.messageFormat = messageFormat != null ? messageFormat
+        : RDFLanguages.nameToLang(CONFIG.wampMessageFormat());
+  }
 
   @Override
   public void onCompleted() {
@@ -22,7 +35,7 @@ public abstract class RDFMessageObserver implements Observer<String> {
   public void onNext(String message) {
     try {
       Model model = ModelFactory.createDefaultModel()
-          .read(new StringReader(message), null, CONFIG.wampMessageFormat());
+          .read(new StringReader(message), null, messageFormat.getName());
 
       onNext(model);
     } catch (Throwable e) {

@@ -74,18 +74,17 @@ public class SystemResource extends AbstractSystemResource {
           + "?system a ssn:System, proto:Individual ."
           + "FILTER NOT EXISTS { [] ssn:hasSubSystem ?system }"
           + "}";
-  private static final String QUERY_DESCRIBE_SYSTEM =
-      "CONSTRUCT {"
-          + "  ?system ?p ?o ."
-          + "  ?o ?o_p ?o_o ."
-          + "} WHERE {"
-          + "  ?system ?p ?o ;"
-          + "    dcterms:identifier \"${SYSTEM_ID}\"^^xsd:string ."
-          + "  OPTIONAL {"
-          + "    ?o ?o_p ?o_o ."
-          + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"
-          + "  }"
-          + "}";
+  private static final String QUERY_DESCRIBE_SYSTEM = "CONSTRUCT {"
+      + "  ?system ?p ?o ."
+      + "  ?o ?o_p ?o_o ."
+      + "} WHERE {"
+      + "  ?system ?p ?o ;"
+      + "    dcterms:identifier \"${SYSTEM_ID}\" ."
+      + "  OPTIONAL {"
+      + "    ?o ?o_p ?o_o ."
+      + "    FILTER(?p NOT IN (rdf:type, proto:hasPrototype))"
+      + "  }"
+      + "}";
 
   private static final String VAR_URI = "uri";
   private static final String VAR_ID = "id";

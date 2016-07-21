@@ -9,7 +9,7 @@ import org.aeonbits.owner.Config.Sources;
 @Sources({"file:/semiot-platform/api-gateway/config.properties"})
 public interface ServerConfig extends Config {
 
-  @DefaultValue("http://fuseki:3030/ds/query")
+  @DefaultValue("http://triplestore:3030/blazegraph/sparql")
   @Key("services.triplestore.url")
   String sparqlEndpoint();
 

@@ -7,6 +7,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.DCTerms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,7 @@ import ru.semiot.services.tsdbservice.model.Observation;
 
 public class ObservationListener extends RDFMessageObserver {
 
-  private static final Logger logger = LoggerFactory
-      .getLogger(ObservationListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(ObservationListener.class);
   private static final String TIMESTAMP = "timestamp";
   private static final String VALUE = "value";
   private static final String PROPERTY = "property";
@@ -40,6 +40,7 @@ public class ObservationListener extends RDFMessageObserver {
           + "}", SSN.class, QUDT.class, DCTerms.class));
 
   public ObservationListener(String system_id) {
+    super(RDFLanguages.JSONLD);
     this.system_id = system_id;
   }
 
@@ -51,6 +52,7 @@ public class ObservationListener extends RDFMessageObserver {
   @Override
   public void onNext(Model description) {
     try {
+      long startTimestamp = System.currentTimeMillis();
       ResultSet metrics = query(description, METRICS_QUERY);
       while (metrics.hasNext()) {
         QuerySolution qs = metrics.next();
@@ -74,6 +76,8 @@ public class ObservationListener extends RDFMessageObserver {
           logger.warn("Required properties not found!");
         }
       }
+      logger.debug("Observation written in {} seconds",
+          System.currentTimeMillis() - startTimestamp);
     } catch (Throwable ex) {
       logger.error(ex.getMessage(), ex);
     }

@@ -7,7 +7,6 @@ import rx.Subscriber;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
 import ws.wamp.jawampa.auth.client.Ticket;
-import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -48,7 +47,7 @@ public class WAMPClient implements Closeable, AutoCloseable {
       String authId, String ticket)
       throws Exception {
     WampClientBuilder builder = new WampClientBuilder();
-    builder.withConnectorProvider(new NettyWampClientConnectorProvider())
+    builder.withConnectorProvider(new PlainWampClientConnectorProvider())
         .withUri(wampUri)
         .withRealm(wampRealm)
         .withInfiniteReconnects()

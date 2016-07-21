@@ -1,15 +1,18 @@
 package ru.semiot.services.analyzing.wamp;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import static ru.semiot.services.analyzing.ServiceConfig.config;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static ru.semiot.services.analyzing.ServiceConfig.config;
 import rx.Observable;
 import ws.wamp.jawampa.WampClient;
 import ws.wamp.jawampa.WampClientBuilder;
+import ws.wamp.jawampa.auth.client.Ticket;
 import ws.wamp.jawampa.transport.netty.NettyWampClientConnectorProvider;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class WAMPClient implements Closeable, AutoCloseable {
 
@@ -25,18 +28,20 @@ public class WAMPClient implements Closeable, AutoCloseable {
         return INSTANCE;
     }
 
-    public Observable<WampClient.State> init() throws Exception {
-        WampClientBuilder builder = new WampClientBuilder();
-        builder.withConnectorProvider(new NettyWampClientConnectorProvider())
-                .withUri(config.wampUri())
-                .withRealm(config.wampRealm())
-                .withInfiniteReconnects()
-                .withReconnectInterval(config.wampReconnectInterval(),
-                        TimeUnit.SECONDS);
-        client = builder.build();
-        client.open();
-        return client.statusChanged();
-    }
+  public Observable<WampClient.State> init() throws Exception {
+    WampClientBuilder builder = new WampClientBuilder();
+    builder.withConnectorProvider(new NettyWampClientConnectorProvider())
+        .withAuthId(config.wampUsername())
+        .withAuthMethod(new Ticket(config.wampPassword()))
+        .withUri(config.wampUri())
+        .withRealm(config.wampRealm())
+        .withInfiniteReconnects()
+        .withReconnectInterval(config.wampReconnectInterval(),
+            TimeUnit.SECONDS);
+    client = builder.build();
+    client.open();
+    return client.statusChanged();
+  }
 
     public Observable<Long> publish(String topic, String message) {
         return client.publish(topic, message);

@@ -39,6 +39,7 @@ public class Launcher {
 
       //Device Proxy Service bundles
       "device-proxy-service-api-1.0-SNAPSHOT.jar",
+      "device-proxy-service-directory-1.0-SNAPSHOT.jar",
       "device-proxy-service-manager-1.0-SNAPSHOT.jar",
       "rs-proxy-service-1.0.0-SNAPSHOT.jar",
       "configurator-1.0.0.jar",
