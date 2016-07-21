@@ -5,7 +5,8 @@ import { Pagination } from 'react-bootstrap';
 import SystemListTable from '../components/system-list-table';
 import { browserHistory } from 'react-router'
 
-const MAX_ITEMS_PER_PAGE = 10;
+const DEFAULT_PAGE_NUMBER = 1;
+const DEFAULT_PAGE_SIZE = 10;
 
 export default class SystemList extends Component {
     constructor(...args) {
@@ -14,43 +15,51 @@ export default class SystemList extends Component {
         this.state = {
             systems: [],
             isLoading: true,
-            totalSystemsCount: MAX_ITEMS_PER_PAGE,
+            totalSystemsCount: DEFAULT_PAGE_SIZE,
             search: ""
         };
         this.handleNewSystem = (s) => {
             const { totalSystemsCount, systems } = this.state;
+            const pageSize = this.getCurrentPageSize();
             console.info("registered new system: ", s);
             this.setState({
-                systems: systems.length >= MAX_ITEMS_PER_PAGE ? systems : [...systems, s],
+                systems: systems.length >= pageSize ? systems : [...systems, s],
                 totalSystemsCount: totalSystemsCount + 1
             });
         };
         this.handleSearchChange = (e) => {
-            /*this.setState({
-                search: e.target.value.toLowerCase()
-            }, () => {
-                const { systems, currentIndex } = this.state;
-                if (systems.length < currentIndex * MAX_ITEMS_PER_PAGE) {
-                    this.setPage(1);
-                }
-            });*/
+            //
         };
         this.handlePageClick = (e) => {
             this.setPage(e);
         };
     }
     setPage(page) {
-        browserHistory.push(`/systems?page=${page}`)
+        browserHistory.push(`/systems?page=${page}&size=${this.getCurrentPageSize()}`)
     }
     getCurrentPage() {
-        return this.props.location.query.page || 1;
+        return this.props.location.query.page || DEFAULT_PAGE_NUMBER;
+    }
+    getCurrentPageSize() {
+        return this.props.location.query.size || DEFAULT_PAGE_SIZE;
     }
     componentDidMount() {
-        this.querySystems();
+        let { page, size } = this.props.location.query;
+        if (!page || !size) {
+            if (!page) {
+                page = DEFAULT_PAGE_NUMBER;
+            }
+            if (!size) {
+                size = DEFAULT_PAGE_SIZE;
+            }
+            browserHistory.replace(`/systems?page=${page}&size=${size}`)
+        } else {
+            this.querySystems();
+        }
         this.subscribe();
     }
     componentDidUpdate(prevProps) {
-        if (prevProps.location.query.page !== this.props.location.query.page) {
+        if (prevProps.location.query.page !== this.props.location.query.page || prevProps.location.query.size !== this.props.location.query.size) {
             this.querySystems();
         }
     }
@@ -59,8 +68,9 @@ export default class SystemList extends Component {
     }
     querySystems() {
         const page = this.getCurrentPage();
-        console.info(`querying systems; current page is ${page}, items per page: ${MAX_ITEMS_PER_PAGE}`);
-        systemAPI.loadSystems(page, MAX_ITEMS_PER_PAGE).then((res) => {
+        const size = this.getCurrentPageSize();
+        console.info(`querying systems; current page is ${page}, items per page: ${size}`);
+        systemAPI.loadSystems(page, size).then((res) => {
             this.setState({
                 systems: res.systems,
                 totalSystemsCount: res.totalSystemsCount,
@@ -83,15 +93,16 @@ export default class SystemList extends Component {
 
     render() {
         const page = this.getCurrentPage();
+        const size = this.getCurrentPageSize();
         const { isLoading, systems, search, totalSystemsCount } = this.state;
         return (
             <section className={isLoading ? "preloader" : ""}>
                 <ol className="breadcrumb">
                     <li className="active">Systems</li>
                 </ol>
-                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} fromIndex={(page - 1) * MAX_ITEMS_PER_PAGE} />
+                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} fromIndex={(page - 1) * size} />
                 {
-                    totalSystemsCount > MAX_ITEMS_PER_PAGE &&
+                    totalSystemsCount > size &&
                         <Pagination
                                 prev
                                 next
@@ -99,7 +110,7 @@ export default class SystemList extends Component {
                                 last
                                 ellipsis
                                 boundaryLinks
-                                items={Math.ceil(totalSystemsCount/ MAX_ITEMS_PER_PAGE)}
+                                items={Math.ceil(totalSystemsCount/ size)}
                                 maxButtons={5}
                                 activePage={page}
                                 onSelect={this.handlePageClick} />

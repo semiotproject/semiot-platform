@@ -25,10 +25,10 @@ export default class SystemListTable extends Component {
                                 </tr>
                         }
                         {
-                            systems.map((s) => {
+                            systems.map((s, i) => {
                                 return (
                                     <tr key={s.id}>
-                                        <td>{fromIndex + s.index}</td>
+                                        <td>{fromIndex + i + 1}</td>
                                         <td><Link to={'/systems/' + s.id}>{s.name}</Link></td>
                                         <td>
                                         </td>
