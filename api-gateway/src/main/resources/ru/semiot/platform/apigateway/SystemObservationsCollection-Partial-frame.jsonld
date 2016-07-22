@@ -27,5 +27,8 @@
     "hydra-pubsub:protocol": {"@type": "@id"},
     "hydra-pubsub:publishes": {"@type": "@id"}
   },
-  "@type": "hydra:PartialCollectionView"
+  "@type": "hydra:PartialCollectionView",
+  "hydra:member": {
+    "@type": "ssn:Observation"
+  }
 }

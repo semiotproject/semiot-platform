@@ -30,5 +30,8 @@
     "semiot:forParameter": {"@type": "@id"},
     "hydra:member": {"@container": "@set"}
   },
-  "@type": "hydra:PartialCollectionView"
+  "@type": "hydra:PartialCollectionView",
+  "hydra:member": {
+    "@type": "semiot:CommandResult"
+  }
 }

@@ -25,5 +25,8 @@
     "ssn:observationResultTime": {"@type": "xsd:dateTime"},
     "hydra:member": {"@container": "@set"}
   },
-  "@type": "hydra:PartialCollectionView"
+  "@type": "hydra:PartialCollectionView",
+  "hydra:member": {
+    "@type": "semiot:CommandResult"
+  }
 }
