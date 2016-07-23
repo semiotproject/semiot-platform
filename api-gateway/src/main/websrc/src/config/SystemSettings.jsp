@@ -79,14 +79,14 @@
                     <h3>System Settings</h3>
                     <form action="${pageContext.request.contextPath}/config/ConfigurationDriver" method="post">
                         <div class="form-group is-empty">
-                            <label for="inputEmail" class="col-md-2 control-label"><%=jsonDomain.get("name")%></label>
+                            <label for="inputEmail" class="col-md-2 control-label"><%=jsonDomain.getString("name")%></label>
                             <div class="col-md-10">
                                 <input
                                     class="form-control"
                                     type="text"
                                     id="txtfld1"
                                     name=<%=BundleConstants.MANAGER_DOMAIN%>
-                                    value=<%=jsonDomain.get("value")%>
+                                    value=<%=jsonDomain.getString("value")%>
                                 />
                             </div>
                             <span class="material-input"></span>

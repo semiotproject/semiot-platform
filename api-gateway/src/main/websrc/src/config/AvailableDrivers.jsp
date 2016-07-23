@@ -108,7 +108,7 @@
                                         <span><%=j++%></span>
                                     </td>
                                     <td>
-                                        <span><%=bundle.get("name")%></span>
+                                        <span><%=bundle.getString("name")%></span>
                                     </td>
                                     <td>
                                         <button class="btn btn-primary btn-sm install-button"
