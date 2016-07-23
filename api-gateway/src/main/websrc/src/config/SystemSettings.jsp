@@ -45,7 +45,7 @@
                 <li>
                     <a href="/systems">Explorer</a>
                 </li>
-                <li class="dropdown active">
+                <li class="dropdown active config-menu">
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -102,6 +102,7 @@
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="/js/current-user-check.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
     <script>$.material.init();</script>
