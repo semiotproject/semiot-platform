@@ -39,6 +39,15 @@
         var REPEATABLE_CONFIGURATIONS = [];
     </script>
     <style>
+        .rectangle-editor > div > div,
+        .circle-editor > div > div {
+            display: inline-block;
+            width: 120px;
+            margin: 0 10px 0 0;
+        }
+        #map-editor {
+            height: 300px;
+        }
         i.fa.fa-info-circle {
             cursor: help;
             display: inline-block;
@@ -64,7 +73,7 @@
                 <li>
                     <a href="/systems">Explorer</a>
                 </li>
-                <li class="dropdown active config-menu">
+                <li class="dropdown active">
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Configuration
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -84,7 +93,7 @@
                     <a data-target="#" class="dropdown-toggle" data-toggle="dropdown"><%=request.getRemoteUser()%>
                     <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/user/logout">Logout</a></li>
+                        <li><a href="/logout">Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -114,13 +123,61 @@
     </div>
 
     <div class="field template" style="display: none;">
-        <div class="form-group is-empty">
+        <div class="form-group is-empty form-wrapper">
             <label class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <input
                     class="form-control"
                     type="text"
                 />
+            </div>
+            <span class="material-input"></span>
+        </div>
+    </div>
+
+    <div class="rectangle-field template" style="display: none;">
+        <div class="form-group is-empty form-wrapper rectangle-editor">
+            <label class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <div class="form-group label-floating">
+                    <input class="form-control location-lat-ne" type="text" placeholder="north-east latitude" />
+                    <span class="help-block">North-East Latitude</code></span>
+                </div>
+                <div class="form-group label-floating">
+                    <input class="form-control location-lng-ne" type="text" placeholder="north-east longitude" />
+                    <span class="help-block">North-East Longitude</code></span>
+                </div>
+                <div class="form-group label-floating">
+                    <input class="form-control location-lat-sw" type="text" placeholder="south-west latitude" />
+                    <span class="help-block">South-West Latitude</code></span>
+                </div>
+                <div class="form-group label-floating">
+                    <input class="form-control location-lng-sw" type="text" placeholder="south-west longitude" />
+                    <span class="help-block">South-West Longitude</code></span>
+                </div>
+                <i class="fa fa-edit show-dialog"></i>
+            </div>
+            <span class="material-input"></span>
+        </div>
+    </div>
+
+    <div class="circle-field template" style="display: none;">
+        <div class="form-group form-wrapper is-empty circle-editor">
+            <label class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <div class="form-group label-floating">
+                    <input class="form-control location-lat" type="text" placeholder="latitude" />
+                    <span class="help-block">Latitude</code></span>
+                </div>
+                <div class="form-group label-floating">
+                    <input class="form-control location-lng" type="text" placeholder="longitude" />
+                    <span class="help-block">Longitude</code></span>
+                </div>
+                <div class="form-group label-floating">
+                    <input class="form-control location-radius" type="text" placeholder="radius" />
+                    <span class="help-block">Radius</code></span>
+                </div>
+                <i class="fa fa-edit show-dialog"></i>
             </div>
             <span class="material-input"></span>
         </div>
@@ -140,6 +197,24 @@
         <input type="hidden" name="save" value="Save and start">
     </form>
 
+    <div class="modal fade" id="edit-area-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Edit area</h4>
+          </div>
+          <div class="modal-body" id="modal-content">
+            <div id="map-editor"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default modal-decline" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary modal-accept save-area-button">Save</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://fezvrasta.github.io/bootstrap-material-design/dist/js/material.min.js"></script>
@@ -148,7 +223,8 @@
     <script>$.material.init();</script>
     <script>
 
-        var AREA_TYPE = "semiot:GeoRectangle";
+        var POLYGON_AREA_TYPE = "semiot:GeoRectangle";
+        var CIRCLE_AREA_TYPE = "semiot:GeoCircle";
 
         var SCHEMAS = {
             common: (function() {
@@ -172,26 +248,6 @@
         };
 
         var UTILS = {
-            getRectangeFromSchema: function(data) {
-                return [
-                    [
-                        data['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
-                        data['ru.semiot.area.longitude_ne']['dtype:defaultValue'],
-                    ],
-                    [
-                        data['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
-                        data['ru.semiot.area.longitude_ne']['dtype:defaultValue'],
-                    ],
-                    [
-                        data['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
-                        data['ru.semiot.area.longitude_sw']['dtype:defaultValue'],
-                    ],
-                    [
-                        data['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
-                        data['ru.semiot.area.longitude_sw']['dtype:defaultValue'],
-                    ]
-                ];
-            },
             serializeRectangleToForm: function(prefix, rect) {
                 var data = {};
 
@@ -199,6 +255,16 @@
                 data[prefix + '1.longitude'] = rect[0][1];
                 data[prefix + '2.latitude'] = rect[1][0];
                 data[prefix + '2.longitude'] = rect[1][1];
+                debugger;
+
+                return data;
+            },
+            serializeCircleToForm: function(prefix, circle) {
+                var data = {};
+
+                data[prefix + 'latitude'] = circle.latitude;
+                data[prefix + 'longitude'] = circle.longitude;
+                data[prefix + 'radius'] = circle.radius / 1000;
 
                 return data;
             },
@@ -209,36 +275,30 @@
                     $('.add-repeatable').removeAttr('disabled');
                 }
             },
-            generateMapId: function() {
-                return 'map' + Date.now();
+            getCurrentRepeatableCount: function() {
+                return $('.repeatable-configurations > div').length;
             }
         };
 
-        var LeafletMap = function(mapId, rectangle) {
+        var LeafletMap = function(mapId) {
             console.info('initializing new leaflet map');
-            this._map = L.map(mapId);// .setView([51.505, -0.09], 13);
-
+            this._map = L.map(mapId);
+            this.setCenter([60, 30]);
             this.addTileLayer();
             this.addDrawLayer();
-            if (rectangle) {
-                this.addDrawnItems([rectangle]);
-                this.setCenter(rectangle[0]);
-            }
-            this.checkMaxRectangles();
         };
         LeafletMap.prototype = {
             constructor: LeafletMap,
+            invalidateSize: function() {
+                this._map.invalidateSize();
+            },
             addTileLayer: function() {
                 L.tileLayer('https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
                     attribution: ''
                 }).addTo(this._map);
             },
-            addDrawLayer: function() {
-                var that = this;
-                this._drawnItems = new L.FeatureGroup();
-                this._map.addLayer(this._drawnItems);
-
-                this._drawControls = {
+            getDrawControls: function() {
+                return {
                     zero: new L.Control.Draw({
                         position: 'topright',
                         draw: {
@@ -246,7 +306,7 @@
                             polyline: false,
                             marker: false,
                             polygon: false,
-                            circle: false
+                            circle: {}
                         },
                         edit: {
                             featureGroup: this._drawnItems
@@ -259,20 +319,23 @@
                             featureGroup: this._drawnItems
                         }
                     })
-                }
-
+                };
+            },
+            addDrawLayer: function() {
+                var that = this;
+                this._drawnItems = new L.FeatureGroup();
+                this._map.addLayer(this._drawnItems);
+                this._drawControls = this.getDrawControls();
                 this._map.addControl(this._drawControls.zero);
-
                 this._map.on('draw:created', function (e) {
                     that.clearItems();
                     that._drawnItems.addLayer(e.layer);
-                    // that.checkMaxRectangles();
                 });
                 this._map.on('draw:edited', function (e) {
                     //
                 });
                 this._map.on('draw:deleted', function (e) {
-                    // that.checkMaxRectangles();
+
                 });
             },
             clearItems: function() {
@@ -281,10 +344,29 @@
                     that._drawnItems.removeLayer(layer);
                 });
             },
-            addDrawnItems: function(rectangles) {
+            setRectangles: function(rectangles) {
+                this.clearItems();
+                $('.leaflet-draw-draw-rectangle').show();
+                $('.leaflet-draw-draw-circle').hide();
+                this.addRectangles(rectangles);
+            },
+            addRectangles: function(rectangles) {
                 var that = this;
                 rectangles.map(function(r) {
+                    debugger;
                     L.rectangle(r).addTo(that._drawnItems);
+                });
+            },
+            setCircles: function(circles) {
+                this.clearItems();
+                $('.leaflet-draw-draw-rectangle').hide();
+                $('.leaflet-draw-draw-circle').show();
+                this.addCircles(circles);
+            },
+            addCircles: function(circles) {
+                var that = this;
+                circles.map(function(c) {
+                    L.circle([c.latitude, c.longitude], c.radius).addTo(that._drawnItems);
                 });
             },
             setCenter: function(point) {
@@ -302,54 +384,122 @@
                     console.error('failed to get rectangle from map: e = ', e);
                 }
             },
-            checkMaxRectangles: function() {
-                /*
-                if (Object.keys(this._drawnItems._layers).length >= 1) {
-                    console.info('one rectangle on the map; hiding draw controls..');
-                    this._drawControls.zero.removeFrom(this._map);
-                    this._drawControls.one.addTo(this._map);
-                } else {
-                    console.info('zero rectangles on the map; showing draw controls..');
-                    this._drawControls.one.removeFrom(this._map);
-                    this._drawControls.zero.addTo(this._map);
+            getCircle: function() {
+                try {
+                    var circle = this._drawnItems.getLayers()[0];
+                    var latlng = circle.getLatLng();
+                    var radius = parseFloat(circle.getRadius());
+                    return {
+                        latitude: latlng.lat,
+                        longitude: latlng.lng,
+                        radius: radius
+                    };
+                } catch(e) {
+                    console.error('failed to get circle from map: e = ', e);
                 }
-                */
             },
+            remove: function() {
+                this._map.remove();
+            }
         };
 
         var DOM_BUILDERS = {
-            field: function(f, key) {
+            field: function(f, key, type) {
                 if (!f['rdfs:label']) {
                     return null;
                 }
-                var field = $('.field.template').find('.form-group').clone();
 
-                field.find('label').text(f['rdfs:label']);
-                field.find('input').val(f['dtype:defaultValue']).attr({
-                    name: key
-                });
+                var fieldSelector;
+                switch (type) {
+                case "text":
+                    fieldSelector = '.field';
+                    break;
+                case "circle":
+                    fieldSelector = '.circle-field';
+                    break;
+                case "rectangle":
+                    fieldSelector = '.rectangle-field';
+                    break;
+                default:
+                    return null;
+                }
 
-                if (f['rdfs:comment']) {
-                    field.find('label').append($('<i class="fa fa-info-circle" title="'+ f['rdfs:comment'] + '">'))
+                var field = $(fieldSelector + '.template').find('.form-wrapper').clone();
+
+                DOM_BUILDERS.addLabel(f, field);
+                DOM_BUILDERS.addComment(f, field);
+
+                switch (type) {
+                case "text":
+                    field.find('input').val(f['dtype:defaultValue']).attr({
+                        name: key
+                    });
+                    break;
+                case "circle":
+                    SETTERS.circleToInputs({
+                        latitude: f['ru.semiot.area.latitude']['dtype:defaultValue'],
+                        longitude: f['ru.semiot.area.longitude']['dtype:defaultValue'],
+                        radius: f['ru.semiot.area.radius']['dtype:defaultValue'] * 1000
+                    }, field);
+
+                    var onSave = function() {
+                        SETTERS.circleToInputs(MAP.getCircle(), field);
+                        // finally unbind event
+                        $('body').off('click', '.save-area-button', onSave);
+                        $('#edit-area-modal').modal('hide');
+                    }
+
+                    field.find('.show-dialog').on('click', function() {
+                        console.info('showing circle editor dialog');
+                        MAP.setCircles([GETTERS.circleFromInput(field)]);
+                        $('body').on('click', '.save-area-button', onSave);
+                    });
+                    break;
+                case "rectangle":
+                    SETTERS.rectangleToInputs([
+                        [
+                            f['ru.semiot.area.latitude_ne']['dtype:defaultValue'],
+                            f['ru.semiot.area.longitude_ne']['dtype:defaultValue']
+                        ],
+                        [
+                            f['ru.semiot.area.latitude_sw']['dtype:defaultValue'],
+                            f['ru.semiot.area.longitude_sw']['dtype:defaultValue']
+                        ],
+                    ], field);
+
+                    var onSave = function() {
+                        SETTERS.rectangleToInputs(MAP.getRectangle(), field);
+                        // finally unbind event
+                        $('body').off('click', '.save-area-button', onSave);
+                        $('#edit-area-modal').modal('hide');
+                    }
+
+                    field.find('.show-dialog').on('click', function() {
+                        console.info('showing rectangle editor dialog');
+                        MAP.setRectangles([GETTERS.rectangleFromInput(field)]);
+                        $('body').on('click', '.save-area-button', onSave);
+                    });
+                    break;
+                default:
+                    return null;
                 }
 
                 return field;
             },
-            map: function(rectangle, container) {
-                var map = $('.map-wrapper.template').find('> div').clone();
-                var mapId = UTILS.generateMapId()
-                map.attr({
-                    id: mapId
-                });
-                map.appendTo(container);
-                return new LeafletMap(mapId, rectangle);
+            addLabel(f, field) {
+                field.find('label').text(f['rdfs:label']);
+            },
+            addComment(f, field) {
+                if (f['rdfs:comment']) {
+                    field.find('label').append($('<i class="fa fa-info-circle" title="'+ f['rdfs:comment'] + '">'))
+                }
             }
         };
 
         var BLOCK_BUILDERS = {
             common: function() {
                 Object.keys(SCHEMAS.common).forEach(function(key, index) {
-                    $('.common-fields').append(DOM_BUILDERS.field(SCHEMAS.common[key], key));
+                    $('.common-fields').append(DOM_BUILDERS.field(SCHEMAS.common[key], key, 'text'));
                 });
             },
             repeatable: function() {
@@ -358,14 +508,23 @@
 
                 var newRepeatableConfig = {};
 
-                Object.keys(SCHEMAS.repeatable).forEach(function(key, index) {
+                Object.keys(SCHEMAS.repeatable).forEach(function(key, i) {
                     if (key !== "@type") {
-                        if (SCHEMAS.repeatable[key]['@type'] === AREA_TYPE) {
+                        var field;
+                        if (SCHEMAS.repeatable[key]['@type'] === POLYGON_AREA_TYPE) {
+                            field = DOM_BUILDERS.field(SCHEMAS.repeatable[key], key, 'rectangle');
                             newRepeatableConfig[key] = $.extend({}, SCHEMAS.repeatable[key], {
-                                map: DOM_BUILDERS.map(UTILS.getRectangeFromSchema(SCHEMAS.repeatable[key]), formTemplate)
+                                field: field
                             });
+                            formTemplate.append(field);
+                        } else if (SCHEMAS.repeatable[key]['@type'] === CIRCLE_AREA_TYPE) {
+                            field = DOM_BUILDERS.field(SCHEMAS.repeatable[key], key, 'circle');
+                            newRepeatableConfig[key] = $.extend({}, SCHEMAS.repeatable[key], {
+                                field: field
+                            });
+                            formTemplate.append(field);
                         } else {
-                            var field = DOM_BUILDERS.field(SCHEMAS.repeatable[key], key);
+                            field = DOM_BUILDERS.field(SCHEMAS.repeatable[key], key, 'text');
                             newRepeatableConfig[key] = $.extend({}, SCHEMAS.repeatable[key], {
                                 field: field
                             });
@@ -403,10 +562,14 @@
                     Object.keys(r).map(function(key, j) {
                         if (r[key]) {
                             var prefix = (i + 1).toString() + "." + key + ".";
-                            if (r[key]['@type'] === AREA_TYPE) {
-                                // get value from LeafletMap
-                                var rectangle = r[key].map.getRectangle();
+                            var container = $('.repeatable-configurations').find('[data-index=' + j + ']').parent();
+                            if (r[key]['@type'] === POLYGON_AREA_TYPE) {
+                                var rectangle = GETTERS.rectangleFromInput(container.find('.rectangle-editor'));
                                 data = $.extend(data, UTILS.serializeRectangleToForm(prefix, rectangle));
+                            } else if (r[key]['@type'] === CIRCLE_AREA_TYPE) {
+                                debugger;
+                                var circle = GETTERS.circleFromInput(container.find('.circle-editor'));
+                                data = $.extend(data, UTILS.serializeCircleToForm(prefix, circle));
                             } else {
                                 // get value from DOM
                                 data[prefix] = r[key].field.val();
@@ -416,8 +579,43 @@
                 });
                 console.info('repeatable config is: ', data);
                 return data;
+            },
+            circleFromInput: function(el) {
+                return {
+                    latitude: el.find('.location-lat').val(),
+                    longitude: el.find('.location-lng').val(),
+                    radius: el.find('.location-radius').val() * 1000,
+                }
+            },
+            rectangleFromInput: function(el) {
+                return [
+                    [
+                        el.find('.location-lat-ne').val(),
+                        el.find('.location-lng-ne').val()
+                    ],
+                    [
+                        el.find('.location-lat-sw').val(),
+                        el.find('.location-lng-sw').val()
+                    ]
+                ];
             }
         };
+
+        var SETTERS = {
+            circleToInputs: function(circle, field) {
+                field.find('.location-lat').val(circle.latitude.toFixed(2)).attr({ name: '.ru.semiot.area.latitude' });
+                field.find('.location-lng').val(circle.longitude.toFixed(2)).attr({ name: '.ru.semiot.area.longitude' });
+                field.find('.location-radius').val((circle.radius / 1000).toFixed(2)).attr({ name: '.ru.semiot.area.radius' });
+            },
+            rectangleToInputs: function(rect, field) {
+                field.find('.location-lat-ne').val(rect[0][0].toFixed(2)).attr({ name: '.ru.semiot.area.1.latitude' });
+                field.find('.location-lng-ne').val(rect[0][1].toFixed(2)).attr({ name: '.ru.semiot.area.1.longitude' });
+                field.find('.location-lat-sw').val(rect[1][0].toFixed(2)).attr({ name: '.ru.semiot.area.2.latitude' });
+                field.find('.location-lng-sw').val(rect[1][1].toFixed(2)).attr({ name: '.ru.semiot.area.2.longitude' });
+            }
+        };
+
+        var MAP = new LeafletMap('map-editor');
 
         function addEventListeners() {
             $('.add-repeatable').on('click', function(e) {
@@ -431,11 +629,17 @@
                 UTILS.checkMaxRepeatableCount();
                 RESULT_CONFIG.repeatable[$(this).attr('data-index')] = null;
             });
-            $('.save-button').on('click', () => {
+            $('.save-button').on('click', function() {
                 var data = $.extend({}, GETTERS.common(), GETTERS.repeatable());
                 console.info('result config is: ', data);
                 submit(data);
-            })
+            });
+            $('body').on('click', '.show-dialog', function() {
+                $("#edit-area-modal").modal({});
+            });
+            $("#edit-area-modal").on('show.bs.modal', function() {
+                setTimeout(MAP.invalidateSize.bind(MAP), 500);
+            });
         }
 
         function submit(data) {
@@ -443,7 +647,7 @@
                 $('#target-form').append('<input name="' + key + '" value="' + data[key] + '">');
             });
             // $('#target-form').attr({ action: '/' });
-            $('#target-form').submit();
+            // $('#target-form').submit();
         }
 
         function init() {
