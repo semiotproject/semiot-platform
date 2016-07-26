@@ -646,8 +646,8 @@
             Object.keys(data).map(function(key) {
                 $('#target-form').append('<input name="' + key + '" value="' + data[key] + '">');
             });
-            // $('#target-form').attr({ action: '/' });
-            // $('#target-form').submit();
+            $('#target-form').attr({ action: '/' });
+            $('#target-form').submit();
         }
 
         function init() {
