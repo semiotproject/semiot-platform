@@ -73,18 +73,19 @@ export default {
         console.info(`loading command results from ${uri}`);
         return HTTP.get(uri).then((res) => {
             let commandResult;
-            if (!res["hydra:member"]) {
-                commandResult = {};
-            } else if (Array.isArray(res["hydra:member"])) {
+            if (res["hydra:member"] && res["hydra:member"].length > 0) {
                 commandResult = res["hydra:member"][0];
             }
-            return {
-                result: {
-                    timestamp: (new Date(commandResult['dul:hasEventTime'])).toString(),
-                    value: commandResult['semiot:isResultOf']['dcterms:identifier']
-                },
+            const r = {
                 wamp: parseWAMPTopicFromCommandResults(res)
             };
+            if (commandResult) {
+                r.result = {
+                    timestamp: (new Date(commandResult['dul:hasEventTime'])).toString(),
+                    value: commandResult['semiot:isResultOf']['dcterms:identifier']
+                };
+            }
+            return r;
         });
     },
     performOperation(o) {

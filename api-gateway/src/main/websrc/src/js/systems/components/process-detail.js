@@ -151,7 +151,7 @@ export default class ProcessDetail extends Component {
                 <h4>{label}</h4>
                 {
                     operations.map((o) => {
-                        const isLast = lastCommandResult.value === o.id;
+                        const isLast = lastCommandResult && lastCommandResult.value === o.id;
                         return (
                             <button className={`btn operation-btn btn-raised ${isLast ? "active" : ""}`} style={{
                                 backgroundColor: utils.lightenDarkenColor(baseColor, isLast ? -40 : 0)
