@@ -13,8 +13,8 @@
       },
       {
         "name": "Narodmon.ru Weather Station (Temperature & Humidity)",
-        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_narodmon_temperature_build/lastSuccessfulBuild/artifact/narodmon-temperature/target/narodmon.temperature-1.0-SNAPSHOT.jar",
-        "pid": "ru.semiot.platform.drivers.narodmon.temperature"
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_narodmon_temperature_build/lastSuccessfulBuild/artifact/narodmon-temperature/target/narodmon-temperature-1.0-SNAPSHOT.jar",
+        "pid": "ru.semiot.platform.drivers.narodmon-temperature"
       },
       {
         "name": "Netatmo Weather Station (Outdoor module)",
