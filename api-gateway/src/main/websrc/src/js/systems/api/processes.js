@@ -32,7 +32,7 @@ function parseOperations(uri, context, o) {
 }
 
 function parseWAMPTopicFromCommandResults(res) {
-    const hydraOperationRoot = res["hydra-filter:viewOf"] ? res["hydra-filter:viewOf"] : res["hydra-filter:viewTemplate"];
+    const hydraOperationRoot = res["hydra-filter:viewOf"] ? res["hydra-filter:viewOf"] : res;
     const operations = commonUtils.ensureArray(hydraOperationRoot["hydra:operation"]);
     const subscriptionOperation = operations.find((o) => {
         return o['@type'] === "hydra-pubsub:SubscribeOperation";

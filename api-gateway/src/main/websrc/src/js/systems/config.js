@@ -1,10 +1,10 @@
-const DEFAULT_HOSTNAME = "demo.semiot.ru";
+const DEFAULT_HOSTNAME = "test.semiot.ru";
 
 const HTTP_PROTOCOL = 'https:';
 const WS_PROTOCOL = HTTP_PROTOCOL === 'https:' ? 'wss:' : 'ws:';
 
 // change it to target BASE_HOSTNAME when develop
-const BASE_HOSTNAME = location.hostname;
+const BASE_HOSTNAME = DEFAULT_HOSTNAME; // location.hostname;
 
 const BASE_URL = `${HTTP_PROTOCOL}//${BASE_HOSTNAME}`;
 

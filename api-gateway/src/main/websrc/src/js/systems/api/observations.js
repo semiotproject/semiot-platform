@@ -33,7 +33,7 @@ export default {
     loadWAMPTopic(observationsURI) {
         console.info(`loading WAMP topic from oobservationsURI ${observationsURI}`);
         return HTTP.get(`${observationsURI}`).then((res) => {
-            const hydraOperationRoot = res["hydra-filter:viewOf"] ? res["hydra-filter:viewOf"] : res["hydra-filter:viewTemplate"];
+            const hydraOperationRoot = res["hydra-filter:viewOf"] ? res["hydra-filter:viewOf"] : res;
             const subscriptionOperation = hydraOperationRoot['hydra:operation'];
             return {
                 endpoint: subscriptionOperation['hydra-pubsub:endpoint']['@value'],
