@@ -149,10 +149,21 @@ export default class SensorDetail extends Component {
                             backgroundColor: baseColor
                         }}>
                             <span>
-                                <span className="big">{lastObservation.value}</span>
+                                {
+                                    lastObservation ?
+                                        <span className="big">{lastObservation.value}</span> :
+                                        <i className="fa fa-clock-o" style={{
+                                            marginBottom: "5px",
+                                            fontSize: "22px"
+                                        }}></i>
+                                }
                                 <span>{label}</span>
-                                <span>last observation at {moment(lastObservation.timestamp).format('HH:mm:ss')}</span>
-                            </span>
+                                {
+                                    lastObservation ?
+                                        <span>last observation at {moment(lastObservation.timestamp).format('HH:mm:ss')}</span> :
+                                        <span>no observations found</span>
+                                }
+                                </span>
                         </div>
                 }
                 {this.renderModeControls()}
@@ -161,8 +172,15 @@ export default class SensorDetail extends Component {
                         <DateRangePicker start={range[0]} end={range[1]} onChange={this.handleRangeChanged}/>
                 }
                 {
-                    !isLoading &&
-                        <Chart data={this.filterObservations(observations)} color={baseColor} label={label}/>
+                    !isLoading && (
+                        lastObservation ?
+                            <Chart data={this.filterObservations(observations)} color={baseColor} label={label}/> :
+                            (
+                                mode === "archive" ?
+                                    <div className="no-observations-banner">No observations found</div> :
+                                    <div className="no-observations-banner">Waiting for the first observation..</div>
+                            )
+                    )
                 }
             </div>
         )
