@@ -562,7 +562,7 @@
                     Object.keys(r).map(function(key, j) {
                         if (r[key]) {
                             var prefix = (i + 1).toString() + "." + key + ".";
-                            var container = $('.repeatable-configurations').find('[data-index=' + j + ']').parent();
+                            var container = $('.repeatable-configurations').find('[data-index=' + i + ']').parent();
                             if (r[key]['@type'] === POLYGON_AREA_TYPE) {
                                 var rectangle = GETTERS.rectangleFromInput(container.find('.rectangle-editor'));
                                 data = $.extend(data, UTILS.serializeRectangleToForm(prefix, rectangle));
