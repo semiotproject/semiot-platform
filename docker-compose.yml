@@ -1,39 +1,32 @@
 wamprouter:
-  image: docker.semiot.ru/wamp-router
+  image: semiot/wamp-router:v0.1.0-rc.7
   links:
     - mysqlbase
-  ports:
-    - "8080:8080"
   restart: always
 
 dataarchivingservice:
-  image: docker.semiot.ru/data-archiving-service
+  image: semiot/data-archiving-service:v0.1.0-rc.7
   links:
     - tsdb
     - wamprouter
     - deviceproxyservice
     - triplestore
-  ports:
-    - "8787:8787"
   volumes:
     - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
   restart: always
 
 tsdb:
   image: cassandra:3.3
-  ports:
-    - "9042:9042"
   volumes:
     - /semiot-platform/tsdb:/var/lib/cassandra
   restart: always
 
 deviceproxyservice:
-  image: docker.semiot.ru/device-proxy-service
+  image: semiot/device-proxy-service:v0.1.0-rc.7
   links:
     - wamprouter
     - triplestore
   ports:
-    - "8181:8181"
     - "9500:9500/udp"
     - "3131:3131/udp"
   volumes:
@@ -45,22 +38,17 @@ deviceproxyservice:
   restart: always
 
 triplestore:
-  image: docker.semiot.ru/triplestore
-  ports:
-    - "3030:3030"
+  image: semiot/triplestore:v0.1.0-rc.7
   restart: always
 
 apigateway:
-  image: docker.semiot.ru/api-gateway
+  image: semiot/api-gateway:v0.1.0-rc.7
   links:
     - wamprouter
     - deviceproxyservice
     - dataarchivingservice
     - mysqlbase
     - triplestore
-  ports:
-    - "8383:8080"
-    - "9990:9990"
   volumes:
     - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
   extra_hosts:
@@ -69,7 +57,7 @@ apigateway:
   restart: always
 
 frontend:
-  image: docker.semiot.ru/frontend
+  image: semiot/frontend:v0.1.0-rc.7
   links:
     - wamprouter
     - deviceproxyservice
@@ -80,7 +68,5 @@ frontend:
   restart: always
 
 mysqlbase:
-  image: docker.semiot.ru/mysql
-  ports:
-    - "3306:3306"
+  image: semiot/mysql:v0.1.0-rc.7
   restart: always
