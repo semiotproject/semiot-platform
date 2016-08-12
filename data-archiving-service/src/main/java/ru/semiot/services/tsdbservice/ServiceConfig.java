@@ -8,7 +8,7 @@ import org.aeonbits.owner.Mutable;
 import org.apache.jena.riot.RDFLanguages;
 
 @LoadPolicy(LoadType.FIRST)
-@Sources({"file:/semiot-platform/data-archiving-service/config.properties"})
+@Sources({"file:/semiot-platform/config.properties"})
 public interface ServiceConfig extends Mutable {
 
   public static final ServiceConfig CONFIG = ConfigFactory.create(ServiceConfig.class);
@@ -22,11 +22,11 @@ public interface ServiceConfig extends Mutable {
   String wampRealm();
 
   @DefaultValue("internal")
-  @Key("ru.semiot.platform.wamp_login")
+  @Key("services.wamp.login")
   String wampLogin();
 
   @DefaultValue("internal")
-  @Key("ru.semiot.platform.wamp_password")
+  @Key("services.wamp.password")
   String wampPassword();
 
   @DefaultValue("15")
@@ -47,7 +47,7 @@ public interface ServiceConfig extends Mutable {
   String tsdbUrl();
 
   @DefaultValue("http://triplestore:3030/blazegraph/sparql")
-  @Key("services.fuseki.store.url")
+  @Key("services.triplestore.url")
   String storeUrl();
 
   @DefaultValue("ru.semiot.devices.remove.sensor")
@@ -55,14 +55,14 @@ public interface ServiceConfig extends Mutable {
   String topicsRemoveSensor();
 
   @DefaultValue("admin")
-  @Key("services.fuseki.store.username")
+  @Key("services.triplestore.username")
   String storeUsername();
 
   @DefaultValue("pw")
-  @Key("services.fuseki.store.password")
+  @Key("services.triplestore.password")
   String storePassword();
 
   @DefaultValue("http://localhost/")
-  @Key("ru.semiot.platform.domain")
+  @Key("semiot.platform.domain")
   String rootUrl();
 }

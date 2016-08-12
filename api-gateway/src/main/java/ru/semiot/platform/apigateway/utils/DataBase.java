@@ -16,13 +16,7 @@ public class DataBase {
   private EntityManager em;
 
   public Credentials addUser(int id, String login, String password, String role) {
-    try {
-      Credentials c = new Credentials(id, login, password, role);
-      em.merge(c);
-      return c;
-    } catch (Exception ex) {
-      return null;
-    }
+      return addUser(new Credentials(id, login, password, role));
   }
 
   public Credentials addUser(Credentials c) {
