@@ -83,7 +83,6 @@
                         <li><a href="/config/UploadDriver">New</a></li>
                         <li class="divider"></li>
                         <li class="dropdown-header">Settings</li>
-                        <li><a href="/config/SystemSettings">System</a></li>
                         <li><a href="/config/AdminPanel">Users</a></li>
                     </ul>
                 </li>
