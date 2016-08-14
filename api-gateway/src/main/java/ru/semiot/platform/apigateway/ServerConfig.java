@@ -6,7 +6,7 @@ import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
 
 @LoadPolicy(LoadType.FIRST)
-@Sources({"file:/semiot-platform/api-gateway/config.properties"})
+@Sources({"file:/semiot-platform/config.properties"})
 public interface ServerConfig extends Config {
 
   @DefaultValue("http://triplestore:3030/blazegraph/sparql")
@@ -14,7 +14,7 @@ public interface ServerConfig extends Config {
   String sparqlEndpoint();
 
   @DefaultValue("admin")
-  @Key("services.triplestore.login")
+  @Key("services.triplestore.username")
   String sparqlUsername();
 
   @DefaultValue("pw")
@@ -22,7 +22,7 @@ public interface ServerConfig extends Config {
   String sparqlPassword();
 
   @DefaultValue("ws://wamprouter:8080/ws")
-  @Key("services.wamp.url")
+  @Key("services.wamp.uri")
   String wampUri();
 
   @DefaultValue("realm1")

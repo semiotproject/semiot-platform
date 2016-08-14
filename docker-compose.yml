@@ -16,7 +16,7 @@ dataarchivingservice:
   ports:
     - "8787:8787"
   volumes:
-    - /semiot-platform/data-archiving-service/:/semiot-platform/data-archiving-service/
+    - /semiot-platform/:/semiot-platform/
   restart: always
 
 tsdb:
@@ -32,13 +32,14 @@ deviceproxyservice:
   links:
     - wamprouter
     - triplestore
+    - mysqlbase
   ports:
     - "8181:8181"
     - "9500:9500/udp"
     - "3131:3131/udp"
   volumes:
     - /semiot-platform/felix-cache:/root/semiot-platform/device-proxy-service/felix-cache
-    - /semiot-platform/device-proxy-service:/semiot-platform/device-proxy-service
+    - /semiot-platform/:/semiot-platform/
   extra_hosts:
     - "assets-cdn.github.com:151.101.12.133"
     - "raw.githubusercontent.com:151.101.12.133"
@@ -62,7 +63,7 @@ apigateway:
     - "8383:8080"
     - "9990:9990"
   volumes:
-    - /semiot-platform/api-gateway/:/semiot-platform/api-gateway/
+    - /semiot-platform/:/semiot-platform/
   extra_hosts:
     - "assets-cdn.github.com:151.101.12.133"
     - "raw.githubusercontent.com:151.101.12.133"

@@ -8,6 +8,7 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,9 +65,22 @@ public class Launcher {
   };
 
   private static Framework framework = null;
+  private static long TIMEOUT = 2000;
 
   public static void main(String args[]) throws BundleException {
 
+    Connection connection = DataBase.connection();
+    while(connection == null) {
+      try {
+        Thread.sleep(TIMEOUT);
+      } catch (InterruptedException ex) {
+        logger.error(ex.getMessage());
+      }
+      connection = DataBase.connection();
+    }
+    logger.info("Connected to data base");
+    DataBase.insertUser(connection);
+    
     ServiceLoader<FrameworkFactory> loader = ServiceLoader.load(FrameworkFactory.class);
     FrameworkFactory frameworkFactory = loader.iterator().next();
 
