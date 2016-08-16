@@ -14,28 +14,28 @@ public class DeviceManager extends ABundle {
   private static final BundlesConfig config = ConfigFactory.create(BundlesConfig.class);
   
   public DeviceManager() {
-    super("ru.semiot.platform.deviceproxyservice.manager");
+    super("ru.semiot.platform.device-proxy-service-manager");
     
     Dictionary<String, String> props = new Hashtable();
     props.put("ru.semiot.platform.device-proxy-service-directory.triplestore_update_url",
         config.triplestoreEndpoint());
 
-    props.put("ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url",
+    props.put("ru.semiot.platform.device-proxy-service-manager.fuseki_update_url",
         config.triplestoreEndpoint());
-    props.put("ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url",
+    props.put("ru.semiot.platform.device-proxy-service-manager.fuseki_query_url",
         config.triplestoreEndpoint());
-    props.put("ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url",
+    props.put("ru.semiot.platform.device-proxy-service-manager.fuseki_store_url",
         config.triplestoreEndpoint());
     
-    props.put("ru.semiot.platform.deviceproxyservice.manager.fuseki_pass",
+    props.put("ru.semiot.platform.device-proxy-service-manager.fuseki_pass",
         config.triplestorePassword());
-    props.put("ru.semiot.platform.deviceproxyservice.manager.fuseki_username",
+    props.put("ru.semiot.platform.device-proxy-service-manager.fuseki_username",
         config.triplestoreUsername());
     
     props.put("ru.semiot.platform.domain",
         config.domain());
 
-    props.put("ru.semiot.platform.deviceproxyservice.manager.wamp_uri",
+    props.put("ru.semiot.platform.device-proxy-service-manager.wamp_uri",
         config.wampUri());
     props.put("ru.semiot.platform.wamp_login",
         config.wampLogin());
