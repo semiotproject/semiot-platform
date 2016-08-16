@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
     <OCD description="Device Proxy Service Manager" name="Device Proxy Service Manager"
-         id="ru.semiot.platform.deviceproxyservice.manager">
-        <AD name="WAMP URI" id="ru.semiot.platform.deviceproxyservice.manager.wamp_uri"
+         id="ru.semiot.platform.device-proxy-service-manager">
+        <AD name="WAMP URI" id="ru.semiot.platform.device-proxy-service-manager.wamp_uri"
             required="false" type="String" default="ws://wamprouter:8080/ws"/>
         <AD name="WAMP login" id="ru.semiot.platform.wamp_login"
             required="false" type="String" default="internal"/>
         <AD name="WAMP password" id="ru.semiot.platform.wamp_password"
             required="true" type="String" default="internal"/>
-        <AD name="WAMP Realm" id="ru.semiot.platform.deviceproxyservice.manager.wamp_realm"
+        <AD name="WAMP Realm" id="ru.semiot.platform.device-proxy-service-manager.wamp_realm"
             required="false" type="String" default="realm1"/>
         <AD name="WAMP Reconnect interval"
-            id="ru.semiot.platform.deviceproxyservice.manager.wamp_reconnect"
+            id="ru.semiot.platform.device-proxy-service-manager.wamp_reconnect"
             required="false" type="Integer" default="15"/>
         <AD name="Topic new and observing"
-            id="ru.semiot.platform.deviceproxyservice.manager.topic_newandobserving"
+            id="ru.semiot.platform.device-proxy-service-manager.topic_newandobserving"
             required="false" type="String" default="ru.semiot.devices.newandobserving"/>
-        <AD name="Topic inactive" id="ru.semiot.platform.deviceproxyservice.manager.topic_inactive"
+        <AD name="Topic inactive" id="ru.semiot.platform.device-proxy-service-manager.topic_inactive"
             required="false" type="String" default="ru.semiot.devices.turnoff"/>
-        <AD name="Fuseki password" id="ru.semiot.platform.deviceproxyservice.manager.fuseki_pass"
+        <AD name="Fuseki password" id="ru.semiot.platform.device-proxy-service-manager.fuseki_pass"
             required="false" type="String" default="pw"/>
         <AD name="Fuseki username"
-            id="ru.semiot.platform.deviceproxyservice.manager.fuseki_username"
+            id="ru.semiot.platform.device-proxy-service-manager.fuseki_username"
             required="false" type="String" default="admin"/>
         <AD name="Fuseki update url"
-            id="ru.semiot.platform.deviceproxyservice.manager.fuseki_update_url"
+            id="ru.semiot.platform.device-proxy-service-manager.fuseki_update_url"
             required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
         <AD name="Fuseki query url"
-            id="ru.semiot.platform.deviceproxyservice.manager.fuseki_query_url"
+            id="ru.semiot.platform.device-proxy-service-manager.fuseki_query_url"
             required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
         <AD name="Fuseki store url"
-            id="ru.semiot.platform.deviceproxyservice.manager.fuseki_store_url"
+            id="ru.semiot.platform.device-proxy-service-manager.fuseki_store_url"
             required="false" type="String" default="http://triplestore:3030/blazegraph/sparql"/>
 
         <AD name="Domain" id="ru.semiot.platform.domain"
@@ -43,7 +43,7 @@
             required="false" type="String" default="processes"/>
     </OCD>
 
-    <Designate pid="ru.semiot.platform.deviceproxyservice.manager">
-        <Object ocdref="ru.semiot.platform.deviceproxyservice.manager"/>
+    <Designate pid="ru.semiot.platform.device-proxy-service-manager">
+        <Object ocdref="ru.semiot.platform.device-proxy-service-manager"/>
     </Designate>
 </metatype:MetaData>
