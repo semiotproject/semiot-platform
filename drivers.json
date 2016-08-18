@@ -45,6 +45,21 @@
         "name": "Regulator Simulator",
         "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_regulator_simulator/lastSuccessfulBuild/artifact/regulator-simulator/target/regulator-simulator-1.0.jar",
         "pid": "ru.semiot.drivers.regulator-simulator"
+      },
+      {
+        "name": "Lamp (Brightness)",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_lamp/lastSuccessfulBuild/artifact/lamp/target/lamp-1.0.jar",
+        "pid": "ru.semiot.platform.drivers.lamp"
+      },
+      {
+        "name": "Water Impulse",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_water_impulse/lastSuccessfulBuild/artifact/water-impulse/target/impulse.water-1.0.jar",
+        "pid": "ru.semiot.platform.drivers.impulse.water"
+      },
+      {
+        "name": "Electric Impulse",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_electric_impulse/lastSuccessfulBuild/artifact/electric-impulse/target/impulse.electric-1.0.jar",
+        "pid": "ru.semiot.platform.drivers.impulse.electric"
       }
     ]
   }
