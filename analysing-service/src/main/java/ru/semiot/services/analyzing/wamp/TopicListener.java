@@ -6,6 +6,7 @@ import java.io.StringReader;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.services.analyzing.cep.Engine;
@@ -37,7 +38,7 @@ public class TopicListener implements Observer<String> {
     @Override
     public void onNext(String message) {
         Model description = ModelFactory.createDefaultModel().read(
-                new StringReader(message), null, "TURTLE");
+                new StringReader(message), null, RDFLanguages.strLangJSONLD);
         if (!description.isEmpty()) {
             engine.appendData(message);
         }
