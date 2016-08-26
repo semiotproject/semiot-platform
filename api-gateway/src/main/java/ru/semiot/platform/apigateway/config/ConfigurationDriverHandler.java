@@ -1,7 +1,6 @@
 package ru.semiot.platform.apigateway.config;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.platform.apigateway.beans.TSDBQueryService;
@@ -48,6 +47,7 @@ public class ConfigurationDriverHandler extends HttpServlet {
   @Inject
   private DataBase db;
 
+  @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
 
@@ -122,30 +122,6 @@ public class ConfigurationDriverHandler extends HttpServlet {
         session.removeAttribute("inputStreamFile");
         session.removeAttribute("filename");
         post = service.sendPostUploadFile(is, filename, pid, parameters);
-      } else if (request.getParameter("configure") != null) {
-        parameters.put("propertylist",
-            parameters.get("propertylist")
-                .concat(",")
-                .concat(BundleConstants.WAMP_LOGIN)
-                .concat(",")
-                .concat(BundleConstants.WAMP_PASSWORD));
-        String domain = parameters.get(BundleConstants.MANAGER_DOMAIN);
-        String role = "internal";
-        String login = RandomStringUtils.randomAlphanumeric(12);
-        String pass = RandomStringUtils.randomAlphanumeric(12);
-        db.addUser(0, login, pass, role);
-
-        JsonObject json = Json.createObjectBuilder()
-            .add(BundleConstants.MANAGER_DOMAIN, domain)
-            .add(BundleConstants.WAMP_LOGIN, login)
-            .add(BundleConstants.WAMP_PASSWORD, pass)
-            .build();
-
-        tsdb.submitConfiguration(json).subscribe();
-
-        parameters.put(BundleConstants.WAMP_LOGIN, login);
-        parameters.put(BundleConstants.WAMP_PASSWORD, pass);
-        post = service.sendPostConfigStart(pid, parameters);
       }
 
       post.subscribe((symbolicName) -> {},

@@ -63,10 +63,6 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>SystemSettings</servlet-name>
-        <jsp-file>/config/SystemSettings.jsp</jsp-file>
-    </servlet>
-    <servlet>
         <servlet-name>UploadDriver</servlet-name>
         <jsp-file>/config/UploadDriver.jsp</jsp-file>
     </servlet>
@@ -86,10 +82,6 @@
         <servlet-name>AdminPanel</servlet-name>
         <jsp-file>/config/AdminPanel.jsp</jsp-file>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>SystemSettings</servlet-name>
-        <url-pattern>/configuration/SystemSettings</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UploadDriver</servlet-name>
         <url-pattern>/config/UploadDriver</url-pattern>

@@ -1,5 +1,6 @@
 (function() {
-
+/*
+    // do nothing since we do not check platform configuration
     $.get('/config/system').then(function() {
         console.info("looks like platform is configured");
         $(".save-platform-settings-button").attr({
@@ -15,5 +16,5 @@
         });
         // $(".platform-not-configured-helper").show();
     });
-
+*/
 })();

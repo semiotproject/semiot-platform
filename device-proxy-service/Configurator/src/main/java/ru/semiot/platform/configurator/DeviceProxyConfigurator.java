@@ -1,6 +1,7 @@
 package ru.semiot.platform.configurator;
 
 import bundles.ABundle;
+import bundles.DeviceManager;
 import bundles.DirectoryService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -21,6 +22,7 @@ public class DeviceProxyConfigurator {
     
     List<ABundle> confBundles = new ArrayList<ABundle>();
     confBundles.add(new DirectoryService());
+    confBundles.add(new DeviceManager());
     
     for(ABundle bundle : confBundles) {
       bundle.configuringBundle(ctx, contextBundles);
