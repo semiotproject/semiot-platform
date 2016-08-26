@@ -249,6 +249,7 @@
 
         var UTILS = {
             serializeRectangleToForm: function(prefix, rect) {
+                prefix = prefix + ".";
                 var data = {};
 
                 data[prefix + '1.latitude'] = rect[0][0];
@@ -260,6 +261,7 @@
                 return data;
             },
             serializeCircleToForm: function(prefix, circle) {
+                prefix = prefix + ".";
                 var data = {};
 
                 data[prefix + 'latitude'] = circle.latitude;
@@ -561,7 +563,7 @@
                 }).map(function(r, i) {
                     Object.keys(r).map(function(key, j) {
                         if (r[key]) {
-                            var prefix = (i + 1).toString() + "." + key + ".";
+                            var prefix = (i + 1).toString() + "." + key;
                             var container = $('.repeatable-configurations').find('[data-index=' + i + ']').parent();
                             if (r[key]['@type'] === POLYGON_AREA_TYPE) {
                                 var rectangle = GETTERS.rectangleFromInput(container.find('.rectangle-editor'));
