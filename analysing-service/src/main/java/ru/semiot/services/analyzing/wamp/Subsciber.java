@@ -35,6 +35,7 @@ public class Subsciber {
     connectWithDataStore();
     try {
       wampClient.init();
+      Thread.sleep(3000);
       wampClient.subscribe("someTopic").subscribe(topicListener);
       listTopics = new HashMap<>();
     } catch (Exception ex) {

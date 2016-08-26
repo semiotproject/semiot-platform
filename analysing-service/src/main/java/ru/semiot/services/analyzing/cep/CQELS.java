@@ -3,11 +3,9 @@ package ru.semiot.services.analyzing.cep;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sparql.core.Var;
 import java.io.File;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,7 +71,7 @@ public class CQELS implements Engine {
                         public void update(List<Triple> graph) {
                             String message = getString(graph);
                             sendToWAMP(message);
-                            appendData(message);
+                            //appendData(message);
                         }
                     });
                     queries.put(query_id, cc);
@@ -121,15 +119,13 @@ public class CQELS implements Engine {
     }
 
     @Override
-    public void appendData(String msg) {
-        Model description = ModelFactory.createDefaultModel().read(
-                new StringReader(msg), null, "TURTLE");
+    public void appendData(Model description) {
         stream.stream(description);
         /*
          String streamName = description.getNsPrefixURI("");
          if(!streams.containsKey(streamName))
          streams.put(streamName, new DefaultRDFStream(context, streamName));
-         streams.get(streamName).stream(description);        
+         streams.get(streamName).stream(description);
          */
     }
 

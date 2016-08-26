@@ -36,7 +36,6 @@ import javax.inject.Named;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.jena.atlas.web.auth.HttpAuthenticator;
 import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
-import org.apache.jena.riot.RDFLanguages;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
@@ -77,9 +76,7 @@ public class CSPARQL implements Engine {
   Subsciber subscriber;
 
   @Override
-  public void appendData(String message) {
-    Model description = ModelFactory.createDefaultModel().read(
-        new StringReader(message), null, RDFLanguages.strLangJSONLD);
+  public void appendData(Model description) {
     StmtIterator iterator = description.listStatements();
     String timestamp = description.getGraph()
         .find(Node.ANY, NodeFactory.createURI("http://purl.oclc.org/NET/ssnx/ssn#observationResultTime"), Node.ANY)
@@ -115,7 +112,7 @@ public class CSPARQL implements Engine {
             });
             sendToWAMP(getString(vars, bindings), query_id);
             appendEventsToStore(getString(vars, bindings), query_id);
-            subscribeTopics(query_id, true);
+            //subscribeTopics(query_id, true);
           }
         });
         return true;
@@ -206,7 +203,7 @@ public class CSPARQL implements Engine {
   }
 
   private Node toNode(String value) {
-    if (value.startsWith("http://")) {
+    if (value.startsWith("http://") || value.startsWith("https://")) {
       return NodeFactory.createURI(value);
     } else if (value.contains("^^")) {
       String[] parts = value.split("\\^\\^");
@@ -279,7 +276,7 @@ public class CSPARQL implements Engine {
 
   private String asURI(final String string) {
     final StringBuilder builder = new StringBuilder();
-    if (string.startsWith("http://")) {
+    if (string.startsWith("http://") || string.startsWith("https://")) {
       //If it is URI (something like http://ex.com/#hasValue)
       builder.append(LT).append(string).append(GT);
     } else if (string.contains("^^")) {
