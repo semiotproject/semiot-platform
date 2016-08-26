@@ -574,7 +574,7 @@
                                 data = $.extend(data, UTILS.serializeCircleToForm(prefix, circle));
                             } else {
                                 // get value from DOM
-                                data[prefix] = r[key].field.val();
+                                data[prefix] = r[key].field.find('input').val();
                             }
                         }
                     });
