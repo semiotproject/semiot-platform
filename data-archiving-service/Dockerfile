@@ -11,7 +11,4 @@ WORKDIR /root/semiot-platform/$SERVICE_NAME
 
 ADD target/$SERVICE_JAR_NAME.jar $SERVICE_JAR_NAME.jar
 
-ADD run.sh ./
-RUN chmod 777 run.sh
-
-CMD ./run.sh
+CMD java -Dcom.sun.management.jmxremote.rmi.port=8980 -Dcom.sun.management.jmxremote.port=8980 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=$SERVICE_JMX_DISABLED -Djava.rmi.server.hostname=$SERVICE_JMX_DOMAIN -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/root/semiot-platform/$SERVICE_NAME/dump/dump.hprof -Dlogback.configurationFile=/root/semiot-platform/$SERVICE_NAME/logback.xml -jar $SERVICE_JAR_NAME.jar
