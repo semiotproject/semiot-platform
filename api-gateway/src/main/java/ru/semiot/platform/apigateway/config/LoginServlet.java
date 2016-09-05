@@ -1,11 +1,14 @@
 package ru.semiot.platform.apigateway.config;
 
+import arq.rsparql;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
+import javax.servlet.http.Cookie;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,7 +29,7 @@ public class LoginServlet extends HttpServlet {
     try {
       JSONObject object = new JSONObject(builder.toString());
       request.login(object.optString("username"), object.optString("password"));
-
+      response.setHeader("JSESSIONID", request.getSession().getId());      
     } catch (JSONException ex) {
       response.setStatus(400);
     } catch (ServletException ex) {
