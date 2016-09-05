@@ -37,15 +37,15 @@ public interface ServerConfig extends Config {
   @Key("services.wamp.protocol.scheme")
   String wampProtocolScheme();
 
-  @Key("services.tsdb.url")
+  @Key("services.dataarchiving.url")
   @DefaultValue("http://dataarchivingservice:8787")
   String tsdbEndpoint();
 
-  @Key("services.tsdb.commandResults.path")
+  @Key("services.dataarchiving.commandResults.path")
   @DefaultValue("/commandResults")
   String tsdbCommandResultsPath();
 
-  @Key("services.tsdb.commandResults.latest.path")
+  @Key("services.dataarchiving.commandResults.latest.path")
   @DefaultValue("/commandResults/latest")
   String tsdbCommandResultsLatestPath();
 
