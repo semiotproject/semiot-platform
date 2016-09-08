@@ -92,10 +92,9 @@ export default {
     performOperation(o) {
         return HTTP.post(o.uri, o.body);
     },
-    subscribe(endpoint, topic, callback) {
+    subscribe(topic, callback) {
         WAMP.subscribe({
             topic,
-            endpoint,
             callback: (msg) => {
                 callback(extractCommandResultFromWAMPMessage(JSON.parse(msg[0])));
             }

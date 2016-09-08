@@ -86,7 +86,7 @@ export default class ProcessDetail extends Component {
         const { wamp } = this.state;
         if (wamp && wamp.topic && wamp.endpoint) {
             console.info("subscribing to process..");
-            processAPI.subscribe(wamp.endpoint, wamp.topic, (data) => {
+            processAPI.subscribe(wamp.topic, (data) => {
                 console.info(`received new command result! `, data);
                 this.setState({
                     lastCommandResult: data

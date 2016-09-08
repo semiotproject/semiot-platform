@@ -11,6 +11,13 @@ function renderUsername(user) {
 export default {
     getCurrentUser() {
         return new Promise((resolve, reject) => {
+/*            resolve({
+                data: {
+                    username: "root",
+                    password: "root"
+                }
+            });
+            return;*/
             if (currentUser) {
                 resolve(currentUser);
                 return;

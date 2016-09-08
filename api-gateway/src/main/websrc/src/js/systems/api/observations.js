@@ -43,10 +43,9 @@ export default {
             console.error(`failed to load observation list: error = `, e);
         });
     },
-    subscribeForNewObservations(endpoint, topic, callback) {
+    subscribeForNewObservations(topic, callback) {
         WAMP.subscribe({
             topic: topic,
-            endpoint: endpoint,
             callback: (msg) => {
                 callback(extractObservationFromWAMPMessage(JSON.parse(msg[0])));
             }

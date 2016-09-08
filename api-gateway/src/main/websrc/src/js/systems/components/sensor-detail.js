@@ -102,7 +102,7 @@ export default class SensorDetail extends Component {
             this.setState({
                 WAMPTopic: res.topic
             }, () => {
-                observationAPI.subscribeForNewObservations(res.endpoint, res.topic, this.handleNewObservationReceived);
+                observationAPI.subscribeForNewObservations(res.topic, this.handleNewObservationReceived);
             })
         });
     }
