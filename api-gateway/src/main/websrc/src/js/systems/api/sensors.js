@@ -18,6 +18,7 @@ export default {
             };
         }, (e) => {
             console.error(`unable to parse system: e = `, e);
+            throw e;
         });
     }
 };

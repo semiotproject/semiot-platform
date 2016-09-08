@@ -76,6 +76,11 @@ export default class SystemList extends Component {
                 totalSystemsCount: res.totalSystemsCount,
                 isLoading: false
             });
+        }, () => {
+            this.setState({
+                error: true,
+                isLoading: false
+            });
         });
     }
     filterSystems(systems) {
@@ -94,27 +99,33 @@ export default class SystemList extends Component {
     render() {
         const page = this.getCurrentPage();
         const size = this.getCurrentPageSize();
-        const { isLoading, systems, search, totalSystemsCount } = this.state;
-        return (
-            <section className={isLoading ? "preloader" : ""}>
+        const { isLoading, error, systems, search, totalSystemsCount } = this.state;
+        let content;
+        if (error) {
+            content = "error while loading data";
+        } else {
+            content = [
                 <ol className="breadcrumb">
                     <li className="active">Systems</li>
-                </ol>
-                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} fromIndex={(page - 1) * size} />
-                {
-                    totalSystemsCount > size &&
-                        <Pagination
-                                prev
-                                next
-                                first
-                                last
-                                ellipsis
-                                boundaryLinks
-                                items={Math.ceil(totalSystemsCount/ size)}
-                                maxButtons={5}
-                                activePage={page}
-                                onSelect={this.handlePageClick} />
-                }
+                </ol>,
+                <SystemListTable systems={systems} search={search} onSearchChange={this.handleSearchChange} fromIndex={(page - 1) * size} />,
+                totalSystemsCount > size &&
+                    <Pagination
+                            prev
+                            next
+                            first
+                            last
+                            ellipsis
+                            boundaryLinks
+                            items={Math.ceil(totalSystemsCount/ size)}
+                            maxButtons={5}
+                            activePage={page}
+                            onSelect={this.handlePageClick} />
+            ];
+        }
+        return (
+            <section className={isLoading ? "preloader" : ""}>
+                {content}
             </section>
         );
     }

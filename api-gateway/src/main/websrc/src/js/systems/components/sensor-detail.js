@@ -32,6 +32,7 @@ export default class SensorDetail extends Component {
             mode: "real-time",
             isLoading: true,
             observations: [],
+            error: false,
             range: getDefaultRange()
         };
         this.handleModeClick = (mode) => {
@@ -80,6 +81,10 @@ export default class SensorDetail extends Component {
                 this.loadObservations().then(() => {
                     this.subscribe();
                 });
+            });
+        }, (e) => {
+            this.setState({
+                error: true
             });
         });
     }
@@ -138,50 +143,52 @@ export default class SensorDetail extends Component {
     }
 
     render() {
-        const { label, range, mode, observations, isLoading } = this.state;
+        const { label, range, mode, observations, isLoading, error } = this.state;
         const { baseColor } = this.props;
         const lastObservation = this.getLastObservation();
+
+        let content;
+        if (error) {
+            content = "error while loading data";
+        } else if (isLoading) {
+            content = "loading..";
+        } else {
+            content = [
+                <div className="sensor-last-observation raised" style={{
+                    backgroundColor: baseColor
+                }}>
+                    <span>
+                        {
+                            lastObservation ?
+                                <span className="big">{lastObservation.value}</span> :
+                                <i className="fa fa-clock-o" style={{
+                                    marginBottom: "5px",
+                                    fontSize: "22px"
+                                }}></i>
+                        }
+                        <span>{label}</span>
+                        {
+                            lastObservation ?
+                                <span>last observation at {moment(lastObservation.timestamp).format('HH:mm:ss')}</span> :
+                                <span>no observations found</span>
+                        }
+                        </span>
+                </div>,
+                this.renderModeControls(),
+                mode === "archive" &&
+                    <DateRangePicker start={range[0]} end={range[1]} onChange={this.handleRangeChanged}/>,
+                lastObservation ?
+                    <Chart data={this.filterObservations(observations)} color={baseColor} label={label}/> :
+                    (
+                        mode === "archive" ?
+                            <div className="no-observations-banner">No observations found</div> :
+                            <div className="no-observations-banner">Waiting for the first observation..</div>
+                    )
+            ];
+        }
         return (
             <div className={`sensor-view ${isLoading ? "preloader" : ""}`}>
-                {
-                    !isLoading &&
-                        <div className="sensor-last-observation raised" style={{
-                            backgroundColor: baseColor
-                        }}>
-                            <span>
-                                {
-                                    lastObservation ?
-                                        <span className="big">{lastObservation.value}</span> :
-                                        <i className="fa fa-clock-o" style={{
-                                            marginBottom: "5px",
-                                            fontSize: "22px"
-                                        }}></i>
-                                }
-                                <span>{label}</span>
-                                {
-                                    lastObservation ?
-                                        <span>last observation at {moment(lastObservation.timestamp).format('HH:mm:ss')}</span> :
-                                        <span>no observations found</span>
-                                }
-                                </span>
-                        </div>
-                }
-                {this.renderModeControls()}
-                {
-                    mode === "archive" &&
-                        <DateRangePicker start={range[0]} end={range[1]} onChange={this.handleRangeChanged}/>
-                }
-                {
-                    !isLoading && (
-                        lastObservation ?
-                            <Chart data={this.filterObservations(observations)} color={baseColor} label={label}/> :
-                            (
-                                mode === "archive" ?
-                                    <div className="no-observations-banner">No observations found</div> :
-                                    <div className="no-observations-banner">Waiting for the first observation..</div>
-                            )
-                    )
-                }
+                {content}
             </div>
         )
     }

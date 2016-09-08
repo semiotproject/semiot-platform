@@ -33,6 +33,7 @@ export default {
             };
         }, (e) => {
             console.error(`unable to parse systems: e = `, e);
+            throw e;
         });
     },
     loadSystem(uri) {
