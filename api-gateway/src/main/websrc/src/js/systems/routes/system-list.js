@@ -119,7 +119,7 @@ export default class SystemList extends Component {
                             boundaryLinks
                             items={Math.ceil(totalSystemsCount/ size)}
                             maxButtons={5}
-                            activePage={page}
+                            activePage={parseInt(page)}
                             onSelect={this.handlePageClick} />
             ];
         }

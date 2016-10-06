@@ -120,7 +120,7 @@ export default class SensorDetail extends Component {
         }
     }
     filterObservations(obs) {
-        return this.state.mode === "real-time" ? obs.slice(Math.max(obs.length - 5, 1)) : obs;
+        return this.state.mode === "real-time" ? obs.slice(Math.max(obs.length - 5 > 0 ? obs.length - 5 : 0, 0)) : obs;
     }
 
     renderModeControls() {

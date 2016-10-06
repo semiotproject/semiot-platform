@@ -41,9 +41,10 @@ export default class ObservationChart extends Component {
     componentDidUpdate() {
         let chart = this.state.chart;
 
+        // additional nulls because library does not show correctly 1 observation
         chart.data.datasets[0].data = this.props.data.map((d) => {
             return {
-                x: d.timestamp,
+                x: new Date(d.timestamp),
                 y: d.value
             }
         });
