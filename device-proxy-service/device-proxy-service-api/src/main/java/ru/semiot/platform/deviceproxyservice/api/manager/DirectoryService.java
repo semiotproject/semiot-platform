@@ -17,6 +17,8 @@ public interface DirectoryService {
    */
   public boolean addNewDevice(DriverInformation info, Device device, Model description);
 
+  public boolean updateDevice(DriverInformation info, Device device, Model description);
+
   public String findDriverPidByDeviceId(String deviceId);
 
 }

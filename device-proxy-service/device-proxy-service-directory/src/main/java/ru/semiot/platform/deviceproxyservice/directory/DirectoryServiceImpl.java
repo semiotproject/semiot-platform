@@ -17,6 +17,7 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.semiot.commons.namespaces.NamespaceUtils;
+import ru.semiot.commons.namespaces.Proto;
 import ru.semiot.commons.namespaces.SEMIOT;
 import ru.semiot.commons.namespaces.SSN;
 import ru.semiot.commons.namespaces.SSNCOM;
@@ -36,6 +37,7 @@ public class DirectoryServiceImpl implements DirectoryService, ManagedService {
   private static final String TOPIC_SENSOR_OBSERVATIONS = "${SYSTEM_ID}.observations.${SENSOR_ID}";
   private static final String TOPIC_OBSERVATIONS = "${SYSTEM_ID}.observations";
   private static final String TOPIC_COMMANDRESULT = "${SYSTEM_ID}.commandresults";
+  private static final String URI_SYSTEM = "${URI_SYSTEM}";
   private static final String GET_SYSTEM_URI =
       NamespaceUtils.newSPARQLQuery("SELECT ?uri {?uri a ssn:System} LIMIT 1", SSN.class);
   private static final String GET_SENSOR = NamespaceUtils.newSPARQLQuery(
@@ -43,10 +45,20 @@ public class DirectoryServiceImpl implements DirectoryService, ManagedService {
           + "?sensor_uri a ssn:SensingDevice. ?sensor_uri dcterms:identifier ?sensor_id}",
       SSN.class, DCTerms.class);
   private static final String GET_DRIVER_PID_BY_SYSTEM_ID = NamespaceUtils.newSPARQLQuery(
-      "SELECT ?pid {" + "?system dcterms:identifier \"${SYSTEM_ID}\" ."
+      "SELECT ?pid {"
+          + "?system dcterms:identifier \"${SYSTEM_ID}\" ."
           + "?system semiot:hasDriver ?pid"
           + "} LIMIT 1",
       DCTerms.class, SEMIOT.class);
+  private static final String DELETE_SOME_TRIPLES = NamespaceUtils.newSPARQLQuery(
+      "DELETE {"
+          + "<${URI_SYSTEM}> ?p1 ?o1 ."
+          + "?o1 ?p2 ?o2 ."
+          + "} WHERE {"
+          + "<${URI_SYSTEM}> ?p1 ?o1 ."
+          + "?o1 ?p2 ?o2 ."
+          + "FILTER (?p1 != proto:hasPrototype && ?p2 != proto:hasPrototype)"
+          + "}", Proto.class);
 
   private final Configuration configuration = new Configuration();
   private RDFStore store;
@@ -130,7 +142,7 @@ public class DirectoryServiceImpl implements DirectoryService, ManagedService {
                 .createResource(TEMPLATE_DRIVER_URN.replace("${PID}", info.getId())));
 
             ResultSet sensors = QueryExecutionFactory
-                .create(GET_SENSOR.replace("${URI_SYSTEM}", system.getURI()), description)
+                .create(GET_SENSOR.replace(URI_SYSTEM, system.getURI()), description)
                 .execSelect();
             if (sensors.hasNext()) {
               QuerySolution qs = sensors.next();
@@ -151,6 +163,33 @@ public class DirectoryServiceImpl implements DirectoryService, ManagedService {
           }
         } else {
           logger.error("Can't find a system!");
+        }
+      } else {
+        logger.warn("Received an empty message or in a wrong format!");
+      }
+    } catch (RiotException ex) {
+      logger.warn(ex.getMessage(), ex);
+    } catch (Throwable ex) {
+      logger.error(ex.getMessage(), ex);
+    }
+
+    return false;
+  }
+
+  public boolean updateDevice(DriverInformation info, Device device, Model description) {
+    try {
+      if (!description.isEmpty()) {
+        ResultSet qr = QueryExecutionFactory.create(GET_SYSTEM_URI, description).execSelect();
+        if (qr.hasNext()) {
+          Resource system = qr.next().getResource(Vars.URI);
+
+          if(system.isURIResource()) {
+            store.update(DELETE_SOME_TRIPLES.replace(URI_SYSTEM, system.getURI()));
+
+            return addNewDevice(info, device, description);
+          } else {
+            logger.error("Device [{}] doesn't have URI!", device.getId());
+          }
         }
       } else {
         logger.warn("Received an empty message or in a wrong format!");

@@ -13,7 +13,7 @@ public interface DeviceDriverManager {
 
   public void registerDevice(DriverInformation info, Device device);
 
-  public void updateDevice(Device device);
+  public void updateDevice(DriverInformation info, Device device);
 
   /**
    * It's called by a device driver.

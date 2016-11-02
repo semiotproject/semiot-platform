@@ -146,6 +146,7 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
           configuration.put(Keys.WAMP_LOGIN, "internal");
           configuration.put(Keys.WAMP_PASSWORD, "internal");
           configuration.put(Keys.TOPIC_NEWANDOBSERVING, "ru.semiot.devices.newandobserving");
+          configuration.put(Keys.TOPIC_UPDATED, "ru.semiot.devices.updated");
           configuration.put(Keys.TOPIC_INACTIVE, "ru.semiot.devices.turnoff");
           configuration.put(Keys.FUSEKI_PASSWORD, "pw");
           configuration.put(Keys.FUSEKI_USERNAME, "admin");
@@ -186,8 +187,32 @@ public class DriverManagerImpl implements DeviceDriverManager, ManagedService {
   }
 
   @Override
-  public void updateDevice(Device device) {
-    //TODO: Here we should update device's states.
+  public void updateDevice(DriverInformation info, Device device) {
+    executor.execute(() -> {
+      logger.debug("Device [{}] is being updated", device.getId());
+
+      try {
+        final Model description = device.toDescriptionAsModel(configuration);
+
+        boolean isUpdated = directoryService.updateDevice(info, device, description);
+
+        if(isUpdated) {
+          logger.debug("Device [{}] updated in database!", device.getId());
+          long start = System.currentTimeMillis();
+          String message = JsonUtils.toString(
+              ModelJsonLdUtils.toJsonLdCompact(description, systemFrame));
+          WAMPClient.getInstance().publish(
+              getConfiguration().getAsString(Keys.TOPIC_UPDATED), message)
+              .subscribe(WAMPClient.onError());
+          long end = System.currentTimeMillis();
+          logger.info("Device [{}] was updated in {} ms!", device.getId(), end - start);
+        } else {
+          logger.warn("Device [{}] was not updated in database!", device.getId());
+        }
+      } catch (Throwable ex) {
+        logger.error(ex.getMessage(), ex);
+      }
+    });
   }
 
   @Override
