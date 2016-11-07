@@ -2,6 +2,11 @@
   "drivers": {
     "driver": [
       {
+        "name": "SEMIOT TH-S",
+        "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_semiot_th-s/lastSuccessfulBuild/artifact/semiot-th-s/target/semiot-th-s-0.0.1.jar",
+        "pid": "ru.semiot.platform.drivers.semiot_th_s"
+      },
+      {
         "name": "Weather Station (based on DHT-22)",
         "url": "http://jenkins.semiot.ru/view/SemIoT%20Drivers/job/semiot_driver_DHT-22-based_weather_station/lastSuccessfulBuild/artifact/dht22/target/dht22-1.0-SNAPSHOT.jar",
         "pid": "ru.semiot.platform.drivers.dht22"
